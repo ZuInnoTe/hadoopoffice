@@ -30,18 +30,21 @@ public class SpreadSheetCellDAO implements Writable {
 private String value;
 private String comment;
 private String formula;
+private String address;
 
 public SpreadSheetCellDAO() {
 	this.value="";
 	this.comment="";
 	this.formula="";
+	this.address="";
 }
 
 
-public SpreadSheetCellDAO(String value, String comment, String formula) {
+public SpreadSheetCellDAO(String value, String comment, String formula, String address) {
 	this.value=value;
 	this.comment=comment;
 	this.formula=formula;
+	this.address=address;
 }
 
 public String getValue() {
@@ -56,11 +59,16 @@ public String getFormula() {
 	return this.formula;
 }
 
+public String getAddress() {
+	return this.address;
+}
+
 
 public void set(SpreadSheetCellDAO newSpreadSheetCellDAO) {
 	this.value=newSpreadSheetCellDAO.getValue();
         this.comment=newSpreadSheetCellDAO.getComment();
 	this.formula=newSpreadSheetCellDAO.getFormula();
+	this.address=newSpreadSheetCellDAO.getAddress();
 }
 
 
