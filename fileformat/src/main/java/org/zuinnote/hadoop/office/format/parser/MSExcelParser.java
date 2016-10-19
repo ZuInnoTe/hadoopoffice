@@ -43,6 +43,8 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 
+import org.zuinnote.hadoop.office.format.dao.SpreadSheetCellDAO;
+
 /*
 *
 * This class is responsible for parsing Excel content in OOXML format and old excel format
@@ -160,7 +162,13 @@ private int currentRow=0;
 			if (currentCell==null) {
 				result[i]=null;
 			} else {	
-				result[i]=useDataFormatter.formatCellValue(currentCell);
+				String formattedValue = useDataFormatter.formatCellValue(currentCell);
+				String comment = currentCell.getCellComment().getString().getString();
+				String formula = currentCell.getCellFormula();
+				String address = currentCell.getAddress().toString();
+				String sheetName = currentCell.getSheet().getSheetName();
+				SpreadSheetCellDAO mySpreadSheetCellDAO = new SpreadSheetCellDAO(formattedValue,comment,formula,address,sheetName);
+				result[i]=mySpreadSheetCellDAO;
 			}
 		}
 		
