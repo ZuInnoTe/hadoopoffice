@@ -16,23 +16,40 @@
 
 package org.zuinnote.hadoop.office.format;
 
+import java.io.IOException;
+
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.ArrayWritable;
+
+import org.apache.hadoop.mapred.FileSplit;
+import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.mapred.RecordReader;
+import org.apache.hadoop.mapred.Reporter;
 
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 
+import org.zuinnote.hadoop.office.format.dao.SpreadSheetCellDAO;
+
+
+import org.zuinnote.hadoop.office.format.parser.*;
 /* ExcelRecordReader reads rows from Excel
 *
 * You can specify the following options:
-* "io.file.buffer.size": Size of io Buffer. Defaults to 64K
-* "hadoopoffice.msexcel.locale": locale to use, defaults to empty string (=use default locale)
+* See AbstractTableDocumentRecordReader
 *
 *
 */
 
 
-public class ExcelRecordReader extends AbstractTableDocumentRecordReader<LongWritable,TextArrayWritable> {
+public class ExcelRecordReader extends AbstractTableDocumentRecordReader<Text,ArrayWritable> {
 private static final Log LOG = LogFactory.getLog(ExcelRecordReader.class.getName());
 
+
+
+public ExcelRecordReader(FileSplit split, JobConf job, Reporter reporter) throws IOException,FormatNotUnderstoodException {
+ super(split,job,reporter);
+}
 
 /**
 *
@@ -40,7 +57,9 @@ private static final Log LOG = LogFactory.getLog(ExcelRecordReader.class.getName
 *
 * @return key
 */
-public abstract K createKey();
+public Text createKey() {	
+	return new Text("");	
+}
 
 /**
 *
@@ -48,7 +67,11 @@ public abstract K createKey();
 *
 * @return value
 */
-public abstract V createValue();
+public ArrayWritable createValue() {
+	ArrayWritable newArrayWritable = new ArrayWritable(SpreadSheetCellDAO.class);
+	newArrayWritable.set(new SpreadSheetCellDAO[0]);
+	return newArrayWritable;
+}
 
 
 
@@ -58,7 +81,15 @@ public abstract V createValue();
 *
 * @return true if next more rows are available, false if not
 */
-public abstract boolean next(K key, V value) throws IOException;
+public boolean next(Text key, ArrayWritable value) throws IOException {
+	Object[] objectArray = this.getOfficeReader().getNext();
+	if (objectArray==null) return false; // no more to read
+	SpreadSheetCellDAO[] cellRows = (SpreadSheetCellDAO[])objectArray;
+	if (cellRows.length<1) return false;
+	key.set(new Text(cellRows[0].getSheetName()+"!"+cellRows[0].getAddress()));
+	value.set(cellRows);
+	return true;	
+}
 
 
 
