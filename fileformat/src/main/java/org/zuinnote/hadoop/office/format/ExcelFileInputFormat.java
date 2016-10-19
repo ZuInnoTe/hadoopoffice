@@ -16,12 +16,38 @@
 
 package org.zuinnote.hadoop.office.format;
 
+import java.io.IOException;
+
+import org.apache.hadoop.mapred.InputSplit;
+
+import org.apache.hadoop.mapred.FileSplit;
+import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.mapred.Reporter;
+import org.apache.hadoop.mapred.RecordReader;
+
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.ArrayWritable;
 
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 
+import org.zuinnote.hadoop.office.format.parser.*;
+
 public class ExcelFileInputFormat extends AbstractTableDocumentFileInputFormat {
 
 private static final Log LOG = LogFactory.getLog(ExcelFileInputFormat.class.getName());
+public  RecordReader<Text,ArrayWritable> getRecordReader(InputSplit split, JobConf job, Reporter reporter) throws IOException {
+/** Create reader **/
+try {
+		return new ExcelRecordReader( (FileSplit) split,job,reporter);
+	} catch (FormatNotUnderstoodException e) {
+		// log
+		LOG.error(e);
+	} 
+return null;
+}
+	
+	
+
 
 }
