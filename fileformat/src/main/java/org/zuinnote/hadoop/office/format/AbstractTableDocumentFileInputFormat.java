@@ -26,8 +26,8 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.CompressionCodecFactory;
 import org.apache.hadoop.io.compress.SplittableCompressionCodec;
-import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.ArrayPrimitiveWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.ArrayWritable;
 import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileSplit;
 import org.apache.hadoop.mapred.InputSplit;
@@ -45,11 +45,11 @@ import org.apache.commons.logging.Log;
 
 /* The input format will return an array of strings that it reads per "row" from the source formats */
 
-public abstract class AbstractTableDocumentFileInputFormat  extends FileInputFormat<LongWritable,ArrayPrimitiveWritable> {
+public abstract class AbstractTableDocumentFileInputFormat  extends FileInputFormat<Text,ArrayWritable> {
 private static final Log LOG = LogFactory.getLog(AbstractTableDocumentFileInputFormat.class.getName());
 private CompressionCodecFactory compressionCodecs = null;
 
-	public abstract RecordReader<LongWritable,ArrayPrimitiveWritable> getRecordReader(InputSplit split, JobConf job, Reporter reporter) throws IOException;
+	public abstract RecordReader<Text,ArrayWritable> getRecordReader(InputSplit split, JobConf job, Reporter reporter) throws IOException;
 	
 	public void configure (JobConf conf) {
 		this.compressionCodecs = new CompressionCodecFactory(conf); // not really needed for now since isSplitable is always false
