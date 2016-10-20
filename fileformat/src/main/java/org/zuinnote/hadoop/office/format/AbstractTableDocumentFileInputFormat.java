@@ -59,7 +59,7 @@ private CompressionCodecFactory compressionCodecs = null;
 
 	/**
 	 * Unfortunately, we cannot split Office documents correctly. Apache Tika/library requires full documents.
-	 * Nevertheless, most of the time you have anyway small (> HDFS blocksize) Office documents that can be processed fast. 
+	 * Nevertheless, most of the time you have anyway small (smaller than default HDFS blocksize) Office documents that can be processed fast. 
 	 * Hence, you should put them in Hadoop Archives (HAR) either uncompressed or compressed to reduce load on namenode.
 	 *
 	*/
