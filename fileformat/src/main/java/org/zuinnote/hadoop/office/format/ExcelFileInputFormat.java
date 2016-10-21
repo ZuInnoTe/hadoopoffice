@@ -39,6 +39,8 @@ private static final Log LOG = LogFactory.getLog(ExcelFileInputFormat.class.getN
 public  RecordReader<Text,ArrayWritable> getRecordReader(InputSplit split, JobConf job, Reporter reporter) throws IOException {
 /** Create reader **/
 try {
+		 // send configuration option to ms excel
+ 		job.set("hadoopoffice.mimeType","ms-excel");
 		return new ExcelRecordReader( (FileSplit) split,job,reporter);
 	} catch (FormatNotUnderstoodException e) {
 		// log
