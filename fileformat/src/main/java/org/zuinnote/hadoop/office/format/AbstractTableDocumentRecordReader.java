@@ -48,6 +48,7 @@ import org.apache.hadoop.mapred.Reporter;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 
+import org.zuinnote.hadoop.office.format.parser.*;
 
 
 
@@ -99,7 +100,7 @@ private FSDataInputStream fileIn;
 
 *
 */
-public AbstractTableDocumentRecordReader(FileSplit split, JobConf job, Reporter reporter) throws IOException {
+public AbstractTableDocumentRecordReader(FileSplit split, JobConf job, Reporter reporter) throws IOException,FormatNotUnderstoodException {
  	// parse configuration
      this.conf=job;	
      this.bufferSize=conf.getInt(this.CONF_BUFFERSIZE,this.DEFAULT_BUFFERSIZE);
@@ -138,6 +139,7 @@ public AbstractTableDocumentRecordReader(FileSplit split, JobConf job, Reporter 
     }
     // initialize reader
 this.pos=start;
+	this.officeReader.parse();
 }
 
 
