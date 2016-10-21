@@ -31,6 +31,8 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Comment;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -124,10 +126,10 @@ private int currentRow=0;
 	* 
 	*/
 	public Object[] getNext() {
-		Object[] result=null;
+		SpreadSheetCellDAO[] result=null;
 		// all sheets?
 		if (this.sheets==null) { //  go on with all sheets
-				if (this.currentRow>=this.currentWorkbook.getSheetAt(this.currentSheet).getLastRowNum()) { // end of row reached? => next sheet
+				if (this.currentRow>this.currentWorkbook.getSheetAt(this.currentSheet).getLastRowNum()) { // end of row reached? => next sheet
 					this.currentSheet++;
 					if (this.currentSheet<this.currentWorkbook.getNumberOfSheets()) return result; // no more sheets available?
 					this.currentRow=0;
@@ -140,7 +142,7 @@ private int currentRow=0;
 				if (this.currentWorkbook.getSheet(this.sheets[this.sheetsIndex])==null) { // log only if sheet not found
 					LOG.warn("Sheet \""+this.sheets[this.sheetsIndex]+"\" not found");
 				} else { // sheet found, check number of rows
-				   if (this.currentRow>=this.currentWorkbook.getSheet(this.sheets[this.sheetsIndex]).getLastRowNum()) {
+				   if (this.currentRow>this.currentWorkbook.getSheet(this.sheets[this.sheetsIndex]).getLastRowNum()) {
 					// reset rows
 					this.currentRow=0;
 				   } else { // we have a sheet where we still need to process rows
@@ -156,15 +158,23 @@ private int currentRow=0;
 		// read row from the sheet currently to be processed
 		Sheet rSheet = this.currentWorkbook.getSheetAt(this.currentSheet);
 		Row rRow = rSheet.getRow(this.currentRow);
-		result = new Object[rRow.getLastCellNum()];
+		result = new SpreadSheetCellDAO[rRow.getLastCellNum()];
 		for (int i=0;i<rRow.getLastCellNum();i++) {
 			Cell currentCell=rRow.getCell(i);
 			if (currentCell==null) {
 				result[i]=null;
 			} else {	
 				String formattedValue = useDataFormatter.formatCellValue(currentCell);
-				String comment = currentCell.getCellComment().getString().getString();
-				String formula = currentCell.getCellFormula();
+				Comment currentCellComment = currentCell.getCellComment();
+				String comment = "";
+				if (currentCellComment!=null) {
+					comment = currentCellComment.getString().getString();
+				}
+				String formula = "";
+				if (currentCell.getCellTypeEnum()==CellType.FORMULA)  {
+					formula = currentCell.getCellFormula();
+					break;
+				}
 				String address = currentCell.getAddress().toString();
 				String sheetName = currentCell.getSheet().getSheetName();
 				SpreadSheetCellDAO mySpreadSheetCellDAO = new SpreadSheetCellDAO(formattedValue,comment,formula,address,sheetName);
