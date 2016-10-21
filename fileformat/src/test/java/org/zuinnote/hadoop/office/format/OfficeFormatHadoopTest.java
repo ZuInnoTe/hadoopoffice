@@ -141,7 +141,7 @@ private static Reporter reporter = Reporter.NULL;
     public void readExcelInputFormatExcel2003SingleSheet() throws IOException {
     	JobConf job = new JobConf(defaultConf);
     	ClassLoader classLoader = getClass().getClassLoader();
-    	String fileName="excel2013test.xlsx";
+    	String fileName="excel2003test.xls";
     	String fileNameSpreadSheet=classLoader.getResource(fileName).getFile();	
     	Path file = new Path(fileNameSpreadSheet);
     	FileInputFormat.setInputPaths(job, file);
