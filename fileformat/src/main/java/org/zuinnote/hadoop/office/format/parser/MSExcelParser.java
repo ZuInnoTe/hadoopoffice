@@ -32,6 +32,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Comment;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -55,6 +56,7 @@ import org.zuinnote.hadoop.office.format.dao.SpreadSheetCellDAO;
 
 public class MSExcelParser implements OfficeReaderParserInterface {
 private static final Log LOG = LogFactory.getLog(MSExcelParser.class.getName());
+private FormulaEvaluator formulaEvaluator;
 private InputStream in;
 private DataFormatter useDataFormatter=null;
 private String[] sheets=null;
@@ -117,6 +119,7 @@ private int currentRow=0;
 			this.in.close();
 			this.in=null;
 		}
+		 this.formulaEvaluator = this.currentWorkbook.getCreationHelper().createFormulaEvaluator();
 	}
 
 	/*
@@ -164,16 +167,15 @@ private int currentRow=0;
 			if (currentCell==null) {
 				result[i]=null;
 			} else {	
-				String formattedValue = useDataFormatter.formatCellValue(currentCell);
+				String formattedValue=useDataFormatter.formatCellValue(currentCell,this.formulaEvaluator);
+				String formula = "";
+				if (currentCell.getCellTypeEnum()==CellType.FORMULA)  {
+					formula = currentCell.getCellFormula();
+				}
 				Comment currentCellComment = currentCell.getCellComment();
 				String comment = "";
 				if (currentCellComment!=null) {
 					comment = currentCellComment.getString().getString();
-				}
-				String formula = "";
-				if (currentCell.getCellTypeEnum()==CellType.FORMULA)  {
-					formula = currentCell.getCellFormula();
-					break;
 				}
 				String address = currentCell.getAddress().toString();
 				String sheetName = currentCell.getSheet().getSheetName();
