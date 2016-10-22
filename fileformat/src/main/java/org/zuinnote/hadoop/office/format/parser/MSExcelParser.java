@@ -125,7 +125,7 @@ private int currentRow=0;
 	/*
 	* Returns the next row in the set of sheets. If sheets==null then all available sheets are returned in the order as specified in the document. If sheets contains specific sheets then rows of the specific sheets are returned in order of the sheets specified.
 	*
-	* @return column values for given row as Objects (use instanceof or similar to determine the type, currently only String objects or null if cell does not have a value), null if no further rows exist
+	* @return column array of SpreadSheetCellDAO (may contain nulls if cell is without content), null if no further rows exist
 	* 
 	*/
 	public Object[] getNext() {
