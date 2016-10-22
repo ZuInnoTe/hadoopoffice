@@ -60,7 +60,16 @@ artifacts {
     archives hadoopOfficeJavaDocs, sourcesJar
 }
 
-
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+		groupId 'com.github.zuinnote'
+            artifactId 'hadoopoffice-fileformat'
+            version '1.0.0'
+            from components.java
+        }
+    }
+}
 
 
 dependencies {
