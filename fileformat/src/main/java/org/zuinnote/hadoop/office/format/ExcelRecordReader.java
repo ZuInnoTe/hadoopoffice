@@ -93,6 +93,7 @@ public boolean next(Text key, ArrayWritable value) throws IOException {
 			break;
 		}
 	}
+	if (cellRows[firstCellIndex]==null) return false;
 	key.set(new Text("["+this.split.getPath().getName()+"]"+cellRows[firstCellIndex].getSheetName()+"!"+cellRows[firstCellIndex].getAddress()));
 	value.set(cellRows);
 	return true;	
