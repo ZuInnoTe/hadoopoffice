@@ -1,0 +1,56 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'application'
+
+
+
+compileJava.options.encoding = 'UTF-8'
+sourceCompatibility = 1.7
+version = '1.0'
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'Example - MR job (ExcelInput) for reading Excel files using hadoopoffice', 'Implementation-Version': version
+    }
+ 
+    baseName = 'example-ho-mr-excelinput'
+    version = '0.1.0'
+   // note this builds one fat jar and it is not recommended for production use - just for illustration purpose
+ doFirst {
+        from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } } 
+    }
+    exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA' // remove signature digests of other libraries
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+
+configurations {
+	provided
+}
+
+sourceSets {
+    main.compileClasspath += configurations.provided
+    test.compileClasspath += configurations.provided
+    test.runtimeClasspath += configurations.provided
+}
+
+dependencies {
+   // hadoop lib for driver
+     provided("org.apache.hadoop:hadoop-client:2.7.0")
+     // hadoopoffice library
+   compile("com.github.zuinnote:hadoopoffice-fileformat:1.0.0")
+    testCompile group: 'junit', name: 'junit', version: '4.+'
+    testCompile group: 'org.apache.mrunit', name: 'mrunit', version: '1.1.0', classifier: 'hadoop2'
+}
+
+
+uploadArchives {
+    repositories {
+       flatDir {
+           dirs 'repos'
+       }
+    }
+}
