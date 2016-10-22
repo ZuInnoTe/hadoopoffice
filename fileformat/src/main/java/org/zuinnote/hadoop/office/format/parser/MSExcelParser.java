@@ -161,6 +161,7 @@ private int currentRow=0;
 		// read row from the sheet currently to be processed
 		Sheet rSheet = this.currentWorkbook.getSheetAt(this.currentSheet);
 		Row rRow = rSheet.getRow(this.currentRow);
+		if (rRow==null) return result;
 		result = new SpreadSheetCellDAO[rRow.getLastCellNum()];
 		for (int i=0;i<rRow.getLastCellNum();i++) {
 			Cell currentCell=rRow.getCell(i);
