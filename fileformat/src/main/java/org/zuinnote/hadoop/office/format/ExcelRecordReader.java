@@ -86,7 +86,14 @@ public boolean next(Text key, ArrayWritable value) throws IOException {
 	if (objectArray==null) return false; // no more to read
 	SpreadSheetCellDAO[] cellRows = (SpreadSheetCellDAO[])objectArray;
 	if (cellRows.length<1) return false;
-	key.set(new Text(cellRows[0].getSheetName()+"!"+cellRows[0].getAddress()));
+	int firstCellIndex=0;
+	for (int i=0;i<cellRows.length;i++) {
+		firstCellIndex=i;
+		if (cellRows[i]!=null) {
+			break;
+		}
+	}
+	key.set(new Text(cellRows[firstCellIndex].getSheetName()+"!"+cellRows[firstCellIndex].getAddress()));
 	value.set(cellRows);
 	return true;	
 }
