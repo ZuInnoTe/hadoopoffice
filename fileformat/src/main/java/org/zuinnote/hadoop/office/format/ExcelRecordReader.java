@@ -44,11 +44,11 @@ import org.zuinnote.hadoop.office.format.parser.*;
 
 public class ExcelRecordReader extends AbstractTableDocumentRecordReader<Text,ArrayWritable> {
 private static final Log LOG = LogFactory.getLog(ExcelRecordReader.class.getName());
-
-
+private FileSplit split;
 
 public ExcelRecordReader(FileSplit split, JobConf job, Reporter reporter) throws IOException,FormatNotUnderstoodException {
  super(split,job,reporter);
+ this.split=split;
 }
 
 /**
@@ -93,7 +93,7 @@ public boolean next(Text key, ArrayWritable value) throws IOException {
 			break;
 		}
 	}
-	key.set(new Text(cellRows[firstCellIndex].getSheetName()+"!"+cellRows[firstCellIndex].getAddress()));
+	key.set(new Text("["+this.split.getPath().getName()+"]"+cellRows[firstCellIndex].getSheetName()+"!"+cellRows[firstCellIndex].getAddress()));
 	value.set(cellRows);
 	return true;	
 }
