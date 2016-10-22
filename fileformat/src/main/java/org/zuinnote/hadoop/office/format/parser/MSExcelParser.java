@@ -134,8 +134,8 @@ private int currentRow=0;
 		if (this.sheets==null) { //  go on with all sheets
 				if (this.currentRow>this.currentWorkbook.getSheetAt(this.currentSheet).getLastRowNum()) { // end of row reached? => next sheet
 					this.currentSheet++;
-					if (this.currentSheet<this.currentWorkbook.getNumberOfSheets()) return result; // no more sheets available?
 					this.currentRow=0;
+					if (this.currentSheet>=this.currentWorkbook.getNumberOfSheets()) return result; // no more sheets available?
 				}
 
 		} else { // go on with specified sheets
