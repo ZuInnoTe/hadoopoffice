@@ -85,20 +85,8 @@ public boolean next(Text key, ArrayWritable value) throws IOException {
 	Object[] objectArray = this.getOfficeReader().getNext();
 	if (objectArray==null) return false; // no more to read
 	SpreadSheetCellDAO[] cellRows = (SpreadSheetCellDAO[])objectArray;
-	if (cellRows.length<1) return false;
-	int firstCellIndex=0;
-	for (int i=0;i<cellRows.length;i++) {
-		firstCellIndex=i;
-		if (cellRows[i]!=null) {
-			break;
-		}
-	}
-	if (cellRows[firstCellIndex]==null) {
-		key.set("["+this.split.getPath().getName()+"]");
-		value.set(new SpreadSheetCellDAO[0]);
-		return true; // these empty rows are possible
-	}
-	key.set(new Text("["+this.split.getPath().getName()+"]"+cellRows[firstCellIndex].getSheetName()+"!"+cellRows[firstCellIndex].getAddress()));
+	if (cellRows.length<1) return false;	
+	key.set(new Text("["+this.split.getPath().getName()+"]"+this.getOfficeReader().getCurrentSheetName()+"!A"+this.getOfficeReader().getCurrentRow()));
 	value.set(cellRows);
 	return true;	
 }
