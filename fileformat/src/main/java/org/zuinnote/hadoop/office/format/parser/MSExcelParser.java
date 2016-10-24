@@ -192,7 +192,10 @@ private String currentSheetName="";
 		// read row from the sheet currently to be processed
 		Sheet rSheet = this.currentWorkbook.getSheetAt(this.currentSheet);
 		Row rRow = rSheet.getRow(this.currentRow);
-		if (rRow==null) return result;
+		if (rRow==null) {
+			this.currentRow++;
+			return new SpreadSheetCellDAO[0]; // emtpy row
+		}
 		result = new SpreadSheetCellDAO[rRow.getLastCellNum()];
 		for (int i=0;i<rRow.getLastCellNum();i++) {
 			Cell currentCell=rRow.getCell(i);
