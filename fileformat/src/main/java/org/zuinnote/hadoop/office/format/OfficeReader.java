@@ -98,6 +98,17 @@ private OfficeReaderParserInterface currentParser=null;
 		return currentParser.getNext();
 	}
 
+
+	public long getCurrentRow() {
+			if (currentParser==null) return 0;
+			return currentParser.getCurrentRow();
+	}
+
+	public String getCurrentSheetName() {
+			if (currentParser==null) return null;
+			return currentParser.getCurrentSheetName();
+	}
+
 	public void close() throws IOException {
 		
 		if (this.bis!=null) {
