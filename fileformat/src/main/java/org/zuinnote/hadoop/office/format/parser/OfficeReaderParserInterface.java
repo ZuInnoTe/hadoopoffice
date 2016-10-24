@@ -28,6 +28,8 @@ import java.io.IOException;
 public interface OfficeReaderParserInterface {
 
 public void parse(InputStream inputStream) throws IOException,FormatNotUnderstoodException;
+public long getCurrentRow();
+public String getCurrentSheetName();
 public Object[] getNext();
 public void close() throws IOException;
 

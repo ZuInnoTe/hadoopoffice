@@ -64,6 +64,7 @@ private Workbook currentWorkbook=null;
 private int currentSheet=0; // current sheet where we are
 private int sheetsIndex=0; // current index of sheets, if specified
 private int currentRow=0;
+private String currentSheetName="";
 
 	/*
 	* In the default case all sheets are parsed one after the other.
@@ -120,6 +121,34 @@ private int currentRow=0;
 			this.in=null;
 		}
 		 this.formulaEvaluator = this.currentWorkbook.getCreationHelper().createFormulaEvaluator();
+		 this.currentRow=0;
+		 if (this.sheets==null) {
+			this.currentSheetName=this.currentWorkbook.getSheetAt(0).getSheetName();
+		 } else if (sheets.length<1) {
+			throw new FormatNotUnderstoodException("Error: no sheets selected");
+		 } else  {
+			this.currentSheetName=sheets[0];
+		 }
+	}
+
+
+	/* returns the current row number starting from 1
+	*
+	* @return current row number
+	*
+	*/
+	public long getCurrentRow() {
+		return new Long(this.currentRow).longValue();
+	}
+
+
+	/* returns the current sheet name
+	*
+	* @return current sheet name
+	*
+	*/
+	public String getCurrentSheetName() {
+		return this.currentSheetName;
 	}
 
 	/*
@@ -136,6 +165,7 @@ private int currentRow=0;
 					this.currentSheet++;
 					this.currentRow=0;
 					if (this.currentSheet>=this.currentWorkbook.getNumberOfSheets()) return result; // no more sheets available?
+					this.currentSheetName=this.currentWorkbook.getSheetAt(this.currentSheet).getSheetName();
 				}
 
 		} else { // go on with specified sheets
@@ -150,6 +180,7 @@ private int currentRow=0;
 					this.currentRow=0;
 				   } else { // we have a sheet where we still need to process rows
 					this.currentSheet=this.currentWorkbook.getSheetIndex(this.currentWorkbook.getSheet(this.sheets[this.sheetsIndex]));
+					this.currentSheetName=this.currentWorkbook.getSheetAt(this.currentSheet).getSheetName();
 					sheetFound=true;
 					break;
 				   }
