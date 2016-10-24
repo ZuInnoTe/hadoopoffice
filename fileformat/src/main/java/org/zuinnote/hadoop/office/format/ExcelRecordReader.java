@@ -85,7 +85,6 @@ public boolean next(Text key, ArrayWritable value) throws IOException {
 	Object[] objectArray = this.getOfficeReader().getNext();
 	if (objectArray==null) return false; // no more to read
 	SpreadSheetCellDAO[] cellRows = (SpreadSheetCellDAO[])objectArray;
-	if (cellRows.length<1) return false;	
 	key.set(new Text("["+this.split.getPath().getName()+"]"+this.getOfficeReader().getCurrentSheetName()+"!A"+this.getOfficeReader().getCurrentRow()));
 	value.set(cellRows);
 	return true;	
