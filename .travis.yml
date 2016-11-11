@@ -13,4 +13,4 @@ script:
 - gradle clean
 - gradle build
 - gradle test
-- sonar-scanner -Dsonar.login=$SONAR_HO -Dsonar.projectKey=ZuInnoTe:hadoopoffice -Dsonar.projectName=HadoopOffice -Dsonar.sources=./fileformat/src
+- sonar-scanner -Dsonar.login=$SONAR_HO -Dsonar.projectKey=ZuInnoTe:hadoopoffice -Dsonar.projectName=HadoopOffice -Dsonar.sources=./fileformat/src/main/java -Dsonar.tests=./fileformat/src/test/java
