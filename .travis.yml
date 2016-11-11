@@ -1,7 +1,9 @@
+addons:
+  sonarqube: true
+env:
+global:
+- secure: "S+Qn7je+eltfNXy+CAAYBrQ3ZYvm3ctMzUv4J7nE/Cew3NQql1Xk0PgIndEfyz3QcD+1Gs9CPGgEWI8e7LTr1PIDCYhOXIODntCOkOlvwQe3Hj6i3HRTyZLMtqyCw5t5376CfgmtmKAfYGUPw4yKUtKBsZA7zR0w3xAnqOakc08xrrE0rULCAUhThrw5y9iLRiDUBYHx8KHI7ECI4BI1oVAPjEC6K4CLjFHSC2eUSSgF0cIjuoZNwvnQEpQsr9tJvhT+6glkLz9O0pbuFeRAz3jnbwx1RW9aRwOPs/Jzsc9BXxiqw+vmZT09b+fMiJPZTDkRnmxpBELuv07ggsw18/QIBY8WJXHHgBk8rBT/4AjNqEWU6Q7jmWaRg1hz1lM6ByNZ4DtFN+mPSWAiD5JW7HAFDP35fpLqTnYpvpGkbdsHSYQxqmuuI9QI3L/EHF3dI3pGQlOg3LE44LjKHMQQub0as1Bwexz+lfULA/h0agCx55mLSpahUC1aQHr2+VX8xmeH9KI6ToTue+NialKnP57IGXqKA0Kd5ODaCTmr9f9oWcIT4J53CpoqGnodeXPblA3MciXF2gA9U8q5+hZ2kctP7FEXSnhIQMnSVCKQOkz9+tqaAf6+rIoDO9kxpriEFJ9Sru8RXY2XWJjvND/iukf/SxijVfyIGGIDV/rg8Qc="
 language: java
-jdk:
-  - oraclejdk8
-  - oraclejdk7
 script:
 - jdk_switcher use oraclejdk7
 - gradle clean
@@ -11,3 +13,4 @@ script:
 - gradle clean
 - gradle build
 - gradle test
+- sonar-scanner -Dsonar.login=$SONAR_HO -Dsonar.projectKey=ZuInnoTe:hadoopoffice -Dsonar.projectName=HadoopOffice -Dsonar.sources=./fileformat/src
