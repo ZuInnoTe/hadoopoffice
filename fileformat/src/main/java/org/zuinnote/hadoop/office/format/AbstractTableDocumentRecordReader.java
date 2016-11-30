@@ -65,10 +65,13 @@ private static final String CONF_BUFFERSIZE="io.file.buffer.size";
 private static final String CONF_MIMETYPE="hadoopoffice.mimeType";
 private static final String CONF_SHEETS="hadoopoffice.sheets";
 private static final String CONF_LOCALE="hadoopoffice.locale.bcp47";
+private static final String CONF_LINKEDWB="hadoopoffice.linkedworkbooks";
 private static final int DEFAULT_BUFFERSIZE=64*1024;
 private static final String DEFAULT_MIMETYPE="";
 private static final String DEFAULT_LOCALE="";
 private static final String DEFAULT_SHEETS="";
+private static final String DEFAULT_LINKEDWB="";
+
 private int bufferSize=DEFAULT_BUFFERSIZE;
 private String mimeType=null;
 private String localeStrBCP47=null;
@@ -93,7 +96,9 @@ private FSDataInputStream fileIn;
 * io.file.buffer.size: Size of in-memory  specified in the given Configuration. If io.file.buffer.size is not specified the default buffersize will be used. 
 * hadoopoffice.mimeType: Mimetype of the document
 * hadoopoffice.locale: Locale of the document (e.g. needed for interpreting spreadsheets) in the BCP47 format (cf. https://tools.ietf.org/html/bcp47). If not specified then default system locale will be used.
+* hadoopoffice.sheets: A ":" separated list of sheets to be read. If not specified then all sheets will be read one after the other
 * @param reporter Reporter
+* hadoopoffice.linkedworkbooks: A "[file1]:[filex]" separated list of file names (e.g. HDFS Urls) that are linked to this workbook. Example: "[hdfs://user/test/input/linkedwb1.xls]:[hdfs://user/test/input/linkedwb2.xlsx]"If not specified then it is assumed that no links exist to other files. Linked Workbooks will be processed together with the main workbook on one node and thus it should be avoided to have a lot of linked workbooks.
 *
 *
 * @throws java.io.IOException in case of errors reading from the filestream provided by Hadoop
