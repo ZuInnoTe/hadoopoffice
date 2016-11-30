@@ -57,7 +57,7 @@ public class ExcelRowDriver  {
     conf.setInputFormat(ExcelFileInputFormat.class);
     conf.setOutputFormat(TextOutputFormat.class);
     /** Set as an example some of the options to configure the HadoopOffice fileformat **/
-    conf.set("hadoopoffice.locale.bcp47","de");
+    conf.set("hadoopoffice.read.locale.bcp47","de");
     FileInputFormat.addInputPath(conf, new Path(args[0]));
     FileOutputFormat.setOutputPath(conf, new Path(args[1]));
         
