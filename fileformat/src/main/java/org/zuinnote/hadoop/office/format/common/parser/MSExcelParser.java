@@ -171,7 +171,7 @@ private String fileName;
 	* @return true if it has been added, false if it has been already added
 	*
 	* @throws java.io.IOException in case of issues during reading of the inputStream
-	* @throws org.zuinnote.hadoop.office.format.common.parser in case there are issues reading from the Excel file
+	* @throws org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException in case there are issues reading from the Excel file
 	*
 	**/
 	@Override
