@@ -107,7 +107,7 @@ public MSExcelWriter(String excelFormat, Locale useLocale, boolean ignoreMissing
 * @param oStream OutputStream where the Workbook should be written when calling finalizeWrite
 * @param linkedWorkbooks linked workbooks that are already existing and linked to this spreadsheet
 *
-* @throws IOException if there is an issue with the OutputStream
+* @throws java.io.IOException if there is an issue with the OutputStream
 *
 */
 
