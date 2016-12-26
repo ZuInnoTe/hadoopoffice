@@ -96,7 +96,8 @@ private Map<String,InputStream> linkedWorkbooksMap;
 *
 * @throws java.io.IOException in case of errors reading from the filestream provided by Hadoop
 * @throws org.zuinnote.hadoop.office.format.common.writer.InvalidWriterConfigurationException in case the writer could not be configured correctly
-
+* @throws org.zuinnote.hadoop.office.format.common.writer.InvalidCellSpecificationException in case there are not enough information in SpreadSheetDAO to fill out cell
+* @throws org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException in case of invalid format of linkeded workbooks
 *
 */
 public AbstractSpreadSheetDocumentRecordWriter(DataOutputStream out, String fileName, JobConf conf) throws IOException,InvalidWriterConfigurationException,InvalidCellSpecificationException,FormatNotUnderstoodException {
