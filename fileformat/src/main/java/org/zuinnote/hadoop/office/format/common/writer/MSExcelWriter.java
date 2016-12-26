@@ -80,7 +80,7 @@ private FormulaEvaluator currentFormulaEvaluator;
 * @param commentWidth width of comments in terms of number of columns
 * @param commentHeight height of commments in terms of number of rows
 *
-* @throws org.zuinnote.hadoop.office.format.common.InvalidWriterConfigurationException in case the writer is not configured correctly 
+* @throws org.zuinnote.hadoop.office.format.common.writer.InvalidWriterConfigurationException in case the writer is not configured correctly 
 *
 */
 
