@@ -80,6 +80,8 @@ private OfficeReaderParserInterface currentParser=null;
 	/**
 	* Parses the input stream and generates an in-memory representation of the document. In most cases (depending on the parser) the full document needs to be represented in-memory.
 	*
+	* @throws java.io.IOException in case of errors reading from the InputStream
+	* @throws org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException in case an invalid format is detected
 	*
 	*/
 	public void parse() throws IOException, FormatNotUnderstoodException {
