@@ -98,7 +98,7 @@ public OfficeWriter(String mimeType, Locale useLocale, boolean ignoreMissingLink
 *
 * @throws java.io.IOException if there is an issue with the OutputStream
 * @throws org.zuinnote.hadoop.office.format.common.writer.InvalidWriterConfigurationException in case no proper writer has been instantiated
-*
+* @throws org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException in case one of the linked workbooks has an invalid format
 */
 
 public void create(OutputStream oStream, Map<String,InputStream> linkedWorkbooks) throws IOException, InvalidWriterConfigurationException,FormatNotUnderstoodException {
