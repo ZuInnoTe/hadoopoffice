@@ -60,6 +60,10 @@ artifacts {
     archives hadoopOfficeJavaDocs, sourcesJar
 }
 
+test {
+    testLogging.showStandardStreams = true
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
@@ -73,8 +77,6 @@ publishing {
 
 
 dependencies {
-    // Tika parsers
-   compile("org.apache.tika:tika-parsers:1.13")
    // Apache POI (for Excel parsing)
    compile("org.apache.poi:poi:3.15")
    compile("org.apache.poi:poi-ooxml:3.15")
