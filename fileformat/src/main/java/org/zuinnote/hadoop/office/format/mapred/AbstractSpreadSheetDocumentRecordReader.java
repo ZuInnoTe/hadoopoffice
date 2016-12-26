@@ -106,7 +106,7 @@ private FSDataInputStream fileIn;
 * hadoopoffice.read.ignoremissinglinkedworkbooks: true if missing linked workbooks should be ignored. Default: false
 *
 * @throws java.io.IOException in case of errors reading from the filestream provided by Hadoop
-
+* @throws org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException in case the document has an invalid format
 *
 */
 public AbstractSpreadSheetDocumentRecordReader(FileSplit split, JobConf job, Reporter reporter) throws IOException,FormatNotUnderstoodException {
