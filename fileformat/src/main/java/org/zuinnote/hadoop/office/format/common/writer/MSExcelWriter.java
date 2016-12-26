@@ -76,9 +76,11 @@ private FormulaEvaluator currentFormulaEvaluator;
 * @param useLocale Locale to be used to evaluate cells
 * @param ignoreMissingLinkedWorkbooks if true then missing linked workbooks are ignored during writing, if false then missing linked workbooks are not ignored and need to be present
 * @param fileName filename without path of the workbook
+* @param commentAuthor default author for comments
 * @param commentWidth width of comments in terms of number of columns
 * @param commentHeight height of commments in terms of number of rows
 *
+* @throws org.zuinnote.hadoop.office.format.common.InvalidWriterConfigurationException in case the writer is not configured correctly 
 *
 */
 
