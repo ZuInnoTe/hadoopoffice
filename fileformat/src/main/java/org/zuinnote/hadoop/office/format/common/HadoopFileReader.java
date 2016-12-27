@@ -91,11 +91,11 @@ public InputStream openFile(Path path) throws IOException {
 			long end = fs.getFileStatus(path).getLen(); 
         		final SplitCompressionInputStream cIn =((SplittableCompressionCodec)codec).createInputStream(fileIn, decompressor, 0, end,SplittableCompressionCodec.READ_MODE.CONTINUOUS);
 					return cIn;
-      } else {
-		LOG.debug("Reading from a compressed file \""+path+"\" with non-splittable compression codec");
-        	return codec.createInputStream(fileIn,decompressor);
-      }
-}
+      		} else {
+			LOG.debug("Reading from a compressed file \""+path+"\" with non-splittable compression codec");
+        		return codec.createInputStream(fileIn,decompressor);
+      		}
+	}
 }
 
 /*
