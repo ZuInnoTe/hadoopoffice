@@ -767,7 +767,7 @@ JobConf job = new JobConf(defaultConf);
 	assertEquals("Input Split for Excel file contains row 1 with cell 2 == \"5\"", "5", ((SpreadSheetCellDAO)spreadSheetValue.get()[1]).getFormattedValue());
 
     }
-   @Ignore("ignore due to travis ci issue")
+
   @Test
     public void readExcelInputFormatExcel2003LinkedWorkbook() throws IOException {
 	JobConf job = new JobConf(defaultConf);
