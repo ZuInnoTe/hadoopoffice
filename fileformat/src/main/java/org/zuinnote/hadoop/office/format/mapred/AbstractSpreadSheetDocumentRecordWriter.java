@@ -81,6 +81,7 @@ private int commentWidth;
 private int commentHeight;
 private OfficeWriter officeWriter;
 private Map<String,InputStream> linkedWorkbooksMap;
+private HadoopFileReader currentReader;
 
 
 /**
@@ -116,6 +117,7 @@ public AbstractSpreadSheetDocumentRecordWriter(DataOutputStream out, String file
       this.linkedWorkbooksName=parseLinkedWorkbooks(linkedWorkbooksStr);
       this.ignoreMissingLinkedWorkbooks=conf.getBoolean(this.CONF_IGNOREMISSINGWB,this.DEFAULT_IGNOREMISSINGLINKEDWB);
       // load linked workbooks as inputstreams
+      this.currentReader= new HadoopFileReader(this.conf);
       this.linkedWorkbooksMap=loadLinkedWorkbooks(linkedWorkbooksName);
      // create OfficeWriter 
        this.officeWriter=new OfficeWriter(this.mimeType, this.locale, this.ignoreMissingLinkedWorkbooks,  this.fileName, this.commentAuthor,this.commentWidth,this.commentHeight);
@@ -154,6 +156,10 @@ public synchronized void  close(Reporter reporter) throws IOException {
 		this.officeWriter.finalizeWrite();
 	} catch (InvalidWriterConfigurationException iwce) {
 		LOG.error(iwce);
+	} finally {
+		if (this.currentReader!=null) {
+			this.currentReader.close();
+		}
 	}
  }
 
@@ -202,7 +208,6 @@ private Map<String,InputStream> loadLinkedWorkbooks(String[] fileNames) throws I
 	if (fileNames==null) return result;
 	for (String currentFile: fileNames) {
 		Path currentPath=new Path(currentFile);
-		HadoopFileReader currentReader= new HadoopFileReader(this.conf);
 		InputStream currentInputStream = currentReader.openFile(currentPath);
 		result.put(currentPath.getName(), currentInputStream); 
 	}
