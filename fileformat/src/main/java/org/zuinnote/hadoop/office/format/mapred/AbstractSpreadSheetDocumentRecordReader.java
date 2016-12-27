@@ -92,7 +92,7 @@ private long pos;
 private long end;
 private final Seekable filePosition;
 private FSDataInputStream fileIn;
-
+private HadoopFileReader currentHFR;
 
 /**
 * Creates an Abstract Record Reader for tables from various document formats
@@ -125,26 +125,26 @@ public AbstractSpreadSheetDocumentRecordReader(FileSplit split, JobConf job, Rep
     end = start + split.getLength();
     final Path file = split.getPath();
      compressionCodecs = new CompressionCodecFactory(job);
-    codec = new CompressionCodecFactory(job).getCodec(file);
+    codec = compressionCodecs.getCodec(file);
     final FileSystem fs = file.getFileSystem(job);
     fileIn = fs.open(file);
     // open stream
       if (isCompressedInput()) { // decompress
       	decompressor = CodecPool.getDecompressor(codec);
       	if (codec instanceof SplittableCompressionCodec) {
-		LOG.debug("Reading from a compressed file \""+file+"\"with splittable compression codec");
+		LOG.debug("Reading from a compressed file \""+file+"\" with splittable compression codec");
         	final SplitCompressionInputStream cIn =((SplittableCompressionCodec)codec).createInputStream(fileIn, decompressor, start, end,SplittableCompressionCodec.READ_MODE.CONTINUOUS);
 		officeReader = new OfficeReader(cIn, this.mimeType, this.sheets, this.locale,this.ignoreMissingLinkedWorkbooks,file.getName());  
 		start = cIn.getAdjustedStart();
        		end = cIn.getAdjustedEnd();
         	filePosition = cIn; // take pos from compressed stream
       } else {
-	LOG.debug("Reading from a compressed file \""+file+"\"with non-splittable compression codec");
+	LOG.debug("Reading from a compressed file \""+file+"\" with non-splittable compression codec");
 	officeReader = new OfficeReader(codec.createInputStream(fileIn,decompressor), this.mimeType, this.sheets, this.locale, this.ignoreMissingLinkedWorkbooks,file.getName());
         filePosition = fileIn;
       }
     } else {
-	LOG.debug("Reading from an uncompressed file \""+file+"\"with non-splittable compression codec");
+	LOG.debug("Reading from an uncompressed file \""+file+"\"");
       fileIn.seek(start);
 	officeReader = new OfficeReader(fileIn, this.mimeType,this.sheets, this.locale,this.ignoreMissingLinkedWorkbooks,file.getName());
       filePosition = fileIn;
@@ -159,11 +159,12 @@ public AbstractSpreadSheetDocumentRecordReader(FileSplit split, JobConf job, Rep
 	Path parentPath = currentPath.getParent();
 	// read linked workbook filenames
 	List<String> linkedWorkbookList=this.officeReader.getCurrentParser().getLinkedWorkbooks();
+	this.currentHFR = new HadoopFileReader(job);
 	if (linkedWorkbookList!=null) {
 		for (String listItem: linkedWorkbookList) {
 			LOG.info("Adding linked workbook "+listItem);
 			// read file from hadoop file
-			HadoopFileReader currentHFR = new HadoopFileReader(job);
+		         
 			Path currentFile=new Path(parentPath,listItem);
 			InputStream currentIn=currentHFR.openFile(currentFile);
 			this.officeReader.getCurrentParser().addLinkedWorkbook(listItem,currentIn);
@@ -288,10 +289,13 @@ try {
 	officeReader.close();
      }
     } finally {
-      if (decompressor != null) {
+      if (decompressor != null) { // return this decompressor
         CodecPool.returnDecompressor(decompressor);
         decompressor = null;
-      }
+      } // return decompressor of linked workbooks
+	if (this.currentHFR!=null) {
+		currentHFR.close();
+	}
     }
 }
 
