@@ -93,6 +93,7 @@ private long end;
 private final Seekable filePosition;
 private FSDataInputStream fileIn;
 private HadoopFileReader currentHFR;
+private FileSystem fs;
 
 /**
 * Creates an Abstract Record Reader for tables from various document formats
@@ -126,7 +127,7 @@ public AbstractSpreadSheetDocumentRecordReader(FileSplit split, JobConf job, Rep
     final Path file = split.getPath();
      compressionCodecs = new CompressionCodecFactory(job);
     codec = compressionCodecs.getCodec(file);
-    final FileSystem fs = file.getFileSystem(job);
+     fs = file.getFileSystem(job);
     fileIn = fs.open(file);
     // open stream
       if (isCompressedInput()) { // decompress
@@ -297,6 +298,9 @@ try {
 		currentHFR.close();
 	}
     }
+  if (this.fs!=null) {
+	this.fs.close();
+  }
 }
 
 
