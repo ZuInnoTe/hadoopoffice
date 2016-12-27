@@ -16,6 +16,7 @@
 
 package org.zuinnote.hadoop.office.format.common.parser;
 
+import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
 
