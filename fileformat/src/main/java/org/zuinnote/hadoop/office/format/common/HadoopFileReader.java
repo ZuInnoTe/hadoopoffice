@@ -56,7 +56,7 @@ private HadoopFileReader() {
 *
 */
 
-public HadoopFileReader(Configuration conf) {
+public HadoopFileReader(Configuration conf) throws IOException {
 	this.conf=conf;
 	this.compressionCodecs=  new CompressionCodecFactory(conf);
 	this.openDecompressors = new ArrayList<Decompressor>();
@@ -102,7 +102,7 @@ public InputStream openFile(Path path) throws IOException {
 * Closes the reader. Note that you are on your own to close related inputStreams.
 *
 */
-public void close() {
+public void close() throws IOException {
  for (Decompressor currentDecompressor: this.openDecompressors) {
 	if (currentDecompressor!=null) {
 		 CodecPool.returnDecompressor(currentDecompressor);
