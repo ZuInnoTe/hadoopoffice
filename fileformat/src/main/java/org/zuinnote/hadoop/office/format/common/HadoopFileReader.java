@@ -17,16 +17,33 @@ package org.zuinnote.hadoop.office.format.common;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.io.compress.CodecPool;
+import org.apache.hadoop.io.compress.CompressionCodec;
+import org.apache.hadoop.io.compress.CompressionCodecFactory;
+import org.apache.hadoop.io.compress.SplitCompressionInputStream;
+import org.apache.hadoop.io.compress.SplittableCompressionCodec;
+import org.apache.hadoop.io.compress.CompressionCodecFactory;
+import org.apache.hadoop.io.compress.Decompressor;
+
+
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 
 /** This class servers as a reader for a file from any file system supported by Hadoop. It is suppposed to be used only for loading related files to a main file (e.g. linked workbook), but not the main file itself (this is done via the normal file format mechanism).
  **/
 
 public class HadoopFileReader {
+private static final Log LOG = LogFactory.getLog(HadoopFileReader.class.getName());
+private CompressionCodec codec;
+private CompressionCodecFactory compressionCodecs = null;
 private Configuration conf;
+private ArrayList<Decompressor> openDecompressors;
 
 
 private HadoopFileReader() {
@@ -41,10 +58,12 @@ private HadoopFileReader() {
 
 public HadoopFileReader(Configuration conf) {
 	this.conf=conf;
+	this.compressionCodecs=  new CompressionCodecFactory(conf);
+	this.openDecompressors = new ArrayList<Decompressor>();
 }
 
 /*
-* Opens a file using the Hadoop API
+* Opens a file using the Hadoop API. It supports uncompressed and compressed files.
 *
 * @param path path to the file, e.g. file://path/to/file for a local file or hdfs://path/to/file for HDFS file. All filesystem configured for Hadoop can be used
 *
@@ -57,8 +76,37 @@ public HadoopFileReader(Configuration conf) {
 
 public InputStream openFile(Path path) throws IOException {
         FileSystem fs = FileSystem.get(this.conf);
-	return fs.open(path);
+	CompressionCodec codec=compressionCodecs.getCodec(path);
+ 	FSDataInputStream fileIn=fs.open(path);
+	// check if compressed
+	if (codec==null) { // uncompressed
+	LOG.debug("Reading from an uncompressed file \""+path+"\"");
+		return fileIn;
+	} else { // compressed
+		Decompressor decompressor = CodecPool.getDecompressor(codec);
+		this.openDecompressors.add(decompressor); // to be returned later using close
+		if (codec instanceof SplittableCompressionCodec) {
+			LOG.debug("Reading from a compressed file \""+path+"\" with splittable compression codec");
+			long end = fs.getFileStatus(path).getLen(); 
+        		final SplitCompressionInputStream cIn =((SplittableCompressionCodec)codec).createInputStream(fileIn, decompressor, 0, end,SplittableCompressionCodec.READ_MODE.CONTINUOUS);
+					return cIn;
+      } else {
+		LOG.debug("Reading from a compressed file \""+path+"\" with non-splittable compression codec");
+        	return codec.createInputStream(fileIn,decompressor);
+      }
+}
+}
 
+/*
+* Closes the reader. Note that you are on your own to close related inputStreams.
+*
+*/
+public void close() {
+ for (Decompressor currentDecompressor: this.openDecompressors) {
+	if (currentDecompressor!=null) {
+		 CodecPool.returnDecompressor(currentDecompressor);
+	}
+ }
 }
 
 }
