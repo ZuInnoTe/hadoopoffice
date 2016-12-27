@@ -44,7 +44,7 @@ private CompressionCodec codec;
 private CompressionCodecFactory compressionCodecs = null;
 private Configuration conf;
 private ArrayList<Decompressor> openDecompressors;
-
+private FileSystem fs;
 
 private HadoopFileReader() {
 }
@@ -60,6 +60,8 @@ public HadoopFileReader(Configuration conf) {
 	this.conf=conf;
 	this.compressionCodecs=  new CompressionCodecFactory(conf);
 	this.openDecompressors = new ArrayList<Decompressor>();
+	this.fs = FileSystem.get(this.conf);
+	
 }
 
 /*
@@ -75,8 +77,7 @@ public HadoopFileReader(Configuration conf) {
 */
 
 public InputStream openFile(Path path) throws IOException {
-        FileSystem fs = FileSystem.get(this.conf);
-	CompressionCodec codec=compressionCodecs.getCodec(path);
+        CompressionCodec codec=compressionCodecs.getCodec(path);
  	FSDataInputStream fileIn=fs.open(path);
 	// check if compressed
 	if (codec==null) { // uncompressed
@@ -107,6 +108,7 @@ public void close() {
 		 CodecPool.returnDecompressor(currentDecompressor);
 	}
  }
+ this.fs.close();
 }
 
 }
