@@ -50,7 +50,7 @@ import org.zuinnote.hadoop.office.format.common.parser.MSExcelParser;
 public class MSExcelWriter implements OfficeSpreadSheetWriterInterface {
 public final static String FORMAT_OOXML = "ooxmlexcel";
 public final static String FORMAT_OLD = "oldexcel";
-public final static String[] VALID_FORMAT = {FORMAT_OOXML, FORMAT_OLD};
+protected final static String[] VALID_FORMAT = {FORMAT_OOXML, FORMAT_OLD};
 private static final Log LOG = LogFactory.getLog(MSExcelWriter.class.getName());
 private final static String DEFAULT_FORMAT = VALID_FORMAT[0];
 private String format=DEFAULT_FORMAT;
