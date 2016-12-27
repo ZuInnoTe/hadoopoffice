@@ -108,7 +108,9 @@ public void close() {
 		 CodecPool.returnDecompressor(currentDecompressor);
 	}
  }
- this.fs.close();
+ if (this.fs!=null) {
+  	this.fs.close();
+ }
 }
 
 }
