@@ -31,6 +31,8 @@ import org.apache.hadoop.io.ArrayWritable;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 
+import java.security.GeneralSecurityException;
+
 import org.zuinnote.hadoop.office.format.common.parser.*;
 
 public class ExcelFileInputFormat extends AbstractSpreadSheetDocumentFileInputFormat {
@@ -45,7 +47,9 @@ try {
 	} catch (FormatNotUnderstoodException e) {
 		// log
 		LOG.error(e);
-	} 
+	} catch (GeneralSecurityException gse) {
+		LOG.error(gse);
+	}
 return null;
 }
 	
