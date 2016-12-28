@@ -21,6 +21,10 @@ import java.io.InputStream;
 
 import java.nio.ByteBuffer;
 
+import java.security.GeneralSecurityException;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 import java.util.Locale;
 import java.util.Locale.Builder;
@@ -50,6 +54,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 
 import org.zuinnote.hadoop.office.format.common.HadoopFileReader;
+import org.zuinnote.hadoop.office.format.common.HadoopUtil;
 import org.zuinnote.hadoop.office.format.common.OfficeReader;
 import org.zuinnote.hadoop.office.format.common.parser.*;
 
@@ -69,11 +74,15 @@ public static final String CONF_SHEETS="hadoopoffice.read.sheets";
 public static final String CONF_LOCALE="hadoopoffice.read.locale.bcp47";
 public static final String CONF_LINKEDWB="hadoopoffice.read.linkedworkbooks";
 public static final String CONF_IGNOREMISSINGWB="hadoopoffice.read.ignoremissinglinkedworkbooks";
+public static final String CONF_DECRYPT="hadoopoffice.read.security.crypt.password";
+public static final String CONF_DECRYPTLINKEDWBBASE="hadoopoffice.read.security.crypt.linkedworkbooks.";
+public static final String CONF_FILTERMETADATA = "hadoopoffice.read.filter.metadata."; // base: all these properties (e.g. hadoopoffice.read.filter.metadata.author) will be handed over to the corresponding reader which does the filtering!
 public static final String DEFAULT_MIMETYPE="";
 public static final String DEFAULT_LOCALE="";
 public static final String DEFAULT_SHEETS="";
 public static final boolean DEFAULT_LINKEDWB=false;
 public static final boolean DEFAULT_IGNOREMISSINGLINKEDWB=false;
+
 
 private String mimeType=null;
 private String localeStrBCP47=null;
@@ -82,6 +91,10 @@ private Locale locale=null;
 private boolean readLinkedWorkbooks=this.DEFAULT_LINKEDWB;
 private boolean ignoreMissingLinkedWorkbooks=this.DEFAULT_IGNOREMISSINGLINKEDWB;
 private OfficeReader officeReader=null;
+private String password=null;
+private String linkedWBpassword=null;
+private Map<String,String> metadataFilter;
+private Map<String,String> linkedWBCredentialMap;
 
 private CompressionCodec codec;
 private CompressionCodecFactory compressionCodecs = null;
@@ -95,6 +108,7 @@ private FSDataInputStream fileIn;
 private HadoopFileReader currentHFR;
 private FileSystem fs;
 
+
 /**
 * Creates an Abstract Record Reader for tables from various document formats
 * @param split Split to use (assumed to be a file split)
@@ -105,12 +119,16 @@ private FileSystem fs;
 * @param reporter Reporter
 * hadoopoffice.read.linkedworkbooks: true if linkedworkbooks should be fetched. They must be in the same folder as the main workbook. Linked Workbooks will be processed together with the main workbook on one node and thus it should be avoided to have a lot of linked workbooks. It does only read the linked workbooks that are directly linked to the main workbook. Default: false
 * hadoopoffice.read.ignoremissinglinkedworkbooks: true if missing linked workbooks should be ignored. Default: false
+* hadoopoffice.read.security.crypt.password: if set then hadoopoffice will try to decrypt the file
+* hadoopoffice.read.security.crypt.linkedworkbooks.*: if set then hadoopoffice will try to decrypt all the linked workbooks where a password has been specified. If no password is specified then it is assumed that the linked workbook is not encrypted. Example: Property key for file "linkedworkbook1.xlsx" is  "hadoopoffice.read.security.crypt.linkedworkbooks.linkedworkbook1.xslx". Value is the password. You must not include path or protocol information in the filename 
+* hadoopoffice.read.filter.metadata: filters documents according to metadata. For example, hadoopoffice.read.filter.metadata.author will filter by author and the filter defined as value. Filtering is done by the parser and it is recommended that it supports regular expression for filtering, but this is up to the parser!
+
 *
 * @throws java.io.IOException in case of errors reading from the filestream provided by Hadoop
 * @throws org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException in case the document has an invalid format
 *
 */
-public AbstractSpreadSheetDocumentRecordReader(FileSplit split, JobConf job, Reporter reporter) throws IOException,FormatNotUnderstoodException {
+public AbstractSpreadSheetDocumentRecordReader(FileSplit split, JobConf job, Reporter reporter) throws IOException,FormatNotUnderstoodException,GeneralSecurityException {
  	// parse configuration
      this.conf=job;	
      this.mimeType=conf.get(this.CONF_MIMETYPE,this.DEFAULT_MIMETYPE);
@@ -121,6 +139,10 @@ public AbstractSpreadSheetDocumentRecordReader(FileSplit split, JobConf job, Rep
       }
       this.readLinkedWorkbooks=conf.getBoolean(this.CONF_LINKEDWB,this.DEFAULT_LINKEDWB);
       this.ignoreMissingLinkedWorkbooks=conf.getBoolean(CONF_IGNOREMISSINGWB,this.DEFAULT_IGNOREMISSINGLINKEDWB);
+      this.password=conf.get(CONF_DECRYPT); // null if no password is set
+      this.linkedWBpassword=conf.get(CONF_DECRYPTLINKEDWBBASE); // null if no password is set
+      this.metadataFilter=HadoopUtil.parsePropertiesFromBase(job,this.CONF_FILTERMETADATA);
+      this.linkedWBCredentialMap=HadoopUtil.parsePropertiesFromBase(job,this.CONF_DECRYPTLINKEDWBBASE);
  // Initialize start and end of split
     start = split.getStart();
     end = start + split.getLength();
@@ -135,19 +157,19 @@ public AbstractSpreadSheetDocumentRecordReader(FileSplit split, JobConf job, Rep
       	if (codec instanceof SplittableCompressionCodec) {
 		LOG.debug("Reading from a compressed file \""+file+"\" with splittable compression codec");
         	final SplitCompressionInputStream cIn =((SplittableCompressionCodec)codec).createInputStream(fileIn, decompressor, start, end,SplittableCompressionCodec.READ_MODE.CONTINUOUS);
-		officeReader = new OfficeReader(cIn, this.mimeType, this.sheets, this.locale,this.ignoreMissingLinkedWorkbooks,file.getName());  
+		officeReader = new OfficeReader(cIn, this.mimeType, this.sheets, this.locale,this.ignoreMissingLinkedWorkbooks,file.getName(),this.password,this.metadataFilter);  
 		start = cIn.getAdjustedStart();
        		end = cIn.getAdjustedEnd();
         	filePosition = cIn; // take pos from compressed stream
       } else {
 	LOG.debug("Reading from a compressed file \""+file+"\" with non-splittable compression codec");
-	officeReader = new OfficeReader(codec.createInputStream(fileIn,decompressor), this.mimeType, this.sheets, this.locale, this.ignoreMissingLinkedWorkbooks,file.getName());
+	officeReader = new OfficeReader(codec.createInputStream(fileIn,decompressor), this.mimeType, this.sheets, this.locale, this.ignoreMissingLinkedWorkbooks,file.getName(),this.password,this.metadataFilter);
         filePosition = fileIn;
       }
     } else {
 	LOG.debug("Reading from an uncompressed file \""+file+"\"");
       fileIn.seek(start);
-	officeReader = new OfficeReader(fileIn, this.mimeType,this.sheets, this.locale,this.ignoreMissingLinkedWorkbooks,file.getName());
+	officeReader = new OfficeReader(fileIn, this.mimeType,this.sheets, this.locale,this.ignoreMissingLinkedWorkbooks,file.getName(),this.password,this.metadataFilter);  
       filePosition = fileIn;
     }
     // initialize reader
@@ -168,7 +190,7 @@ public AbstractSpreadSheetDocumentRecordReader(FileSplit split, JobConf job, Rep
 			// read file from hadoop file
 			Path currentFile=new Path(parentPath,sanitizedListItem);
 			InputStream currentIn=this.currentHFR.openFile(currentFile);
-			this.officeReader.getCurrentParser().addLinkedWorkbook(listItem,currentIn);
+			this.officeReader.getCurrentParser().addLinkedWorkbook(listItem,currentIn,this.linkedWBCredentialMap.get(sanitizedListItem));
 		}
 	}
     }
@@ -275,6 +297,9 @@ private boolean  isCompressedInput() {
 public  synchronized long getPos() throws IOException {
 	return filePosition.getPos();
 }
+
+
+
 
 /*
 * Clean up InputStream and Decompressor after use
