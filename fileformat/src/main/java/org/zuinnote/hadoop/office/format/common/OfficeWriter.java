@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.BufferedOutputStream;
 
+import java.security.GeneralSecurityException;
 
 import java.util.Locale;
 import java.util.Map;
@@ -67,12 +68,18 @@ private OfficeSpreadSheetWriterInterface currentOfficeSpreadSheetWriter=null;
 * @param commentAuthor default author for comments
 * @param commentWidth default width for comments
 * @param commentHeight default height for comments
+* @param password password for encryption. Set to null for no encryption.
+* @param encryptAlgorithm Encryption algorithm (support depends upon writer, see documentation there). It is strongly recommended to do an in-depth analysis which algorithm to select to provide optimal security
+* @param hashAlgorithm Hash algorithm (support depends upon writer, see documentation there). It is strongly recommended to do an in-depth analysis which algorithm to select to provide optimal security
+* @param encryptMode Encrypt mode (support depends upon writer, see documentation there). It is strongly recommended to do an in-depth analysis which algorithm to select to provide optimal security
+* @param chainMode Chain mode (support depends upon writer, see documentation there). It is strongly recommended to do an in-depth analysis which algorithm to select to provide optimal security
+* @param metadata to write with the document. Please consult documentation of the write to see which attribute names and values are supported
 *
-* @throws org.zuinnote.hadoop.office.format.common.writer.InvalidWriterConfigurationException in case format is not supported
+* @throws org.zuinnote.hadoop.office.format.common.writer.InvalidWriterConfigurationException in case format is not supported or encryption algorithm is wrongly specified
 *
 */
 
-public OfficeWriter(String mimeType, Locale useLocale, boolean ignoreMissingLinkedWorkbooks, String fileName,String commentAuthor, int commentWidth, int commentHeight) throws InvalidWriterConfigurationException {
+public OfficeWriter(String mimeType, Locale useLocale, boolean ignoreMissingLinkedWorkbooks, String fileName,String commentAuthor, int commentWidth, int commentHeight, String password, String encryptAlgorithm, String hashAlgorithm, String encryptMode, String chainMode, Map<String,String> metadata) throws InvalidWriterConfigurationException {
 	this.mimeType=mimeType;
 	this.useLocale=useLocale;
 	this.ignoreMissingLinkedWorkbooks=ignoreMissingLinkedWorkbooks;
@@ -83,7 +90,7 @@ public OfficeWriter(String mimeType, Locale useLocale, boolean ignoreMissingLink
 	// check mimetype and create parser, this is based on some heuristics on the mimetype
 	String writerFormat=getInternalWriterFormatFromMimeType(mimeType);
 	if (MSExcelWriter.isSupportedFormat(writerFormat)==true) {
-		currentOfficeSpreadSheetWriter=new MSExcelWriter(writerFormat,this.useLocale,this.ignoreMissingLinkedWorkbooks, this.fileName,this.commentAuthor,this.commentWidth,this.commentHeight);
+		currentOfficeSpreadSheetWriter=new MSExcelWriter(writerFormat,this.useLocale,this.ignoreMissingLinkedWorkbooks, this.fileName,this.commentAuthor,this.commentWidth,this.commentHeight,password,encryptAlgorithm,hashAlgorithm,encryptMode,chainMode,metadata);
 	} else {
 		throw new InvalidWriterConfigurationException("Error: Writer does not recognize format +\""+writerFormat+"\"");
 	}
@@ -95,15 +102,17 @@ public OfficeWriter(String mimeType, Locale useLocale, boolean ignoreMissingLink
 *
 * @param oStream OutputStream where the Workbook should be written when calling finalizeWrite
 * @param linkedWorkbooks linked workbooks that are already existing and linked to this document. Only if supported by the format
+* @param linkedWorkbooksPasswords a map of passwords and linkedworkbooks. The key is the filename without path of the linkedworkbook and the value is the password
 *
 * @throws java.io.IOException if there is an issue with the OutputStream
 * @throws org.zuinnote.hadoop.office.format.common.writer.InvalidWriterConfigurationException in case no proper writer has been instantiated
 * @throws org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException in case one of the linked workbooks has an invalid format
+* 
 */
 
-public void create(OutputStream oStream, Map<String,InputStream> linkedWorkbooks) throws IOException, InvalidWriterConfigurationException,FormatNotUnderstoodException {
+public void create(OutputStream oStream, Map<String,InputStream> linkedWorkbooks,Map<String,String> linkedWorkbooksPasswords) throws IOException, InvalidWriterConfigurationException,FormatNotUnderstoodException,GeneralSecurityException {
 	if (this.currentOfficeSpreadSheetWriter!=null) {
-		this.currentOfficeSpreadSheetWriter.create(oStream,linkedWorkbooks);
+		this.currentOfficeSpreadSheetWriter.create(oStream,linkedWorkbooks,linkedWorkbooksPasswords);
 	} else {
 		throw new InvalidWriterConfigurationException("No writer instantiated");
 	}
@@ -135,10 +144,11 @@ if (this.currentOfficeSpreadSheetWriter!=null) {
 *
 * @throws java.io.IOException in case of issues writing.
 * @throws org.zuinnote.hadoop.office.format.common.writer.InvalidWriterConfigurationException in case no proper writer has been instantiated
+* @throws java.security.GeneralSecurityException in case of issues of writing encrypted documents
 *
 *
 */
-public void finalizeWrite() throws IOException,InvalidWriterConfigurationException {
+public void finalizeWrite() throws IOException,InvalidWriterConfigurationException,GeneralSecurityException {
 	
 if (this.currentOfficeSpreadSheetWriter!=null) {
 		this.currentOfficeSpreadSheetWriter.finalizeWrite();
