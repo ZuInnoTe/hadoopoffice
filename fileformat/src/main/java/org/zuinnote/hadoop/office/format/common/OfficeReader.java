@@ -21,7 +21,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.BufferedInputStream;
 
+import java.security.GeneralSecurityException;
 
+import java.util.Map;
 import java.util.Locale;
 
 import org.apache.commons.logging.LogFactory;
@@ -45,6 +47,8 @@ private InputStream in=null;
 private String mimeType; 
 private boolean ignoreMissingLinkedWorkbooks;
 private String fileName;
+private String password;
+private Map<String,String> metadataFilter;
 private OfficeReaderParserInterface currentParser=null;
 
 	/*
@@ -57,9 +61,11 @@ private OfficeReaderParserInterface currentParser=null;
 	* @param locale Locale to be used for interpreting content in spreadsheets and databases
 	* @param ignoreMissingLinkedWorkbooks only for formats supporting references to other files. Ignores if these files are not available. 
 	* @param fileName fileName of the file to read. Optional parameter and should not contain information about the directory.
+	* @param password Password of this document (null if no password)
+	* @param metadataFilter filter on metadata. The name is the metadata attribute name and the property is a filter. See the individual parser implementation what attributes are supported and if the filter, for example, supports regular expressions
 	*/
 
-	public OfficeReader(InputStream in, String mimeType, String sheets, Locale locale, boolean ignoreMissingLinkedWorkbooks, String fileName) {
+	public OfficeReader(InputStream in, String mimeType, String sheets, Locale locale, boolean ignoreMissingLinkedWorkbooks, String fileName,String password, Map<String,String> metadataFilter) {
 		this.in=in;
 		if (mimeType==null) {
 			this.mimeType="";
@@ -74,7 +80,8 @@ private OfficeReaderParserInterface currentParser=null;
 		this.locale=locale;
 		this.ignoreMissingLinkedWorkbooks=ignoreMissingLinkedWorkbooks;
 		this.fileName=fileName;
-		
+		this.password=password;
+		this.metadataFilter=metadataFilter;
 	}
 
 	/**
@@ -82,19 +89,33 @@ private OfficeReaderParserInterface currentParser=null;
 	*
 	* @throws java.io.IOException in case of errors reading from the InputStream
 	* @throws org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException in case an invalid format is detected
+	* @throws java.security.GeneralSecurityException in case of issues decrypting the document, if document is encrypted
 	*
 	*/
-	public void parse() throws IOException, FormatNotUnderstoodException {
+	public void parse() throws IOException, FormatNotUnderstoodException,GeneralSecurityException {
 		// do content detection of document
 			if (this.mimeType.contains(OfficeReader.FORMAT_EXCEL))	{
 			// if it contains Excel then use MSExcelParser
-				this.currentParser=new MSExcelParser(this.locale,this.sheetsArray,this.ignoreMissingLinkedWorkbooks, this.fileName);
+				this.currentParser=new MSExcelParser(this.locale,this.sheetsArray,this.ignoreMissingLinkedWorkbooks, this.fileName,this.password,this.metadataFilter);
 			} else {
 			// if it cannot be detected throw an exception
 				throw new FormatNotUnderstoodException("Format not understood");
 			}
 		// parse the inputStream
 		currentParser.parse(this.in);
+	}
+
+	/**
+	* Returns if the current document is filtered by a metadata filter
+	*
+	* @return true, if document applies to metadata filter, false if not
+	*
+	*/
+	public boolean getFiltered() {
+		if (this.currentParser!=null) {
+			return this.currentParser.getFiltered();
+		}
+		return false;
 	}
 
 
