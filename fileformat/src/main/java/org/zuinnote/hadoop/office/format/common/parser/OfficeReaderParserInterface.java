@@ -18,7 +18,7 @@ package org.zuinnote.hadoop.office.format.common.parser;
 
 import java.io.InputStream;
 import java.io.IOException;
-
+import java.security.GeneralSecurityException;
 import java.util.List;
 /*
 *
@@ -28,12 +28,13 @@ import java.util.List;
 
 public interface OfficeReaderParserInterface {
 
-public void parse(InputStream inputStream) throws IOException,FormatNotUnderstoodException;
+public void parse(InputStream inputStream) throws IOException,FormatNotUnderstoodException,GeneralSecurityException;
 public long getCurrentRow();
 public String getCurrentSheetName();
-public boolean addLinkedWorkbook(String name, InputStream inputStream) throws IOException,FormatNotUnderstoodException;
+public boolean addLinkedWorkbook(String name, InputStream inputStream,String password) throws IOException,FormatNotUnderstoodException,GeneralSecurityException;
 public List<String> getLinkedWorkbooks();
 public Object[] getNext();
+public boolean getFiltered();
 public void close() throws IOException;
 
 }
