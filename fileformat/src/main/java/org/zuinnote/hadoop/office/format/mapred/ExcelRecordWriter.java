@@ -19,6 +19,8 @@ package org.zuinnote.hadoop.office.format.mapred;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import java.security.GeneralSecurityException;
+
 import org.apache.hadoop.mapred.JobConf;
 
 import org.apache.commons.logging.LogFactory;
@@ -43,7 +45,7 @@ private static final Log LOG = LogFactory.getLog(ExcelRecordWriter.class.getName
 * Instantiate the constructor of AbstractSpreadSheetDocumentRecordWriter
 *
 */
-public ExcelRecordWriter(DataOutputStream out, String fileName, JobConf conf) throws IOException,InvalidWriterConfigurationException,InvalidCellSpecificationException,FormatNotUnderstoodException {
+public ExcelRecordWriter(DataOutputStream out, String fileName, JobConf conf) throws IOException,InvalidWriterConfigurationException,InvalidCellSpecificationException,FormatNotUnderstoodException,GeneralSecurityException {
 	super(out,fileName,conf);
 }
 
