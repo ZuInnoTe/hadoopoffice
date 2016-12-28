@@ -18,6 +18,8 @@ package org.zuinnote.hadoop.office.format.mapred;
 
 import java.io.IOException;
 
+import java.security.GeneralSecurityException;
+
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.ArrayWritable;
 
@@ -45,7 +47,7 @@ public class ExcelRecordReader extends AbstractSpreadSheetDocumentRecordReader<T
 private static final Log LOG = LogFactory.getLog(ExcelRecordReader.class.getName());
 private FileSplit split;
 
-public ExcelRecordReader(FileSplit split, JobConf job, Reporter reporter) throws IOException,FormatNotUnderstoodException {
+public ExcelRecordReader(FileSplit split, JobConf job, Reporter reporter) throws IOException,FormatNotUnderstoodException,GeneralSecurityException {
  super(split,job,reporter);
  this.split=split;
 }
@@ -76,11 +78,12 @@ public ArrayWritable createValue() {
 
 /**
 *
-* Read row from Office document
+* Read row from Office document. If document does not match a defined metadata filter then it returns no rows. If no metadata filter is defined or document matches metadata filter then it returns rows, if available in the document/selected sheet
 *
 * @return true if next more rows are available, false if not
 */
 public boolean next(Text key, ArrayWritable value) throws IOException {
+	if (this.getOfficeReader().getFiltered()==false) return false;
 	Object[] objectArray = this.getOfficeReader().getNext();
 	if (objectArray==null) return false; // no more to read
 	SpreadSheetCellDAO[] cellRows = (SpreadSheetCellDAO[])objectArray;
