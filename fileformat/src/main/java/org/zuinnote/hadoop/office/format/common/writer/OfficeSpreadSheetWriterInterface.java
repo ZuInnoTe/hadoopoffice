@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.IOException;
 
+import java.security.GeneralSecurityException;
 
 import java.util.Properties;
 
@@ -30,10 +31,10 @@ import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 
 public interface OfficeSpreadSheetWriterInterface {
 
-public void create(OutputStream osStream, Map<String,InputStream> linkedWorkbooks) throws IOException,FormatNotUnderstoodException;
+public void create(OutputStream osStream, Map<String,InputStream> linkedWorkbooks,Map<String,String> linkedWorkbooksPasswords) throws IOException,FormatNotUnderstoodException,GeneralSecurityException;
 
 public void write(Object newDAO) throws InvalidCellSpecificationException,ObjectNotSupportedException;
 
-public void finalizeWrite() throws IOException;
+public void finalizeWrite() throws IOException,GeneralSecurityException;
 
 }
