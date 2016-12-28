@@ -21,11 +21,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.Properties;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.IOException;
+
+
+import java.security.GeneralSecurityException;
 
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -39,6 +41,15 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.ss.util.WorkbookUtil;
+import org.apache.poi.poifs.filesystem.OPOIFSFileSystem;
+import org.apache.poi.poifs.crypt.CipherAlgorithm;
+import org.apache.poi.poifs.crypt.HashAlgorithm;
+import org.apache.poi.poifs.crypt.EncryptionMode;
+import org.apache.poi.poifs.crypt.Encryptor;
+import org.apache.poi.poifs.crypt.EncryptionInfo;
+import org.apache.poi.poifs.crypt.ChainingMode;
+import org.apache.poi.hssf.record.crypto.Biff8EncryptionKey;
+import org.apache.poi.openxml4j.opc.OPCPackage;
 
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
@@ -67,6 +78,13 @@ private Map<String,FormulaEvaluator> linkedFormulaEvaluators;
 private Map<String,Drawing> mappedDrawings;
 private List<Workbook> listOfWorkbooks;
 private FormulaEvaluator currentFormulaEvaluator;
+private Map<String,String> linkedWorkbooksPasswords;
+private Map<String,String> metadata;
+private String password;
+private CipherAlgorithm encryptAlgorithmCipher;
+private HashAlgorithm hashAlgorithmCipher;
+private EncryptionMode encryptionModeCipher;
+private ChainingMode chainModeCipher;
 
 /**
 *
@@ -79,12 +97,19 @@ private FormulaEvaluator currentFormulaEvaluator;
 * @param commentAuthor default author for comments
 * @param commentWidth width of comments in terms of number of columns
 * @param commentHeight height of commments in terms of number of rows
+* @param password Password of this document (null if no password)
+* @param encryptAlgorithm algorithm use for encryption. It is recommended to carefully choose the algorithm. Supported for .xlsx: aes128,aes192,aes256,des,des3,des3_112,rc2,rc4,rsa. Support for .xls: rc4
+* @param hashAlgorithm Hash algorithm,  Supported for .xslx: sha512, sha384, sha256, sha224, whirlpool, sha1, ripemd160,ripemd128,  md5, md4, md2,none. Ignored for .xls
+* @param encryptMode Encrypt mode, Supported for .xlsx: binaryRC4,standard,agile,cryptoAPI. Ignored for .xls
+* @param chainMode Chain mode, Supported for .xlsx: cbc, cfb, ecb.  Ignored for .xls 
+* @param metadata properties as metadata.  Currently the following are supported for .xlsx documents: category,contentstatus, contenttype,created,creator,description,identifier,keywords,lastmodifiedbyuser,lastprinted,modified,revision,subject,title. Additionally all custom.* are defined as custom properties. Example custom.myproperty.
+ Currently the following are supported for .xls documents: applicationname,author,charcount, comments, createdatetime,edittime,keywords,lastauthor,lastprinted,lastsavedatetime,pagecount,revnumber,security,subject,template,title,wordcount
 *
 * @throws org.zuinnote.hadoop.office.format.common.writer.InvalidWriterConfigurationException in case the writer is not configured correctly 
 *
 */
 
-public MSExcelWriter(String excelFormat, Locale useLocale, boolean ignoreMissingLinkedWorkbooks, String fileName, String commentAuthor, int commentWidth, int commentHeight) throws InvalidWriterConfigurationException {
+public MSExcelWriter(String excelFormat, Locale useLocale, boolean ignoreMissingLinkedWorkbooks, String fileName, String commentAuthor, int commentWidth, int commentHeight,String password,String encryptAlgorithm,  String hashAlgorithm, String encryptMode, String chainMode, Map<String,String> metadata) throws InvalidWriterConfigurationException {
 	boolean formatFound=isSupportedFormat(excelFormat);
 	if (formatFound==false) {
 		 LOG.error("Unknown Excel format: "+this.format);
@@ -97,6 +122,12 @@ public MSExcelWriter(String excelFormat, Locale useLocale, boolean ignoreMissing
 	this.commentAuthor=commentAuthor;
 	this.commentWidth=commentWidth;
 	this.commentHeight=commentHeight;
+	this.password=password;
+	this.encryptAlgorithmCipher=getAlgorithmCipher(encryptAlgorithm);
+	this.hashAlgorithmCipher=getHashAlgorithm(hashAlgorithm);
+	this.encryptionModeCipher=getEncryptionModeCipher(encryptMode);
+	this.chainModeCipher=getChainMode(chainMode);
+	this.metadata=metadata;
 }
 
 
@@ -106,12 +137,13 @@ public MSExcelWriter(String excelFormat, Locale useLocale, boolean ignoreMissing
 *
 * @param oStream OutputStream where the Workbook should be written when calling finalizeWrite
 * @param linkedWorkbooks linked workbooks that are already existing and linked to this spreadsheet
+* @param linkedWorkbooksPasswords a map of passwords and linkedworkbooks. The key is the filename without path of the linkedworkbook and the value is the password
 *
 * @throws java.io.IOException if there is an issue with the OutputStream
 *
 */
 
-public void create(OutputStream oStream, Map<String,InputStream> linkedWorkbooks) throws IOException,FormatNotUnderstoodException {
+public void create(OutputStream oStream, Map<String,InputStream> linkedWorkbooks,Map<String,String> linkedWorkbooksPasswords) throws IOException,FormatNotUnderstoodException, GeneralSecurityException {
 	this.oStream=oStream;
 	// create a new Workbook either in old Excel or "new" Excel format
 	if (this.format.equals(MSExcelWriter.FORMAT_OOXML)) {
@@ -130,7 +162,7 @@ public void create(OutputStream oStream, Map<String,InputStream> linkedWorkbooks
 	try {
 		for (String name: linkedWorkbooks.keySet()) {
 			// parse linked workbook
-			MSExcelParser currentLinkedWorkbookParser = new MSExcelParser(this.useLocale, null, this.ignoreMissingLinkedWorkbooks,name);
+			MSExcelParser currentLinkedWorkbookParser = new MSExcelParser(this.useLocale, null, this.ignoreMissingLinkedWorkbooks,name,linkedWorkbooksPasswords.get(name),null);
 			currentLinkedWorkbookParser.parse(this.linkedWorkbooks.get(name));
 			this.listOfWorkbooks.add(currentLinkedWorkbookParser.getCurrentWorkbook());
 			this.linkedFormulaEvaluators.put(name,currentLinkedWorkbookParser.getCurrentFormulaEvaluator());
@@ -227,15 +259,50 @@ public void write(Object newDAO) throws InvalidCellSpecificationException,Object
 * Writes the document in-memory representation to the OutputStream. Aferwards, it closes all related workbooks.
 *
 * @throws java.io.IOException in case of issues writing.
+* @throws java.security.GeneralSecurityException in case of issues encrypting
 *
 *
 */
 
-public void finalizeWrite() throws IOException {
+public void finalizeWrite() throws IOException, GeneralSecurityException {
 	try {
 	if (this.oStream!=null) {
-		this.currentWorkbook.write(this.oStream);
-		this.oStream.close();
+		if (this.password==null) { // no encryption
+			this.currentWorkbook.write(this.oStream);
+			this.oStream.close();
+		} else {	// encryption
+			if (this.currentWorkbook instanceof HSSFWorkbook) { // old Excel format
+				Biff8EncryptionKey.setCurrentUserPassword(this.password);
+				this.currentWorkbook.write(this.oStream);
+				this.oStream.close();
+			} else if (this.currentWorkbook instanceof XSSFWorkbook) {
+				if (this.encryptAlgorithmCipher==null) {
+					LOG.error("No encryption algorithm specified");
+				} else
+				if (this.hashAlgorithmCipher==null) {
+					LOG.error("No hash algorithm specified");
+				} else
+				if (this.encryptionModeCipher==null) {
+					LOG.error("No encryption mode specified");
+				} else
+				if (this.chainModeCipher==null) {
+					LOG.error("No chain mode specified");
+				} else {
+					OPOIFSFileSystem documentFileSystem = new OPOIFSFileSystem();
+					EncryptionInfo info = new EncryptionInfo(this.encryptionModeCipher, this.encryptAlgorithmCipher, this.hashAlgorithmCipher, -1, -1, this.chainModeCipher);
+					Encryptor enc = info.getEncryptor();
+					enc.confirmPassword(this.password);
+					OPCPackage opc = ((XSSFWorkbook)this.currentWorkbook).getPackage();
+					OutputStream os = enc.getDataStream(documentFileSystem);
+					opc.save(os);
+					opc.close();
+					documentFileSystem.writeFilesystem(this.oStream);
+					this.oStream.close();
+				}
+			} else {
+				LOG.error("Could not write encrypted workbook, because type of workbook is unknown");
+			}
+		}
 	}
 	} finally {
 	// close main workbook
@@ -267,6 +334,108 @@ public static boolean isSupportedFormat(String format) {
 		}
 	}
 return false;
+}
+
+/**
+* Returns the CipherAlgorithm object matching the String.
+*
+* @param encryptAlgorithm encryption algorithm
+*
+*@return CipherAlgorithm object corresponding to encryption algorithm. Null if does not correspond to any algorithm.
+*
+*
+*/
+
+private static CipherAlgorithm getAlgorithmCipher(String encryptAlgorithm) {
+	if (encryptAlgorithm==null) return null;
+	switch (encryptAlgorithm) {
+		case "aes128": return CipherAlgorithm.aes128;
+		case "aes192": return CipherAlgorithm.aes192;
+		case "aes256": return CipherAlgorithm.aes256;
+		case "des": return CipherAlgorithm.des;
+		case "des3": return CipherAlgorithm.des3;
+		case "des3_112": return CipherAlgorithm.des3_112;
+		case "rc2": return CipherAlgorithm.rc2;
+		case "rc4": return CipherAlgorithm.rc4;
+		case "rsa": return CipherAlgorithm.rsa;
+	}
+	return null;
+}
+
+/**
+* Returns the HashAlgorithm object matching the String.
+*
+* @param hashAlgorithm hash algorithm
+*
+*@return HashAlgorithm object corresponding to hash algorithm. Null if does not correspond to any algorithm.
+*
+*
+*/
+private static HashAlgorithm getHashAlgorithm(String hashAlgorithm) {
+	if (hashAlgorithm==null) return null;
+	switch (hashAlgorithm) {
+		case "md2": return HashAlgorithm.md2;
+		case "md4": return HashAlgorithm.md4;
+		case "md5": return HashAlgorithm.md5;
+		case "none": return HashAlgorithm.none;
+		case "ripemd128": return HashAlgorithm.ripemd128;
+		case "ripemd160": return HashAlgorithm.ripemd160;
+		case "sha1": return HashAlgorithm.sha1;
+		case "sha224": return HashAlgorithm.sha224;
+		case "sha256": return HashAlgorithm.sha256;
+		case "sha384": return HashAlgorithm.sha384;
+		case "sha512": return HashAlgorithm.sha512;
+		case "whirlpool": return HashAlgorithm.whirlpool;
+	}
+	return null;
+}
+
+
+
+/**
+* Returns the EncryptionMode object matching the String.
+*
+* @param encryptionMode encryption mode
+*
+*@return EncryptionMode object corresponding to encryption mode. Null if does not correspond to any mode.
+*
+*
+*/
+
+
+private static EncryptionMode getEncryptionModeCipher(String encryptionMode) {
+	if (encryptionMode==null) return null;
+	switch (encryptionMode) {
+		case "agile": return EncryptionMode.agile;
+		case "binaryRC4": return EncryptionMode.binaryRC4;
+		case "cryptoAPI": return EncryptionMode.cryptoAPI;
+		case "standard": return EncryptionMode.standard;
+		//case "xor": return EncryptionMode.xor; // does not seem to be supported anymore
+	}
+	return null;
+}
+
+
+/**
+* Returns the ChainMode object matching the String.
+*
+* @param chainMode chain mode
+*
+*@return ChainMode object corresponding to chain mode. Null if does not correspond to any mode.
+*
+*
+*/
+
+
+private static ChainingMode getChainMode(String chainMode) {
+	if (chainMode==null) return null;
+	switch (chainMode) {
+		case "cbc": return ChainingMode.cbc;
+		case "cfb": return ChainingMode.cfb;
+		case "ecb": return ChainingMode.ecb;
+
+	}
+	return null;
 }
 
 }
