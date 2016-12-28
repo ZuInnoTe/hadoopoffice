@@ -17,10 +17,16 @@
 package org.zuinnote.hadoop.office.format.common.writer;
 
 import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Date;
+
+import java.text.ParseException;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -50,6 +56,9 @@ import org.apache.poi.poifs.crypt.EncryptionInfo;
 import org.apache.poi.poifs.crypt.ChainingMode;
 import org.apache.poi.hssf.record.crypto.Biff8EncryptionKey;
 import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.POIXMLProperties;
+import org.apache.poi.hpsf.SummaryInformation;
+import org.apache.poi.openxml4j.util.Nullable;
 
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
@@ -102,7 +111,7 @@ private ChainingMode chainModeCipher;
 * @param hashAlgorithm Hash algorithm,  Supported for .xslx: sha512, sha384, sha256, sha224, whirlpool, sha1, ripemd160,ripemd128,  md5, md4, md2,none. Ignored for .xls
 * @param encryptMode Encrypt mode, Supported for .xlsx: binaryRC4,standard,agile,cryptoAPI. Ignored for .xls
 * @param chainMode Chain mode, Supported for .xlsx: cbc, cfb, ecb.  Ignored for .xls 
-* @param metadata properties as metadata.  Currently the following are supported for .xlsx documents: category,contentstatus, contenttype,created,creator,description,identifier,keywords,lastmodifiedbyuser,lastprinted,modified,revision,subject,title. Additionally all custom.* are defined as custom properties. Example custom.myproperty.
+* @param metadata properties as metadata.  Currently the following are supported for .xlsx documents: category,contentstatus, contenttype,created (date),creator,description,identifier,keywords,lastmodifiedbyuser,lastprinted (date),modified (date),revision,subject,title. Everything refering to a date needs to be in the format (EEE MMM dd hh:mm:ss zzz yyyy) see http://docs.oracle.com/javase/7/docs/api/java/util/Date.html#toString() Additionally all custom.* are defined as custom properties. Example custom.myproperty. 
  Currently the following are supported for .xls documents: applicationname,author,charcount, comments, createdatetime,edittime,keywords,lastauthor,lastprinted,lastsavedatetime,pagecount,revnumber,security,subject,template,title,wordcount
 *
 * @throws org.zuinnote.hadoop.office.format.common.writer.InvalidWriterConfigurationException in case the writer is not configured correctly 
@@ -266,6 +275,9 @@ public void write(Object newDAO) throws InvalidCellSpecificationException,Object
 
 public void finalizeWrite() throws IOException, GeneralSecurityException {
 	try {
+	// prepare metadata
+	prepareMetaData();
+	// write
 	if (this.oStream!=null) {
 		if (this.password==null) { // no encryption
 			this.currentWorkbook.write(this.oStream);
@@ -436,6 +448,108 @@ private static ChainingMode getChainMode(String chainMode) {
 
 	}
 	return null;
+}
+
+
+/**
+* writes metadata into document
+*
+*
+*/
+
+private void prepareMetaData() {
+	if (this.currentWorkbook instanceof HSSFWorkbook) {
+		prepareHSSFMetaData();
+	} else if (this.currentWorkbook instanceof HSSFWorkbook) {
+		prepareXSSFMetaData();
+	} else {
+		LOG.error("Unknown workbook type. Cannot write metadata.");
+	}
+}
+
+/**
+*
+* Write metadata into HSSF document
+*
+*/
+private void prepareHSSFMetaData() {
+	HSSFWorkbook currentHSSFWorkbook = (HSSFWorkbook) this.currentWorkbook;
+	SummaryInformation summaryInfo = currentHSSFWorkbook.getSummaryInformation(); 
+	SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd hh:mm:ss zzz yyyy"); // this is the format of the toString method of date used in the parser. Just to be consistent...http://docs.oracle.com/javase/7/docs/api/java/util/Date.html#toString()
+	for (String currentKey: this.metadata.keySet()) {
+		// process general properties
+		try {
+		switch(currentKey) {
+			case "applicationame": summaryInfo.setApplicationName(this.metadata.get(currentKey)); break;
+			case "author": summaryInfo.setAuthor(this.metadata.get(currentKey)); break;
+			case "charcount": summaryInfo.setCharCount(Integer.parseInt(this.metadata.get(currentKey))); break;
+			case "comments": summaryInfo.setComments(this.metadata.get(currentKey)); break;
+			case "createdatetime": summaryInfo.setCreateDateTime(format.parse(this.metadata.get(currentKey))); break;
+			case "edittime": summaryInfo.setEditTime(Long.parseLong(this.metadata.get(currentKey))); break;
+			case "keywords": summaryInfo.setKeywords(this.metadata.get(currentKey)); break;
+			case "lastauthor": summaryInfo.setLastAuthor(this.metadata.get(currentKey)); break;
+			case "lastprinted": summaryInfo.setLastPrinted(format.parse(this.metadata.get(currentKey))); break;	
+			case "lastsavedatetime": summaryInfo.setLastSaveDateTime(format.parse(this.metadata.get(currentKey))); break;
+			case "pagecount": summaryInfo.setPageCount(Integer.parseInt(this.metadata.get(currentKey))); break;
+			case "revnumber": summaryInfo.setRevNumber(this.metadata.get(currentKey)); break;
+			case "security": summaryInfo.setSecurity(Integer.parseInt(this.metadata.get(currentKey))); break;
+			case "subject": summaryInfo.setSubject(this.metadata.get(currentKey)); break;
+			case "template": summaryInfo.setTemplate(this.metadata.get(currentKey)); break;	
+			case "title": summaryInfo.setTitle(this.metadata.get(currentKey)); break;
+			case "wordcount": summaryInfo.setWordCount(Integer.parseInt(this.metadata.get(currentKey))); break;
+			default: LOG.warn("Unknown metadata key: "+currentKey); break;	
+		} 
+		} catch (ParseException pe) {
+			LOG.error(pe);
+		}
+
+	}
+}
+
+/**
+*
+* Write metadata into XSSF document
+*
+*/
+
+private void prepareXSSFMetaData() {
+ 	XSSFWorkbook currentXSSFWorkbook = (XSSFWorkbook) this.currentWorkbook;
+        POIXMLProperties props = currentXSSFWorkbook.getProperties();
+	POIXMLProperties.CoreProperties coreProp=props.getCoreProperties();
+	POIXMLProperties.CustomProperties custProp = props.getCustomProperties();
+	SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd hh:mm:ss zzz yyyy"); // this is the format of the toString method of date used in the parser. Just to be consistent...http://docs.oracle.com/javase/7/docs/api/java/util/Date.html#toString()
+	for (String currentKey: this.metadata.keySet()) {
+		// process general properties
+		try {
+		switch(currentKey) {
+			case "category": coreProp.setCategory(this.metadata.get(currentKey)); break;
+			case "contentstatus": coreProp.setContentStatus(this.metadata.get(currentKey)); break;
+			case "contenttype": coreProp.setContentType(this.metadata.get(currentKey)); break;
+			case "created": coreProp.setCreated(new Nullable<Date>(format.parse(this.metadata.get(currentKey)))); break;
+			case "creator": coreProp.setCreator(this.metadata.get(currentKey)); break;
+			case "description": coreProp.setDescription(this.metadata.get(currentKey)); break;
+			case "identifier": coreProp.setIdentifier(this.metadata.get(currentKey)); break;
+			case "keywords": coreProp.setKeywords(this.metadata.get(currentKey)); break;
+			case "lastmodifiedbyuser": coreProp.setLastModifiedByUser(this.metadata.get(currentKey)); break;
+			case "lastprinted": coreProp.setLastPrinted(new Nullable<Date>(format.parse(this.metadata.get(currentKey)))); break;
+			case "modified": coreProp.setLastPrinted(new Nullable<Date>(format.parse(this.metadata.get(currentKey)))); break;
+			case "revision": coreProp.setRevision(this.metadata.get(currentKey)); break;
+			case "subject": coreProp.setSubjectProperty(this.metadata.get(currentKey)); break;
+			case "title": coreProp.setTitle(this.metadata.get(currentKey)); break;
+		}
+		// process custom properties
+		if (currentKey.startsWith("custom.")==true) {
+			String strippedKey=currentKey.substring("custom.".length());
+			if (strippedKey.length()>0) {
+				custProp.addProperty(strippedKey,this.metadata.get(currentKey));
+			}
+		} else {
+			LOG.warn("Unknown metadata key: "+currentKey);
+		}
+		} catch (ParseException pe) {
+			LOG.error(pe);
+		}
+	}
 }
 
 }
