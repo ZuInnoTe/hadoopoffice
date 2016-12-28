@@ -27,6 +27,8 @@ import org.apache.hadoop.io.NullWritable;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import java.security.GeneralSecurityException;
+
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 
@@ -71,6 +73,8 @@ public RecordWriter<NullWritable,SpreadSheetCellDAO> getRecordWriter(FileSystem 
 		LOG.error(icse);
 	} catch (FormatNotUnderstoodException fnue) {
 		LOG.error(fnue);
+	} catch (GeneralSecurityException gse) {
+		LOG.error(gse);
 	}
 	return null;
 }
