@@ -520,23 +520,25 @@ private void prepareXSSFMetaData() {
 	SimpleDateFormat format = new SimpleDateFormat(MSExcelParser.DATE_FORMAT); 
 	for (String currentKey: this.metadata.keySet()) {
 		// process general properties
+		boolean attribMatch=false;
 		try {
 		switch(currentKey) {
-			case "category": coreProp.setCategory(this.metadata.get(currentKey)); break;
-			case "contentstatus": coreProp.setContentStatus(this.metadata.get(currentKey)); break;
-			case "contenttype": coreProp.setContentType(this.metadata.get(currentKey)); break;
-			case "created": coreProp.setCreated(new Nullable<Date>(format.parse(this.metadata.get(currentKey)))); break;
-			case "creator": coreProp.setCreator(this.metadata.get(currentKey)); break;
-			case "description": coreProp.setDescription(this.metadata.get(currentKey)); break;
-			case "identifier": coreProp.setIdentifier(this.metadata.get(currentKey)); break;
-			case "keywords": coreProp.setKeywords(this.metadata.get(currentKey)); break;
-			case "lastmodifiedbyuser": coreProp.setLastModifiedByUser(this.metadata.get(currentKey)); break;
-			case "lastprinted": coreProp.setLastPrinted(new Nullable<Date>(format.parse(this.metadata.get(currentKey)))); break;
-			case "modified": coreProp.setLastPrinted(new Nullable<Date>(format.parse(this.metadata.get(currentKey)))); break;
-			case "revision": coreProp.setRevision(this.metadata.get(currentKey)); break;
-			case "subject": coreProp.setSubjectProperty(this.metadata.get(currentKey)); break;
-			case "title": coreProp.setTitle(this.metadata.get(currentKey)); break;
-		}
+			case "category": coreProp.setCategory(this.metadata.get(currentKey)); attribMatch=true; break;
+			case "contentstatus": coreProp.setContentStatus(this.metadata.get(currentKey)); attribMatch=true; break;
+			case "contenttype": coreProp.setContentType(this.metadata.get(currentKey));attribMatch=true; break;
+			case "created": coreProp.setCreated(new Nullable<Date>(format.parse(this.metadata.get(currentKey)))); attribMatch=true; break;
+			case "creator": coreProp.setCreator(this.metadata.get(currentKey)); attribMatch=true; break;
+			case "description": coreProp.setDescription(this.metadata.get(currentKey)); attribMatch=true; break;
+			case "identifier": coreProp.setIdentifier(this.metadata.get(currentKey)); attribMatch=true; break;
+			case "keywords": coreProp.setKeywords(this.metadata.get(currentKey));attribMatch=true; break;
+			case "lastmodifiedbyuser": coreProp.setLastModifiedByUser(this.metadata.get(currentKey)); attribMatch=true; break;
+			case "lastprinted": coreProp.setLastPrinted(new Nullable<Date>(format.parse(this.metadata.get(currentKey))));attribMatch=true; break;
+			case "modified": coreProp.setLastPrinted(new Nullable<Date>(format.parse(this.metadata.get(currentKey)))); attribMatch=true; break;
+			case "revision": coreProp.setRevision(this.metadata.get(currentKey)); attribMatch=true; break;
+			case "subject": coreProp.setSubjectProperty(this.metadata.get(currentKey)); attribMatch=true; break;
+			case "title": coreProp.setTitle(this.metadata.get(currentKey));attribMatch=true; break;
+		} 
+		if (attribMatch==false) {
 		// process custom properties
 		if (currentKey.startsWith("custom.")==true) {
 			String strippedKey=currentKey.substring("custom.".length());
@@ -545,6 +547,7 @@ private void prepareXSSFMetaData() {
 			}
 		} else {
 			LOG.warn("Unknown metadata key: "+currentKey);
+		}
 		}
 		} catch (ParseException pe) {
 			LOG.error(pe);
