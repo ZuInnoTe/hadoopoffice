@@ -85,7 +85,7 @@ import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 
 public class MSExcelParser implements OfficeReaderParserInterface {
 private static final Log LOG = LogFactory.getLog(MSExcelParser.class.getName());
-public static final String DATE_FORMAT = "hh:mm:ss z dd.MM.yyyy";
+public static final String DATE_FORMAT = "hh:mm:ss dd.MM.yyyy";
 private FormulaEvaluator formulaEvaluator;
 private InputStream in;
 private DataFormatter useDataFormatter=null;
@@ -506,13 +506,15 @@ private boolean filtered=false;
 		// check for each defined property
 		// check if we need to match all
 		boolean matchAll=true;
+		boolean matchFull=true;
 		boolean matchOnce=false;
-		boolean matchFull=false;
 		if (this.metadataFilter.get("matchAll")!=null) {
 			if (this.metadataFilter.get("matchAll").toLowerCase().equals("true")) {
 				matchAll=true;
+				LOG.info("matching all metadata properties");
 			} else if (this.metadataFilter.get("matchAll").toLowerCase().equals("false"))	{
 				matchAll=false;
+				LOG.info("matching at least one metadata property");
 			} else {
 				LOG.error("Metadata property matchAll not defined correctly. Assuming that at only least one attribute needs to match");
 			}
@@ -526,7 +528,8 @@ private boolean filtered=false;
 				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName))==true)) {
 					matchOnce=true;
 				 } else {
-						matchAll=false;
+						matchFull=false;
+					LOG.debug("Not matching: "+corePropStr+":"+this.metadataFilter.get(corePropertyName));
 				}
 		}
 		corePropertyName="contentstatus";
@@ -535,7 +538,8 @@ private boolean filtered=false;
 				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName))==true)) {
 					matchOnce=true;
 				 } else {
-						matchAll=false;
+						matchFull=false;
+						LOG.debug("Not matching: "+corePropStr+":"+this.metadataFilter.get(corePropertyName));
 				}
 		}
 		corePropertyName="contenttype";
@@ -544,7 +548,8 @@ private boolean filtered=false;
 				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName))==true)) {
 					matchOnce=true;
 				 } else {
-						matchAll=false;
+						matchFull=false;
+						LOG.debug("Not matching: "+corePropStr+":"+this.metadataFilter.get(corePropertyName));
 				}
 		}
 		corePropertyName="created";
@@ -553,7 +558,9 @@ private boolean filtered=false;
 				if ((corePropStr!=null) && (format.format(corePropStr).matches(this.metadataFilter.get(corePropertyName))==true)) {
 					matchOnce=true;
 				 } else {
-						matchAll=false;
+						matchFull=false;
+						LOG.debug("Not matching: "+format.format(corePropStr)+":"+this.metadataFilter.get(corePropertyName));
+						LOG.debug(corePropertyName);
 				}
 		}
 		corePropertyName="creator";
@@ -562,7 +569,8 @@ private boolean filtered=false;
 				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName))==true)) {
 					matchOnce=true;
 				 } else {
-						matchAll=false;
+						matchFull=false;
+						LOG.debug("Not matching: "+corePropStr+":"+this.metadataFilter.get(corePropertyName));
 				}
 		}
 		corePropertyName="description";
@@ -571,7 +579,8 @@ private boolean filtered=false;
 				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName))==true)) {
 					matchOnce=true;
 				 } else {
-						matchAll=false;
+						matchFull=false;
+						LOG.debug("Not matching: "+corePropStr+":"+this.metadataFilter.get(corePropertyName));
 				}
 		}
 		corePropertyName="identifier";
@@ -580,7 +589,8 @@ private boolean filtered=false;
 				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName))==true)) {
 					matchOnce=true;
 				 } else {
-						matchAll=false;
+						matchFull=false;
+						LOG.debug("Not matching: "+corePropStr+":"+this.metadataFilter.get(corePropertyName));
 				}
 		}
 		corePropertyName="keywords";
@@ -589,7 +599,8 @@ private boolean filtered=false;
 				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName))==true)) {
 					matchOnce=true;
 				 } else {
-						matchAll=false;
+						matchFull=false;
+						LOG.debug("Not matching: "+corePropStr+":"+this.metadataFilter.get(corePropertyName));
 				}
 		}
 		corePropertyName="lastmodifiedbyuser";
@@ -598,7 +609,8 @@ private boolean filtered=false;
 				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName))==true)) {
 					matchOnce=true;
 				 } else {
-						matchAll=false;
+						matchFull=false;
+						LOG.debug("Not matching: "+corePropStr+":"+this.metadataFilter.get(corePropertyName));
 				}
 		}
 		corePropertyName="lastprinted";
@@ -607,7 +619,9 @@ private boolean filtered=false;
 				if ((corePropStr!=null) && (format.format(corePropStr).matches(this.metadataFilter.get(corePropertyName))==true)) {
 					matchOnce=true;
 				 } else {
-						matchAll=false;
+						matchFull=false;
+						LOG.debug("Not matching: "+format.format(corePropStr)+":"+this.metadataFilter.get(corePropertyName));
+						LOG.debug(corePropertyName);
 				}
 		}
 		corePropertyName="modified";
@@ -616,7 +630,9 @@ private boolean filtered=false;
 				if ((corePropStr!=null) && (format.format(corePropStr).matches(this.metadataFilter.get(corePropertyName))==true)) {
 					matchOnce=true;
 				 } else {
-						matchAll=false;
+						matchFull=false;
+						LOG.debug("Not matching: "+corePropStr+":"+this.metadataFilter.get(corePropertyName));
+						LOG.debug(corePropertyName);
 				}
 		}
 		corePropertyName="revision";
@@ -625,7 +641,8 @@ private boolean filtered=false;
 				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName))==true)) {
 					matchOnce=true;
 				 } else {
-						matchAll=false;
+						matchFull=false;
+						LOG.debug("Not matching: "+corePropStr+":"+this.metadataFilter.get(corePropertyName));
 				}
 		}
 		corePropertyName="subject";
@@ -634,7 +651,8 @@ private boolean filtered=false;
 				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName))==true)) {
 					matchOnce=true;
 				 } else {
-						matchAll=false;
+						matchFull=false;
+						LOG.debug("Not matching: "+corePropStr+":"+this.metadataFilter.get(corePropertyName));
 				}
 		}
 		corePropertyName="title";
@@ -643,9 +661,11 @@ private boolean filtered=false;
 				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName))==true)) {
 					matchOnce=true;
 				 } else {
-						matchAll=false;
+						matchFull=false;
+						LOG.debug("Not matching: "+corePropStr+":"+this.metadataFilter.get(corePropertyName));
 				}
 		}
+		// check for custom properties
 		POIXMLProperties.CustomProperties custProp = props.getCustomProperties();
 		for (String currentKey: this.metadataFilter.keySet()) {
 			if (currentKey.startsWith("custom.")) {
@@ -654,20 +674,20 @@ private boolean filtered=false;
 					String valueMatch=this.metadataFilter.get(currentKey);
 					if (valueMatch!=null) {
 						
-						if ((custProp.getProperty(strippedKey)!=null) && (custProp.getProperty(strippedKey).getName()!=null)&& (custProp.getProperty(strippedKey).getName().matches(valueMatch))) {
+						if ((custProp.getProperty(strippedKey)!=null) && (custProp.getProperty(strippedKey).getName()!=null)&& (custProp.getProperty(strippedKey).getLpwstr().matches(valueMatch))) {
 		matchOnce=true;
 	} else {
-		matchAll=false;
+		matchFull=false;
 	}
 					}
 				}
 			}
 		}		
-		// check for custom properties
+		
 		if (matchAll==false) {
 			return  matchOnce;
 		} else {
-			return matchAll;
+			return matchFull;
 		}
 	}
 	

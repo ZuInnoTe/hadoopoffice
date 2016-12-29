@@ -475,7 +475,7 @@ private void prepareMetaData() {
 private void prepareHSSFMetaData() {
 	HSSFWorkbook currentHSSFWorkbook = (HSSFWorkbook) this.currentWorkbook;
 	SummaryInformation summaryInfo = currentHSSFWorkbook.getSummaryInformation(); 
-	SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd hh:mm:ss zzz yyyy"); // this is the format of the toString method of date used in the parser. Just to be consistent...http://docs.oracle.com/javase/7/docs/api/java/util/Date.html#toString()
+	SimpleDateFormat format = new SimpleDateFormat(MSExcelParser.DATE_FORMAT); 
 	for (String currentKey: this.metadata.keySet()) {
 		// process general properties
 		try {
@@ -533,8 +533,8 @@ private void prepareXSSFMetaData() {
 			case "keywords": coreProp.setKeywords(this.metadata.get(currentKey));attribMatch=true; break;
 			case "lastmodifiedbyuser": coreProp.setLastModifiedByUser(this.metadata.get(currentKey)); attribMatch=true; break;
 			case "lastprinted": coreProp.setLastPrinted(new Nullable<Date>(format.parse(this.metadata.get(currentKey))));attribMatch=true; break;
-			case "modified": coreProp.setLastPrinted(new Nullable<Date>(format.parse(this.metadata.get(currentKey)))); attribMatch=true; break;
-			case "revision": coreProp.setRevision(this.metadata.get(currentKey)); attribMatch=true; break;
+			case "modified": coreProp.setModified(new Nullable<Date>(format.parse(this.metadata.get(currentKey)))); attribMatch=true; break;
+			case "revision":coreProp.setRevision(this.metadata.get(currentKey)); attribMatch=true; break;
 			case "subject": coreProp.setSubjectProperty(this.metadata.get(currentKey)); attribMatch=true; break;
 			case "title": coreProp.setTitle(this.metadata.get(currentKey));attribMatch=true; break;
 		} 
