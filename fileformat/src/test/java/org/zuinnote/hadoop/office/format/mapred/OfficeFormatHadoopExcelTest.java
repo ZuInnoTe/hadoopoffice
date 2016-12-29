@@ -1138,7 +1138,7 @@ JobConf job = new JobConf(defaultConf);
 	SpreadSheetCellDAO a4 = new SpreadSheetCellDAO("","","A3+B3","A4","Sheet1");
 	// write
 	JobConf job = new JobConf(defaultConf);
-    	String fileName="excel2013singlesheettestoutencryptedpositive";
+    	String fileName="excel2013singlesheettestoutencryptednegative";
     	String tmpDir=tmpPath.toString();	
     	Path outputPath = new Path(tmpDir);
     	FileOutputFormat.setOutputPath(job, outputPath);
