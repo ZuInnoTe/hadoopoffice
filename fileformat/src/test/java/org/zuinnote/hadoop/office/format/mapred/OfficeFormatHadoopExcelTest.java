@@ -1024,6 +1024,94 @@ JobConf job = new JobConf(defaultConf);
 	assertEquals("Input Split for Excel file contains row 1 with cell 3 == \"test3\"", "test3", ((SpreadSheetCellDAO)spreadSheetValue.get()[2]).getFormattedValue());
     }
 
+    @Test
+    public void writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchAllPositive() throws IOException {
+	// one row string and three columns ("test1","test2","test3")
+	// the idea here is to have some content although we only evaluate metadata
+	SpreadSheetCellDAO a1 = new SpreadSheetCellDAO("test1","","","A1","Sheet1");
+	SpreadSheetCellDAO b1 = new SpreadSheetCellDAO("test2","","","B1","Sheet1");
+	SpreadSheetCellDAO c1 = new SpreadSheetCellDAO("test3","","","C1","Sheet1");
+	// write
+	JobConf job = new JobConf(defaultConf);
+    	String fileName="excel2003singlesheetmetadatapositivetestout";
+    	String tmpDir=tmpPath.toString();	
+    	Path outputPath = new Path(tmpDir);
+    	FileOutputFormat.setOutputPath(job, outputPath);
+	// set generic outputformat settings
+	job.set(JobContext.TASK_ATTEMPT_ID, attempt);
+	// set locale to the one of the test data
+	job.set("hadoopoffice.read.locale.bcp47","de");
+	job.set("hadoopoffice.write.mimeType","application/vnd.ms-excel"); //old Excel format
+
+
+	// set all the meta data 
+	job.set("hadoopoffice.write.metadata.applicationname","dummyapplicationname");
+	job.set("hadoopoffice.write.metadata.author","dummyauthor");
+	job.set("hadoopoffice.write.metadata.charcount","1");
+	job.set("hadoopoffice.write.metadata.comments","dummycomments");
+	job.set("hadoopoffice.write.metadata.createdatetime","12:00:00 01.01.2016");
+	job.set("hadoopoffice.write.metadata.edittime","0");
+	job.set("hadoopoffice.write.metadata.keywords","dummykeywords");
+	job.set("hadoopoffice.write.metadata.lastauthor","dummylastauthor");
+	job.set("hadoopoffice.write.metadata.lastprinted","12:00:00 01.01.2016");
+	job.set("hadoopoffice.write.metadata.lastsavedatetime","12:00:00 01.01.2016");
+	job.set("hadoopoffice.write.metadata.pagecount","1");
+	job.set("hadoopoffice.write.metadata.revnumber","1");
+	job.set("hadoopoffice.write.metadata.security","0");
+	job.set("hadoopoffice.write.metadata.subject","dummysubject");
+	//job.set("hadoopoffice.write.metadata.template","dummytemplate");
+	job.set("hadoopoffice.write.metadata.title","dummytitle");
+	//job.set("hadoopoffice.write.metadata.wordcount","1");
+   	ExcelFileOutputFormat outputFormat = new ExcelFileOutputFormat();
+    	RecordWriter<NullWritable,SpreadSheetCellDAO> writer = outputFormat.getRecordWriter(null, job, fileName, null);
+	assertNotNull("Format returned  null RecordWriter", writer);
+	writer.write(null,a1);
+	writer.write(null,b1);
+	writer.write(null,c1);
+	writer.close(reporter);
+	// try to read it again
+	job = new JobConf(defaultConf);
+	Path inputFile = new Path(tmpDir+File.separator+"_temporary"+File.separator+"0"+File.separator+"_temporary"+File.separator+attempt+File.separator+fileName+".xls");
+    	FileInputFormat.setInputPaths(job, inputFile);
+	// set locale to the one of the test data
+	job.set("hadoopoffice.read.locale.bcp47","de");
+	// set metadata to match all
+	job.set("hadoopoffice.read.filter.metadata.matchAll","true");
+	// following filter
+	job.set("hadoopoffice.read.filter.metadata.applicationname","dummyapplicationname");
+	job.set("hadoopoffice.read.filter.metadata.metadata.author","dummyauthor");
+	job.set("hadoopoffice.read.filter.metadata.metadata.charcount","1");
+	job.set("hadoopoffice.read.filter.metadata.metadata.comments","dummycomments");
+	job.set("hadoopoffice.read.filter.metadata.metadata.createdatetime","12:00:00 01.01.2016");
+	job.set("hadoopoffice.read.filter.metadata.metadata.edittime","0");
+	job.set("hadoopoffice.read.filter.metadata.metadata.keywords","dummykeywords");
+	job.set("hadoopoffice.read.filter.metadata.metadata.lastauthor","dummylastauthor");
+	job.set("hadoopoffice.read.filter.metadata.metadata.lastprinted","12:00:00 01.01.2016");
+	job.set("hadoopoffice.read.filter.metadata.metadata.lastsavedatetime","12:00:00 01.01.2016");
+	job.set("hadoopoffice.read.filter.metadata.metadata.pagecount","1");
+	job.set("hadoopoffice.read.filter.metadata.metadata.revnumber","1");
+	job.set("hadoopoffice.read.filter.metadata.metadata.security","0");
+	job.set("hadoopoffice.read.filter.metadata.metadata.subject","dummysubject");
+	job.set("hadoopoffice.read.filter.metadata.metadata.template","dummytemplate");
+	job.set("hadoopoffice.read.filter.metadata.metadata.title","dummytitle");
+	job.set("hadoopoffice.read.filter.metadata.metadata.wordcount","1");
+   	ExcelFileInputFormat inputFormat = new ExcelFileInputFormat();
+    	inputFormat.configure(job);
+    	InputSplit[] inputSplits = inputFormat.getSplits(job,1);
+    	assertEquals("Only one split generated for Excel file", 1, inputSplits.length);
+    	RecordReader<Text, ArrayWritable> reader = inputFormat.getRecordReader(inputSplits[0], job, reporter);
+	assertNotNull("Format returned  null RecordReader", reader);
+	Text spreadSheetKey = new Text();	
+	ArrayWritable spreadSheetValue = new ArrayWritable(SpreadSheetCellDAO.class);
+	// if following assertion is not true that means the document has (wrongly) been filtered out
+	assertTrue("Input Split for Excel file contains row 1", reader.next(spreadSheetKey,spreadSheetValue));	
+	assertEquals("Input Split for Excel file has keyname == \"["+fileName+".xlsx]Sheet1!A1\"", "["+fileName+".xls]Sheet1!A1", spreadSheetKey.toString());
+	assertEquals("Input Split for Excel file contains row 1 with 3 columns", 3, spreadSheetValue.get().length);
+	assertEquals("Input Split for Excel file contains row 1 with cell 1 == \"test1\"", "test1", ((SpreadSheetCellDAO)spreadSheetValue.get()[0]).getFormattedValue());
+	assertEquals("Input Split for Excel file contains row 1 with cell 2 == \"test2\"", "test2", ((SpreadSheetCellDAO)spreadSheetValue.get()[1]).getFormattedValue());
+	assertEquals("Input Split for Excel file contains row 1 with cell 3 == \"test3\"", "test3", ((SpreadSheetCellDAO)spreadSheetValue.get()[2]).getFormattedValue());
+    }
+
  @Test
     public void writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchAllNegative() throws IOException {
 	// one row string and three columns ("test1","test2","test3")
@@ -1104,6 +1192,88 @@ JobConf job = new JobConf(defaultConf);
 	// if following assertion is true that means the document has wrongly NOT been filtered out
 	assertFalse("Input Split for Excel file contains row 1", reader.next(spreadSheetKey,spreadSheetValue));	
     }
+    @Test
+    public void writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchAllNegative() throws IOException {
+	// one row string and three columns ("test1","test2","test3")
+	// the idea here is to have some content although we only evaluate metadata
+	SpreadSheetCellDAO a1 = new SpreadSheetCellDAO("test1","","","A1","Sheet1");
+	SpreadSheetCellDAO b1 = new SpreadSheetCellDAO("test2","","","B1","Sheet1");
+	SpreadSheetCellDAO c1 = new SpreadSheetCellDAO("test3","","","C1","Sheet1");
+	// write
+	JobConf job = new JobConf(defaultConf);
+    	String fileName="excel2003singlesheetmetadatanegativetestout";
+    	String tmpDir=tmpPath.toString();	
+    	Path outputPath = new Path(tmpDir);
+    	FileOutputFormat.setOutputPath(job, outputPath);
+	// set generic outputformat settings
+	job.set(JobContext.TASK_ATTEMPT_ID, attempt);
+	// set locale to the one of the test data
+	job.set("hadoopoffice.read.locale.bcp47","de");
+	job.set("hadoopoffice.write.mimeType","application/vnd.ms-excel"); //old Excel format
+
+
+	// set all the meta data 
+	job.set("hadoopoffice.write.metadata.applicationname","dummyapplicationname");
+	job.set("hadoopoffice.write.metadata.author","dummyauthor");
+	job.set("hadoopoffice.write.metadata.charcount","1");
+	job.set("hadoopoffice.write.metadata.comments","dummycomments");
+	job.set("hadoopoffice.write.metadata.createdatetime","12:00:00 01.01.2016");
+	job.set("hadoopoffice.write.metadata.edittime","0");
+	job.set("hadoopoffice.write.metadata.keywords","dummykeywords");
+	job.set("hadoopoffice.write.metadata.lastauthor","dummylastauthor");
+	job.set("hadoopoffice.write.metadata.lastprinted","12:00:00 01.01.2016");
+	job.set("hadoopoffice.write.metadata.lastsavedatetime","12:00:00 01.01.2016");
+	job.set("hadoopoffice.write.metadata.pagecount","1");
+	job.set("hadoopoffice.write.metadata.revnumber","1");
+	job.set("hadoopoffice.write.metadata.security","0");
+	job.set("hadoopoffice.write.metadata.subject","dummysubject");
+	job.set("hadoopoffice.write.metadata.template","dummytemplate");
+	job.set("hadoopoffice.write.metadata.title","dummytitle");
+	job.set("hadoopoffice.write.metadata.wordcount","1");
+   	ExcelFileOutputFormat outputFormat = new ExcelFileOutputFormat();
+    	RecordWriter<NullWritable,SpreadSheetCellDAO> writer = outputFormat.getRecordWriter(null, job, fileName, null);
+	assertNotNull("Format returned  null RecordWriter", writer);
+	writer.write(null,a1);
+	writer.write(null,b1);
+	writer.write(null,c1);
+	writer.close(reporter);
+	// try to read it again
+	job = new JobConf(defaultConf);
+	Path inputFile = new Path(tmpDir+File.separator+"_temporary"+File.separator+"0"+File.separator+"_temporary"+File.separator+attempt+File.separator+fileName+".xls");
+    	FileInputFormat.setInputPaths(job, inputFile);
+	// set locale to the one of the test data
+	job.set("hadoopoffice.read.locale.bcp47","de");
+	// set metadata to match all
+	job.set("hadoopoffice.read.filter.metadata.matchAll","true");
+	// following filter
+	job.set("hadoopoffice.read.filter.metadata.applicationname","dummyapplicationname2");
+	job.set("hadoopoffice.read.filter.metadata.metadata.author","dummyauthor");
+	job.set("hadoopoffice.read.filter.metadata.metadata.charcount","1");
+	job.set("hadoopoffice.read.filter.metadata.metadata.comments","dummycomments");
+	job.set("hadoopoffice.read.filter.metadata.metadata.createdatetime","12:00:00 01.01.2016");
+	job.set("hadoopoffice.read.filter.metadata.metadata.edittime","0");
+	job.set("hadoopoffice.read.filter.metadata.metadata.keywords","dummykeywords");
+	job.set("hadoopoffice.read.filter.metadata.metadata.lastauthor","dummylastauthor");
+	job.set("hadoopoffice.read.filter.metadata.metadata.lastprinted","12:00:00 01.01.2016");
+	job.set("hadoopoffice.read.filter.metadata.metadata.lastsavedatetime","12:00:00 01.01.2016");
+	job.set("hadoopoffice.read.filter.metadata.metadata.pagecount","1");
+	job.set("hadoopoffice.read.filter.metadata.metadata.revnumber","1");
+	job.set("hadoopoffice.read.filter.metadata.metadata.security","0");
+	job.set("hadoopoffice.read.filter.metadata.metadata.subject","dummysubject");
+	job.set("hadoopoffice.read.filter.metadata.metadata.template","dummytemplate");
+	job.set("hadoopoffice.read.filter.metadata.metadata.title","dummytitle");
+	job.set("hadoopoffice.read.filter.metadata.metadata.wordcount","1");
+   	ExcelFileInputFormat inputFormat = new ExcelFileInputFormat();
+    	inputFormat.configure(job);
+    	InputSplit[] inputSplits = inputFormat.getSplits(job,1);
+    	assertEquals("Only one split generated for Excel file", 1, inputSplits.length);
+    	RecordReader<Text, ArrayWritable> reader = inputFormat.getRecordReader(inputSplits[0], job, reporter);
+	assertNotNull("Format returned  null RecordReader", reader);
+	Text spreadSheetKey = new Text();	
+	ArrayWritable spreadSheetValue = new ArrayWritable(SpreadSheetCellDAO.class);
+	// if following assertion not true that means the document has (wrongly) NOT been filtered out
+	assertFalse("Input Split for Excel file contains row 1", reader.next(spreadSheetKey,spreadSheetValue));	
+    }
 
 @Test
     public void writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchOncePositive() throws IOException {
@@ -1114,7 +1284,7 @@ JobConf job = new JobConf(defaultConf);
 	SpreadSheetCellDAO c1 = new SpreadSheetCellDAO("test3","","","C1","Sheet1");
 	// write
 	JobConf job = new JobConf(defaultConf);
-    	String fileName="excel2013singlesheetmetadatapositivetestout";
+    	String fileName="excel2013singlesheetmetadatapositiveoncetestout";
     	String tmpDir=tmpPath.toString();	
     	Path outputPath = new Path(tmpDir);
     	FileOutputFormat.setOutputPath(job, outputPath);
@@ -1190,6 +1360,259 @@ JobConf job = new JobConf(defaultConf);
 	assertEquals("Input Split for Excel file contains row 1 with cell 2 == \"test2\"", "test2", ((SpreadSheetCellDAO)spreadSheetValue.get()[1]).getFormattedValue());
 	assertEquals("Input Split for Excel file contains row 1 with cell 3 == \"test3\"", "test3", ((SpreadSheetCellDAO)spreadSheetValue.get()[2]).getFormattedValue());
     }
+
+    @Test
+    public void writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchOncePositive() throws IOException {
+	// one row string and three columns ("test1","test2","test3")
+	// the idea here is to have some content although we only evaluate metadata
+	SpreadSheetCellDAO a1 = new SpreadSheetCellDAO("test1","","","A1","Sheet1");
+	SpreadSheetCellDAO b1 = new SpreadSheetCellDAO("test2","","","B1","Sheet1");
+	SpreadSheetCellDAO c1 = new SpreadSheetCellDAO("test3","","","C1","Sheet1");
+	// write
+	JobConf job = new JobConf(defaultConf);
+    	String fileName="excel2003singlesheetmetadatapositiveoncetestout";
+    	String tmpDir=tmpPath.toString();	
+    	Path outputPath = new Path(tmpDir);
+    	FileOutputFormat.setOutputPath(job, outputPath);
+	// set generic outputformat settings
+	job.set(JobContext.TASK_ATTEMPT_ID, attempt);
+	// set locale to the one of the test data
+	job.set("hadoopoffice.read.locale.bcp47","de");
+	job.set("hadoopoffice.write.mimeType","application/vnd.ms-excel"); //old Excel format
+
+
+	// set all the meta data 
+	job.set("hadoopoffice.write.metadata.applicationname","dummyapplicationname");
+	job.set("hadoopoffice.write.metadata.author","dummyauthor");
+	job.set("hadoopoffice.write.metadata.charcount","1");
+	job.set("hadoopoffice.write.metadata.comments","dummycomments");
+	job.set("hadoopoffice.write.metadata.createdatetime","12:00:00 01.01.2016");
+	job.set("hadoopoffice.write.metadata.edittime","0");
+	job.set("hadoopoffice.write.metadata.keywords","dummykeywords");
+	job.set("hadoopoffice.write.metadata.lastauthor","dummylastauthor");
+	job.set("hadoopoffice.write.metadata.lastprinted","12:00:00 01.01.2016");
+	job.set("hadoopoffice.write.metadata.lastsavedatetime","12:00:00 01.01.2016");
+	job.set("hadoopoffice.write.metadata.pagecount","1");
+	job.set("hadoopoffice.write.metadata.revnumber","1");
+	job.set("hadoopoffice.write.metadata.security","0");
+	job.set("hadoopoffice.write.metadata.subject","dummysubject");
+	job.set("hadoopoffice.write.metadata.template","dummytemplate");
+	job.set("hadoopoffice.write.metadata.title","dummytitle");
+	job.set("hadoopoffice.write.metadata.wordcount","1");
+   	ExcelFileOutputFormat outputFormat = new ExcelFileOutputFormat();
+    	RecordWriter<NullWritable,SpreadSheetCellDAO> writer = outputFormat.getRecordWriter(null, job, fileName, null);
+	assertNotNull("Format returned  null RecordWriter", writer);
+	writer.write(null,a1);
+	writer.write(null,b1);
+	writer.write(null,c1);
+	writer.close(reporter);
+	// try to read it again
+	job = new JobConf(defaultConf);
+	Path inputFile = new Path(tmpDir+File.separator+"_temporary"+File.separator+"0"+File.separator+"_temporary"+File.separator+attempt+File.separator+fileName+".xls");
+    	FileInputFormat.setInputPaths(job, inputFile);
+	// set locale to the one of the test data
+	job.set("hadoopoffice.read.locale.bcp47","de");
+	// set metadata to match all
+	job.set("hadoopoffice.read.filter.metadata.matchAll","false");
+	// following filter
+	job.set("hadoopoffice.read.filter.metadata.applicationname","dummyapplicationname");
+	job.set("hadoopoffice.read.filter.metadata.metadata.author","dummyautho2r");
+	job.set("hadoopoffice.read.filter.metadata.metadata.charcount","2");
+	job.set("hadoopoffice.read.filter.metadata.metadata.comments","dummycomments2");
+	job.set("hadoopoffice.read.filter.metadata.metadata.createdatetime","12:00:00 01.01.2017");
+	job.set("hadoopoffice.read.filter.metadata.metadata.edittime","1");
+	job.set("hadoopoffice.read.filter.metadata.metadata.keywords","dummykeywords2");
+	job.set("hadoopoffice.read.filter.metadata.metadata.lastauthor","dummylastauthor2");
+	job.set("hadoopoffice.read.filter.metadata.metadata.lastprinted","12:00:00 01.01.2017");
+	job.set("hadoopoffice.read.filter.metadata.metadata.lastsavedatetime","12:00:00 01.01.2017");
+	job.set("hadoopoffice.read.filter.metadata.metadata.pagecount","2");
+	job.set("hadoopoffice.read.filter.metadata.metadata.revnumber","2");
+	job.set("hadoopoffice.read.filter.metadata.metadata.security","1");
+	job.set("hadoopoffice.read.filter.metadata.metadata.subject","dummysubject2");
+	job.set("hadoopoffice.read.filter.metadata.metadata.template","dummytemplate2");
+	job.set("hadoopoffice.read.filter.metadata.metadata.title","dummytitle2");
+	job.set("hadoopoffice.read.filter.metadata.metadata.wordcount","2");
+   	ExcelFileInputFormat inputFormat = new ExcelFileInputFormat();
+    	inputFormat.configure(job);
+    	InputSplit[] inputSplits = inputFormat.getSplits(job,1);
+    	assertEquals("Only one split generated for Excel file", 1, inputSplits.length);
+    	RecordReader<Text, ArrayWritable> reader = inputFormat.getRecordReader(inputSplits[0], job, reporter);
+	assertNotNull("Format returned  null RecordReader", reader);
+	Text spreadSheetKey = new Text();	
+	ArrayWritable spreadSheetValue = new ArrayWritable(SpreadSheetCellDAO.class);
+	// if following assertion is not true that means the document has (wrongly) been filtered out
+	assertTrue("Input Split for Excel file contains row 1", reader.next(spreadSheetKey,spreadSheetValue));	
+	assertEquals("Input Split for Excel file has keyname == \"["+fileName+".xlsx]Sheet1!A1\"", "["+fileName+".xls]Sheet1!A1", spreadSheetKey.toString());
+	assertEquals("Input Split for Excel file contains row 1 with 3 columns", 3, spreadSheetValue.get().length);
+	assertEquals("Input Split for Excel file contains row 1 with cell 1 == \"test1\"", "test1", ((SpreadSheetCellDAO)spreadSheetValue.get()[0]).getFormattedValue());
+	assertEquals("Input Split for Excel file contains row 1 with cell 2 == \"test2\"", "test2", ((SpreadSheetCellDAO)spreadSheetValue.get()[1]).getFormattedValue());
+	assertEquals("Input Split for Excel file contains row 1 with cell 3 == \"test3\"", "test3", ((SpreadSheetCellDAO)spreadSheetValue.get()[2]).getFormattedValue());
+    }
+
+@Test
+    public void writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchOnceNegative() throws IOException {
+	// one row string and three columns ("test1","test2","test3")
+	// the idea here is to have some content although we only evaluate metadata
+	SpreadSheetCellDAO a1 = new SpreadSheetCellDAO("test1","","","A1","Sheet1");
+	SpreadSheetCellDAO b1 = new SpreadSheetCellDAO("test2","","","B1","Sheet1");
+	SpreadSheetCellDAO c1 = new SpreadSheetCellDAO("test3","","","C1","Sheet1");
+	// write
+	JobConf job = new JobConf(defaultConf);
+    	String fileName="excel2013singlesheetmetadatanativeoncetestout";
+    	String tmpDir=tmpPath.toString();	
+    	Path outputPath = new Path(tmpDir);
+    	FileOutputFormat.setOutputPath(job, outputPath);
+	// set generic outputformat settings
+	job.set(JobContext.TASK_ATTEMPT_ID, attempt);
+	// set locale to the one of the test data
+	job.set("hadoopoffice.read.locale.bcp47","de");
+	job.set("hadoopoffice.write.mimeType","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new Excel format, anyway default, but here for illustrative purposes
+	// set all the meta data including to custom properties
+	job.set("hadoopoffice.write.metadata.category","dummycategory");
+	job.set("hadoopoffice.write.metadata.contentstatus","dummycontentstatus");
+	job.set("hadoopoffice.write.metadata.contenttype","dummycontenttype");
+	job.set("hadoopoffice.write.metadata.created","12:00:00 01.01.2016");
+	job.set("hadoopoffice.write.metadata.creator","dummycreator");
+	job.set("hadoopoffice.write.metadata.description","dummydescription");	
+	job.set("hadoopoffice.write.metadata.identifier","dummyidentifier");
+	job.set("hadoopoffice.write.metadata.keywords","dummykeywords");
+	job.set("hadoopoffice.write.metadata.lastmodifiedbyuser","dummylastmodifiedbyuser");
+	job.set("hadoopoffice.write.metadata.lastprinted","12:00:00 01.01.2016");
+	job.set("hadoopoffice.write.metadata.modified","12:00:00 01.01.2016");
+	job.set("hadoopoffice.write.metadata.lastmodifiedbyuser","dummylastmodifiedbyuser");
+	job.set("hadoopoffice.write.metadata.revision","2");
+	job.set("hadoopoffice.write.metadata.subject","dummysubject");
+	job.set("hadoopoffice.write.metadata.title","dummytitle");
+	job.set("hadoopoffice.write.metadata.custom.mycustomproperty1","dummymycustomproperty1");
+	job.set("hadoopoffice.write.metadata.custom.mycustomproperty2","dummymycustomproperty2");
+   	ExcelFileOutputFormat outputFormat = new ExcelFileOutputFormat();
+    	RecordWriter<NullWritable,SpreadSheetCellDAO> writer = outputFormat.getRecordWriter(null, job, fileName, null);
+	assertNotNull("Format returned  null RecordWriter", writer);
+	writer.write(null,a1);
+	writer.write(null,b1);
+	writer.write(null,c1);
+	writer.close(reporter);
+	// try to read it again
+	job = new JobConf(defaultConf);
+	Path inputFile = new Path(tmpDir+File.separator+"_temporary"+File.separator+"0"+File.separator+"_temporary"+File.separator+attempt+File.separator+fileName+".xlsx");
+    	FileInputFormat.setInputPaths(job, inputFile);
+	// set locale to the one of the test data
+	job.set("hadoopoffice.read.locale.bcp47","de");
+	// set metadata to match all
+	job.set("hadoopoffice.read.filter.metadata.matchAll","false");
+	// following filter
+   	job.set("hadoopoffice.read.filter.metadata.category","dummycategory2");
+	job.set("hadoopoffice.read.filter.metadata.contentstatus","dummycontentstatus2");
+	job.set("hadoopoffice.read.filter.metadata.contenttype","dummycontenttype2");
+	job.set("hadoopoffice.read.filter.metadata.created","12:00:00 01.01.2017");
+	job.set("hadoopoffice.read.filter.metadata.creator","dummycreator2");
+	job.set("hadoopoffice.read.filter.metadata.description","dummydescription2");	
+	job.set("hadoopoffice.read.filter.metadata.identifier","dummyidentifier2");
+	job.set("hadoopoffice.read.filter.metadata.keywords","dummykeywords2");
+	job.set("hadoopoffice.read.filter.metadata.lastmodifiedbyuser","dummylastmodifiedbyuser2");
+	job.set("hadoopoffice.read.filter.metadata.lastprinted","12:00:00 01.01.2017");
+	job.set("hadoopoffice.read.filter.metadata.modified","12:00:00 01.01.2017");
+	job.set("hadoopoffice.read.filter.metadata.lastmodifiedbyuser","dummylastmodifiedbyuser2");
+	job.set("hadoopoffice.read.filter.metadata.revision","3");
+	job.set("hadoopoffice.read.filter.metadata.subject","dummysubject2");
+	job.set("hadoopoffice.read.filter.metadata.title","dummytitle2");
+	job.set("hadoopoffice.read.filter.metadata.custom.mycustomproperty1","dummymycustomproperty12");
+	job.set("hhadoopoffice.read.filter.metadata.custom.mycustomproperty2","dummymycustomproperty22");
+   	ExcelFileInputFormat inputFormat = new ExcelFileInputFormat();
+    	inputFormat.configure(job);
+    	InputSplit[] inputSplits = inputFormat.getSplits(job,1);
+    	assertEquals("Only one split generated for Excel file", 1, inputSplits.length);
+    	RecordReader<Text, ArrayWritable> reader = inputFormat.getRecordReader(inputSplits[0], job, reporter);
+	assertNotNull("Format returned  null RecordReader", reader);
+	Text spreadSheetKey = new Text();	
+	ArrayWritable spreadSheetValue = new ArrayWritable(SpreadSheetCellDAO.class);
+	// if following assertion is true that means the document has (wrongly) NOT been filtered out
+	assertFalse("Input Split for Excel file contains row 1", reader.next(spreadSheetKey,spreadSheetValue));	
+    }
+
+    @Test
+    public void writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchOnceNegative() throws IOException {
+	// one row string and three columns ("test1","test2","test3")
+	// the idea here is to have some content although we only evaluate metadata
+	SpreadSheetCellDAO a1 = new SpreadSheetCellDAO("test1","","","A1","Sheet1");
+	SpreadSheetCellDAO b1 = new SpreadSheetCellDAO("test2","","","B1","Sheet1");
+	SpreadSheetCellDAO c1 = new SpreadSheetCellDAO("test3","","","C1","Sheet1");
+	// write
+	JobConf job = new JobConf(defaultConf);
+    	String fileName="excel2003singlesheetmetadatanegativeoncetestout";
+    	String tmpDir=tmpPath.toString();	
+    	Path outputPath = new Path(tmpDir);
+    	FileOutputFormat.setOutputPath(job, outputPath);
+	// set generic outputformat settings
+	job.set(JobContext.TASK_ATTEMPT_ID, attempt);
+	// set locale to the one of the test data
+	job.set("hadoopoffice.read.locale.bcp47","de");
+	job.set("hadoopoffice.write.mimeType","application/vnd.ms-excel"); //old Excel format
+
+
+	// set all the meta data 
+	job.set("hadoopoffice.write.metadata.applicationname","dummyapplicationname");
+	job.set("hadoopoffice.write.metadata.author","dummyauthor");
+	job.set("hadoopoffice.write.metadata.charcount","1");
+	job.set("hadoopoffice.write.metadata.comments","dummycomments");
+	job.set("hadoopoffice.write.metadata.createdatetime","12:00:00 01.01.2016");
+	job.set("hadoopoffice.write.metadata.edittime","0");
+	job.set("hadoopoffice.write.metadata.keywords","dummykeywords");
+	job.set("hadoopoffice.write.metadata.lastauthor","dummylastauthor");
+	job.set("hadoopoffice.write.metadata.lastprinted","12:00:00 01.01.2016");
+	job.set("hadoopoffice.write.metadata.lastsavedatetime","12:00:00 01.01.2016");
+	job.set("hadoopoffice.write.metadata.pagecount","1");
+	job.set("hadoopoffice.write.metadata.revnumber","1");
+	job.set("hadoopoffice.write.metadata.security","0");
+	job.set("hadoopoffice.write.metadata.subject","dummysubject");
+	job.set("hadoopoffice.write.metadata.template","dummytemplate");
+	job.set("hadoopoffice.write.metadata.title","dummytitle");
+	job.set("hadoopoffice.write.metadata.wordcount","1");
+   	ExcelFileOutputFormat outputFormat = new ExcelFileOutputFormat();
+    	RecordWriter<NullWritable,SpreadSheetCellDAO> writer = outputFormat.getRecordWriter(null, job, fileName, null);
+	assertNotNull("Format returned  null RecordWriter", writer);
+	writer.write(null,a1);
+	writer.write(null,b1);
+	writer.write(null,c1);
+	writer.close(reporter);
+	// try to read it again
+	job = new JobConf(defaultConf);
+	Path inputFile = new Path(tmpDir+File.separator+"_temporary"+File.separator+"0"+File.separator+"_temporary"+File.separator+attempt+File.separator+fileName+".xls");
+    	FileInputFormat.setInputPaths(job, inputFile);
+	// set locale to the one of the test data
+	job.set("hadoopoffice.read.locale.bcp47","de");
+	// set metadata to match all
+	job.set("hadoopoffice.read.filter.metadata.matchAll","false");
+	// following filter
+	job.set("hadoopoffice.read.filter.metadata.applicationname","dummyapplicationname2");
+	job.set("hadoopoffice.read.filter.metadata.metadata.author","dummyautho2r");
+	job.set("hadoopoffice.read.filter.metadata.metadata.charcount","2");
+	job.set("hadoopoffice.read.filter.metadata.metadata.comments","dummycomments2");
+	job.set("hadoopoffice.read.filter.metadata.metadata.createdatetime","12:00:00 01.01.2017");
+	job.set("hadoopoffice.read.filter.metadata.metadata.edittime","1");
+	job.set("hadoopoffice.read.filter.metadata.metadata.keywords","dummykeywords2");
+	job.set("hadoopoffice.read.filter.metadata.metadata.lastauthor","dummylastauthor2");
+	job.set("hadoopoffice.read.filter.metadata.metadata.lastprinted","12:00:00 01.01.2017");
+	job.set("hadoopoffice.read.filter.metadata.metadata.lastsavedatetime","12:00:00 01.01.2017");
+	job.set("hadoopoffice.read.filter.metadata.metadata.pagecount","2");
+	job.set("hadoopoffice.read.filter.metadata.metadata.revnumber","2");
+	job.set("hadoopoffice.read.filter.metadata.metadata.security","1");
+	job.set("hadoopoffice.read.filter.metadata.metadata.subject","dummysubject2");
+	job.set("hadoopoffice.read.filter.metadata.metadata.template","dummytemplate2");
+	job.set("hadoopoffice.read.filter.metadata.metadata.title","dummytitle2");
+	job.set("hadoopoffice.read.filter.metadata.metadata.wordcount","2");
+   	ExcelFileInputFormat inputFormat = new ExcelFileInputFormat();
+    	inputFormat.configure(job);
+    	InputSplit[] inputSplits = inputFormat.getSplits(job,1);
+    	assertEquals("Only one split generated for Excel file", 1, inputSplits.length);
+    	RecordReader<Text, ArrayWritable> reader = inputFormat.getRecordReader(inputSplits[0], job, reporter);
+	assertNotNull("Format returned  null RecordReader", reader);
+	Text spreadSheetKey = new Text();	
+	ArrayWritable spreadSheetValue = new ArrayWritable(SpreadSheetCellDAO.class);
+	// if following assertion is true that means the document has (wrongly) NOT been filtered out
+	assertFalse("Input Split for Excel file contains row 1", reader.next(spreadSheetKey,spreadSheetValue));	
+    }
+
 
  @Test
     public void writeExcelOutputFormatExcel2013SingleSheetGZipCompressed() throws IOException {
