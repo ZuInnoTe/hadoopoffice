@@ -475,12 +475,18 @@ private void prepareMetaData() {
 private void prepareHSSFMetaData() {
 	HSSFWorkbook currentHSSFWorkbook = (HSSFWorkbook) this.currentWorkbook;
 	SummaryInformation summaryInfo = currentHSSFWorkbook.getSummaryInformation(); 
+	if (summaryInfo==null) {
+		currentHSSFWorkbook.createInformationProperties();
+		 summaryInfo = currentHSSFWorkbook.getSummaryInformation(); 
+	}
 	SimpleDateFormat format = new SimpleDateFormat(MSExcelParser.DATE_FORMAT); 
 	for (String currentKey: this.metadata.keySet()) {
 		// process general properties
 		try {
+		LOG.debug(currentKey);
+		LOG.debug(this.metadata.get(currentKey));
 		switch(currentKey) {
-			case "applicationame": summaryInfo.setApplicationName(this.metadata.get(currentKey)); break;
+			case "applicationname": summaryInfo.setApplicationName(this.metadata.get(currentKey)); break;
 			case "author": summaryInfo.setAuthor(this.metadata.get(currentKey)); break;
 			case "charcount": summaryInfo.setCharCount(Integer.parseInt(this.metadata.get(currentKey))); break;
 			case "comments": summaryInfo.setComments(this.metadata.get(currentKey)); break;
