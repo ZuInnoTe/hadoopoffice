@@ -460,7 +460,7 @@ private static ChainingMode getChainMode(String chainMode) {
 private void prepareMetaData() {
 	if (this.currentWorkbook instanceof HSSFWorkbook) {
 		prepareHSSFMetaData();
-	} else if (this.currentWorkbook instanceof HSSFWorkbook) {
+	} else if (this.currentWorkbook instanceof XSSFWorkbook) {
 		prepareXSSFMetaData();
 	} else {
 		LOG.error("Unknown workbook type. Cannot write metadata.");
