@@ -47,7 +47,9 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.ss.util.WorkbookUtil;
+import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
 import org.apache.poi.poifs.filesystem.OPOIFSFileSystem;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.poifs.crypt.CipherAlgorithm;
 import org.apache.poi.poifs.crypt.HashAlgorithm;
 import org.apache.poi.poifs.crypt.EncryptionMode;
@@ -159,6 +161,7 @@ public void create(OutputStream oStream, Map<String,InputStream> linkedWorkbooks
 		this.currentWorkbook=new XSSFWorkbook();
 	} else if (this.format.equals(MSExcelWriter.FORMAT_OLD)) {
 		this.currentWorkbook=new HSSFWorkbook();
+		((HSSFWorkbook)this.currentWorkbook).createInformationProperties();
 	} 
 	this.linkedWorkbooks=linkedWorkbooks;
 	this.currentFormulaEvaluator=this.currentWorkbook.getCreationHelper().createFormulaEvaluator();
@@ -284,9 +287,11 @@ public void finalizeWrite() throws IOException, GeneralSecurityException {
 			this.oStream.close();
 		} else {	// encryption
 			if (this.currentWorkbook instanceof HSSFWorkbook) { // old Excel format
+				LOG.debug("encrypting HSSFWorkbook");
 				Biff8EncryptionKey.setCurrentUserPassword(this.password);
 				this.currentWorkbook.write(this.oStream);
 				this.oStream.close();
+				Biff8EncryptionKey.setCurrentUserPassword(null);
 			} else if (this.currentWorkbook instanceof XSSFWorkbook) {
 				if (this.encryptAlgorithmCipher==null) {
 					LOG.error("No encryption algorithm specified");
@@ -300,15 +305,16 @@ public void finalizeWrite() throws IOException, GeneralSecurityException {
 				if (this.chainModeCipher==null) {
 					LOG.error("No chain mode specified");
 				} else {
-					OPOIFSFileSystem documentFileSystem = new OPOIFSFileSystem();
+					POIFSFileSystem ooxmlDocumentFileSystem = new POIFSFileSystem();
 					EncryptionInfo info = new EncryptionInfo(this.encryptionModeCipher, this.encryptAlgorithmCipher, this.hashAlgorithmCipher, -1, -1, this.chainModeCipher);
 					Encryptor enc = info.getEncryptor();
 					enc.confirmPassword(this.password);
-					OPCPackage opc = ((XSSFWorkbook)this.currentWorkbook).getPackage();
-					OutputStream os = enc.getDataStream(documentFileSystem);
-					opc.save(os);
-					opc.close();
-					documentFileSystem.writeFilesystem(this.oStream);
+					//OPCPackage opc = ((XSSFWorkbook)this.currentWorkbook).getPackage();
+					OutputStream os = enc.getDataStream(ooxmlDocumentFileSystem);	
+					this.currentWorkbook.write(os);
+					//opc.save(os);
+					//opc.close();
+					ooxmlDocumentFileSystem.writeFilesystem(this.oStream);
 					this.oStream.close();
 				}
 			} else {
