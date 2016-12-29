@@ -47,25 +47,14 @@ import org.apache.commons.logging.Log;
 
 public abstract class AbstractSpreadSheetDocumentFileInputFormat  extends FileInputFormat<Text,ArrayWritable> {
 private static final Log LOG = LogFactory.getLog(AbstractSpreadSheetDocumentFileInputFormat.class.getName());
-private CompressionCodecFactory compressionCodecs = null;
+
 
 	public abstract RecordReader<Text,ArrayWritable> getRecordReader(InputSplit split, JobConf job, Reporter reporter) throws IOException;
 	
-	public void configure (JobConf conf) {
-		this.compressionCodecs = new CompressionCodecFactory(conf); // not really needed for now since isSplitable is always false
-	} 
 
+	public abstract void configure(JobConf conf);
+	protected abstract boolean isSplitable(FileSystem fs, Path file);
 	
-
-	/**
-	 * Unfortunately, we cannot split Office documents correctly. Apache Tika/library requires full documents.
-	 * Nevertheless, most of the time you have anyway small (smaller than default HDFS blocksize) Office documents that can be processed fast. 
-	 * Hence, you should put them in Hadoop Archives (HAR) either uncompressed or compressed to reduce load on namenode.
-	 *
-	*/
-  	protected boolean isSplitable(FileSystem fs, Path file) {
-		return false;
-  	}
 
 
 }
