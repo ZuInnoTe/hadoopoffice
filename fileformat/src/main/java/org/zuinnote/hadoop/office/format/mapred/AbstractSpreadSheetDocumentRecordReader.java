@@ -139,7 +139,7 @@ public AbstractSpreadSheetDocumentRecordReader(FileSplit split, JobConf job, Rep
       }
       this.readLinkedWorkbooks=conf.getBoolean(this.CONF_LINKEDWB,this.DEFAULT_LINKEDWB);
       this.ignoreMissingLinkedWorkbooks=conf.getBoolean(CONF_IGNOREMISSINGWB,this.DEFAULT_IGNOREMISSINGLINKEDWB);
-      this.password=conf.get(CONF_DECRYPT); // null if no password is set
+      this.password=conf.get(this.CONF_DECRYPT); // null if no password is set
       this.linkedWBpassword=conf.get(CONF_DECRYPTLINKEDWBBASE); // null if no password is set
       this.metadataFilter=HadoopUtil.parsePropertiesFromBase(job,this.CONF_FILTERMETADATA);
       this.linkedWBCredentialMap=HadoopUtil.parsePropertiesFromBase(job,this.CONF_DECRYPTLINKEDWBBASE);
