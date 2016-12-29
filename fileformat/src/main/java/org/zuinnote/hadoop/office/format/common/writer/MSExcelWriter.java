@@ -309,11 +309,8 @@ public void finalizeWrite() throws IOException, GeneralSecurityException {
 					EncryptionInfo info = new EncryptionInfo(this.encryptionModeCipher, this.encryptAlgorithmCipher, this.hashAlgorithmCipher, -1, -1, this.chainModeCipher);
 					Encryptor enc = info.getEncryptor();
 					enc.confirmPassword(this.password);
-					//OPCPackage opc = ((XSSFWorkbook)this.currentWorkbook).getPackage();
 					OutputStream os = enc.getDataStream(ooxmlDocumentFileSystem);	
 					this.currentWorkbook.write(os);
-					//opc.save(os);
-					//opc.close();
 					ooxmlDocumentFileSystem.writeFilesystem(this.oStream);
 					this.oStream.close();
 				}
