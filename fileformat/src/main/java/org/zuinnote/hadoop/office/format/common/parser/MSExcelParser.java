@@ -167,10 +167,9 @@ private boolean filtered=false;
 	*/
 	@Override
 	public void parse(InputStream in) throws IOException,FormatNotUnderstoodException, GeneralSecurityException {
-		this.in=getDecryptedInputStream(in);
 		// read xls
 		try {
-			this.currentWorkbook=WorkbookFactory.create(in);
+			this.currentWorkbook=WorkbookFactory.create(in,this.password);
 		} catch (InvalidFormatException e) {
 			throw new FormatNotUnderstoodException(e.toString());
 		}
@@ -436,42 +435,6 @@ private boolean filtered=false;
 	
 	}
 
-	/*
-	*
-	* Returns the decrypted InputStream in case it is encrypted
-	*
-	* @param in original InputStream
-	* 
-	* @return decrypted InputStream in case document is encrypted, original InputStream if document is not encrypted
-	*
-	* @throws java.io.IOException in case of issues reading from in
-	* @throws org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException in case there are issues reading from the Excel file, e.g. wrong password or unknown format
-	* @throws java.security.GeneralSecurityException in case of issues decrypting the document
-	*
-	*/
-	private InputStream getDecryptedInputStream(InputStream in) throws IOException,FormatNotUnderstoodException,GeneralSecurityException {
-		if (this.password==null) { // document is not encrypted
-			return in;
-		}
-		if (this.currentWorkbook instanceof XSSFWorkbook) {
-			// use POIFileSystem
-			OPOIFSFileSystem documentFileSystem=new OPOIFSFileSystem(this.in);
-			EncryptionInfo info = new EncryptionInfo(documentFileSystem);
-			// create decryptor
-			Decryptor d = Decryptor.getInstance(info);
-    			if (!d.verifyPassword(this.password)) {
-				this.close();
-        			throw new FormatNotUnderstoodException("Could not decrypt format");
-			}
-    			return d.getDataStream(documentFileSystem);
-		} else if (this.currentWorkbook instanceof HSSFWorkbook) {
-			Biff8EncryptionKey.setCurrentUserPassword(this.password);
-			return in;
-		} else {
-			LOG.error("Unknown workbook type. Do not know how to decrypt");
-		}
-		return in;
-	}
 
 	/*
 	* Check if document matches the metadata filters
@@ -701,8 +664,9 @@ private boolean filtered=false;
 		HSSFWorkbook currentHSSFWorkbook = (HSSFWorkbook) this.currentWorkbook;
 		SummaryInformation summaryInfo = currentHSSFWorkbook.getSummaryInformation(); 
 		boolean matchAll=true;
+
+		boolean matchFull=true;
 		boolean matchOnce=false;
-		boolean matchFull=false;
 		if (this.metadataFilter.get("matchAll")!=null) {
 			if (this.metadataFilter.get("matchAll").toLowerCase().equals("true")) {
 				matchAll=true;
@@ -719,7 +683,7 @@ private boolean filtered=false;
 			if ((coreProp!=null) && (coreProp.matches(this.metadataFilter.get(corePropertyName))==true)) {
 				matchOnce=true;
 			} else {
-				matchAll=false;
+				matchFull=false;
 			}
 		}
 		corePropertyName="author";
@@ -728,7 +692,7 @@ private boolean filtered=false;
 			if ((coreProp!=null) && (coreProp.matches(this.metadataFilter.get(corePropertyName))==true)) {
 				matchOnce=true;
 			} else {
-				matchAll=false;
+				matchFull=false;
 			}
 		}
 		corePropertyName="charcount";
@@ -737,7 +701,7 @@ private boolean filtered=false;
 			if (String.valueOf(coreProp).matches(this.metadataFilter.get(corePropertyName))==true) {
 				matchOnce=true;
 			} else {
-				matchAll=false;
+				matchFull=false;
 			}
 		}
 		corePropertyName="comments";
@@ -746,7 +710,7 @@ private boolean filtered=false;
 			if ((coreProp!=null) && (coreProp.matches(this.metadataFilter.get(corePropertyName))==true)) {
 				matchOnce=true;
 			} else {
-				matchAll=false;
+				matchFull=false;
 			}
 		}
 		corePropertyName="createddatetime";
@@ -755,7 +719,7 @@ private boolean filtered=false;
 			if ((coreProp!=null) && (coreProp.toString().matches(this.metadataFilter.get(corePropertyName))==true)) {
 				matchOnce=true;
 			} else {
-				matchAll=false;
+				matchFull=false;
 			}
 		}
 		corePropertyName="edittime";
@@ -764,7 +728,7 @@ private boolean filtered=false;
 			if (String.valueOf(coreProp).matches(this.metadataFilter.get(corePropertyName))==true) {
 				matchOnce=true;
 			} else {
-				matchAll=false;
+				matchFull=false;
 			}
 		}
 		corePropertyName="keywords";
@@ -773,7 +737,7 @@ private boolean filtered=false;
 			if ((coreProp!=null) && (coreProp.matches(this.metadataFilter.get(corePropertyName))==true)) {
 				matchOnce=true;
 			} else {
-				matchAll=false;
+				matchFull=false;
 			}
 		}
 		corePropertyName="lastauthor";
@@ -782,7 +746,7 @@ private boolean filtered=false;
 			if ((coreProp!=null) && (coreProp.matches(this.metadataFilter.get(corePropertyName))==true)) {
 				matchOnce=true;
 			} else {
-				matchAll=false;
+				matchFull=false;
 			}
 		}
 		corePropertyName="lastprinted";
@@ -791,7 +755,7 @@ private boolean filtered=false;
 			if ((coreProp!=null) && (coreProp.toString().matches(this.metadataFilter.get(corePropertyName))==true)) {
 				matchOnce=true;
 			} else {
-				matchAll=false;
+				matchFull=false;
 			}
 		}
 		corePropertyName="lastsavedatetime";
@@ -800,7 +764,7 @@ private boolean filtered=false;
 			if ((coreProp!=null) && (coreProp.toString().matches(this.metadataFilter.get(corePropertyName))==true)) {
 				matchOnce=true;
 			} else {
-				matchAll=false;
+				matchFull=false;
 			}
 		}
 		corePropertyName="pagecount";
@@ -809,7 +773,7 @@ private boolean filtered=false;
 			if (String.valueOf(coreProp).matches(this.metadataFilter.get(corePropertyName))==true) {
 				matchOnce=true;
 			} else {
-				matchAll=false;
+				matchFull=false;
 			}
 		}
 		corePropertyName="revnumber";
@@ -818,7 +782,7 @@ private boolean filtered=false;
 			if ((coreProp!=null) && (coreProp.matches(this.metadataFilter.get(corePropertyName))==true)) {
 				matchOnce=true;
 			} else {
-				matchAll=false;
+				matchFull=false;
 			}
 		}
 		corePropertyName="security";
@@ -827,7 +791,7 @@ private boolean filtered=false;
 			if (String.valueOf(coreProp).matches(this.metadataFilter.get(corePropertyName))==true) {
 				matchOnce=true;
 			} else {
-				matchAll=false;
+				matchFull=false;
 			}
 		}
 		corePropertyName="subject";
@@ -836,7 +800,7 @@ private boolean filtered=false;
 			if ((coreProp!=null) && (coreProp.matches(this.metadataFilter.get(corePropertyName))==true)) {
 				matchOnce=true;
 			} else {
-				matchAll=false;
+				matchFull=false;
 			}
 		}
 		corePropertyName="template";
@@ -845,7 +809,7 @@ private boolean filtered=false;
 			if ((coreProp!=null) && (coreProp.matches(this.metadataFilter.get(corePropertyName))==true)) {
 				matchOnce=true;
 			} else {
-				matchAll=false;
+				matchFull=false;
 			}
 		}
 		corePropertyName="title";
@@ -854,7 +818,7 @@ private boolean filtered=false;
 			if ((coreProp!=null) && (coreProp.matches(this.metadataFilter.get(corePropertyName))==true)) {
 				matchOnce=true;
 			} else {
-				matchAll=false;
+				matchFull=false;
 			}
 		}
 		corePropertyName="wordcount";
@@ -863,14 +827,14 @@ private boolean filtered=false;
 			if (String.valueOf(coreProp).matches(this.metadataFilter.get(corePropertyName))==true) {
 				matchOnce=true;
 			} else {
-				matchAll=false;
+				matchFull=false;
 			}
 		}
 	
 		if (matchAll==false) {
 			return  matchOnce;
 		} else {
-			return matchAll;
+			return matchFull;
 		}
 	}
 
