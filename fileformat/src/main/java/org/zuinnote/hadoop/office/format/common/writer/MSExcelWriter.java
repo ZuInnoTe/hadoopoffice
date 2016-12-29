@@ -517,7 +517,7 @@ private void prepareXSSFMetaData() {
         POIXMLProperties props = currentXSSFWorkbook.getProperties();
 	POIXMLProperties.CoreProperties coreProp=props.getCoreProperties();
 	POIXMLProperties.CustomProperties custProp = props.getCustomProperties();
-	SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd hh:mm:ss zzz yyyy"); // this is the format of the toString method of date used in the parser. Just to be consistent...http://docs.oracle.com/javase/7/docs/api/java/util/Date.html#toString()
+	SimpleDateFormat format = new SimpleDateFormat(MSExcelParser.DATE_FORMAT); 
 	for (String currentKey: this.metadata.keySet()) {
 		// process general properties
 		try {
