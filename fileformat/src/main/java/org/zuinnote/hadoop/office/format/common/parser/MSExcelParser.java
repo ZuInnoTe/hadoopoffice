@@ -19,6 +19,8 @@ package org.zuinnote.hadoop.office.format.common.parser;
 import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 
 import java.security.GeneralSecurityException;
 
@@ -83,6 +85,7 @@ import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 
 public class MSExcelParser implements OfficeReaderParserInterface {
 private static final Log LOG = LogFactory.getLog(MSExcelParser.class.getName());
+public static final String DATE_FORMAT = "hh:mm:ss z dd.MM.yyyy";
 private FormulaEvaluator formulaEvaluator;
 private InputStream in;
 private DataFormatter useDataFormatter=null;
@@ -499,6 +502,7 @@ private boolean filtered=false;
 	private boolean checkFilteredXSSF() {
 		XSSFWorkbook currentXSSFWorkbook = (XSSFWorkbook) this.currentWorkbook;
      		POIXMLProperties props = currentXSSFWorkbook.getProperties();
+		SimpleDateFormat format = new SimpleDateFormat(MSExcelParser.DATE_FORMAT); 
 		// check for each defined property
 		// check if we need to match all
 		boolean matchAll=true;
@@ -546,7 +550,7 @@ private boolean filtered=false;
 		corePropertyName="created";
 		if (this.metadataFilter.get(corePropertyName)!=null) {
 				Date corePropStr=coreProp.getCreated();
-				if ((corePropStr!=null) && (corePropStr.toString().matches(this.metadataFilter.get(corePropertyName))==true)) {
+				if ((corePropStr!=null) && (format.format(corePropStr).matches(this.metadataFilter.get(corePropertyName))==true)) {
 					matchOnce=true;
 				 } else {
 						matchAll=false;
@@ -600,7 +604,7 @@ private boolean filtered=false;
 		corePropertyName="lastprinted";
 		if (this.metadataFilter.get(corePropertyName)!=null) {
 				Date corePropStr=coreProp.getLastPrinted();
-				if ((corePropStr!=null) && (corePropStr.toString().matches(this.metadataFilter.get(corePropertyName))==true)) {
+				if ((corePropStr!=null) && (format.format(corePropStr).matches(this.metadataFilter.get(corePropertyName))==true)) {
 					matchOnce=true;
 				 } else {
 						matchAll=false;
@@ -609,7 +613,7 @@ private boolean filtered=false;
 		corePropertyName="modified";
 		if (this.metadataFilter.get(corePropertyName)!=null) {
 				Date corePropStr=coreProp.getModified();
-				if ((corePropStr!=null) && (corePropStr.toString().matches(this.metadataFilter.get(corePropertyName))==true)) {
+				if ((corePropStr!=null) && (format.format(corePropStr).matches(this.metadataFilter.get(corePropertyName))==true)) {
 					matchOnce=true;
 				 } else {
 						matchAll=false;
