@@ -175,8 +175,9 @@ private boolean filtered=false;
 		}
 		finally 
 		{
-			this.in.close();
-			this.in=null;
+			(if this.in!=null) {
+				this.in.close();
+			}
 		}
 		 this.formulaEvaluator = this.currentWorkbook.getCreationHelper().createFormulaEvaluator();
 		  // add the formulator evaluator of this file as well or we will see a strange Exception
