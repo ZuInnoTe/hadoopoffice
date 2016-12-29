@@ -483,8 +483,6 @@ private void prepareHSSFMetaData() {
 	for (String currentKey: this.metadata.keySet()) {
 		// process general properties
 		try {
-		LOG.debug(currentKey);
-		LOG.debug(this.metadata.get(currentKey));
 		switch(currentKey) {
 			case "applicationname": summaryInfo.setApplicationName(this.metadata.get(currentKey)); break;
 			case "author": summaryInfo.setAuthor(this.metadata.get(currentKey)); break;
