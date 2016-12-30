@@ -25,20 +25,19 @@ package org.zuinnote.hadoop.office.example.tasks;
 *
 */
 import java.io.IOException;
-import org.apache.hadoop.mapred.*;
+import org.apache.hadoop.mapreduce.*;
 import org.apache.hadoop.io.*;
 import java.util.*;
 
-import org.zuinnote.hadoop.office.example.tasks.util.TextArrayWritable;
-
-public class HadoopOfficeExcelReducer extends MapReduceBase implements Reducer<Text, TextArrayWritable, NullWritable, Text> {
+import org.zuinnote.hadoop.office.format.common.dao.TextArrayWritable;
+ 
+public class HadoopOfficeExcelReducer extends  Reducer<Text, TextArrayWritable, NullWritable, Text> {
 private static final String CSV_SEPARATOR=",";
 private static final NullWritable EMPTYKEY = NullWritable.get();
 
-   public void reduce(Text key, Iterator<TextArrayWritable> values, OutputCollector<NullWritable, Text> output, Reporter reporter)
-     throws IOException {
-       while (values.hasNext()) { // should be only called once
-	   TextArrayWritable currentRow = values.next();
+   public void reduce(Text key, Iterable<TextArrayWritable> values, Context context)
+     throws IOException, InterruptedException {
+       for (TextArrayWritable currentRow: values) {  // should be only called once
 	   Writable[] currentRowTextArray = currentRow.get();
 	   if (currentRowTextArray.length>0) {
 	   	StringBuilder currentCSVRowSB=new StringBuilder();
@@ -52,7 +51,7 @@ private static final NullWritable EMPTYKEY = NullWritable.get();
 	   	// remove last separator and add new line
 	   	String currentCSVRowString = currentCSVRowSB.substring(0,currentCSVRowSB.length()-1)+"\n";
 		// add new line
-	   	output.collect(this.EMPTYKEY, new Text(currentCSVRowString));
+	   	context.write(this.EMPTYKEY, new Text(currentCSVRowString));
 	   }
        }
    }
