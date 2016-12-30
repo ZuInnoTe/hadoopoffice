@@ -67,10 +67,9 @@ public RecordWriter<NullWritable,SpreadSheetCellDAO> getRecordWriter(TaskAttempt
 	Configuration conf=context.getConfiguration();
 	String defaultConf=conf.get(AbstractSpreadSheetDocumentRecordWriter.CONF_MIMETYPE,this.DEFAULT_MIMETYPE);
 	conf.set(AbstractSpreadSheetDocumentRecordWriter.CONF_MIMETYPE,defaultConf);
-	
-	Path file = getOutputPath(context);
-	// add suffix
-	file=file.suffix(getSuffix(conf.get(AbstractSpreadSheetDocumentRecordWriter.CONF_MIMETYPE)));
+	// add suffix	
+	Path file = getDefaultWorkFile(context,getSuffix(conf.get(AbstractSpreadSheetDocumentRecordWriter.CONF_MIMETYPE)));
+
 	try {
 	 	return new ExcelRecordWriter(HadoopUtil.getDataOutputStream(conf,file,context,getCompressOutput(context),getOutputCompressorClass(context, this.defaultCompressorClass)),file.getName(),conf);
 	} catch (InvalidWriterConfigurationException iwe) {
