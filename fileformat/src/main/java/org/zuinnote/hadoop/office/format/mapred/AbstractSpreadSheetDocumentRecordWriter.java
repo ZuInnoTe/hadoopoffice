@@ -130,7 +130,7 @@ private HadoopFileReader currentReader;
 * @throws java.security.GeneralSecurityException in case of encrypted linkedworkbooks that could not be decrypted
 *
 */
-public AbstractSpreadSheetDocumentRecordWriter(DataOutputStream out, String fileName, JobConf conf) throws IOException,InvalidWriterConfigurationException,InvalidCellSpecificationException,FormatNotUnderstoodException, GeneralSecurityException {
+public AbstractSpreadSheetDocumentRecordWriter(DataOutputStream out, String fileName, Configuration conf) throws IOException,InvalidWriterConfigurationException,InvalidCellSpecificationException,FormatNotUnderstoodException, GeneralSecurityException {
  	// parse configuration
      this.conf=conf;
      this.mimeType=conf.get(this.CONF_MIMETYPE,this.DEFAULT_MIMETYPE);
