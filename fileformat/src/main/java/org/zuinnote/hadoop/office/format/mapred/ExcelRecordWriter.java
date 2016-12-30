@@ -45,7 +45,7 @@ private static final Log LOG = LogFactory.getLog(ExcelRecordWriter.class.getName
 * Instantiate the constructor of AbstractSpreadSheetDocumentRecordWriter
 *
 */
-public ExcelRecordWriter(DataOutputStream out, String fileName, JobConf conf) throws IOException,InvalidWriterConfigurationException,InvalidCellSpecificationException,FormatNotUnderstoodException,GeneralSecurityException {
+public ExcelRecordWriter(DataOutputStream out, String fileName, Configuration conf) throws IOException,InvalidWriterConfigurationException,InvalidCellSpecificationException,FormatNotUnderstoodException,GeneralSecurityException {
 	super(out,fileName,conf);
 }
 
