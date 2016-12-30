@@ -170,6 +170,7 @@ public AbstractSpreadSheetDocumentRecordWriter(DataOutputStream out, String file
 */
 @Override
 public synchronized void write(NullWritable key, SpreadSheetCellDAO value) throws IOException {
+
 	try {
 		this.officeWriter.write(value);
 	} catch (ObjectNotSupportedException onse) {
