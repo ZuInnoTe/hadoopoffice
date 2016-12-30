@@ -14,7 +14,7 @@
 * limitations under the License.
 **/
 
-package org.zuinnote.hadoop.office.format.mapred;
+package org.zuinnote.hadoop.office.format.mapreduce;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -35,10 +35,9 @@ import java.util.ArrayList;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.io.NullWritable;
-import org.apache.hadoop.mapred.RecordWriter;
-import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import org.apache.hadoop.mapreduce.RecordWriter;
 import org.apache.hadoop.util.Progressable;
 
 import org.apache.commons.logging.LogFactory;
@@ -58,33 +57,31 @@ import org.zuinnote.hadoop.office.format.common.writer.*;
 *
 */
 
-
-
-public abstract class AbstractSpreadSheetDocumentRecordWriter<NullWritable,SpreadSheetCellDAO> implements RecordWriter<NullWritable,SpreadSheetCellDAO> {
+public abstract class AbstractSpreadSheetDocumentRecordWriter<NullWritable,SpreadSheetCellDAO> extends RecordWriter<NullWritable,SpreadSheetCellDAO> {
 public static final Log LOG = LogFactory.getLog(AbstractSpreadSheetDocumentRecordWriter.class.getName());
-public static final String CONF_MIMETYPE=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.CONF_MIMETYPE;
-public static final String CONF_LOCALE=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.CONF_LOCALE;
-public static final String CONF_LINKEDWB=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.CONF_LINKEDWB;
-public static final String CONF_IGNOREMISSINGWB=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.CONF_IGNOREMISSINGWB;
-public static final String CONF_COMMENTAUTHOR=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.CONF_COMMENTAUTHOR;
-public static final String CONF_COMMENTWIDTH=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.CONF_COMMENTWIDTH;
-public static final String CONF_COMMENTHEIGHT=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.CONF_COMMENTHEIGHT;
-public static final String CONF_SECURITYPASSWORD=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.CONF_SECURITYPASSWORD;
-public static final String CONF_SECURITYALGORITHM=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.CONF_SECURITYALGORITHM;
-public static final String CONF_SECURITYMODE=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.CONF_SECURITYMODE;
-public static final String CONF_CHAINMODE=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.CONF_CHAINMODE;
-public static final String CONF_HASHALGORITHM=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.CONF_HASHALGORITHM;
-public static final String CONF_DECRYPTLINKEDWBBASE=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.CONF_DECRYPTLINKEDWBBASE;
-public static final String CONF_METADATA=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.CONF_METADATA; // base: all these properties (e.g. hadoopoffice.write.metadata.author) will be handed over to the corresponding writer
-public static final String DEFAULT_MIMETYPE=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.DEFAULT_MIMETYPE;
-public static final String DEFAULT_LOCALE=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.DEFAULT_LOCALE;
-public static final String DEFAULT_LINKEDWB=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.DEFAULT_LINKEDWB;
-public static final boolean DEFAULT_IGNOREMISSINGLINKEDWB=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.DEFAULT_IGNOREMISSINGLINKEDWB;
-public static final String DEFAULT_AUTHOR=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.DEFAULT_AUTHOR;
-public static final int DEFAULT_COMMENTWIDTH=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.DEFAULT_COMMENTWIDTH;
-public static final int DEFAULT_COMMENTHEIGHT=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.DEFAULT_COMMENTHEIGHT;
-public static final String DEFAULT_PASSWORD=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.DEFAULT_PASSWORD;
-public static final String DEFAULT_ALGORITHM=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.DEFAULT_ALGORITHM;
+public static final String CONF_MIMETYPE="hadoopoffice.write.mimeType";
+public static final String CONF_LOCALE="hadoopoffice.write.locale.bcp47";
+public static final String CONF_LINKEDWB="hadoopoffice.write.linkedworkbooks";
+public static final String CONF_IGNOREMISSINGWB="hadoopoffice.write.ignoremissinglinkedworkbooks";
+public static final String CONF_COMMENTAUTHOR="hadoopoffice.write.comment.author";
+public static final String CONF_COMMENTWIDTH="hadoopoffice.write.comment.width";
+public static final String CONF_COMMENTHEIGHT="hadoopoffice.write.comment.height";
+public static final String CONF_SECURITYPASSWORD="hadoopoffice.write.security.crypt.password";
+public static final String CONF_SECURITYALGORITHM="hadoopoffice.write.security.crypt.encrypt.algorithm";
+public static final String CONF_SECURITYMODE="hadoopoffice.write.security.crypt.encrypt.mode";
+public static final String CONF_CHAINMODE="hadoopoffice.write.security.crypt.chain.mode";
+public static final String CONF_HASHALGORITHM="hadoopoffice.write.security.crypt.hash.algorithm";
+public static final String CONF_DECRYPTLINKEDWBBASE="hadoopoffice.write.security.crypt.linkedworkbooks.";
+public static final String CONF_METADATA="hadoopoffice.write.metadata."; // base: all these properties (e.g. hadoopoffice.write.metadata.author) will be handed over to the corresponding writer
+public static final String DEFAULT_MIMETYPE="";
+public static final String DEFAULT_LOCALE="";
+public static final String DEFAULT_LINKEDWB="";
+public static final boolean DEFAULT_IGNOREMISSINGLINKEDWB=false;
+public static final String DEFAULT_AUTHOR="hadoopoffice";
+public static final int DEFAULT_COMMENTWIDTH=1;
+public static final int DEFAULT_COMMENTHEIGHT=3;
+public static final String DEFAULT_PASSWORD=null;
+public static final String DEFAULT_ALGORITHM="aes256";
 private String[] linkedWorkbooksName;
 private Configuration conf;
 private String fileName;
@@ -191,7 +188,7 @@ public synchronized void write(NullWritable key, SpreadSheetCellDAO value) throw
 *
 */
 @Override
-public synchronized void  close(Reporter reporter) throws IOException {
+public synchronized void  close(TaskAttemptContext context) throws IOException {
 	try {
 		this.officeWriter.finalizeWrite();
 	} catch (InvalidWriterConfigurationException iwce) {

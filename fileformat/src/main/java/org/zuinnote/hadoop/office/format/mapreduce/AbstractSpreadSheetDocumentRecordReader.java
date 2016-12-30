@@ -14,7 +14,7 @@
 * limitations under the License.
 **/
 
-package org.zuinnote.hadoop.office.format.mapred;
+package org.zuinnote.hadoop.office.format.mapreduce;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,10 +45,10 @@ import org.apache.hadoop.io.compress.SplittableCompressionCodec;
 import org.apache.hadoop.io.compress.CompressionCodecFactory;
 import org.apache.hadoop.io.compress.Decompressor;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.mapred.FileSplit;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.RecordReader;
-import org.apache.hadoop.mapred.Reporter;
+import org.apache.hadoop.mapreduce.lib.input.FileSplit;
+import org.apache.hadoop.mapreduce.InputSplit;
+import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import org.apache.hadoop.mapreduce.RecordReader;
 
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
@@ -67,21 +67,21 @@ import org.zuinnote.hadoop.office.format.common.parser.*;
 *
 */
 
-public abstract class AbstractSpreadSheetDocumentRecordReader<K,V> implements RecordReader<K,V> {
+public abstract class AbstractSpreadSheetDocumentRecordReader<K,V> extends RecordReader<K,V> {
 private static final Log LOG = LogFactory.getLog(AbstractSpreadSheetDocumentRecordReader.class.getName());
-public static final String CONF_MIMETYPE=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordReader.CONF_MIMETYPE;
-public static final String CONF_SHEETS=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordReader.CONF_SHEETS;
-public static final String CONF_LOCALE=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordReader.CONF_LOCALE;
-public static final String CONF_LINKEDWB=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordReader.CONF_LINKEDWB;
-public static final String CONF_IGNOREMISSINGWB=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordReader.CONF_IGNOREMISSINGWB;
-public static final String CONF_DECRYPT=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordReader.CONF_DECRYPT;
-public static final String CONF_DECRYPTLINKEDWBBASE=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordReader.CONF_DECRYPTLINKEDWBBASE;
-public static final String CONF_FILTERMETADATA = org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordReader.CONF_FILTERMETADATA; // base: all these properties (e.g. hadoopoffice.read.filter.metadata.author) will be handed over to the corresponding reader which does the filtering!
-public static final String DEFAULT_MIMETYPE=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordReader.DEFAULT_MIMETYPE;
-public static final String DEFAULT_LOCALE=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordReader.DEFAULT_LOCALE;
-public static final String DEFAULT_SHEETS=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordReader.DEFAULT_SHEETS;
-public static final boolean DEFAULT_LINKEDWB=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordReader.DEFAULT_LINKEDWB;
-public static final boolean DEFAULT_IGNOREMISSINGLINKEDWB=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordReader.DEFAULT_IGNOREMISSINGLINKEDWB;
+public static final String CONF_MIMETYPE="hadoopoffice.read.mimeType";
+public static final String CONF_SHEETS="hadoopoffice.read.sheets";
+public static final String CONF_LOCALE="hadoopoffice.read.locale.bcp47";
+public static final String CONF_LINKEDWB="hadoopoffice.read.linkedworkbooks";
+public static final String CONF_IGNOREMISSINGWB="hadoopoffice.read.ignoremissinglinkedworkbooks";
+public static final String CONF_DECRYPT="hadoopoffice.read.security.crypt.password";
+public static final String CONF_DECRYPTLINKEDWBBASE="hadoopoffice.read.security.crypt.linkedworkbooks.";
+public static final String CONF_FILTERMETADATA = "hadoopoffice.read.filter.metadata."; // base: all these properties (e.g. hadoopoffice.read.filter.metadata.author) will be handed over to the corresponding reader which does the filtering!
+public static final String DEFAULT_MIMETYPE="";
+public static final String DEFAULT_LOCALE="";
+public static final String DEFAULT_SHEETS="";
+public static final boolean DEFAULT_LINKEDWB=false;
+public static final boolean DEFAULT_IGNOREMISSINGLINKEDWB=false;
 
 
 private String mimeType=null;
@@ -103,7 +103,7 @@ private Configuration conf;
 private long start;
 private long pos;
 private long end;
-private final Seekable filePosition;
+private Seekable filePosition;
 private FSDataInputStream fileIn;
 private HadoopFileReader currentHFR;
 private FileSystem fs;
@@ -111,8 +111,7 @@ private FileSystem fs;
 
 /**
 * Creates an Abstract Record Reader for tables from various document formats
-* @param split Split to use (assumed to be a file split)
-* @param job Configuration:
+* @param conf Configuration:
 * hadoopoffice.read.mimeType: Mimetype of the document
 * hadoopoffice.read.locale: Locale of the document (e.g. needed for interpreting spreadsheets) in the BCP47 format (cf. https://tools.ietf.org/html/bcp47). If not specified then default system locale will be used.
 * hadoopoffice.read.sheets: A ":" separated list of sheets to be read. If not specified then all sheets will be read one after the other
@@ -121,15 +120,13 @@ private FileSystem fs;
 * hadoopoffice.read.security.crypt.password: if set then hadoopoffice will try to decrypt the file
 * hadoopoffice.read.security.crypt.linkedworkbooks.*: if set then hadoopoffice will try to decrypt all the linked workbooks where a password has been specified. If no password is specified then it is assumed that the linked workbook is not encrypted. Example: Property key for file "linkedworkbook1.xlsx" is  "hadoopoffice.read.security.crypt.linkedworkbooks.linkedworkbook1.xslx". Value is the password. You must not include path or protocol information in the filename 
 * hadoopoffice.read.filter.metadata: filters documents according to metadata. For example, hadoopoffice.read.filter.metadata.author will filter by author and the filter defined as value. Filtering is done by the parser and it is recommended that it supports regular expression for filtering, but this is up to the parser!
-* @param reporter Reporter
+
 *
-* @throws java.io.IOException in case of errors reading from the filestream provided by Hadoop
-* @throws org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException in case the document has an invalid format
 *
 */
-public AbstractSpreadSheetDocumentRecordReader(FileSplit split, JobConf job, Reporter reporter) throws IOException,FormatNotUnderstoodException,GeneralSecurityException {
+public AbstractSpreadSheetDocumentRecordReader(Configuration conf) {
  	// parse configuration
-     this.conf=job;	
+     this.conf=conf;	
      this.mimeType=conf.get(this.CONF_MIMETYPE,this.DEFAULT_MIMETYPE);
      this.sheets=conf.get(this.CONF_SHEETS,this.DEFAULT_SHEETS);
      this.localeStrBCP47=conf.get(this.CONF_LOCALE, this.DEFAULT_LOCALE);
@@ -140,15 +137,32 @@ public AbstractSpreadSheetDocumentRecordReader(FileSplit split, JobConf job, Rep
       this.ignoreMissingLinkedWorkbooks=conf.getBoolean(CONF_IGNOREMISSINGWB,this.DEFAULT_IGNOREMISSINGLINKEDWB);
       this.password=conf.get(this.CONF_DECRYPT); // null if no password is set
       this.linkedWBpassword=conf.get(CONF_DECRYPTLINKEDWBBASE); // null if no password is set
-      this.metadataFilter=HadoopUtil.parsePropertiesFromBase(job,this.CONF_FILTERMETADATA);
-      this.linkedWBCredentialMap=HadoopUtil.parsePropertiesFromBase(job,this.CONF_DECRYPTLINKEDWBBASE);
+      this.metadataFilter=HadoopUtil.parsePropertiesFromBase(conf,this.CONF_FILTERMETADATA);
+      this.linkedWBCredentialMap=HadoopUtil.parsePropertiesFromBase(conf,this.CONF_DECRYPTLINKEDWBBASE);
+}
+
+
+/**
+* Initializes reader
+* @param split Split to use (assumed to be a file split)
+* @param context context of the job
+*
+*
+* @throws java.io.IOException in case of errors reading from the filestream provided by Hadoop
+* @throws java.lang.InterruptedException in case of thread interruption
+*
+*/
+@Override
+public void initialize(InputSplit split, TaskAttemptContext context) throws IOException, InterruptedException {
+try {
+   FileSplit fSplit = (FileSplit)split;
  // Initialize start and end of split
-    start = split.getStart();
-    end = start + split.getLength();
-    final Path file = split.getPath();
-     compressionCodecs = new CompressionCodecFactory(job);
+    start = fSplit.getStart();
+    end = start + fSplit.getLength();
+    final Path file = fSplit.getPath();
+     compressionCodecs = new CompressionCodecFactory(context.getConfiguration());
     codec = compressionCodecs.getCodec(file);
-     fs = file.getFileSystem(job);
+     fs = file.getFileSystem(context.getConfiguration());
     fileIn = fs.open(file);
     // open stream
       if (isCompressedInput()) { // decompress
@@ -177,11 +191,11 @@ public AbstractSpreadSheetDocumentRecordReader(FileSplit split, JobConf job, Rep
     // read linked workbooks
     if (this.readLinkedWorkbooks==true) {
 	// get current path
-	Path currentPath = split.getPath();
+	Path currentPath = fSplit.getPath();
 	Path parentPath = currentPath.getParent();
 	// read linked workbook filenames
 	List<String> linkedWorkbookList=this.officeReader.getCurrentParser().getLinkedWorkbooks();
-	this.currentHFR = new HadoopFileReader(job);
+	this.currentHFR = new HadoopFileReader(context.getConfiguration());
 	if (linkedWorkbookList!=null) {
 		for (String listItem: linkedWorkbookList) {
 			LOG.info("Adding linked workbook \""+listItem+"\"");
@@ -193,24 +207,14 @@ public AbstractSpreadSheetDocumentRecordReader(FileSplit split, JobConf job, Rep
 		}
 	}
     }
+} catch (FormatNotUnderstoodException fnue) {
+	LOG.error(fnue); 	
+	this.close();
+}  catch (GeneralSecurityException gse) {
+	LOG.error(gse);
+	this.close();
 }
-
-
-/**
-*
-* Create an empty key
-*
-* @return key
-*/
-public abstract K createKey();
-
-/**
-*
-* Create an empty value
-*
-* @return value
-*/
-public abstract V createValue();
+}
 
 
 
@@ -220,7 +224,7 @@ public abstract V createValue();
 *
 * @return true if next more rows are available, false if not
 */
-public abstract boolean next(K key, V value) throws IOException;
+public abstract boolean nextKeyValue() throws IOException;
 
 
 /*

@@ -14,13 +14,15 @@
 * limitations under the License.
 **/
 
-package org.zuinnote.hadoop.office.format.mapred;
+package org.zuinnote.hadoop.office.format.mapreduce;
+
+import org.apache.hadoop.conf.Configuration;
 
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.mapred.RecordWriter;
-import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.mapreduce.RecordWriter;
+import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.util.Progressable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.compress.CompressionCodec;
@@ -43,9 +45,9 @@ import org.zuinnote.hadoop.office.format.common.writer.InvalidCellSpecificationE
 public class ExcelFileOutputFormat extends AbstractSpreadSheetDocumentFileOutputFormat {
 private static final Log LOG = LogFactory.getLog(ExcelFileOutputFormat.class.getName());
 public static final Class defaultCompressorClass = GzipCodec.class; 
-public static final String DEFAULT_MIMETYPE=org.zuinnote.hadoop.office.format.mapreduce.ExcelFileOutputFormat.DEFAULT_MIMETYPE;
-public static final String SUFFIX_OOXML = org.zuinnote.hadoop.office.format.mapreduce.ExcelFileOutputFormat.SUFFIX_OOXML;
-public static final String SUFFIX_OLDEXCEL = org.zuinnote.hadoop.office.format.mapreduce.ExcelFileOutputFormat.SUFFIX_OLDEXCEL;
+public static final String DEFAULT_MIMETYPE="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+public static final String SUFFIX_OOXML = ".xlsx";
+public static final String SUFFIX_OLDEXCEL = ".xls";
 
 
 /*
@@ -60,17 +62,17 @@ public static final String SUFFIX_OLDEXCEL = org.zuinnote.hadoop.office.format.m
 *
 */
 
-public RecordWriter<NullWritable,SpreadSheetCellDAO> getRecordWriter(FileSystem ignored, JobConf conf, String name, Progressable progress) throws IOException {
+public RecordWriter<NullWritable,SpreadSheetCellDAO> getRecordWriter(TaskAttemptContext context) throws IOException {
 	// check if mimeType is set. If not assume new Excel format (.xlsx)
-	
+	Configuration conf=context.getConfiguration();
 	String defaultConf=conf.get(AbstractSpreadSheetDocumentRecordWriter.CONF_MIMETYPE,this.DEFAULT_MIMETYPE);
 	conf.set(AbstractSpreadSheetDocumentRecordWriter.CONF_MIMETYPE,defaultConf);
 	
-	Path file = getTaskOutputPath(conf, name);
+	Path file = getOutputPath(context);
 	// add suffix
 	file=file.suffix(getSuffix(conf.get(AbstractSpreadSheetDocumentRecordWriter.CONF_MIMETYPE)));
 	try {
-	 	return new ExcelRecordWriter(HadoopUtil.getDataOutputStream(conf,file,progress,getCompressOutput(conf),getOutputCompressorClass(conf, this.defaultCompressorClass)),file.getName(),conf);
+	 	return new ExcelRecordWriter(HadoopUtil.getDataOutputStream(conf,file,context,getCompressOutput(context),getOutputCompressorClass(context, this.defaultCompressorClass)),file.getName(),conf);
 	} catch (InvalidWriterConfigurationException iwe) {
 		LOG.error(iwe);
 	} catch (InvalidCellSpecificationException icse) {

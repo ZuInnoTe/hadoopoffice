@@ -14,19 +14,18 @@
 * limitations under the License.
 **/
 
-package org.zuinnote.hadoop.office.format.mapred;
+package org.zuinnote.hadoop.office.format.mapreduce;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 
 import java.security.GeneralSecurityException;
 
-
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.mapred.JobConf;
-
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
+
+
+import org.apache.hadoop.conf.Configuration;
 
 import org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException;
 
