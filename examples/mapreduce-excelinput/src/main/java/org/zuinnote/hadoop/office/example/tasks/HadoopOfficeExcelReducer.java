@@ -48,8 +48,8 @@ private static final NullWritable EMPTYKEY = NullWritable.get();
 			} 
 		    	currentCSVRowSB.append(this.CSV_SEPARATOR);
 	   	}
-	   	// remove last separator and add new line
-	   	String currentCSVRowString = currentCSVRowSB.substring(0,currentCSVRowSB.length()-1)+"\n";
+	   	// remove last separator (new line does not need to be added anymore, apperantly this is done by textoutputformat
+	   	String currentCSVRowString = currentCSVRowSB.substring(0,currentCSVRowSB.length()-1);
 		// add new line
 	   	context.write(this.EMPTYKEY, new Text(currentCSVRowString));
 	   }
