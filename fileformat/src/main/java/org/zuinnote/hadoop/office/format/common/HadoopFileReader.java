@@ -18,6 +18,8 @@ package org.zuinnote.hadoop.office.format.common;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
@@ -111,6 +113,28 @@ public void close() throws IOException {
  if (this.fs!=null) {
   	this.fs.close();
  }
+}
+
+/*
+* Loads linked workbooks as InputStreams
+* 
+* @param fileNames List of filenames (full URI/path) to load
+*
+* @return a Map of filenames (without path!) with associated InputStreams
+*
+* @throws java.io.IOException in case of issues loading a file
+*
+*/
+
+public Map<String,InputStream> loadLinkedWorkbooks(String[] fileNames) throws IOException {
+	HashMap<String,InputStream> result = new HashMap<String,InputStream>();
+	if (fileNames==null) return result;
+	for (String currentFile: fileNames) {
+		Path currentPath=new Path(currentFile);
+		InputStream currentInputStream = openFile(currentPath);
+		result.put(currentPath.getName(), currentInputStream); 
+	}
+	return result;
 }
 
 }

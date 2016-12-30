@@ -16,6 +16,19 @@
 
 package org.zuinnote.hadoop.office.format.common;
 
+import java.io.IOException;
+import java.io.DataOutputStream;
+
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.util.ReflectionUtils;
+import org.apache.hadoop.util.Progressable;
+import org.apache.hadoop.mapred.FileOutputFormat;
+
+import org.apache.hadoop.io.compress.CompressionCodec;
+import org.apache.hadoop.io.compress.GzipCodec;
+
 import java.util.Map;
 import java.util.HashMap;
 import org.apache.hadoop.conf.Configuration;
@@ -46,6 +59,68 @@ public static Map<String,String> parsePropertiesFromBase(Configuration conf, Str
 	    }
         }
 	return result;
+}
+
+
+
+/*
+* Creates for the file to be written and outputstream and takes - depending on the configuration - take of compression. Set for compression the following options:
+* mapreduce.output.fileoutputformat.compress true/false
+* mapreduce.output.fileoutputformat.compress.codec java class of compression codec
+*
+* Note that some formats may use already internal compression so that additional compression does not lead to many benefits
+*
+* @param conf Configuration of Job
+* @param file file to be written
+*
+* @return outputstream of the file
+*
+*/
+
+public static DataOutputStream getDataOutputStream(Configuration conf,Path file, Progressable progress, boolean compressed, Class<? extends CompressionCodec> compressorClass) throws IOException {
+if (compressed==false) { // uncompressed
+	FileSystem fs = file.getFileSystem(conf);
+        FSDataOutputStream fileOut = fs.create(file, progress);
+	return fileOut;
+} else { // compressed (note partially adapted from TextOutputFormat)
+      Class<? extends CompressionCodec> codecClass = compressorClass;
+      // create the named codec
+      CompressionCodec codec = ReflectionUtils.newInstance(codecClass, conf);
+      // provide proper file extension
+      Path compressedFile = file.suffix(codec.getDefaultExtension());
+      // build the filename including the extension
+      FileSystem fs = compressedFile.getFileSystem(conf);
+      FSDataOutputStream realFileOut = fs.create(compressedFile, progress);
+      return new DataOutputStream(codec.createOutputStream(realFileOut));
+}
+}
+
+
+/*
+* Parses a string in the format [filename]:[filename2]:[filename3] into a String array of filenames
+*
+* @param linkedWorkbookString list of filename as one String
+*
+* @return String Array containing the filenames as separate Strings
+*
+**/
+public static String[] parseLinkedWorkbooks(String linkedWorkbooksString) {
+	if ("".equals(linkedWorkbooksString)) {
+		return null;
+	}
+	// first split by ]:[
+	String[] tempSplit = linkedWorkbooksString.split("\\]:\\[");
+	// 1st case just one filename remove first [ and last ]
+	if (tempSplit.length==1) {
+		tempSplit[0]=tempSplit[0].substring(1,tempSplit[0].length()-1);
+	} else if (tempSplit.length>1) {
+	// 2nd case two or more filenames
+	// remove first [
+		tempSplit[0]=tempSplit[0].substring(1,tempSplit[0].length());
+	// remove last ]
+		tempSplit[tempSplit.length-1]=tempSplit[tempSplit.length-1].substring(0,tempSplit[tempSplit.length-1].length()-1);
+	}
+	return tempSplit;
 }
 
 }

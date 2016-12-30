@@ -23,6 +23,8 @@ import org.apache.hadoop.mapred.RecordWriter;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.util.Progressable;
 import org.apache.hadoop.io.NullWritable;
+import org.apache.hadoop.io.compress.CompressionCodec;
+import org.apache.hadoop.io.compress.GzipCodec;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -32,6 +34,7 @@ import java.security.GeneralSecurityException;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 
+import org.zuinnote.hadoop.office.format.common.HadoopUtil;
 import org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException;
 import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 import org.zuinnote.hadoop.office.format.common.writer.InvalidWriterConfigurationException;
@@ -39,6 +42,7 @@ import org.zuinnote.hadoop.office.format.common.writer.InvalidCellSpecificationE
 
 public class ExcelFileOutputFormat extends AbstractSpreadSheetDocumentFileOutputFormat {
 private static final Log LOG = LogFactory.getLog(ExcelFileOutputFormat.class.getName());
+public static final Class defaultCompressorClass = GzipCodec.class; 
 public static final String DEFAULT_MIMETYPE="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 public static final String SUFFIX_OOXML = ".xlsx";
 public static final String SUFFIX_OLDEXCEL = ".xls";
@@ -66,7 +70,7 @@ public RecordWriter<NullWritable,SpreadSheetCellDAO> getRecordWriter(FileSystem 
 	// add suffix
 	file=file.suffix(getSuffix(conf.get(AbstractSpreadSheetDocumentRecordWriter.CONF_MIMETYPE)));
 	try {
-	 	return new ExcelRecordWriter(getDataOutputStream(conf,file,progress),file.getName(),conf);
+	 	return new ExcelRecordWriter(HadoopUtil.getDataOutputStream(conf,file,progress,getCompressOutput(conf),getOutputCompressorClass(conf, this.defaultCompressorClass)),file.getName(),conf);
 	} catch (InvalidWriterConfigurationException iwe) {
 		LOG.error(iwe);
 	} catch (InvalidCellSpecificationException icse) {

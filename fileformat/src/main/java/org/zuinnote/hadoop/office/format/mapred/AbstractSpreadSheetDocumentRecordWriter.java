@@ -143,7 +143,7 @@ public AbstractSpreadSheetDocumentRecordWriter(DataOutputStream out, String file
       this.commentWidth=conf.getInt(this.CONF_COMMENTWIDTH,this.DEFAULT_COMMENTWIDTH);
       this.commentHeight=conf.getInt(this.CONF_COMMENTHEIGHT,this.DEFAULT_COMMENTHEIGHT);
       String linkedWorkbooksStr=conf.get(this.CONF_LINKEDWB,this.DEFAULT_LINKEDWB);
-      this.linkedWorkbooksName=parseLinkedWorkbooks(linkedWorkbooksStr);
+      this.linkedWorkbooksName=HadoopUtil.parseLinkedWorkbooks(linkedWorkbooksStr);
       this.ignoreMissingLinkedWorkbooks=conf.getBoolean(this.CONF_IGNOREMISSINGWB,this.DEFAULT_IGNOREMISSINGLINKEDWB);
       this.encryptAlgorithm=conf.get(this.CONF_SECURITYALGORITHM);
       this.password=conf.get(this.CONF_SECURITYPASSWORD);
@@ -154,7 +154,7 @@ public AbstractSpreadSheetDocumentRecordWriter(DataOutputStream out, String file
       this.linkedWBCredentialMap=HadoopUtil.parsePropertiesFromBase(conf,this.CONF_DECRYPTLINKEDWBBASE);
       // load linked workbooks as inputstreams
       this.currentReader= new HadoopFileReader(this.conf);
-      this.linkedWorkbooksMap=loadLinkedWorkbooks(linkedWorkbooksName);
+      this.linkedWorkbooksMap=this.currentReader.loadLinkedWorkbooks(linkedWorkbooksName);
      // create OfficeWriter 
        this.officeWriter=new OfficeWriter(this.mimeType, this.locale, this.ignoreMissingLinkedWorkbooks,  this.fileName, this.commentAuthor,this.commentWidth,this.commentHeight,this.password,this.encryptAlgorithm,this.hashAlgorithm,this.encryptMode,this.chainMode,this.metadata);
       this.officeWriter.create(out,this.linkedWorkbooksMap,this.linkedWBCredentialMap);
@@ -202,55 +202,9 @@ public synchronized void  close(Reporter reporter) throws IOException {
 	}
  }
 
-/*
-* Parses a string in the format [filename]:[filename2]:[filename3] into a String array of filenames
-*
-* @param linkedWorkbookString list of filename as one String
-*
-* @return String Array containing the filenames as separate Strings
-*
-**/
-private String[] parseLinkedWorkbooks(String linkedWorkbooksString) {
-	if ("".equals(linkedWorkbooksString)) {
-		return null;
-	}
-	// first split by ]:[
-	String[] tempSplit = linkedWorkbooksString.split("\\]:\\[");
-	// 1st case just one filename remove first [ and last ]
-	if (tempSplit.length==1) {
-		tempSplit[0]=tempSplit[0].substring(1,tempSplit[0].length()-1);
-	} else if (tempSplit.length>1) {
-	// 2nd case two or more filenames
-	// remove first [
-		tempSplit[0]=tempSplit[0].substring(1,tempSplit[0].length());
-	// remove last ]
-		tempSplit[tempSplit.length-1]=tempSplit[tempSplit.length-1].substring(0,tempSplit[tempSplit.length-1].length()-1);
-	}
-	return tempSplit;
-}
 
 
 
-/*
-* Loads linked workbooks as InputStreams
-* 
-* @param fileNames List of filenames (full URI/path) to load
-*
-* @return a Map of filenames (without path!) with associated InputStreams
-*
-* @throws java.io.IOException in case of issues loading a file
-*
-*/
 
-private Map<String,InputStream> loadLinkedWorkbooks(String[] fileNames) throws IOException {
-	HashMap<String,InputStream> result = new HashMap<String,InputStream>();
-	if (fileNames==null) return result;
-	for (String currentFile: fileNames) {
-		Path currentPath=new Path(currentFile);
-		InputStream currentInputStream = currentReader.openFile(currentPath);
-		result.put(currentPath.getName(), currentInputStream); 
-	}
-	return result;
-}
 
 }
