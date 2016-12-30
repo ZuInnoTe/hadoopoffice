@@ -66,7 +66,7 @@ public static final String CONF_IGNOREMISSINGWB="hadoopoffice.write.ignoremissin
 public static final String CONF_COMMENTAUTHOR="hadoopoffice.write.comment.author";
 public static final String CONF_COMMENTWIDTH="hadoopoffice.write.comment.width";
 public static final String CONF_COMMENTHEIGHT="hadoopoffice.write.comment.height";
-public static final String CONF_SECURITYPASSWORD="hadoopoffice.write.security.crypt.password";
+public static final String CONF_SECURITYCRED="hadoopoffice.write.security.crypt.password";
 public static final String CONF_SECURITYALGORITHM="hadoopoffice.write.security.crypt.encrypt.algorithm";
 public static final String CONF_SECURITYMODE="hadoopoffice.write.security.crypt.encrypt.mode";
 public static final String CONF_CHAINMODE="hadoopoffice.write.security.crypt.chain.mode";
@@ -147,7 +147,7 @@ public AbstractSpreadSheetDocumentRecordWriter(DataOutputStream out, String file
       this.linkedWorkbooksName=HadoopUtil.parseLinkedWorkbooks(linkedWorkbooksStr);
       this.ignoreMissingLinkedWorkbooks=conf.getBoolean(this.CONF_IGNOREMISSINGWB,this.DEFAULT_IGNOREMISSINGLINKEDWB);
       this.encryptAlgorithm=conf.get(this.CONF_SECURITYALGORITHM);
-      this.password=conf.get(this.CONF_SECURITYPASSWORD);
+      this.password=conf.get(this.CONF_SECURITYCRED);
       this.hashAlgorithm=conf.get(this.CONF_HASHALGORITHM);
       this.encryptMode=conf.get(this.CONF_SECURITYMODE);
       this.chainMode=conf.get(this.CONF_CHAINMODE);
