@@ -69,7 +69,7 @@ public static final String CONF_IGNOREMISSINGWB=org.zuinnote.hadoop.office.forma
 public static final String CONF_COMMENTAUTHOR=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.CONF_COMMENTAUTHOR;
 public static final String CONF_COMMENTWIDTH=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.CONF_COMMENTWIDTH;
 public static final String CONF_COMMENTHEIGHT=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.CONF_COMMENTHEIGHT;
-public static final String CONF_SECURITYPASSWORD=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.CONF_SECURITYPASSWORD;
+public static final String CONF_SECURITYCRED=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.CONF_SECURITYCRED;
 public static final String CONF_SECURITYALGORITHM=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.CONF_SECURITYALGORITHM;
 public static final String CONF_SECURITYMODE=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.CONF_SECURITYMODE;
 public static final String CONF_CHAINMODE=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.CONF_CHAINMODE;
@@ -150,7 +150,7 @@ public AbstractSpreadSheetDocumentRecordWriter(DataOutputStream out, String file
       this.linkedWorkbooksName=HadoopUtil.parseLinkedWorkbooks(linkedWorkbooksStr);
       this.ignoreMissingLinkedWorkbooks=conf.getBoolean(this.CONF_IGNOREMISSINGWB,this.DEFAULT_IGNOREMISSINGLINKEDWB);
       this.encryptAlgorithm=conf.get(this.CONF_SECURITYALGORITHM);
-      this.password=conf.get(this.CONF_SECURITYPASSWORD);
+      this.password=conf.get(this.CONF_SECURITYCRED);
       this.hashAlgorithm=conf.get(this.CONF_HASHALGORITHM);
       this.encryptMode=conf.get(this.CONF_SECURITYMODE);
       this.chainMode=conf.get(this.CONF_CHAINMODE);
