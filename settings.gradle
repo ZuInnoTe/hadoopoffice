@@ -1,1 +1,1 @@
-include 'fileformat' 
+include 'fileformat','examples:mapreduce-excelinput','examples:mapreduce-exceloutput'
