@@ -33,7 +33,11 @@ import org.zuinnote.hadoop.office.format.common.util.MSExcelUtil;
 import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 import org.zuinnote.hadoop.office.format.common.dao.TextArrayWritable;
  
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
+
 public class HadoopOfficeExcelReducer extends  Reducer<Text, TextArrayWritable, NullWritable, SpreadSheetCellDAO> {
+private static final Log LOG = LogFactory.getLog(HadoopOfficeExcelReducer.class);
 private static final String CSV_SEPARATOR=",";
 private static final NullWritable EMPTYKEY = NullWritable.get();
 // since one reducer equals one file, we can assume one instance

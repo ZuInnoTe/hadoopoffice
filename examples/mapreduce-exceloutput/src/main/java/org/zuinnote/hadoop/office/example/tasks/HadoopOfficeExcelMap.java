@@ -35,9 +35,13 @@ import java.util.*;
 
 import org.zuinnote.hadoop.office.format.common.dao.TextArrayWritable;
 
+
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
+
 public  class HadoopOfficeExcelMap  extends Mapper<LongWritable, Text, Text, TextArrayWritable> {
 private static final String CSV_SEPARATOR=",";
-
+private static final Log LOG = LogFactory.getLog(HadoopOfficeExcelMap.class);
 
 @Override
 public void setup(Context context) throws IOException, InterruptedException {
