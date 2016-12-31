@@ -42,10 +42,10 @@ private int currentRowNum=0;
    public void reduce(Text key, Iterable<TextArrayWritable> values, Context context)
      throws IOException, InterruptedException {
        for (TextArrayWritable currentRow: values) {  // should be only called once
-	   Writable[] currentRowTextArray = currentRow.get();
+	   Text[] currentRowTextArray = (Text[])currentRow.get();
 	   if (currentRowTextArray.length>0) {
 		int currentColumnNum=0;
-		for (Text currentColumn: (Text[])currentRowTextArray) { // for each column in the row
+		for (Text currentColumn: currentRowTextArray) { // for each column in the row
 			String formattedValue=currentColumn.toString();
 			String comment="";
 			String formula="";
