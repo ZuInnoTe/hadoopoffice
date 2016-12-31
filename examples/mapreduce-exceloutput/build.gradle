@@ -4,6 +4,7 @@ apply plugin: 'application'
 
 
 
+mainClassName = "org.zuinnote.hadoop.office.example.driver.CSV2ExcelDriver"
 compileJava.options.encoding = 'UTF-8'
 sourceCompatibility = 1.7
 version = '1.0'
