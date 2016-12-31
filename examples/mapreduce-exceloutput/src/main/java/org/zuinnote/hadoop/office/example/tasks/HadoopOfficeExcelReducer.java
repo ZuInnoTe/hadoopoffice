@@ -42,11 +42,11 @@ private int currentRowNum=0;
    public void reduce(Text key, Iterable<TextArrayWritable> values, Context context)
      throws IOException, InterruptedException {
        for (TextArrayWritable currentRow: values) {  // should be only called once
-	   Writable[] currentRowTextArray = currentRow.get();
+	   String[] currentRowTextArray = currentRow.toStrings();
 	   if (currentRowTextArray.length>0) {
 		int currentColumnNum=0;
-		for (Writable currentColumn: currentRowTextArray) { // for each column in the row
-			String formattedValue=(String)currentColumn.get().toString();
+		for (String currentColumn: currentRowTextArray) { // for each column in the row
+			String formattedValue=currentColumn;
 			String comment="";
 			String formula="";
 			String address=MSExcelUtil.getCellAddressA1Format(currentRowNum,currentColumnNum);
