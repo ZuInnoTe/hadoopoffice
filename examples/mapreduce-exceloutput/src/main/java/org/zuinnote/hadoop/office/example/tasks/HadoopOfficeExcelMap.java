@@ -35,7 +35,7 @@ import java.util.*;
 
 import org.zuinnote.hadoop.office.format.common.dao.TextArrayWritable;
 
-public  class HadoopOfficeExcelMap  extends Mapper<Text, Text, Text, TextArrayWritable> {
+public  class HadoopOfficeExcelMap  extends Mapper<LongWritable, Text, Text, TextArrayWritable> {
 private static final String CSV_SEPARATOR=",";
 
 
@@ -43,7 +43,7 @@ private static final String CSV_SEPARATOR=",";
 public void setup(Context context) throws IOException, InterruptedException {
 }
 @Override
-  public void map(Text key, Text value, Context context) throws IOException, InterruptedException {
+  public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 		// Convert a separated line into several substrings
 		StringTokenizer myTokenizer = new StringTokenizer(value.toString(), HadoopOfficeExcelMap.CSV_SEPARATOR);
 		Text[] textArray = new Text[myTokenizer.countTokens()];
