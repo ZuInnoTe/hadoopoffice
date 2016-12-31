@@ -87,11 +87,26 @@ public void set(SpreadSheetCellDAO newSpreadSheetCellDAO) {
 
   @Override
   public void write(DataOutput dataOutput) throws IOException {
-    Text formattedValueText = new Text(formattedValue);
-    Text commentText = new Text(comment);
-    Text formulaText = new Text(formula);
-    Text addressText = new Text(address);
-    Text sheetNameText = new Text(sheetName);
+    Text formattedValueText = new Text("");
+    if (formattedValue!=null) {
+	formattedValueText = new Text(formattedValue);
+    }
+    Text commentText = new Text("");
+    if (commentText!=null) {
+	commentText = new Text(comment);
+    }
+    Text formulaText = new Text("");
+    if (formulaText!=null) {
+	formulaText = new Text(formula);
+    }
+    Text addressText = new Text("");
+    if (addressText!=null) {
+	addressText = new Text(address);
+    }
+    Text sheetNameText = new Text("");
+    if (sheetNameText!=null) {
+	sheetNameText = new Text(sheetName);
+    }
     formattedValueText.write(dataOutput);
     commentText.write(dataOutput);
     formulaText.write(dataOutput);
