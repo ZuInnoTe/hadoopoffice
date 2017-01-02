@@ -92,19 +92,19 @@ public void set(SpreadSheetCellDAO newSpreadSheetCellDAO) {
 	formattedValueText = new Text(formattedValue);
     }
     Text commentText = new Text("");
-    if (commentText!=null) {
+    if (comment!=null) {
 	commentText = new Text(comment);
     }
     Text formulaText = new Text("");
-    if (formulaText!=null) {
+    if (formula!=null) {
 	formulaText = new Text(formula);
     }
     Text addressText = new Text("");
-    if (addressText!=null) {
+    if (address!=null) {
 	addressText = new Text(address);
     }
     Text sheetNameText = new Text("");
-    if (sheetNameText!=null) {
+    if (sheetName!=null) {
 	sheetNameText = new Text(sheetName);
     }
     formattedValueText.write(dataOutput);
