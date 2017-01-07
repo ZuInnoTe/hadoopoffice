@@ -328,6 +328,7 @@ try {
 		currentHFR.close();
 	}
     }
+	// do not close the filesystem! will cause exceptions in Spark
  
 }
 
