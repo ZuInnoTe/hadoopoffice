@@ -18,6 +18,7 @@ package org.zuinnote.hadoop.office.format.mapred;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 
 import java.security.GeneralSecurityException;
 
@@ -40,7 +41,7 @@ import org.zuinnote.hadoop.office.format.common.writer.InvalidCellSpecificationE
 *
 **/
 
-public class ExcelRecordWriter<NullWritable,SpreadSheetCellDAO>  extends AbstractSpreadSheetDocumentRecordWriter<NullWritable,SpreadSheetCellDAO>  {
+public class ExcelRecordWriter<NullWritable,SpreadSheetCellDAO>  extends AbstractSpreadSheetDocumentRecordWriter<NullWritable,SpreadSheetCellDAO>  implements Serializable {
 private static final Log LOG = LogFactory.getLog(ExcelRecordWriter.class.getName());
 
 /*
