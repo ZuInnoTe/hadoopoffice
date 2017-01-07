@@ -322,9 +322,7 @@ try {
 		currentHFR.close();
 	}
     }
-  if (this.fs!=null) {
-	this.fs.close();
-  }
+  
 }
 
 
