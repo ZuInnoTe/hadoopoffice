@@ -110,9 +110,7 @@ public void close() throws IOException {
 		 CodecPool.returnDecompressor(currentDecompressor);
 	}
  }
- if (this.fs!=null) {
-  	this.fs.close();
- }
+ // never close the filesystem. Causes issues with Spark
 }
 
 /*
