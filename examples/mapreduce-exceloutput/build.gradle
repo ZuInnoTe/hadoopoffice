@@ -43,7 +43,7 @@ dependencies {
    // hadoop lib for driver
      provided("org.apache.hadoop:hadoop-client:2.7.0")
      // hadoopoffice library
-   compile("com.github.zuinnote:hadoopoffice-fileformat:1.0.0")
+   compile("com.github.zuinnote:hadoopoffice-fileformat:1.0.1")
     testProvided group: 'junit', name: 'junit', version: '4.+'
     testProvided group: 'org.apache.mrunit', name: 'mrunit', version: '1.1.0', classifier: 'hadoop2'
 }
