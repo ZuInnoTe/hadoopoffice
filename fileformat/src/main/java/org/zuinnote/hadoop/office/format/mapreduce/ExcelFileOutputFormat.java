@@ -30,6 +30,7 @@ import org.apache.hadoop.io.compress.GzipCodec;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 
 import java.security.GeneralSecurityException;
 
@@ -42,7 +43,7 @@ import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 import org.zuinnote.hadoop.office.format.common.writer.InvalidWriterConfigurationException;
 import org.zuinnote.hadoop.office.format.common.writer.InvalidCellSpecificationException;
 
-public class ExcelFileOutputFormat extends AbstractSpreadSheetDocumentFileOutputFormat {
+public class ExcelFileOutputFormat extends AbstractSpreadSheetDocumentFileOutputFormat implements Serializable {
 private static final Log LOG = LogFactory.getLog(ExcelFileOutputFormat.class.getName());
 public static final Class defaultCompressorClass = GzipCodec.class; 
 public static final String DEFAULT_MIMETYPE="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
