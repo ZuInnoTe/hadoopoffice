@@ -12,7 +12,7 @@ resolvers += Resolver.mavenLocal
 
 assemblyJarName in assembly := "example-ho-spark-scala-excelin.jar"
 
-libraryDependencies += "com.github.zuinnote" %% "spark-hadoopoffice-ds" % "1.0.1" % "compile"
+libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.0.1" % "compile"
 
 libraryDependencies += "org.apache.spark" %% "spark-core" % "1.5.0" % "provided"
 
