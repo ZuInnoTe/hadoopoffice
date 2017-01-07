@@ -155,6 +155,7 @@ public AbstractSpreadSheetDocumentRecordReader(Configuration conf) {
 @Override
 public void initialize(InputSplit split, TaskAttemptContext context) throws IOException, InterruptedException {
 try {
+	this.conf=context.getConfiguration();
    FileSplit fSplit = (FileSplit)split;
  // Initialize start and end of split
     start = fSplit.getStart();
@@ -162,7 +163,7 @@ try {
     final Path file = fSplit.getPath();
      compressionCodecs = new CompressionCodecFactory(context.getConfiguration());
     codec = compressionCodecs.getCodec(file);
-     fs = file.getFileSystem(context.getConfiguration());
+     fs = file.getFileSystem(conf);
     fileIn = fs.open(file);
     // open stream
       if (isCompressedInput()) { // decompress
@@ -195,6 +196,7 @@ try {
 	Path parentPath = currentPath.getParent();
 	// read linked workbook filenames
 	List<String> linkedWorkbookList=this.officeReader.getCurrentParser().getLinkedWorkbooks();
+	LOG.debug(linkedWorkbookList.size());
 	this.currentHFR = new HadoopFileReader(context.getConfiguration());
 	if (linkedWorkbookList!=null) {
 		for (String listItem: linkedWorkbookList) {
@@ -326,9 +328,7 @@ try {
 		currentHFR.close();
 	}
     }
-  if (this.fs!=null) {
-	this.fs.close();
-  }
+ 
 }
 
 
