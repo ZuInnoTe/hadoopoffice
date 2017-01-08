@@ -44,8 +44,7 @@ object SparkScalaExcelInDataSource {
 val sqlContext = sparkSession.sqlContext
 val df = sqlContext.read
     .format("org.zuinnote.spark.office.excel")
-    .option("read.locale.bcp47", "de")
-    .option("hadoopoffice.read.security.crypt.password", "test")  
+    .option("read.locale.bcp47", "de")  
     .load(args(0))
 	val totalCount = df.count
 	// print to screen
