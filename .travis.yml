@@ -15,4 +15,6 @@ script:
 - gradle build
 - gradle test
 - sonar-scanner -Dsonar.login=$SONAR_HO
-  
+after_success: 
+- scripts/publish-javadoc.sh
+- scripts/publish-junitreport.sh 
