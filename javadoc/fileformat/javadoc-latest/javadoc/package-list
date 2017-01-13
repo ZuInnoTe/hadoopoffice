@@ -1,0 +1,7 @@
+org.zuinnote.hadoop.office.format.common
+org.zuinnote.hadoop.office.format.common.dao
+org.zuinnote.hadoop.office.format.common.parser
+org.zuinnote.hadoop.office.format.common.util
+org.zuinnote.hadoop.office.format.common.writer
+org.zuinnote.hadoop.office.format.mapred
+org.zuinnote.hadoop.office.format.mapreduce
