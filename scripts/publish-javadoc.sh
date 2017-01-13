@@ -6,7 +6,7 @@ git clone --quiet --branch=gh-pages https://${GH_TOKEN}@github.com/ZuInnoTe/hado
 
 # Commit and Push the Changes
 cd gh-pages
-git rm -rf ./javadoc
+git rm -rf ./javadoc/fileformat
 mkdir -p ./javadoc/fileformat
 cp -Rf $HOME/fileformat/build/docs/javadoc ./javadoc/fileformat
 git add -f .
