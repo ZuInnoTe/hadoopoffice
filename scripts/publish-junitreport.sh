@@ -1,3 +1,7 @@
+# copy to home
+mkdir -p $HOME/fileformat/tests-latest
+cp -R fileformat/build/reports/tests $HOME/fileformat/tests-latest
+
 # Get to the Travis build directory, configure git and clone the repo
 cd $HOME
 git config --global user.email "travis@travis-ci.org"
@@ -8,7 +12,7 @@ git clone --quiet --branch=gh-pages https://${GH_TOKEN}@github.com/ZuInnoTe/hado
 cd gh-pages
 git rm -rf ./tests/fileformat
 mkdir -p ./tests/fileformat
-cp -Rf $HOME/fileformat/build/reports/tests ./tests/fileformat
+cp -Rf $HOME/fileformat/tests-latest ./tests/fileformat
 git add -f .
 git commit -m "Lastest javadoc on successful travis build $TRAVIS_BUILD_NUMBER auto-pushed to gh-pages"
 git push -fq origin gh-pages > /dev/null
