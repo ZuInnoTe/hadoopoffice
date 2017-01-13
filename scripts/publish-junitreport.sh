@@ -1,3 +1,7 @@
+if [ "$TRAVIS_REPO_SLUG" == "ZuInnoTe/hadoopoffice" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then
+
+echo -e "Publishing test results...\n"
+
 # copy to home
 mkdir -p $HOME/fileformat/tests-latest
 cp -R fileformat/build/reports/tests $HOME/fileformat/tests-latest
@@ -16,3 +20,5 @@ cp -Rf $HOME/fileformat/tests-latest ./tests/fileformat
 git add -f .
 git commit -m "Lastest javadoc on successful travis build $TRAVIS_BUILD_NUMBER auto-pushed to gh-pages"
 git push -fq origin gh-pages > /dev/null
+
+fi

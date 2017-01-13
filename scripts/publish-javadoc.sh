@@ -1,3 +1,7 @@
+if [ "$TRAVIS_REPO_SLUG" == "ZuInnoTe/hadoopoffice" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then
+
+echo -e "Publishing javadoc...\n"
+
 # copy to home
 mkdir -p $HOME/fileformat/javadoc-latest
 cp -R fileformat/build/docs/javadoc $HOME/fileformat/javadoc-latest
@@ -17,3 +21,5 @@ cp -Rf $HOME/fileformat/javadoc-latest ./javadoc/fileformat
 git add -f .
 git commit -m "Lastest javadoc on successful travis build $TRAVIS_BUILD_NUMBER auto-pushed to gh-pages"
 git push -fq origin gh-pages > /dev/null
+
+fi
