@@ -38,7 +38,7 @@ import org.zuinnote.hadoop.office.format.mapreduce.*;
 import org.zuinnote.hadoop.office.format.common.dao.TextArrayWritable;
    
 /**
-* Author: Jörn Franke <zuinnote@gmail.com>
+* Author: Jörn Franke (zuinnote@gmail.com)
 *
 */
 
