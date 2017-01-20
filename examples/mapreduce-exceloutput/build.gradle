@@ -33,6 +33,9 @@ configurations {
 	testProvided
 }
 
+javadoc.classpath += configurations.provided
+
+
 sourceSets {
     main.compileClasspath += configurations.provided
     test.compileClasspath += configurations.provided
