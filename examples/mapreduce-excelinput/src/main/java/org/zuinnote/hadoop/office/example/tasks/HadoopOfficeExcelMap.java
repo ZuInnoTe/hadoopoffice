@@ -21,7 +21,7 @@
 package org.zuinnote.hadoop.office.example.tasks;
 
 /**
-* Author: Jörn Franke <zuinnote@gmail.com>
+* Author: Jörn Franke (zuinnote@gmail.com)
 *
 */
 import java.io.IOException;
