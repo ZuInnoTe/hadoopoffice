@@ -14,7 +14,8 @@ script:
 - gradle clean
 - gradle build
 - gradle test
+- gradle javadoc
 - sonar-scanner -Dsonar.login=$SONAR_HO
 after_success:
-- scripts/publish-javadoc.sh
-- scripts/publish-junitreport.sh
+- .travis/publish-javadoc.sh
+- .travis/publish-junitreport.sh
