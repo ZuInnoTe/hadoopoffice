@@ -39,7 +39,7 @@ import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 import org.zuinnote.hadoop.office.format.common.dao.TextArrayWritable;
    
 /**
-* Author: Jörn Franke <zuinnote@gmail.com>
+* Author: Jörn Franke (zuinnote@gmail.com)
 *
 */
 
