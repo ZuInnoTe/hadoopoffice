@@ -86,6 +86,7 @@ import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 public class MSExcelParser implements OfficeReaderParserInterface {
 private static final Log LOG = LogFactory.getLog(MSExcelParser.class.getName());
 public static final String DATE_FORMAT = "hh:mm:ss dd.MM.yyyy";
+public static final int MAX_LINKEDWB_OLDEXCEL=100;
 private FormulaEvaluator formulaEvaluator;
 private InputStream in;
 private DataFormatter useDataFormatter=null;
@@ -172,6 +173,7 @@ private boolean filtered=false;
 			if (this.password!=null) LOG.debug(this.password);
 			this.currentWorkbook=WorkbookFactory.create(in,this.password);
 		} catch (InvalidFormatException e) {
+			LOG.error(e);
 			throw new FormatNotUnderstoodException(e.toString());
 		}
 		finally 
@@ -253,7 +255,7 @@ private boolean filtered=false;
 				// now we need to browse through the table until we hit an array out of bounds
 				int i = 0;
 				try {
-					while(true) {
+					while(i<this.MAX_LINKEDWB_OLDEXCEL) {
 						String[] externalBooks = (String[])externalBooksMethod.invoke(linkTable, i++);
 						if ((externalBooks!=null) && (externalBooks.length>0)){
 							result.add(externalBooks[0]);
@@ -266,13 +268,16 @@ private boolean filtered=false;
 				}
         			
 			} catch (NoSuchMethodException nsme) {
-				LOG.error("Could not retrieve linked workbooks for old Excel format. Internal error: "+nsme.toString());
+				LOG.error("Could not retrieve linked workbooks for old Excel format.");
+				LOG.error(nsme);
 			}
 			 catch (IllegalAccessException iae) {
-				LOG.error("Could not retrieve linked workbooks for old Excel format. Internal error: "+iae.toString());
+				LOG.error("Could not retrieve linked workbooks for old Excel format.");
+				LOG.error(iae);
 			}
 			catch (InvocationTargetException ite) {
-				LOG.error("Could not retrieve linked workbooks for old Excel format. Internal error: "+ite.toString());
+				LOG.error("Could not retrieve linked workbooks for old Excel format.");
+				LOG.error(ite);
 			}
 			
     
@@ -474,10 +479,10 @@ private boolean filtered=false;
 		boolean matchFull=true;
 		boolean matchOnce=false;
 		if (this.metadataFilter.get("matchAll")!=null) {
-			if (this.metadataFilter.get("matchAll").toLowerCase().equals("true")) {
+			if ("true".equalsIgnoreCase(this.metadataFilter.get("matchAll"))) {
 				matchAll=true;
 				LOG.info("matching all metadata properties");
-			} else if (this.metadataFilter.get("matchAll").toLowerCase().equals("false"))	{
+			} else if ("false".equalsIgnoreCase(this.metadataFilter.get("matchAll")))	{
 				matchAll=false;
 				LOG.info("matching at least one metadata property");
 			} else {
@@ -485,7 +490,7 @@ private boolean filtered=false;
 			}
 		}
 		// check core properties
-		String corePropertyName="";
+		String corePropertyName;
 		POIXMLProperties.CoreProperties coreProp=props.getCoreProperties();
 		corePropertyName="category";
 		if (this.metadataFilter.get(corePropertyName)!=null) {
@@ -632,11 +637,11 @@ private boolean filtered=false;
 		}
 		// check for custom properties
 		POIXMLProperties.CustomProperties custProp = props.getCustomProperties();
-		for (String currentKey: this.metadataFilter.keySet()) {
-			if (currentKey.startsWith("custom.")) {
-				String strippedKey=currentKey.substring("custom.".length());
+		for (Map.Entry<String,String> entry: this.metadataFilter.entrySet()) {
+			if (entry.getKey().startsWith("custom.")) {
+				String strippedKey=entry.getKey().substring("custom.".length());
 				if (strippedKey.length()>0) {
-					String valueMatch=this.metadataFilter.get(currentKey);
+					String valueMatch=entry.getValue();
 					if (valueMatch!=null) {
 						
 						if ((custProp.getProperty(strippedKey)!=null) && (custProp.getProperty(strippedKey).getName()!=null)&& (custProp.getProperty(strippedKey).getLpwstr().matches(valueMatch))) {
@@ -670,15 +675,15 @@ private boolean filtered=false;
 		boolean matchFull=true;
 		boolean matchOnce=false;
 		if (this.metadataFilter.get("matchAll")!=null) {
-			if (this.metadataFilter.get("matchAll").toLowerCase().equals("true")) {
+			if ("true".equalsIgnoreCase(this.metadataFilter.get("matchAll"))) {
 				matchAll=true;
-			} else if (this.metadataFilter.get("matchAll").toLowerCase().equals("false"))	{
+			} else if ("false".equalsIgnoreCase(this.metadataFilter.get("matchAll"))) {
 				matchAll=false;
 			} else {
 				LOG.error("Metadata property matchAll not defined correctly. Assuming that at only least one attribute needs to match");
 			}
 		}
-		String corePropertyName="";
+		String corePropertyName;
 		corePropertyName="applicationname";
 		if (this.metadataFilter.get(corePropertyName)!=null) {
 			String coreProp=summaryInfo.getApplicationName();
