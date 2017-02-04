@@ -367,8 +367,7 @@ private boolean filtered=false;
 
 		} else { // go on with specified sheets
 			// go through sheets specified until one found
-			boolean sheetFound=false;
-			while((this.sheetsIndex!=this.sheets.length) && sheetFound==false) {
+			while (this.sheetsIndex!=this.sheets.length) {
 				if (this.currentWorkbook.getSheet(this.sheets[this.sheetsIndex])==null) { // log only if sheet not found
 					LOG.warn("Sheet \""+this.sheets[this.sheetsIndex]+"\" not found");
 				} else { // sheet found, check number of rows
@@ -378,7 +377,6 @@ private boolean filtered=false;
 				   } else { // we have a sheet where we still need to process rows
 					this.currentSheet=this.currentWorkbook.getSheetIndex(this.currentWorkbook.getSheet(this.sheets[this.sheetsIndex]));
 					this.currentSheetName=this.currentWorkbook.getSheetAt(this.currentSheet).getSheetName();
-					sheetFound=true;
 					break;
 				   }
 				}
