@@ -182,15 +182,13 @@ public AbstractSpreadSheetDocumentRecordReader(FileSplit split, JobConf job, Rep
 	// read linked workbook filenames
 	List<String> linkedWorkbookList=this.officeReader.getCurrentParser().getLinkedWorkbooks();
 	this.currentHFR = new HadoopFileReader(job);
-	if (linkedWorkbookList!=null) {
-		for (String listItem: linkedWorkbookList) {
-			LOG.info("Adding linked workbook \""+listItem+"\"");
-			String sanitizedListItem = new Path(listItem).getName();
-			// read file from hadoop file
-			Path currentFile=new Path(parentPath,sanitizedListItem);
-			InputStream currentIn=this.currentHFR.openFile(currentFile);
-			this.officeReader.getCurrentParser().addLinkedWorkbook(listItem,currentIn,this.linkedWBCredentialMap.get(sanitizedListItem));
-		}
+	for (String listItem: linkedWorkbookList) {
+		LOG.info("Adding linked workbook \""+listItem+"\"");
+		String sanitizedListItem = new Path(listItem).getName();
+		// read file from hadoop file
+		Path currentFile=new Path(parentPath,sanitizedListItem);
+		InputStream currentIn=this.currentHFR.openFile(currentFile);
+		this.officeReader.getCurrentParser().addLinkedWorkbook(listItem,currentIn,this.linkedWBCredentialMap.get(sanitizedListItem));
 	}
     }
 }
