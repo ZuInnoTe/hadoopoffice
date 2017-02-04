@@ -45,6 +45,14 @@ public class ExcelRecordWriter<NullWritable,SpreadSheetCellDAO>  extends Abstrac
 private static final Log LOG = LogFactory.getLog(ExcelRecordWriter.class.getName());
 
 /*
+* Non-arg constructor for Serialization
+*
+*/
+
+public ExcelRecordWriter() {
+}
+
+/*
 * Instantiate the constructor of AbstractSpreadSheetDocumentRecordWriter
 *
 */

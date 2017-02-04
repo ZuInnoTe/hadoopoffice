@@ -108,6 +108,16 @@ private Map<String,String> metadata;
 private HadoopFileReader currentReader;
 
 
+
+/*
+* Non-arg constructor for Serialization
+*
+*/
+
+public AbstractSpreadSheetDocumentRecordWriter() {
+}
+
+
 /**
 * Creates an Abstract Record Writer for tables to various document formats
 * 
