@@ -170,7 +170,6 @@ private boolean filtered=false;
 	public void parse(InputStream in) throws IOException,FormatNotUnderstoodException, GeneralSecurityException {
 		// read xls
 		try {
-			if (this.password!=null) LOG.debug(this.password);
 			this.currentWorkbook=WorkbookFactory.create(in,this.password);
 		} catch (InvalidFormatException e) {
 			LOG.error(e);
