@@ -484,28 +484,28 @@ private void prepareHSSFMetaData() {
 		 summaryInfo = currentHSSFWorkbook.getSummaryInformation(); 
 	}
 	SimpleDateFormat format = new SimpleDateFormat(MSExcelParser.DATE_FORMAT); 
-	for (String currentKey: this.metadata.keySet()) {
+	for (Map.Entry<String,String> entry: this.metadata.entrySet()) {
 		// process general properties
 		try {
-		switch(currentKey) {
-			case "applicationname": summaryInfo.setApplicationName(this.metadata.get(currentKey)); break;
-			case "author": summaryInfo.setAuthor(this.metadata.get(currentKey)); break;
-			case "charcount": summaryInfo.setCharCount(Integer.parseInt(this.metadata.get(currentKey))); break;
-			case "comments": summaryInfo.setComments(this.metadata.get(currentKey)); break;
-			case "createdatetime": summaryInfo.setCreateDateTime(format.parse(this.metadata.get(currentKey))); break;
-			case "edittime": summaryInfo.setEditTime(Long.parseLong(this.metadata.get(currentKey))); break;
-			case "keywords": summaryInfo.setKeywords(this.metadata.get(currentKey)); break;
-			case "lastauthor": summaryInfo.setLastAuthor(this.metadata.get(currentKey)); break;
-			case "lastprinted": summaryInfo.setLastPrinted(format.parse(this.metadata.get(currentKey))); break;	
-			case "lastsavedatetime": summaryInfo.setLastSaveDateTime(format.parse(this.metadata.get(currentKey))); break;
-			case "pagecount": summaryInfo.setPageCount(Integer.parseInt(this.metadata.get(currentKey))); break;
-			case "revnumber": summaryInfo.setRevNumber(this.metadata.get(currentKey)); break;
-			case "security": summaryInfo.setSecurity(Integer.parseInt(this.metadata.get(currentKey))); break;
-			case "subject": summaryInfo.setSubject(this.metadata.get(currentKey)); break;
-			case "template": summaryInfo.setTemplate(this.metadata.get(currentKey)); break;	
-			case "title": summaryInfo.setTitle(this.metadata.get(currentKey)); break;
-			case "wordcount": summaryInfo.setWordCount(Integer.parseInt(this.metadata.get(currentKey))); break;
-			default: LOG.warn("Unknown metadata key: "+currentKey); break;	
+		switch(entry.getKey()) {
+			case "applicationname": summaryInfo.setApplicationName(entry.getValue()); break;
+			case "author": summaryInfo.setAuthor(entry.getValue()); break;
+			case "charcount": summaryInfo.setCharCount(Integer.parseInt(entry.getValue())); break;
+			case "comments": summaryInfo.setComments(entry.getValue()); break;
+			case "createdatetime": summaryInfo.setCreateDateTime(format.parse(entry.getValue())); break;
+			case "edittime": summaryInfo.setEditTime(Long.parseLong(entry.getValue())); break;
+			case "keywords": summaryInfo.setKeywords(entry.getValue()); break;
+			case "lastauthor": summaryInfo.setLastAuthor(entry.getValue()); break;
+			case "lastprinted": summaryInfo.setLastPrinted(format.parse(entry.getValue())); break;	
+			case "lastsavedatetime": summaryInfo.setLastSaveDateTime(format.parse(entry.getValue())); break;
+			case "pagecount": summaryInfo.setPageCount(Integer.parseInt(entry.getValue())); break;
+			case "revnumber": summaryInfo.setRevNumber(entry.getValue()); break;
+			case "security": summaryInfo.setSecurity(Integer.parseInt(entry.getValue())); break;
+			case "subject": summaryInfo.setSubject(entry.getValue()); break;
+			case "template": summaryInfo.setTemplate(entry.getValue()); break;	
+			case "title": summaryInfo.setTitle(entry.getValue()); break;
+			case "wordcount": summaryInfo.setWordCount(Integer.parseInt(entry.getValue())); break;
+			default: LOG.warn("Unknown metadata key: "+entry.getKey()); break;	
 		} 
 		} catch (ParseException pe) {
 			LOG.error(pe);
@@ -526,35 +526,35 @@ private void prepareXSSFMetaData() {
 	POIXMLProperties.CoreProperties coreProp=props.getCoreProperties();
 	POIXMLProperties.CustomProperties custProp = props.getCustomProperties();
 	SimpleDateFormat format = new SimpleDateFormat(MSExcelParser.DATE_FORMAT); 
-	for (String currentKey: this.metadata.keySet()) {
+	for (Map.Entry<String,String> entry: this.metadata.entrySet()) {
 		// process general properties
 		boolean attribMatch=false;
 		try {
-		switch(currentKey) {
-			case "category": coreProp.setCategory(this.metadata.get(currentKey)); attribMatch=true; break;
-			case "contentstatus": coreProp.setContentStatus(this.metadata.get(currentKey)); attribMatch=true; break;
-			case "contenttype": coreProp.setContentType(this.metadata.get(currentKey));attribMatch=true; break;
-			case "created": coreProp.setCreated(new Nullable<Date>(format.parse(this.metadata.get(currentKey)))); attribMatch=true; break;
-			case "creator": coreProp.setCreator(this.metadata.get(currentKey)); attribMatch=true; break;
-			case "description": coreProp.setDescription(this.metadata.get(currentKey)); attribMatch=true; break;
-			case "identifier": coreProp.setIdentifier(this.metadata.get(currentKey)); attribMatch=true; break;
-			case "keywords": coreProp.setKeywords(this.metadata.get(currentKey));attribMatch=true; break;
-			case "lastmodifiedbyuser": coreProp.setLastModifiedByUser(this.metadata.get(currentKey)); attribMatch=true; break;
-			case "lastprinted": coreProp.setLastPrinted(new Nullable<Date>(format.parse(this.metadata.get(currentKey))));attribMatch=true; break;
-			case "modified": coreProp.setModified(new Nullable<Date>(format.parse(this.metadata.get(currentKey)))); attribMatch=true; break;
-			case "revision":coreProp.setRevision(this.metadata.get(currentKey)); attribMatch=true; break;
-			case "subject": coreProp.setSubjectProperty(this.metadata.get(currentKey)); attribMatch=true; break;
-			case "title": coreProp.setTitle(this.metadata.get(currentKey));attribMatch=true; break;
+		switch(entry.getKey()) {
+			case "category": coreProp.setCategory(entry.getValue()); attribMatch=true; break;
+			case "contentstatus": coreProp.setContentStatus(entry.getValue()); attribMatch=true; break;
+			case "contenttype": coreProp.setContentType(entry.getValue());attribMatch=true; break;
+			case "created": coreProp.setCreated(new Nullable<Date>(format.parse(entry.getValue()))); attribMatch=true; break;
+			case "creator": coreProp.setCreator(entry.getValue()); attribMatch=true; break;
+			case "description": coreProp.setDescription(entry.getValue()); attribMatch=true; break;
+			case "identifier": coreProp.setIdentifier(entry.getValue()); attribMatch=true; break;
+			case "keywords": coreProp.setKeywords(entry.getValue());attribMatch=true; break;
+			case "lastmodifiedbyuser": coreProp.setLastModifiedByUser(entry.getValue()); attribMatch=true; break;
+			case "lastprinted": coreProp.setLastPrinted(new Nullable<Date>(format.parse(entry.getValue())));attribMatch=true; break;
+			case "modified": coreProp.setModified(new Nullable<Date>(format.parse(entry.getValue()))); attribMatch=true; break;
+			case "revision":coreProp.setRevision(entry.getValue()); attribMatch=true; break;
+			case "subject": coreProp.setSubjectProperty(entry.getValue()); attribMatch=true; break;
+			case "title": coreProp.setTitle(entry.getValue());attribMatch=true; break;
 		} 
 		if (attribMatch==false) {
 		// process custom properties
-		if (currentKey.startsWith("custom.")==true) {
-			String strippedKey=currentKey.substring("custom.".length());
+		if (entry.getKey().startsWith("custom.")==true) {
+			String strippedKey=entry.getKey().substring("custom.".length());
 			if (strippedKey.length()>0) {
-				custProp.addProperty(strippedKey,this.metadata.get(currentKey));
+				custProp.addProperty(strippedKey,entry.getValue());
 			}
 		} else {
-			LOG.warn("Unknown metadata key: "+currentKey);
+			LOG.warn("Unknown metadata key: "+entry.getKey());
 		}
 		}
 		} catch (ParseException pe) {
