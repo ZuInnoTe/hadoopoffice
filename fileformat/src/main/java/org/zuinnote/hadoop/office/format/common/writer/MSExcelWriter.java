@@ -306,14 +306,17 @@ public void finalizeWrite() throws IOException, GeneralSecurityException {
 					LOG.error("No chain mode specified");
 				} else {
 					POIFSFileSystem ooxmlDocumentFileSystem = new POIFSFileSystem();
-					EncryptionInfo info = new EncryptionInfo(this.encryptionModeCipher, this.encryptAlgorithmCipher, this.hashAlgorithmCipher, -1, -1, this.chainModeCipher);
-					Encryptor enc = info.getEncryptor();
-					enc.confirmPassword(this.password);
-					OutputStream os = enc.getDataStream(ooxmlDocumentFileSystem);	
-					this.currentWorkbook.write(os);
-					ooxmlDocumentFileSystem.writeFilesystem(this.oStream);
-					this.oStream.close();
-					ooxmlDocumentFileSystem.close();
+					try {
+						EncryptionInfo info = new EncryptionInfo(this.encryptionModeCipher, this.encryptAlgorithmCipher, this.hashAlgorithmCipher, -1, -1, this.chainModeCipher);
+						Encryptor enc = info.getEncryptor();
+						enc.confirmPassword(this.password);
+						OutputStream os = enc.getDataStream(ooxmlDocumentFileSystem);	
+						this.currentWorkbook.write(os);
+						ooxmlDocumentFileSystem.writeFilesystem(this.oStream);
+					} finally {
+					 this.oStream.close();
+					 ooxmlDocumentFileSystem.close();
+					}
 				}
 			} else {
 				LOG.error("Could not write encrypted workbook, because type of workbook is unknown");
