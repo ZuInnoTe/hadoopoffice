@@ -96,6 +96,7 @@ private CipherAlgorithm encryptAlgorithmCipher;
 private HashAlgorithm hashAlgorithmCipher;
 private EncryptionMode encryptionModeCipher;
 private ChainingMode chainModeCipher;
+private POIFSFileSystem ooxmlDocumentFileSystem;
 
 /**
 *
@@ -159,6 +160,7 @@ public void create(OutputStream oStream, Map<String,InputStream> linkedWorkbooks
 	// create a new Workbook either in old Excel or "new" Excel format
 	if (this.format.equals(MSExcelWriter.FORMAT_OOXML)) {
 		this.currentWorkbook=new XSSFWorkbook();
+		this.ooxmlDocumentFileSystem = new POIFSFileSystem();					
 	} else if (this.format.equals(MSExcelWriter.FORMAT_OLD)) {
 		this.currentWorkbook=new HSSFWorkbook();
 		((HSSFWorkbook)this.currentWorkbook).createInformationProperties();
@@ -305,7 +307,7 @@ public void finalizeWrite() throws IOException, GeneralSecurityException {
 				if (this.chainModeCipher==null) {
 					LOG.error("No chain mode specified");
 				} else {
-					POIFSFileSystem ooxmlDocumentFileSystem = new POIFSFileSystem();
+					
 					try {
 						EncryptionInfo info = new EncryptionInfo(this.encryptionModeCipher, this.encryptAlgorithmCipher, this.hashAlgorithmCipher, -1, -1, this.chainModeCipher);
 						Encryptor enc = info.getEncryptor();
@@ -315,7 +317,6 @@ public void finalizeWrite() throws IOException, GeneralSecurityException {
 						ooxmlDocumentFileSystem.writeFilesystem(this.oStream);
 					} finally {
 					 this.oStream.close();
-					 ooxmlDocumentFileSystem.close();
 					}
 				}
 			} else {
@@ -324,6 +325,10 @@ public void finalizeWrite() throws IOException, GeneralSecurityException {
 		}
 	}
 	} finally {
+	// close filesystems
+	if (this.ooxmlDocumentFileSystem!=null)  {
+		 ooxmlDocumentFileSystem.close();
+	}
 	// close main workbook
 	if (this.currentWorkbook!=null) {
 		this.currentWorkbook.close();
