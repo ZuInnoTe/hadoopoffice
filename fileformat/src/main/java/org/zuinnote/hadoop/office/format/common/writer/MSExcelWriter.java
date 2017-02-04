@@ -313,6 +313,7 @@ public void finalizeWrite() throws IOException, GeneralSecurityException {
 					this.currentWorkbook.write(os);
 					ooxmlDocumentFileSystem.writeFilesystem(this.oStream);
 					this.oStream.close();
+					ooxmlDocumentFileSystem.close();
 				}
 			} else {
 				LOG.error("Could not write encrypted workbook, because type of workbook is unknown");
