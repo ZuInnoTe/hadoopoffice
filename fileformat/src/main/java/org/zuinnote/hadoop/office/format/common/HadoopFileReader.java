@@ -30,7 +30,6 @@ import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.CompressionCodecFactory;
 import org.apache.hadoop.io.compress.SplitCompressionInputStream;
 import org.apache.hadoop.io.compress.SplittableCompressionCodec;
-import org.apache.hadoop.io.compress.CompressionCodecFactory;
 import org.apache.hadoop.io.compress.Decompressor;
 
 
@@ -42,7 +41,6 @@ import org.apache.commons.logging.Log;
 
 public class HadoopFileReader {
 private static final Log LOG = LogFactory.getLog(HadoopFileReader.class.getName());
-private CompressionCodec codec;
 private CompressionCodecFactory compressionCodecs = null;
 private Configuration conf;
 private ArrayList<Decompressor> openDecompressors;
@@ -91,8 +89,7 @@ public InputStream openFile(Path path) throws IOException {
 		if (codec instanceof SplittableCompressionCodec) {
 			LOG.debug("Reading from a compressed file \""+path+"\" with splittable compression codec");
 			long end = fs.getFileStatus(path).getLen(); 
-        		final SplitCompressionInputStream cIn =((SplittableCompressionCodec)codec).createInputStream(fileIn, decompressor, 0, end,SplittableCompressionCodec.READ_MODE.CONTINUOUS);
-					return cIn;
+        		return ((SplittableCompressionCodec)codec).createInputStream(fileIn, decompressor, 0, end,SplittableCompressionCodec.READ_MODE.CONTINUOUS);
       		} else {
 			LOG.debug("Reading from a compressed file \""+path+"\" with non-splittable compression codec");
         		return codec.createInputStream(fileIn,decompressor);
@@ -125,8 +122,10 @@ public void close() throws IOException {
 */
 
 public Map<String,InputStream> loadLinkedWorkbooks(String[] fileNames) throws IOException {
-	HashMap<String,InputStream> result = new HashMap<String,InputStream>();
-	if (fileNames==null) return result;
+	HashMap<String,InputStream> result = new HashMap<>();
+	if (fileNames==null) {
+		return result;
+	}
 	for (String currentFile: fileNames) {
 		Path currentPath=new Path(currentFile);
 		InputStream currentInputStream = openFile(currentPath);
