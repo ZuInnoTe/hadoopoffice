@@ -26,7 +26,6 @@ import org.apache.hadoop.util.ReflectionUtils;
 import org.apache.hadoop.util.Progressable;
 
 import org.apache.hadoop.io.compress.CompressionCodec;
-import org.apache.hadoop.io.compress.GzipCodec;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -49,7 +48,7 @@ private HadoopUtil() {
 */
 
 public static Map<String,String> parsePropertiesFromBase(Configuration conf, String base) {
-	HashMap<String,String> result = new HashMap<String,String>();
+	HashMap<String,String> result = new HashMap<>();
 	for (Map.Entry<String, String> currentItem : conf) {
 	    String currentKey=currentItem.getKey();
             if (currentKey.startsWith(base)) {
@@ -77,10 +76,9 @@ public static Map<String,String> parsePropertiesFromBase(Configuration conf, Str
 */
 
 public static DataOutputStream getDataOutputStream(Configuration conf,Path file, Progressable progress, boolean compressed, Class<? extends CompressionCodec> compressorClass) throws IOException {
-if (compressed==false) { // uncompressed
+if (!compressed) { // uncompressed
 	FileSystem fs = file.getFileSystem(conf);
-        FSDataOutputStream fileOut = fs.create(file, progress);
-	return fileOut;
+        return fs.create(file, progress);
 } else { // compressed (note partially adapted from TextOutputFormat)
       Class<? extends CompressionCodec> codecClass = compressorClass;
       // create the named codec
@@ -105,7 +103,7 @@ if (compressed==false) { // uncompressed
 **/
 public static String[] parseLinkedWorkbooks(String linkedWorkbooksString) {
 	if ("".equals(linkedWorkbooksString)) {
-		return null;
+		return new String[0];
 	}
 	// first split by ]:[
 	String[] tempSplit = linkedWorkbooksString.split("\\]:\\[");
