@@ -12,12 +12,12 @@ jar {
     manifest {
         attributes 'Implementation-Title': 'Example - MR job (ExcelOutput) for writing Excel files using hadoopoffice', 'Implementation-Version': version
     }
- 
+
     baseName = 'example-ho-mr-exceloutput'
     version = '0.1.0'
    // note this builds one fat jar and it is not recommended for production use - just for illustration purpose
  doFirst {
-        from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } } 
+        from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     }
     exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA' // remove signature digests of other libraries
 }
@@ -31,6 +31,14 @@ repositories {
 configurations {
 	provided
 	testProvided
+}
+
+eclipse {
+
+  classpath {
+    plusConfigurations += [ configurations.provided ]
+    plusConfigurations += [ configurations.testProvided ]
+  }
 }
 
 javadoc.classpath += configurations.provided

@@ -13,7 +13,7 @@ version = "1.0.1"
 jar {
     manifest {
         attributes 'Implementation-Title': 'ZuInnoTe - Hadoop Office Analytics Library - FileFormat', 'Implementation-Version': version
-    } 
+    }
     baseName = 'hadoopoffice-fileformat'
 }
 
@@ -33,6 +33,13 @@ jacocoTestReport {
 
 configurations {
 	provided
+}
+
+eclipse {
+
+  classpath {
+    plusConfigurations += [ configurations.provided ]
+  }
 }
 
 sourceSets {
