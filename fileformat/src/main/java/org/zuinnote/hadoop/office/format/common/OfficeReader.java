@@ -66,6 +66,7 @@ private OfficeReaderParserInterface currentParser=null;
 	*/
 
 	public OfficeReader(InputStream in, String mimeType, String sheets, Locale locale, boolean ignoreMissingLinkedWorkbooks, String fileName,String password, Map<String,String> metadataFilter) {
+		LOG.debug("Initializing OfficeReader");
 		this.in=in;
 		if (mimeType==null) {
 			this.mimeType="";
@@ -135,7 +136,9 @@ private OfficeReaderParserInterface currentParser=null;
 	*/
 
 	public Object[] getNext() {
-		if (currentParser==null) return null;
+		if (currentParser==null) {
+				return new Object[0];
+		}
 		return currentParser.getNext();
 	}
 
@@ -147,7 +150,9 @@ private OfficeReaderParserInterface currentParser=null;
 	*/
 
 	public long getCurrentRow() {
-			if (currentParser==null) return 0;
+			if (currentParser==null) {
+				return 0;
+			}
 			return currentParser.getCurrentRow();
 	}
 
@@ -157,7 +162,9 @@ private OfficeReaderParserInterface currentParser=null;
 	* @return sheet name
 	*/
 	public String getCurrentSheetName() {
-			if (currentParser==null) return null;
+			if (currentParser==null) {
+				return null;
+			}
 			return currentParser.getCurrentSheetName();
 	}
 

@@ -28,7 +28,6 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.io.compress.CodecPool;
 import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.CompressionCodecFactory;
-import org.apache.hadoop.io.compress.SplitCompressionInputStream;
 import org.apache.hadoop.io.compress.SplittableCompressionCodec;
 import org.apache.hadoop.io.compress.Decompressor;
 
@@ -59,7 +58,7 @@ private HadoopFileReader() {
 public HadoopFileReader(Configuration conf) throws IOException {
 	this.conf=conf;
 	this.compressionCodecs=  new CompressionCodecFactory(conf);
-	this.openDecompressors = new ArrayList<Decompressor>();
+	this.openDecompressors = new ArrayList<>();
 	this.fs = FileSystem.get(this.conf);
 	
 }
