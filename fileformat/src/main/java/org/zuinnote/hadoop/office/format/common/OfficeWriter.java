@@ -20,7 +20,6 @@ import java.io.IOException;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.BufferedOutputStream;
 
 import java.security.GeneralSecurityException;
 
@@ -47,7 +46,6 @@ import org.zuinnote.hadoop.office.format.common.writer.InvalidCellSpecificationE
 
 public class OfficeWriter {
 private static final Log LOG = LogFactory.getLog(OfficeWriter.class.getName());
-private String mimeType;
 private Locale useLocale;
 private boolean ignoreMissingLinkedWorkbooks;
 private String fileName;
@@ -80,7 +78,7 @@ private OfficeSpreadSheetWriterInterface currentOfficeSpreadSheetWriter=null;
 */
 
 public OfficeWriter(String mimeType, Locale useLocale, boolean ignoreMissingLinkedWorkbooks, String fileName,String commentAuthor, int commentWidth, int commentHeight, String password, String encryptAlgorithm, String hashAlgorithm, String encryptMode, String chainMode, Map<String,String> metadata) throws InvalidWriterConfigurationException {
-	this.mimeType=mimeType;
+	LOG.debug("Initialize OfficeWriter");
 	this.useLocale=useLocale;
 	this.ignoreMissingLinkedWorkbooks=ignoreMissingLinkedWorkbooks;
 	this.fileName=fileName;
@@ -89,7 +87,7 @@ public OfficeWriter(String mimeType, Locale useLocale, boolean ignoreMissingLink
 	this.commentHeight=commentHeight;
 	// check mimetype and create parser, this is based on some heuristics on the mimetype
 	String writerFormat=getInternalWriterFormatFromMimeType(mimeType);
-	if (MSExcelWriter.isSupportedFormat(writerFormat)==true) {
+	if (MSExcelWriter.isSupportedFormat(writerFormat)) {
 		currentOfficeSpreadSheetWriter=new MSExcelWriter(writerFormat,this.useLocale,this.ignoreMissingLinkedWorkbooks, this.fileName,this.commentAuthor,this.commentWidth,this.commentHeight,password,encryptAlgorithm,hashAlgorithm,encryptMode,chainMode,metadata);
 	} else {
 		throw new InvalidWriterConfigurationException("Error: Writer does not recognize format +\""+writerFormat+"\"");
@@ -171,9 +169,9 @@ if (this.currentOfficeSpreadSheetWriter!=null) {
 */
 private String getInternalWriterFormatFromMimeType(String mimeType) throws InvalidWriterConfigurationException {
  // for MS Office it is based on https://blogs.msdn.microsoft.com/vsofficedeveloper/2008/05/08/office-2007-file-format-mime-types-for-http-content-streaming-2/
- if (mimeType.contains("ms-excel")==true) { 
+ if (mimeType.contains("ms-excel")) { 
 	return MSExcelWriter.FORMAT_OLD;
-} else if (mimeType.contains("openxmlformats-officedocument.spreadsheetml")==true) {
+} else if (mimeType.contains("openxmlformats-officedocument.spreadsheetml")) {
 	return MSExcelWriter.FORMAT_OOXML;
 } else {
 	throw new InvalidWriterConfigurationException("Format \""+mimeType+"\" not recognized");

@@ -16,10 +16,8 @@
 
 package org.zuinnote.hadoop.office.format.common.parser;
 
-import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
-import java.text.Format;
 import java.text.SimpleDateFormat;
 
 import java.security.GeneralSecurityException;
@@ -32,14 +30,6 @@ import java.util.HashMap;
 import java.util.Locale;
 
 import org.apache.poi.hssf.model.InternalWorkbook;
-import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
-import org.apache.poi.hssf.usermodel.HSSFDataFormat;
-import org.apache.poi.hssf.usermodel.HSSFFont;
-import org.apache.poi.hssf.usermodel.HSSFRichTextString;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.ss.usermodel.DataFormatter;
@@ -51,29 +41,18 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory; 
-import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.xssf.model.ExternalLinksTable;
-import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.poifs.filesystem.OPOIFSFileSystem;
-import org.apache.poi.poifs.crypt.Decryptor;
-import org.apache.poi.poifs.crypt.EncryptionMode;
-import org.apache.poi.poifs.crypt.EncryptionInfo;
 import org.apache.poi.POIXMLProperties;
 import org.apache.poi.hpsf.SummaryInformation;
-import org.apache.poi.hssf.record.crypto.Biff8EncryptionKey;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.NoSuchMethodException;
-import java.lang.IllegalAccessException;
-import java.lang.NoSuchFieldException;
 
 import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 
@@ -84,6 +63,9 @@ import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 */
 
 public class MSExcelParser implements OfficeReaderParserInterface {
+private static final String MATCH_ALL = "matchAll";
+private static final String NOT_MATCHING = "Not matching: ";
+private static final String COULD_NOT_RETRIEVE_LINKED_WORKBOOKS_FOR_OLD_EXCEL_FORMAT = "Could not retrieve linked workbooks for old Excel format.";
 private static final Log LOG = LogFactory.getLog(MSExcelParser.class.getName());
 public static final String DATE_FORMAT = "hh:mm:ss dd.MM.yyyy";
 public static final int MAX_LINKEDWB_OLDEXCEL=100;
@@ -139,7 +121,6 @@ private boolean filtered=false;
 	*/
 	public MSExcelParser(Locale useLocale, String[] sheets,boolean ignoreMissingLinkedWorkbooks, String fileName,String password, Map<String,String> metadataFilter) {
 		this.sheets=sheets;
-		this.locale=locale;
 		if (useLocale==null)  {
 			useDataFormatter=new DataFormatter(); // use default locale
 		} else {
@@ -150,8 +131,8 @@ private boolean filtered=false;
 		this.password=password;
 		this.linkedWorkbooksPasswords=linkedWorkbooksPasswords;
 		this.metadataFilter=metadataFilter;
-		this.addedFormulaEvaluators = new HashMap<String,FormulaEvaluator>();
-		this.addedWorkbooks = new ArrayList<Workbook>();
+		this.addedFormulaEvaluators = new HashMap<>();
+		this.addedWorkbooks = new ArrayList<>();
 	}
 
 	/*
@@ -213,7 +194,7 @@ private boolean filtered=false;
 	@Override
 	public boolean addLinkedWorkbook(String name, InputStream inputStream, String password) throws IOException,FormatNotUnderstoodException,GeneralSecurityException {
 		// check if already added
-		if (this.addedFormulaEvaluators.containsKey(name)==true) {
+		if (this.addedFormulaEvaluators.containsKey(name)) {
 			return false;
 		}
 		LOG.debug("Start adding  \""+name+"\" to current workbook");
@@ -237,7 +218,7 @@ private boolean filtered=false;
 	*/
 	@Override
 	public List<String> getLinkedWorkbooks() {
-		ArrayList<String> result = new ArrayList<String>();
+		ArrayList<String> result = new ArrayList<>();
 		if (this.currentWorkbook instanceof HSSFWorkbook) {
 			try {
 				// this is a hack to fetch linked workbooks in the Old Excel format
@@ -254,7 +235,7 @@ private boolean filtered=false;
 				// now we need to browse through the table until we hit an array out of bounds
 				int i = 0;
 				try {
-					while(i<this.MAX_LINKEDWB_OLDEXCEL) {
+					while(i<MSExcelParser.MAX_LINKEDWB_OLDEXCEL) {
 						String[] externalBooks = (String[])externalBooksMethod.invoke(linkTable, i++);
 						if ((externalBooks!=null) && (externalBooks.length>0)){
 							result.add(externalBooks[0]);
@@ -267,15 +248,15 @@ private boolean filtered=false;
 				}
         			
 			} catch (NoSuchMethodException nsme) {
-				LOG.error("Could not retrieve linked workbooks for old Excel format.");
+				LOG.error(COULD_NOT_RETRIEVE_LINKED_WORKBOOKS_FOR_OLD_EXCEL_FORMAT);
 				LOG.error(nsme);
 			}
 			 catch (IllegalAccessException iae) {
-				LOG.error("Could not retrieve linked workbooks for old Excel format.");
+				LOG.error(COULD_NOT_RETRIEVE_LINKED_WORKBOOKS_FOR_OLD_EXCEL_FORMAT);
 				LOG.error(iae);
 			}
 			catch (InvocationTargetException ite) {
-				LOG.error("Could not retrieve linked workbooks for old Excel format.");
+				LOG.error(COULD_NOT_RETRIEVE_LINKED_WORKBOOKS_FOR_OLD_EXCEL_FORMAT);
 				LOG.error(ite);
 			}
 			
@@ -360,7 +341,9 @@ private boolean filtered=false;
 				if (this.currentRow>this.currentWorkbook.getSheetAt(this.currentSheet).getLastRowNum()) { // end of row reached? => next sheet
 					this.currentSheet++;
 					this.currentRow=0;
-					if (this.currentSheet>=this.currentWorkbook.getNumberOfSheets()) return result; // no more sheets available?
+					if (this.currentSheet>=this.currentWorkbook.getNumberOfSheets()) {
+						return result; // no more sheets available?
+					}
 					this.currentSheetName=this.currentWorkbook.getSheetAt(this.currentSheet).getSheetName();
 				}
 
@@ -381,7 +364,9 @@ private boolean filtered=false;
 				}
 				this.sheetsIndex++;
 			}
-			if (this.sheetsIndex==this.sheets.length) return result; // all sheets processed
+			if (this.sheetsIndex==this.sheets.length) {
+				return result; // all sheets processed
+			}
 		}
 		// read row from the sheet currently to be processed
 		Sheet rSheet = this.currentWorkbook.getSheetAt(this.currentSheet);
@@ -475,11 +460,11 @@ private boolean filtered=false;
 		boolean matchAll=true;
 		boolean matchFull=true;
 		boolean matchOnce=false;
-		if (this.metadataFilter.get("matchAll")!=null) {
-			if ("true".equalsIgnoreCase(this.metadataFilter.get("matchAll"))) {
+		if (this.metadataFilter.get(MATCH_ALL)!=null) {
+			if ("true".equalsIgnoreCase(this.metadataFilter.get(MATCH_ALL))) {
 				matchAll=true;
 				LOG.info("matching all metadata properties");
-			} else if ("false".equalsIgnoreCase(this.metadataFilter.get("matchAll")))	{
+			} else if ("false".equalsIgnoreCase(this.metadataFilter.get(MATCH_ALL)))	{
 				matchAll=false;
 				LOG.info("matching at least one metadata property");
 			} else {
@@ -492,144 +477,144 @@ private boolean filtered=false;
 		corePropertyName="category";
 		if (this.metadataFilter.get(corePropertyName)!=null) {
 				String corePropStr=coreProp.getCategory();
-				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName))==true)) {
+				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName)))) {
 					matchOnce=true;
 				 } else {
 						matchFull=false;
-					LOG.debug("Not matching: "+corePropStr+":"+this.metadataFilter.get(corePropertyName));
+					LOG.debug(NOT_MATCHING+corePropStr+":"+this.metadataFilter.get(corePropertyName));
 				}
 		}
 		corePropertyName="contentstatus";
 		if (this.metadataFilter.get(corePropertyName)!=null) {
 				String corePropStr=coreProp.getContentStatus();
-				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName))==true)) {
+				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName)))) {
 					matchOnce=true;
 				 } else {
 						matchFull=false;
-						LOG.debug("Not matching: "+corePropStr+":"+this.metadataFilter.get(corePropertyName));
+						LOG.debug(NOT_MATCHING+corePropStr+":"+this.metadataFilter.get(corePropertyName));
 				}
 		}
 		corePropertyName="contenttype";
 		if (this.metadataFilter.get(corePropertyName)!=null) {
 				String corePropStr=coreProp.getContentType();
-				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName))==true)) {
+				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName)))) {
 					matchOnce=true;
 				 } else {
 						matchFull=false;
-						LOG.debug("Not matching: "+corePropStr+":"+this.metadataFilter.get(corePropertyName));
+						LOG.debug(NOT_MATCHING+corePropStr+":"+this.metadataFilter.get(corePropertyName));
 				}
 		}
 		corePropertyName="created";
 		if (this.metadataFilter.get(corePropertyName)!=null) {
 				Date corePropStr=coreProp.getCreated();
-				if ((corePropStr!=null) && (format.format(corePropStr).matches(this.metadataFilter.get(corePropertyName))==true)) {
+				if ((corePropStr!=null) && (format.format(corePropStr).matches(this.metadataFilter.get(corePropertyName)))) {
 					matchOnce=true;
 				 } else {
 						matchFull=false;
-						LOG.debug("Not matching: "+format.format(corePropStr)+":"+this.metadataFilter.get(corePropertyName));
+						LOG.debug(NOT_MATCHING+format.format(corePropStr)+":"+this.metadataFilter.get(corePropertyName));
 						LOG.debug(corePropertyName);
 				}
 		}
 		corePropertyName="creator";
 		if (this.metadataFilter.get(corePropertyName)!=null) {
 				String corePropStr=coreProp.getCreator();
-				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName))==true)) {
+				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName)))) {
 					matchOnce=true;
 				 } else {
 						matchFull=false;
-						LOG.debug("Not matching: "+corePropStr+":"+this.metadataFilter.get(corePropertyName));
+						LOG.debug(NOT_MATCHING+corePropStr+":"+this.metadataFilter.get(corePropertyName));
 				}
 		}
 		corePropertyName="description";
 		if (this.metadataFilter.get(corePropertyName)!=null) {
 				String corePropStr=coreProp.getDescription();
-				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName))==true)) {
+				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName)))) {
 					matchOnce=true;
 				 } else {
 						matchFull=false;
-						LOG.debug("Not matching: "+corePropStr+":"+this.metadataFilter.get(corePropertyName));
+						LOG.debug(NOT_MATCHING+corePropStr+":"+this.metadataFilter.get(corePropertyName));
 				}
 		}
 		corePropertyName="identifier";
 		if (this.metadataFilter.get(corePropertyName)!=null) {
 				String corePropStr=coreProp.getIdentifier();
-				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName))==true)) {
+				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName)))) {
 					matchOnce=true;
 				 } else {
 						matchFull=false;
-						LOG.debug("Not matching: "+corePropStr+":"+this.metadataFilter.get(corePropertyName));
+						LOG.debug(NOT_MATCHING+corePropStr+":"+this.metadataFilter.get(corePropertyName));
 				}
 		}
 		corePropertyName="keywords";
 		if (this.metadataFilter.get(corePropertyName)!=null) {
 				String corePropStr=coreProp.getKeywords();
-				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName))==true)) {
+				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName)))) {
 					matchOnce=true;
 				 } else {
 						matchFull=false;
-						LOG.debug("Not matching: "+corePropStr+":"+this.metadataFilter.get(corePropertyName));
+						LOG.debug(NOT_MATCHING+corePropStr+":"+this.metadataFilter.get(corePropertyName));
 				}
 		}
 		corePropertyName="lastmodifiedbyuser";
 		if (this.metadataFilter.get(corePropertyName)!=null) {
 				String corePropStr=coreProp.getLastModifiedByUser();
-				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName))==true)) {
+				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName)))) {
 					matchOnce=true;
 				 } else {
 						matchFull=false;
-						LOG.debug("Not matching: "+corePropStr+":"+this.metadataFilter.get(corePropertyName));
+						LOG.debug(NOT_MATCHING+corePropStr+":"+this.metadataFilter.get(corePropertyName));
 				}
 		}
 		corePropertyName="lastprinted";
 		if (this.metadataFilter.get(corePropertyName)!=null) {
 				Date corePropStr=coreProp.getLastPrinted();
-				if ((corePropStr!=null) && (format.format(corePropStr).matches(this.metadataFilter.get(corePropertyName))==true)) {
+				if ((corePropStr!=null) && (format.format(corePropStr).matches(this.metadataFilter.get(corePropertyName)))) {
 					matchOnce=true;
 				 } else {
 						matchFull=false;
-						LOG.debug("Not matching: "+format.format(corePropStr)+":"+this.metadataFilter.get(corePropertyName));
+						LOG.debug(NOT_MATCHING+format.format(corePropStr)+":"+this.metadataFilter.get(corePropertyName));
 						LOG.debug(corePropertyName);
 				}
 		}
 		corePropertyName="modified";
 		if (this.metadataFilter.get(corePropertyName)!=null) {
 				Date corePropStr=coreProp.getModified();
-				if ((corePropStr!=null) && (format.format(corePropStr).matches(this.metadataFilter.get(corePropertyName))==true)) {
+				if ((corePropStr!=null) && (format.format(corePropStr).matches(this.metadataFilter.get(corePropertyName)))) {
 					matchOnce=true;
 				 } else {
 						matchFull=false;
-						LOG.debug("Not matching: "+corePropStr+":"+this.metadataFilter.get(corePropertyName));
+						LOG.debug(NOT_MATCHING+corePropStr+":"+this.metadataFilter.get(corePropertyName));
 						LOG.debug(corePropertyName);
 				}
 		}
 		corePropertyName="revision";
 		if (this.metadataFilter.get(corePropertyName)!=null) {
 				String corePropStr=coreProp.getRevision();
-				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName))==true)) {
+				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName)))) {
 					matchOnce=true;
 				 } else {
 						matchFull=false;
-						LOG.debug("Not matching: "+corePropStr+":"+this.metadataFilter.get(corePropertyName));
+						LOG.debug(NOT_MATCHING+corePropStr+":"+this.metadataFilter.get(corePropertyName));
 				}
 		}
 		corePropertyName="subject";
 		if (this.metadataFilter.get(corePropertyName)!=null) {
 				String corePropStr=coreProp.getSubject();
-				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName))==true)) {
+				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName)))) {
 					matchOnce=true;
 				 } else {
 						matchFull=false;
-						LOG.debug("Not matching: "+corePropStr+":"+this.metadataFilter.get(corePropertyName));
+						LOG.debug(NOT_MATCHING+corePropStr+":"+this.metadataFilter.get(corePropertyName));
 				}
 		}
 		corePropertyName="title";
 		if (this.metadataFilter.get(corePropertyName)!=null) {
 				String corePropStr=coreProp.getTitle();
-				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName))==true)) {
+				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName)))) {
 					matchOnce=true;
 				 } else {
 						matchFull=false;
-						LOG.debug("Not matching: "+corePropStr+":"+this.metadataFilter.get(corePropertyName));
+						LOG.debug(NOT_MATCHING+corePropStr+":"+this.metadataFilter.get(corePropertyName));
 				}
 		}
 		// check for custom properties
@@ -651,7 +636,7 @@ private boolean filtered=false;
 			}
 		}		
 		
-		if (matchAll==false) {
+		if (!(matchAll)) {
 			return  matchOnce;
 		} else {
 			return matchFull;
@@ -671,10 +656,10 @@ private boolean filtered=false;
 
 		boolean matchFull=true;
 		boolean matchOnce=false;
-		if (this.metadataFilter.get("matchAll")!=null) {
-			if ("true".equalsIgnoreCase(this.metadataFilter.get("matchAll"))) {
+		if (this.metadataFilter.get(MATCH_ALL)!=null) {
+			if ("true".equalsIgnoreCase(this.metadataFilter.get(MATCH_ALL))) {
 				matchAll=true;
-			} else if ("false".equalsIgnoreCase(this.metadataFilter.get("matchAll"))) {
+			} else if ("false".equalsIgnoreCase(this.metadataFilter.get(MATCH_ALL))) {
 				matchAll=false;
 			} else {
 				LOG.error("Metadata property matchAll not defined correctly. Assuming that at only least one attribute needs to match");
@@ -684,7 +669,7 @@ private boolean filtered=false;
 		corePropertyName="applicationname";
 		if (this.metadataFilter.get(corePropertyName)!=null) {
 			String coreProp=summaryInfo.getApplicationName();
-			if ((coreProp!=null) && (coreProp.matches(this.metadataFilter.get(corePropertyName))==true)) {
+			if ((coreProp!=null) && (coreProp.matches(this.metadataFilter.get(corePropertyName)))) {
 				matchOnce=true;
 			} else {
 				matchFull=false;
@@ -693,7 +678,7 @@ private boolean filtered=false;
 		corePropertyName="author";
 		if (this.metadataFilter.get(corePropertyName)!=null) {
 			String coreProp=summaryInfo.getAuthor();
-			if ((coreProp!=null) && (coreProp.matches(this.metadataFilter.get(corePropertyName))==true)) {
+			if ((coreProp!=null) && (coreProp.matches(this.metadataFilter.get(corePropertyName)))) {
 				matchOnce=true;
 			} else {
 				matchFull=false;
@@ -702,7 +687,7 @@ private boolean filtered=false;
 		corePropertyName="charcount";
 		if (this.metadataFilter.get(corePropertyName)!=null) {
 			int coreProp=summaryInfo.getCharCount();
-			if (String.valueOf(coreProp).matches(this.metadataFilter.get(corePropertyName))==true) {
+			if (String.valueOf(coreProp).matches(this.metadataFilter.get(corePropertyName))) {
 				matchOnce=true;
 			} else {
 				matchFull=false;
@@ -711,7 +696,7 @@ private boolean filtered=false;
 		corePropertyName="comments";
 		if (this.metadataFilter.get(corePropertyName)!=null) {
 			String coreProp=summaryInfo.getComments();
-			if ((coreProp!=null) && (coreProp.matches(this.metadataFilter.get(corePropertyName))==true)) {
+			if ((coreProp!=null) && (coreProp.matches(this.metadataFilter.get(corePropertyName)))) {
 				matchOnce=true;
 			} else {
 				matchFull=false;
@@ -720,7 +705,7 @@ private boolean filtered=false;
 		corePropertyName="createddatetime";
 		if (this.metadataFilter.get(corePropertyName)!=null) {
 			Date coreProp=summaryInfo.getCreateDateTime();
-			if ((coreProp!=null) && (coreProp.toString().matches(this.metadataFilter.get(corePropertyName))==true)) {
+			if ((coreProp!=null) && (coreProp.toString().matches(this.metadataFilter.get(corePropertyName)))) {
 				matchOnce=true;
 			} else {
 				matchFull=false;
@@ -729,7 +714,7 @@ private boolean filtered=false;
 		corePropertyName="edittime";
 		if (this.metadataFilter.get(corePropertyName)!=null) {
 			long coreProp=summaryInfo.getEditTime();
-			if (String.valueOf(coreProp).matches(this.metadataFilter.get(corePropertyName))==true) {
+			if (String.valueOf(coreProp).matches(this.metadataFilter.get(corePropertyName))) {
 				matchOnce=true;
 			} else {
 				matchFull=false;
@@ -738,7 +723,7 @@ private boolean filtered=false;
 		corePropertyName="keywords";
 		if (this.metadataFilter.get(corePropertyName)!=null) {
 			String coreProp=summaryInfo.getKeywords();
-			if ((coreProp!=null) && (coreProp.matches(this.metadataFilter.get(corePropertyName))==true)) {
+			if ((coreProp!=null) && (coreProp.matches(this.metadataFilter.get(corePropertyName)))) {
 				matchOnce=true;
 			} else {
 				matchFull=false;
@@ -747,7 +732,7 @@ private boolean filtered=false;
 		corePropertyName="lastauthor";
 		if (this.metadataFilter.get(corePropertyName)!=null) {
 			String coreProp=summaryInfo.getLastAuthor();
-			if ((coreProp!=null) && (coreProp.matches(this.metadataFilter.get(corePropertyName))==true)) {
+			if ((coreProp!=null) && (coreProp.matches(this.metadataFilter.get(corePropertyName)))) {
 				matchOnce=true;
 			} else {
 				matchFull=false;
@@ -756,7 +741,7 @@ private boolean filtered=false;
 		corePropertyName="lastprinted";
 		if (this.metadataFilter.get(corePropertyName)!=null) {
 			Date coreProp=summaryInfo.getLastPrinted();
-			if ((coreProp!=null) && (coreProp.toString().matches(this.metadataFilter.get(corePropertyName))==true)) {
+			if ((coreProp!=null) && (coreProp.toString().matches(this.metadataFilter.get(corePropertyName)))) {
 				matchOnce=true;
 			} else {
 				matchFull=false;
@@ -765,7 +750,7 @@ private boolean filtered=false;
 		corePropertyName="lastsavedatetime";
 		if (this.metadataFilter.get(corePropertyName)!=null) {
 			Date coreProp=summaryInfo.getLastSaveDateTime();
-			if ((coreProp!=null) && (coreProp.toString().matches(this.metadataFilter.get(corePropertyName))==true)) {
+			if ((coreProp!=null) && (coreProp.toString().matches(this.metadataFilter.get(corePropertyName)))) {
 				matchOnce=true;
 			} else {
 				matchFull=false;
@@ -774,7 +759,7 @@ private boolean filtered=false;
 		corePropertyName="pagecount";
 		if (this.metadataFilter.get(corePropertyName)!=null) {
 			int coreProp=summaryInfo.getPageCount();
-			if (String.valueOf(coreProp).matches(this.metadataFilter.get(corePropertyName))==true) {
+			if (String.valueOf(coreProp).matches(this.metadataFilter.get(corePropertyName))) {
 				matchOnce=true;
 			} else {
 				matchFull=false;
@@ -783,7 +768,7 @@ private boolean filtered=false;
 		corePropertyName="revnumber";
 		if (this.metadataFilter.get(corePropertyName)!=null) {
 			String coreProp=summaryInfo.getRevNumber();
-			if ((coreProp!=null) && (coreProp.matches(this.metadataFilter.get(corePropertyName))==true)) {
+			if ((coreProp!=null) && (coreProp.matches(this.metadataFilter.get(corePropertyName)))) {
 				matchOnce=true;
 			} else {
 				matchFull=false;
@@ -792,7 +777,7 @@ private boolean filtered=false;
 		corePropertyName="security";
 		if (this.metadataFilter.get(corePropertyName)!=null) {
 			int coreProp=summaryInfo.getSecurity();
-			if (String.valueOf(coreProp).matches(this.metadataFilter.get(corePropertyName))==true) {
+			if (String.valueOf(coreProp).matches(this.metadataFilter.get(corePropertyName))) {
 				matchOnce=true;
 			} else {
 				matchFull=false;
@@ -801,7 +786,7 @@ private boolean filtered=false;
 		corePropertyName="subject";
 		if (this.metadataFilter.get(corePropertyName)!=null) {
 			String coreProp=summaryInfo.getSubject();
-			if ((coreProp!=null) && (coreProp.matches(this.metadataFilter.get(corePropertyName))==true)) {
+			if ((coreProp!=null) && (coreProp.matches(this.metadataFilter.get(corePropertyName)))) {
 				matchOnce=true;
 			} else {
 				matchFull=false;
@@ -810,7 +795,7 @@ private boolean filtered=false;
 		corePropertyName="template";
 		if (this.metadataFilter.get(corePropertyName)!=null) {
 			String coreProp=summaryInfo.getTemplate();
-			if ((coreProp!=null) && (coreProp.matches(this.metadataFilter.get(corePropertyName))==true)) {
+			if ((coreProp!=null) && (coreProp.matches(this.metadataFilter.get(corePropertyName)))) {
 				matchOnce=true;
 			} else {
 				matchFull=false;
@@ -819,7 +804,7 @@ private boolean filtered=false;
 		corePropertyName="title";
 		if (this.metadataFilter.get(corePropertyName)!=null) {
 			String coreProp=summaryInfo.getTitle();
-			if ((coreProp!=null) && (coreProp.matches(this.metadataFilter.get(corePropertyName))==true)) {
+			if ((coreProp!=null) && (coreProp.matches(this.metadataFilter.get(corePropertyName)))) {
 				matchOnce=true;
 			} else {
 				matchFull=false;
@@ -828,14 +813,14 @@ private boolean filtered=false;
 		corePropertyName="wordcount";
 		if (this.metadataFilter.get(corePropertyName)!=null) {
 			int coreProp=summaryInfo.getWordCount();
-			if (String.valueOf(coreProp).matches(this.metadataFilter.get(corePropertyName))==true) {
+			if (String.valueOf(coreProp).matches(this.metadataFilter.get(corePropertyName))) {
 				matchOnce=true;
 			} else {
 				matchFull=false;
 			}
 		}
 	
-		if (matchAll==false) {
+		if (!(matchAll)) {
 			return  matchOnce;
 		} else {
 			return matchFull;
