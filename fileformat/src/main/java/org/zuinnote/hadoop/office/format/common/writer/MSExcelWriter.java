@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.Date;
 
 import java.text.ParseException;
-import java.text.Format;
 import java.text.SimpleDateFormat;
 
 import java.io.InputStream;
@@ -47,8 +46,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.ss.util.WorkbookUtil;
-import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
-import org.apache.poi.poifs.filesystem.OPOIFSFileSystem;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.poifs.crypt.CipherAlgorithm;
 import org.apache.poi.poifs.crypt.HashAlgorithm;
@@ -57,7 +54,6 @@ import org.apache.poi.poifs.crypt.Encryptor;
 import org.apache.poi.poifs.crypt.EncryptionInfo;
 import org.apache.poi.poifs.crypt.ChainingMode;
 import org.apache.poi.hssf.record.crypto.Biff8EncryptionKey;
-import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.POIXMLProperties;
 import org.apache.poi.hpsf.SummaryInformation;
 import org.apache.poi.openxml4j.util.Nullable;
@@ -70,11 +66,11 @@ import org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodExcept
 import org.zuinnote.hadoop.office.format.common.parser.MSExcelParser;
 
 public class MSExcelWriter implements OfficeSpreadSheetWriterInterface {
-public final static String FORMAT_OOXML = "ooxmlexcel";
-public final static String FORMAT_OLD = "oldexcel";
-protected final static String[] VALID_FORMAT = {FORMAT_OOXML, FORMAT_OLD};
+public static final String FORMAT_OOXML = "ooxmlexcel";
+public static final String FORMAT_OLD = "oldexcel";
+protected static final String[] VALID_FORMAT = {FORMAT_OOXML, FORMAT_OLD};
 private static final Log LOG = LogFactory.getLog(MSExcelWriter.class.getName());
-private final static String DEFAULT_FORMAT = VALID_FORMAT[0];
+private static final String DEFAULT_FORMAT = VALID_FORMAT[0];
 private String format=DEFAULT_FORMAT;
 private OutputStream oStream;
 private Workbook currentWorkbook;
@@ -84,12 +80,8 @@ private String fileName;
 private String commentAuthor;
 private int commentWidth;
 private int commentHeight;
-private Map<String,InputStream> linkedWorkbooks;
-private Map<String,FormulaEvaluator> linkedFormulaEvaluators;
 private Map<String,Drawing> mappedDrawings;
 private List<Workbook> listOfWorkbooks;
-private FormulaEvaluator currentFormulaEvaluator;
-private Map<String,String> linkedWorkbooksPasswords;
 private Map<String,String> metadata;
 private String password;
 private CipherAlgorithm encryptAlgorithmCipher;
@@ -123,7 +115,7 @@ private POIFSFileSystem ooxmlDocumentFileSystem;
 
 public MSExcelWriter(String excelFormat, Locale useLocale, boolean ignoreMissingLinkedWorkbooks, String fileName, String commentAuthor, int commentWidth, int commentHeight,String password,String encryptAlgorithm,  String hashAlgorithm, String encryptMode, String chainMode, Map<String,String> metadata) throws InvalidWriterConfigurationException {
 	boolean formatFound=isSupportedFormat(excelFormat);
-	if (formatFound==false) {
+	if (!(formatFound)) {
 		 LOG.error("Unknown Excel format: "+this.format);
 		 throw new InvalidWriterConfigurationException("Unknown Excel format: "+this.format);
 	}
@@ -165,22 +157,21 @@ public void create(OutputStream oStream, Map<String,InputStream> linkedWorkbooks
 		this.currentWorkbook=new HSSFWorkbook();
 		((HSSFWorkbook)this.currentWorkbook).createInformationProperties();
 	} 
-	this.linkedWorkbooks=linkedWorkbooks;
-	this.currentFormulaEvaluator=this.currentWorkbook.getCreationHelper().createFormulaEvaluator();
-	this.linkedFormulaEvaluators=new HashMap<String,FormulaEvaluator>();
-	this.linkedFormulaEvaluators.put(this.fileName,this.currentFormulaEvaluator);
-	this.mappedDrawings=new HashMap<String,Drawing>();
+	FormulaEvaluator currentFormulaEvaluator=this.currentWorkbook.getCreationHelper().createFormulaEvaluator();
+	HashMap<String,FormulaEvaluator> linkedFormulaEvaluators=new HashMap<>();
+	linkedFormulaEvaluators.put(this.fileName,currentFormulaEvaluator);
+	this.mappedDrawings=new HashMap<>();
 	// add current workbook to list of linked workbooks
-	this.listOfWorkbooks=new ArrayList<Workbook>();
+	this.listOfWorkbooks=new ArrayList<>();
 	// parse linked workbooks
 	try {
-		for (String name: linkedWorkbooks.keySet()) {
+		for (Map.Entry<String,InputStream> entry: linkedWorkbooks.entrySet()) {
 			// parse linked workbook
-			MSExcelParser currentLinkedWorkbookParser = new MSExcelParser(this.useLocale, null, this.ignoreMissingLinkedWorkbooks,name,linkedWorkbooksPasswords.get(name),null);
-			currentLinkedWorkbookParser.parse(this.linkedWorkbooks.get(name));
+			MSExcelParser currentLinkedWorkbookParser = new MSExcelParser(this.useLocale, null, this.ignoreMissingLinkedWorkbooks,entry.getKey(),linkedWorkbooksPasswords.get(entry.getKey()),null);
+			currentLinkedWorkbookParser.parse(entry.getValue());
 			this.listOfWorkbooks.add(currentLinkedWorkbookParser.getCurrentWorkbook());
-			this.linkedFormulaEvaluators.put(name,currentLinkedWorkbookParser.getCurrentFormulaEvaluator());
-			this.currentWorkbook.linkExternalWorkbook(name,currentLinkedWorkbookParser.getCurrentWorkbook());
+			linkedFormulaEvaluators.put(entry.getKey(),currentLinkedWorkbookParser.getCurrentFormulaEvaluator());
+			this.currentWorkbook.linkExternalWorkbook(entry.getKey(),currentLinkedWorkbookParser.getCurrentWorkbook());
 		}
 					
 	} finally {	// close linked workbook inputstreams
@@ -189,7 +180,7 @@ public void create(OutputStream oStream, Map<String,InputStream> linkedWorkbooks
 		}
 	}
 	LOG.debug("Size of linked formula evaluators map: "+linkedFormulaEvaluators.size());
-	this.currentFormulaEvaluator.setupReferencedWorkbooks(linkedFormulaEvaluators);
+	currentFormulaEvaluator.setupReferencedWorkbooks(linkedFormulaEvaluators);
 }
 	
 
@@ -225,7 +216,7 @@ public void write(Object newDAO) throws InvalidCellSpecificationException,Object
 	Sheet currentSheet=this.currentWorkbook.getSheet(safeSheetName);
 	if (currentSheet==null) {// create sheet if it does not exist yet
 		currentSheet=this.currentWorkbook.createSheet(safeSheetName);
-		if (safeSheetName.equals(sscd.getSheetName())==false) {
+		if (!(safeSheetName.equals(sscd.getSheetName()))) {
 			LOG.warn("Sheetname modified from \""+sscd.getSheetName()+"\" to \""+safeSheetName+"\" to correspond to Excel conventions.");
 		}
 		// create drawing anchor (needed for comments...)
@@ -244,7 +235,7 @@ public void write(Object newDAO) throws InvalidCellSpecificationException,Object
 	// create cell
 	currentCell=currentRow.createCell(currentCA.getColumn());		
 	// set the values accordingly
-	if ("".equals(sscd.getFormula())==false) { // if formula exists then use formula
+	if (!("".equals(sscd.getFormula()))) { // if formula exists then use formula
 		currentCell.setCellFormula(sscd.getFormula());
 		
 	} else {	
@@ -252,7 +243,7 @@ public void write(Object newDAO) throws InvalidCellSpecificationException,Object
 		currentCell.setCellValue(sscd.getFormattedValue());
 	}
 	// set comment
-	if ((sscd.getComment()!=null) && ("".equals(sscd.getComment())==false)) {
+	if ((sscd.getComment()!=null) && (!("".equals(sscd.getComment())))) {
 		/** the following operations are necessary to create comments **/
 		/** Define size of the comment window **/
 		    ClientAnchor anchor = this.currentWorkbook.getCreationHelper().createClientAnchor();
@@ -334,9 +325,9 @@ public void finalizeWrite() throws IOException, GeneralSecurityException {
 		this.currentWorkbook.close();
 	}
 	// close linked workbooks
-	 	for (Workbook currentWorkbook: this.listOfWorkbooks) {
-			if (currentWorkbook!=null) {
-				currentWorkbook.close();
+	 	for (Workbook currentWorkbookItem: this.listOfWorkbooks) {
+			if (currentWorkbookItem!=null) {
+				currentWorkbookItem.close();
 			}
 		}
 	}
@@ -353,7 +344,7 @@ public void finalizeWrite() throws IOException, GeneralSecurityException {
 */
 public static boolean isSupportedFormat(String format) {
 	for (int i=0;i<MSExcelWriter.VALID_FORMAT.length;i++) {
-		if (VALID_FORMAT[i].equals(format)==true) {
+		if (VALID_FORMAT[i].equals(format)) {
 			return true;
 		}
 	}
@@ -371,7 +362,9 @@ return false;
 */
 
 private static CipherAlgorithm getAlgorithmCipher(String encryptAlgorithm) {
-	if (encryptAlgorithm==null) return null;
+	if (encryptAlgorithm==null) { 
+		return null;
+	}
 	switch (encryptAlgorithm) {
 		case "aes128": return CipherAlgorithm.aes128;
 		case "aes192": return CipherAlgorithm.aes192;
@@ -382,6 +375,9 @@ private static CipherAlgorithm getAlgorithmCipher(String encryptAlgorithm) {
 		case "rc2": return CipherAlgorithm.rc2;
 		case "rc4": return CipherAlgorithm.rc4;
 		case "rsa": return CipherAlgorithm.rsa;
+		default:
+			LOG.error("Uknown encryption algorithm: \""+encryptAlgorithm+"\"");
+			break;
 	}
 	return null;
 }
@@ -396,7 +392,9 @@ private static CipherAlgorithm getAlgorithmCipher(String encryptAlgorithm) {
 *
 */
 private static HashAlgorithm getHashAlgorithm(String hashAlgorithm) {
-	if (hashAlgorithm==null) return null;
+	if (hashAlgorithm==null) {
+		return null;
+	}
 	switch (hashAlgorithm) {
 		case "md2": return HashAlgorithm.md2;
 		case "md4": return HashAlgorithm.md4;
@@ -410,6 +408,9 @@ private static HashAlgorithm getHashAlgorithm(String hashAlgorithm) {
 		case "sha384": return HashAlgorithm.sha384;
 		case "sha512": return HashAlgorithm.sha512;
 		case "whirlpool": return HashAlgorithm.whirlpool;
+		default:
+			LOG.error("Uknown hash algorithm: \""+hashAlgorithm+"\"");
+			break;
 	}
 	return null;
 }
@@ -428,12 +429,17 @@ private static HashAlgorithm getHashAlgorithm(String hashAlgorithm) {
 
 
 private static EncryptionMode getEncryptionModeCipher(String encryptionMode) {
-	if (encryptionMode==null) return null;
+	if (encryptionMode==null) {
+		return null;
+	}
 	switch (encryptionMode) {
 		case "agile": return EncryptionMode.agile;
 		case "binaryRC4": return EncryptionMode.binaryRC4;
 		case "cryptoAPI": return EncryptionMode.cryptoAPI;
 		case "standard": return EncryptionMode.standard;
+		default:
+			LOG.error("Uknown enncryption mode \""+encryptionMode+"\"");
+			break;
 		//case "xor": return EncryptionMode.xor; // does not seem to be supported anymore
 	}
 	return null;
@@ -452,11 +458,16 @@ private static EncryptionMode getEncryptionModeCipher(String encryptionMode) {
 
 
 private static ChainingMode getChainMode(String chainMode) {
-	if (chainMode==null) return null;
+	if (chainMode==null) {
+		return null;
+	}
 	switch (chainMode) {
 		case "cbc": return ChainingMode.cbc;
 		case "cfb": return ChainingMode.cfb;
 		case "ecb": return ChainingMode.ecb;
+		default:
+			LOG.error("Uknown chainmode: \""+chainMode+"\"");
+			break;
 
 	}
 	return null;
@@ -491,29 +502,65 @@ private void prepareHSSFMetaData() {
 		currentHSSFWorkbook.createInformationProperties();
 		 summaryInfo = currentHSSFWorkbook.getSummaryInformation(); 
 	}
-	SimpleDateFormat format = new SimpleDateFormat(MSExcelParser.DATE_FORMAT); 
+	SimpleDateFormat formatSDF = new SimpleDateFormat(MSExcelParser.DATE_FORMAT); 
 	for (Map.Entry<String,String> entry: this.metadata.entrySet()) {
 		// process general properties
 		try {
 		switch(entry.getKey()) {
-			case "applicationname": summaryInfo.setApplicationName(entry.getValue()); break;
-			case "author": summaryInfo.setAuthor(entry.getValue()); break;
-			case "charcount": summaryInfo.setCharCount(Integer.parseInt(entry.getValue())); break;
-			case "comments": summaryInfo.setComments(entry.getValue()); break;
-			case "createdatetime": summaryInfo.setCreateDateTime(format.parse(entry.getValue())); break;
-			case "edittime": summaryInfo.setEditTime(Long.parseLong(entry.getValue())); break;
-			case "keywords": summaryInfo.setKeywords(entry.getValue()); break;
-			case "lastauthor": summaryInfo.setLastAuthor(entry.getValue()); break;
-			case "lastprinted": summaryInfo.setLastPrinted(format.parse(entry.getValue())); break;	
-			case "lastsavedatetime": summaryInfo.setLastSaveDateTime(format.parse(entry.getValue())); break;
-			case "pagecount": summaryInfo.setPageCount(Integer.parseInt(entry.getValue())); break;
-			case "revnumber": summaryInfo.setRevNumber(entry.getValue()); break;
-			case "security": summaryInfo.setSecurity(Integer.parseInt(entry.getValue())); break;
-			case "subject": summaryInfo.setSubject(entry.getValue()); break;
-			case "template": summaryInfo.setTemplate(entry.getValue()); break;	
-			case "title": summaryInfo.setTitle(entry.getValue()); break;
-			case "wordcount": summaryInfo.setWordCount(Integer.parseInt(entry.getValue())); break;
-			default: LOG.warn("Unknown metadata key: "+entry.getKey()); break;	
+			case "applicationname": 
+				summaryInfo.setApplicationName(entry.getValue()); 
+				break;
+			case "author": 
+				summaryInfo.setAuthor(entry.getValue()); 
+				break;
+			case "charcount": 
+				summaryInfo.setCharCount(Integer.parseInt(entry.getValue())); 
+				break;
+			case "comments": 
+				summaryInfo.setComments(entry.getValue()); 
+				break;
+			case "createdatetime": 
+				summaryInfo.setCreateDateTime(formatSDF.parse(entry.getValue())); 
+				break;
+			case "edittime": 
+				summaryInfo.setEditTime(Long.parseLong(entry.getValue())); 
+				break;
+			case "keywords": 
+				summaryInfo.setKeywords(entry.getValue()); 
+				break;
+			case "lastauthor": 
+				summaryInfo.setLastAuthor(entry.getValue()); 
+				break;
+			case "lastprinted": 
+				summaryInfo.setLastPrinted(formatSDF.parse(entry.getValue())); 
+				break;	
+			case "lastsavedatetime": 
+				summaryInfo.setLastSaveDateTime(formatSDF.parse(entry.getValue())); 
+				break;
+			case "pagecount": 
+				summaryInfo.setPageCount(Integer.parseInt(entry.getValue())); 
+				break;
+			case "revnumber": 
+				summaryInfo.setRevNumber(entry.getValue()); 
+				break;
+			case "security": 
+				summaryInfo.setSecurity(Integer.parseInt(entry.getValue())); 
+				break;
+			case "subject": 
+				summaryInfo.setSubject(entry.getValue()); 
+				break;
+			case "template": 
+				summaryInfo.setTemplate(entry.getValue()); 
+				break;	
+			case "title": 
+				summaryInfo.setTitle(entry.getValue()); 
+				break;
+			case "wordcount": 
+				summaryInfo.setWordCount(Integer.parseInt(entry.getValue())); 
+				break;
+			default: 
+				LOG.warn("Unknown metadata key: "+entry.getKey()); 
+				break;	
 		} 
 		} catch (ParseException pe) {
 			LOG.error(pe);
@@ -533,30 +580,74 @@ private void prepareXSSFMetaData() {
         POIXMLProperties props = currentXSSFWorkbook.getProperties();
 	POIXMLProperties.CoreProperties coreProp=props.getCoreProperties();
 	POIXMLProperties.CustomProperties custProp = props.getCustomProperties();
-	SimpleDateFormat format = new SimpleDateFormat(MSExcelParser.DATE_FORMAT); 
+	SimpleDateFormat formatSDF = new SimpleDateFormat(MSExcelParser.DATE_FORMAT); 
 	for (Map.Entry<String,String> entry: this.metadata.entrySet()) {
 		// process general properties
 		boolean attribMatch=false;
 		try {
 		switch(entry.getKey()) {
-			case "category": coreProp.setCategory(entry.getValue()); attribMatch=true; break;
-			case "contentstatus": coreProp.setContentStatus(entry.getValue()); attribMatch=true; break;
-			case "contenttype": coreProp.setContentType(entry.getValue());attribMatch=true; break;
-			case "created": coreProp.setCreated(new Nullable<Date>(format.parse(entry.getValue()))); attribMatch=true; break;
-			case "creator": coreProp.setCreator(entry.getValue()); attribMatch=true; break;
-			case "description": coreProp.setDescription(entry.getValue()); attribMatch=true; break;
-			case "identifier": coreProp.setIdentifier(entry.getValue()); attribMatch=true; break;
-			case "keywords": coreProp.setKeywords(entry.getValue());attribMatch=true; break;
-			case "lastmodifiedbyuser": coreProp.setLastModifiedByUser(entry.getValue()); attribMatch=true; break;
-			case "lastprinted": coreProp.setLastPrinted(new Nullable<Date>(format.parse(entry.getValue())));attribMatch=true; break;
-			case "modified": coreProp.setModified(new Nullable<Date>(format.parse(entry.getValue()))); attribMatch=true; break;
-			case "revision":coreProp.setRevision(entry.getValue()); attribMatch=true; break;
-			case "subject": coreProp.setSubjectProperty(entry.getValue()); attribMatch=true; break;
-			case "title": coreProp.setTitle(entry.getValue());attribMatch=true; break;
+			case "category": 
+				coreProp.setCategory(entry.getValue()); 
+				attribMatch=true; 
+				break;
+			case "contentstatus": 
+				coreProp.setContentStatus(entry.getValue()); 
+				attribMatch=true; 
+				break;
+			case "contenttype": 
+				coreProp.setContentType(entry.getValue());
+				attribMatch=true; 
+				break;
+			case "created": 
+				coreProp.setCreated(new Nullable<Date>(formatSDF.parse(entry.getValue()))); 
+				attribMatch=true; 
+				break;
+			case "creator": 
+				coreProp.setCreator(entry.getValue()); 
+				attribMatch=true; 
+				break;
+			case "description": 
+				coreProp.setDescription(entry.getValue()); 
+				attribMatch=true; 
+				break;
+			case "identifier": 
+				coreProp.setIdentifier(entry.getValue()); 
+				attribMatch=true; 
+				break;
+			case "keywords": 
+				coreProp.setKeywords(entry.getValue());
+				attribMatch=true; 
+				break;
+			case "lastmodifiedbyuser": 
+				coreProp.setLastModifiedByUser(entry.getValue()); 
+				attribMatch=true; 
+				break;
+			case "lastprinted": 
+				coreProp.setLastPrinted(new Nullable<Date>(formatSDF.parse(entry.getValue())));
+				attribMatch=true; 
+				break;
+			case "modified": 
+				coreProp.setModified(new Nullable<Date>(formatSDF.parse(entry.getValue()))); 
+				attribMatch=true; 
+				break;
+			case "revision":
+				coreProp.setRevision(entry.getValue()); 
+				attribMatch=true; 
+				break;
+			case "subject": 
+				coreProp.setSubjectProperty(entry.getValue()); 
+				attribMatch=true; 
+				break;
+			case "title": 
+				coreProp.setTitle(entry.getValue());
+				attribMatch=true; 
+				break;
+			default: // later we check if custom properties need to be added 
+				break;
 		} 
-		if (attribMatch==false) {
+		if (!(attribMatch)) {
 		// process custom properties
-		if (entry.getKey().startsWith("custom.")==true) {
+		if (entry.getKey().startsWith("custom.")) {
 			String strippedKey=entry.getKey().substring("custom.".length());
 			if (strippedKey.length()>0) {
 				custProp.addProperty(strippedKey,entry.getValue());
