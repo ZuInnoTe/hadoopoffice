@@ -271,125 +271,77 @@ public void write(Object newDAO) throws OfficeWriterException {
 
 public void close() throws OfficeWriterException {
 	try {
-	// prepare metadata
-	prepareMetaData();
-	// write
-	if (this.oStream!=null) {
-		if (this.howc.getPassword()==null) { // no encryption
-			try {
+		// prepare metadata
+		prepareMetaData();
+		// write
+		if (this.oStream!=null) {
+			if (this.howc.getPassword()==null) { // no encryption
 				this.currentWorkbook.write(this.oStream);
-			} catch (IOException e) {
-				LOG.error(e);
-			} finally {
-					try {
-						if (this.oStream!=null) {
-							this.oStream.close();
-						}
-					} catch (IOException e) {
-						LOG.error(e);
-					}
-			}
-		} else {	// encryption
-			if (this.currentWorkbook instanceof HSSFWorkbook) { // old Excel format
-				LOG.debug("encrypting HSSFWorkbook");
-				Biff8EncryptionKey.setCurrentUserPassword(this.howc.getPassword());
-				try {
+				this.oStream.close();
+			} else {	// encryption
+				if (this.currentWorkbook instanceof HSSFWorkbook) { // old Excel format
+					LOG.debug("encrypting HSSFWorkbook");
+					Biff8EncryptionKey.setCurrentUserPassword(this.howc.getPassword());
 					this.currentWorkbook.write(this.oStream);
-				} catch (IOException e) {
-					LOG.error(e);
-				} finally {
+					this.oStream.close();
 					Biff8EncryptionKey.setCurrentUserPassword(null);
-					try {
-						if (this.oStream!=null) {
-							this.oStream.close();
-						}
-					} catch (IOException e) {
-						LOG.error(e);
-					}
-				}
-			} else if (this.currentWorkbook instanceof XSSFWorkbook) {
-				if (this.encryptAlgorithmCipher==null) {
-					LOG.error("No encryption algorithm specified");
-				} else
-				if (this.hashAlgorithmCipher==null) {
-					LOG.error("No hash algorithm specified");
-				} else
-				if (this.encryptionModeCipher==null) {
-					LOG.error("No encryption mode specified");
-				} else
-				if (this.chainModeCipher==null) {
-					LOG.error("No chain mode specified");
-				} else {
-					
-					try {
+				} else if (this.currentWorkbook instanceof XSSFWorkbook) {
+					if (this.encryptAlgorithmCipher==null) {
+						LOG.error("No encryption algorithm specified");
+					} else
+					if (this.hashAlgorithmCipher==null) {
+						LOG.error("No hash algorithm specified");
+					} else
+					if (this.encryptionModeCipher==null) {
+						LOG.error("No encryption mode specified");
+					} else
+					if (this.chainModeCipher==null) {
+						LOG.error("No chain mode specified");
+					} else {
+						POIFSFileSystem ooxmlDocumentFileSystem = new POIFSFileSystem();
 						EncryptionInfo info = new EncryptionInfo(this.encryptionModeCipher, this.encryptAlgorithmCipher, this.hashAlgorithmCipher, -1, -1, this.chainModeCipher);
 						Encryptor enc = info.getEncryptor();
 						enc.confirmPassword(this.howc.getPassword());
 						OutputStream os = enc.getDataStream(ooxmlDocumentFileSystem);	
 						this.currentWorkbook.write(os);
 						ooxmlDocumentFileSystem.writeFilesystem(this.oStream);
-					} catch (IOException | GeneralSecurityException e) {
-						LOG.error(e);
-					} finally {
-					 try {
-							if (this.oStream!=null) {
-								this.oStream.close();
-							}
-					} catch (IOException e) {
-						LOG.error(e);
-					}
-					}
-				}
-			} else {
-				LOG.error("Could not write encrypted workbook, because type of workbook is unknown");
-				 try {
-						if (this.oStream!=null) {
-							this.oStream.close();
-						}
-					} catch (IOException e) {
-						LOG.error(e);
-					}
-			}
-		}
-	}
-	} finally {
-	// close filesystems
-	if (this.ooxmlDocumentFileSystem!=null)  {
-		 try {
-			ooxmlDocumentFileSystem.close();
-		} catch (IOException e) {
-			LOG.error(e);
-		}
-	}
-	// close main workbook
-	if (this.currentWorkbook!=null) {
-		try {
-			this.currentWorkbook.close();
-		} catch (IOException e) {
-			LOG.error(e);
-		} finally {
-			
-				 try {
-					 if (this.oStream!=null) {
 						this.oStream.close();
-					 }
-					} catch (IOException e) {
-						LOG.error(e);
-					
-			}
-		}
-	}
-	// close linked workbooks
-	 	for (Workbook currentWorkbookItem: this.listOfWorkbooks) {
-			if (currentWorkbookItem!=null) {
-				try {
-					currentWorkbookItem.close();
-				} catch (IOException e) {
-					LOG.error(e);
+					}
+				} else {
+					LOG.error("Could not write encrypted workbook, because type of workbook is unknown");
 				}
 			}
 		}
-	}
+		} catch(IOException|GeneralSecurityException e){
+			LOG.error(e);
+		}
+		finally {
+		// close main workbook
+		if (this.currentWorkbook!=null) {
+			try {
+				this.currentWorkbook.close();
+			} catch (IOException e) {
+				LOG.error(e);
+			}
+		}
+		if (this.oStream!=null) {
+			try {
+				this.oStream.close();
+			} catch (IOException e) {
+				LOG.error(e);
+			}
+		}
+		// close linked workbooks
+		 	for (Workbook currentWorkbook: this.listOfWorkbooks) {
+				if (currentWorkbook!=null) {
+					try {
+					currentWorkbook.close();
+					} catch (IOException e) {
+						LOG.error(e);
+					}
+				}
+			}
+		}
 }
 
 
