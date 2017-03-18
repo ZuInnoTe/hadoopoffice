@@ -350,7 +350,6 @@ public void finalizeWrite() throws OfficeWriterException {
 			ooxmlDocumentFileSystem.close();
 		} catch (IOException e) {
 			LOG.error(e);
-			throw new OfficeWriterException(e.toString());
 		}
 	}
 	// close main workbook
@@ -359,7 +358,6 @@ public void finalizeWrite() throws OfficeWriterException {
 			this.currentWorkbook.close();
 		} catch (IOException e) {
 			LOG.error(e);
-			throw new OfficeWriterException(e.toString());
 		}
 	}
 	// close linked workbooks
