@@ -326,7 +326,6 @@ public void finalizeWrite() throws OfficeWriterException {
 						ooxmlDocumentFileSystem.writeFilesystem(this.oStream);
 					} catch (IOException | GeneralSecurityException e) {
 						LOG.error(e);
-						throw new OfficeWriterException(e.toString());
 					} finally {
 					 try {
 						this.oStream.close();
