@@ -31,7 +31,7 @@ import java.security.GeneralSecurityException;
 
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
-
+import org.zuinnote.hadoop.office.format.common.HadoopOfficeWriteConfiguration;
 import org.zuinnote.hadoop.office.format.common.HadoopUtil;
 import org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException;
 import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
@@ -65,10 +65,10 @@ public static final String SUFFIX_OLDEXCEL = ".xls";
 public RecordWriter<NullWritable,SpreadSheetCellDAO> getRecordWriter(TaskAttemptContext context) throws IOException {
 	// check if mimeType is set. If not assume new Excel format (.xlsx)
 	Configuration conf=context.getConfiguration();
-	String defaultConf=conf.get(AbstractSpreadSheetDocumentRecordWriter.CONF_MIMETYPE,ExcelFileOutputFormat.DEFAULT_MIMETYPE);
-	conf.set(AbstractSpreadSheetDocumentRecordWriter.CONF_MIMETYPE,defaultConf);
+	String defaultConf=conf.get(HadoopOfficeWriteConfiguration.CONF_MIMETYPE,ExcelFileOutputFormat.DEFAULT_MIMETYPE);
+	conf.set(HadoopOfficeWriteConfiguration.CONF_MIMETYPE,defaultConf);
 	// add suffix	
-	Path file = getDefaultWorkFile(context,ExcelFileOutputFormat.getSuffix(conf.get(AbstractSpreadSheetDocumentRecordWriter.CONF_MIMETYPE)));
+	Path file = getDefaultWorkFile(context,ExcelFileOutputFormat.getSuffix(conf.get(HadoopOfficeWriteConfiguration.CONF_MIMETYPE)));
 
 	try {
 	 	return new ExcelRecordWriter<>(HadoopUtil.getDataOutputStream(conf,file,context,getCompressOutput(context),getOutputCompressorClass(context, ExcelFileOutputFormat.defaultCompressorClass)),file.getName(),conf);

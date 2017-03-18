@@ -23,7 +23,6 @@ import java.io.InputStream;
 
 import java.security.GeneralSecurityException;
 
-import java.util.Locale;
 import java.util.Map;
 
 
@@ -35,8 +34,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 
 
-import org.zuinnote.hadoop.office.format.common.HadoopUtil;
 import org.zuinnote.hadoop.office.format.common.HadoopFileReader;
+import org.zuinnote.hadoop.office.format.common.HadoopOfficeWriteConfiguration;
 import org.zuinnote.hadoop.office.format.common.OfficeWriter;
 import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 import org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException;
@@ -52,50 +51,10 @@ import org.zuinnote.hadoop.office.format.common.writer.*;
 
 public abstract class AbstractSpreadSheetDocumentRecordWriter<NullWritable,SpreadSheetCellDAO> implements RecordWriter<NullWritable,SpreadSheetCellDAO> {
 public static final Log LOG = LogFactory.getLog(AbstractSpreadSheetDocumentRecordWriter.class.getName());
-public static final String CONF_MIMETYPE=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.CONF_MIMETYPE;
-public static final String CONF_LOCALE=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.CONF_LOCALE;
-public static final String CONF_LINKEDWB=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.CONF_LINKEDWB;
-public static final String CONF_IGNOREMISSINGWB=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.CONF_IGNOREMISSINGWB;
-public static final String CONF_COMMENTAUTHOR=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.CONF_COMMENTAUTHOR;
-public static final String CONF_COMMENTWIDTH=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.CONF_COMMENTWIDTH;
-public static final String CONF_COMMENTHEIGHT=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.CONF_COMMENTHEIGHT;
-public static final String CONF_SECURITYCRED=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.CONF_SECURITYCRED;
-public static final String CONF_SECURITYALGORITHM=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.CONF_SECURITYALGORITHM;
-public static final String CONF_SECURITYMODE=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.CONF_SECURITYMODE;
-public static final String CONF_CHAINMODE=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.CONF_CHAINMODE;
-public static final String CONF_HASHALGORITHM=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.CONF_HASHALGORITHM;
-public static final String CONF_DECRYPTLINKEDWBBASE=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.CONF_DECRYPTLINKEDWBBASE;
-public static final String CONF_METADATA=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.CONF_METADATA; // base: all these properties (e.g. hadoopoffice.write.metadata.author) will be handed over to the corresponding writer
-public static final String DEFAULT_MIMETYPE=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.DEFAULT_MIMETYPE;
-public static final String DEFAULT_LOCALE=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.DEFAULT_LOCALE;
-public static final String DEFAULT_LINKEDWB=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.DEFAULT_LINKEDWB;
-public static final boolean DEFAULT_IGNOREMISSINGLINKEDWB=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.DEFAULT_IGNOREMISSINGLINKEDWB;
-public static final String DEFAULT_AUTHOR=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.DEFAULT_AUTHOR;
-public static final int DEFAULT_COMMENTWIDTH=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.DEFAULT_COMMENTWIDTH;
-public static final int DEFAULT_COMMENTHEIGHT=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.DEFAULT_COMMENTHEIGHT;
-public static final String DEFAULT_PASSWORD=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.DEFAULT_PASSWORD;
-public static final String DEFAULT_ALGORITHM=org.zuinnote.hadoop.office.format.mapreduce.AbstractSpreadSheetDocumentRecordWriter.DEFAULT_ALGORITHM;
-private String[] linkedWorkbooksName;
-private Configuration conf;
-private String fileName;
-private String mimeType;
-private Locale locale;
-private String localeStrBCP47;
-private boolean ignoreMissingLinkedWorkbooks;
-private String commentAuthor;
-private int commentWidth;
-private int commentHeight;
 private OfficeWriter officeWriter;
 private Map<String,InputStream> linkedWorkbooksMap;
-private String password;
-private String encryptAlgorithm;
-private String hashAlgorithm;
-private String encryptMode;
-private String chainMode;
-private Map<String,String> linkedWBCredentialMap;
-private Map<String,String> metadata;
 private HadoopFileReader currentReader;
-
+private HadoopOfficeWriteConfiguration howc;
 
 
 /*
@@ -112,19 +71,7 @@ public AbstractSpreadSheetDocumentRecordWriter() {
 * 
 * @param out OutputStream to which the tables should be written to
 * @param fileName fileName (without path) of the file to be written
-* @param conf Configuration:
- hadoopoffice.write.mimeType: Mimetype of the document
-* hadoopoffice.write.locale: Locale of the document (e.g. needed for interpreting spreadsheets) in the BCP47 format (cf. https://tools.ietf.org/html/bcp47). If not specified then default system locale will be used.
-* hadoopoffice.write.linkedworkbooks a []: separated list of existing linked workbooks. Example: [hdfs:///home/user/excel/linkedworkbook1.xls]:[hdfs:///home/user/excel/linkedworkbook2.xls]. Note: these workbooks are loaded during writing the current workbook. This means you may need a lot of memory on the node writing the file. Furthermore, you can only specify files and NOT directories.
-* hadoopoffice.write.ignoremissinglinkedworkbooks: if you have specified linkedworkbooks then they are not read during writing. This implies also that the written document does NOT have a cached value. Value is ignored if you did not specify linkedworkbooks. Default: false. 
-* hadoopoffice.write.security.crypt.password: use password to encrypt the document. Note: There is no security check of strongness of password. This is up to the application developer.
-* hadoopoffice.write.security.crypt.encrypt.algorithm: use the following algorithm to encrypt. Note that some writers do not support all algorithms and an exception will be thrown if the algorithm is not supported. See corresponding writer documentation for supported algorithms.
-* hadoopoffice.write.security.crypt.hash.algorithm: use the following algorithm to hash. Note that some writers do not support all algorithms and an exception will be thrown if the algorithm is not supported. See corresponding writer documentation for supported algorithms.
-* hadoopoffice.write.security.crypt.encrypt.mode: use the following mode to encrypt. Note that some writers do not support all modes and an exception will be thrown if the mode is not supported. See corresponding writer documentation for supported algorithms.
-* hadoopoffice.write.security.crypt.chain.mode: use the following mode to chain. Note that some writers do not support all modes and an exception will be thrown if the mode is not supported. See corresponding writer documentation for supported algorithms.
-* hadoopoffice.write.security.crypt.linkedworkbooks.*: if set then hadoopoffice will try to decrypt all the linked workbooks where a password has been specified. If no password is specified then it is assumed that the linked workbook is not encrypted. Example: Property key for file "linkedworkbook1.xlsx" is  "hadoopoffice.read.security.crypt.linkedworkbooks.linkedworkbook1.xslx". Value is the password. You must not include path or protocol information in the filename 
-* hadoopoffice.write.metadata.*: Write metadata properties of the document. All properties belonging to the base (e.g. hadoopoffice.write.metadata.author for author) will be handed over to the corresponding writer. See writer documentation which properties are supported
-*
+* @param conf Configuration to be parsed by HadoopOfficeWriteConfiguration
 *
 * @throws java.io.IOException in case of errors reading from the filestream provided by Hadoop
 * @throws org.zuinnote.hadoop.office.format.common.writer.InvalidWriterConfigurationException in case the writer could not be configured correctly
@@ -134,33 +81,14 @@ public AbstractSpreadSheetDocumentRecordWriter() {
 *
 */
 public AbstractSpreadSheetDocumentRecordWriter(DataOutputStream out, String fileName, Configuration conf) throws IOException,InvalidWriterConfigurationException,InvalidCellSpecificationException,FormatNotUnderstoodException, GeneralSecurityException {
- 	// parse configuration
-     this.conf=conf;
-     this.mimeType=conf.get(AbstractSpreadSheetDocumentRecordWriter.CONF_MIMETYPE,AbstractSpreadSheetDocumentRecordWriter.DEFAULT_MIMETYPE);
-     this.localeStrBCP47=conf.get(AbstractSpreadSheetDocumentRecordWriter.CONF_LOCALE, AbstractSpreadSheetDocumentRecordWriter.DEFAULT_LOCALE);
-     if (!("".equals(localeStrBCP47))) { // create locale
-	this.locale=new Locale.Builder().setLanguageTag(this.localeStrBCP47).build();
-      }
-      this.fileName=fileName;
-      this.commentAuthor=conf.get(AbstractSpreadSheetDocumentRecordWriter.CONF_COMMENTAUTHOR,AbstractSpreadSheetDocumentRecordWriter.DEFAULT_AUTHOR);
-      this.commentWidth=conf.getInt(AbstractSpreadSheetDocumentRecordWriter.CONF_COMMENTWIDTH,AbstractSpreadSheetDocumentRecordWriter.DEFAULT_COMMENTWIDTH);
-      this.commentHeight=conf.getInt(AbstractSpreadSheetDocumentRecordWriter.CONF_COMMENTHEIGHT,AbstractSpreadSheetDocumentRecordWriter.DEFAULT_COMMENTHEIGHT);
-      String linkedWorkbooksStr=conf.get(AbstractSpreadSheetDocumentRecordWriter.CONF_LINKEDWB,AbstractSpreadSheetDocumentRecordWriter.DEFAULT_LINKEDWB);
-      this.linkedWorkbooksName=HadoopUtil.parseLinkedWorkbooks(linkedWorkbooksStr);
-      this.ignoreMissingLinkedWorkbooks=conf.getBoolean(AbstractSpreadSheetDocumentRecordWriter.CONF_IGNOREMISSINGWB,AbstractSpreadSheetDocumentRecordWriter.DEFAULT_IGNOREMISSINGLINKEDWB);
-      this.encryptAlgorithm=conf.get(AbstractSpreadSheetDocumentRecordWriter.CONF_SECURITYALGORITHM);
-      this.password=conf.get(AbstractSpreadSheetDocumentRecordWriter.CONF_SECURITYCRED);
-      this.hashAlgorithm=conf.get(AbstractSpreadSheetDocumentRecordWriter.CONF_HASHALGORITHM);
-      this.encryptMode=conf.get(AbstractSpreadSheetDocumentRecordWriter.CONF_SECURITYMODE);
-      this.chainMode=conf.get(AbstractSpreadSheetDocumentRecordWriter.CONF_CHAINMODE);
-      this.metadata=HadoopUtil.parsePropertiesFromBase(conf,AbstractSpreadSheetDocumentRecordWriter.CONF_METADATA);
-      this.linkedWBCredentialMap=HadoopUtil.parsePropertiesFromBase(conf,AbstractSpreadSheetDocumentRecordWriter.CONF_DECRYPTLINKEDWBBASE);
+	// parse configuration
+    this.howc=new HadoopOfficeWriteConfiguration(conf,fileName);
       // load linked workbooks as inputstreams
-      this.currentReader= new HadoopFileReader(this.conf);
-      this.linkedWorkbooksMap=this.currentReader.loadLinkedWorkbooks(linkedWorkbooksName);
-     // create OfficeWriter 
-       this.officeWriter=new OfficeWriter(this.mimeType, this.locale, this.ignoreMissingLinkedWorkbooks,  this.fileName, this.commentAuthor,this.commentWidth,this.commentHeight,this.password,this.encryptAlgorithm,this.hashAlgorithm,this.encryptMode,this.chainMode,this.metadata);
-      this.officeWriter.create(out,this.linkedWorkbooksMap,this.linkedWBCredentialMap);
+     this.currentReader= new HadoopFileReader(conf);
+     this.linkedWorkbooksMap=this.currentReader.loadLinkedWorkbooks(this.howc.getLinkedWorkbooksName());
+    // create OfficeWriter 
+      this.officeWriter=new OfficeWriter(this.howc);
+     this.officeWriter.create(out,this.linkedWorkbooksMap,this.howc.getLinkedWBCredentialMap()); 
 }
 
 /**

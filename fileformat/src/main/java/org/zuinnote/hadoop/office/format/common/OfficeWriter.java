@@ -46,49 +46,26 @@ import org.zuinnote.hadoop.office.format.common.writer.InvalidCellSpecificationE
 
 public class OfficeWriter {
 private static final Log LOG = LogFactory.getLog(OfficeWriter.class.getName());
-private Locale useLocale;
-private boolean ignoreMissingLinkedWorkbooks;
-private String fileName;
-private String commentAuthor;
-private int commentWidth;
-private int commentHeight;
 private OfficeSpreadSheetWriterInterface currentOfficeSpreadSheetWriter=null;
+private HadoopOfficeWriteConfiguration howc;
 
 
 /**
 *
 * Creates a new writer for office documents given a mime type (cf. https://tika.apache.org/1.13/formats.html#Full_list_of_Supported_Formats)
 *
-* @param mimeType Mime Type of the office document
-* @param useLocale Locale to be used to evaluate cells
-* @param ignoreMissingLinkedWorkbooks if true then missing linked workbooks are ignored during writing, if false then missing linked workbooks are not ignored and need to be present
-* @param fileName filename of the document without path
-* @param commentAuthor default author for comments
-* @param commentWidth default width for comments
-* @param commentHeight default height for comments
-* @param password password for encryption. Set to null for no encryption.
-* @param encryptAlgorithm Encryption algorithm (support depends upon writer, see documentation there). It is strongly recommended to do an in-depth analysis which algorithm to select to provide optimal security
-* @param hashAlgorithm Hash algorithm (support depends upon writer, see documentation there). It is strongly recommended to do an in-depth analysis which algorithm to select to provide optimal security
-* @param encryptMode Encrypt mode (support depends upon writer, see documentation there). It is strongly recommended to do an in-depth analysis which algorithm to select to provide optimal security
-* @param chainMode Chain mode (support depends upon writer, see documentation there). It is strongly recommended to do an in-depth analysis which algorithm to select to provide optimal security
-* @param metadata to write with the document. Please consult documentation of the write to see which attribute names and values are supported
-*
+* @param howc HadoopOfficeWriteConfiguration
 * @throws org.zuinnote.hadoop.office.format.common.writer.InvalidWriterConfigurationException in case format is not supported or encryption algorithm is wrongly specified
 *
 */
 
-public OfficeWriter(String mimeType, Locale useLocale, boolean ignoreMissingLinkedWorkbooks, String fileName,String commentAuthor, int commentWidth, int commentHeight, String password, String encryptAlgorithm, String hashAlgorithm, String encryptMode, String chainMode, Map<String,String> metadata) throws InvalidWriterConfigurationException {
+public OfficeWriter(HadoopOfficeWriteConfiguration howc) throws InvalidWriterConfigurationException {
 	LOG.debug("Initialize OfficeWriter");
-	this.useLocale=useLocale;
-	this.ignoreMissingLinkedWorkbooks=ignoreMissingLinkedWorkbooks;
-	this.fileName=fileName;
-	this.commentAuthor=commentAuthor;
-	this.commentWidth=commentWidth;
-	this.commentHeight=commentHeight;
+	this.howc=howc;
 	// check mimetype and create parser, this is based on some heuristics on the mimetype
-	String writerFormat=getInternalWriterFormatFromMimeType(mimeType);
+	String writerFormat=getInternalWriterFormatFromMimeType(this.howc.getMimeType());
 	if (MSExcelWriter.isSupportedFormat(writerFormat)) {
-		currentOfficeSpreadSheetWriter=new MSExcelWriter(writerFormat,this.useLocale,this.ignoreMissingLinkedWorkbooks, this.fileName,this.commentAuthor,this.commentWidth,this.commentHeight,password,encryptAlgorithm,hashAlgorithm,encryptMode,chainMode,metadata);
+		currentOfficeSpreadSheetWriter=new MSExcelWriter(writerFormat,this.howc);
 	} else {
 		throw new InvalidWriterConfigurationException("Error: Writer does not recognize format +\""+writerFormat+"\"");
 	}

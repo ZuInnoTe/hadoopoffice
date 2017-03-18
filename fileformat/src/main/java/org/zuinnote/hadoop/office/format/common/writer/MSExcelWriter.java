@@ -61,6 +61,7 @@ import org.apache.poi.openxml4j.util.Nullable;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 import org.zuinnote.hadoop.office.format.common.HadoopOfficeReadConfiguration;
+import org.zuinnote.hadoop.office.format.common.HadoopOfficeWriteConfiguration;
 import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 import org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException;
 import org.zuinnote.hadoop.office.format.common.parser.MSExcelParser;
@@ -74,64 +75,51 @@ private static final String DEFAULT_FORMAT = VALID_FORMAT[0];
 private String format=DEFAULT_FORMAT;
 private OutputStream oStream;
 private Workbook currentWorkbook;
-private Locale useLocale;
-private boolean ignoreMissingLinkedWorkbooks;
-private String fileName;
-private String commentAuthor;
-private int commentWidth;
-private int commentHeight;
 private Map<String,Drawing> mappedDrawings;
 private List<Workbook> listOfWorkbooks;
-private Map<String,String> metadata;
-private String password;
+private POIFSFileSystem ooxmlDocumentFileSystem;
+private HadoopOfficeWriteConfiguration howc;
 private CipherAlgorithm encryptAlgorithmCipher;
 private HashAlgorithm hashAlgorithmCipher;
 private EncryptionMode encryptionModeCipher;
 private ChainingMode chainModeCipher;
-private POIFSFileSystem ooxmlDocumentFileSystem;
 
 /**
 *
 * Creates a new writer for MS Excel files
 *
 * @param excelFormat format of the Excel: ooxmlexcel: Excel 2007-2013 (.xlsx), oldexcel: Excel 2003 (.xls)
-* @param useLocale Locale to be used to evaluate cells
-* @param ignoreMissingLinkedWorkbooks if true then missing linked workbooks are ignored during writing, if false then missing linked workbooks are not ignored and need to be present
-* @param fileName filename without path of the workbook
-* @param commentAuthor default author for comments
-* @param commentWidth width of comments in terms of number of columns
-* @param commentHeight height of commments in terms of number of rows
-* @param password Password of this document (null if no password)
-* @param encryptAlgorithm algorithm use for encryption. It is recommended to carefully choose the algorithm. Supported for .xlsx: aes128,aes192,aes256,des,des3,des3_112,rc2,rc4,rsa. Support for .xls: rc4
-* @param hashAlgorithm Hash algorithm,  Supported for .xslx: sha512, sha384, sha256, sha224, whirlpool, sha1, ripemd160,ripemd128,  md5, md4, md2,none. Ignored for .xls
-* @param encryptMode Encrypt mode, Supported for .xlsx: binaryRC4,standard,agile,cryptoAPI. Ignored for .xls
-* @param chainMode Chain mode, Supported for .xlsx: cbc, cfb, ecb.  Ignored for .xls 
-* @param metadata properties as metadata.  Currently the following are supported for .xlsx documents: category,contentstatus, contenttype,created (date),creator,description,identifier,keywords,lastmodifiedbyuser,lastprinted (date),modified (date),revision,subject,title. Everything refering to a date needs to be in the format (EEE MMM dd hh:mm:ss zzz yyyy) see http://docs.oracle.com/javase/7/docs/api/java/util/Date.html#toString() Additionally all custom.* are defined as custom properties. Example custom.myproperty. 
+* @param howc HadoopOfficeWriteConfiguration
+* locale Locale to be used to evaluate cells
+* ignoreMissingLinkedWorkbooks if true then missing linked workbooks are ignored during writing, if false then missing linked workbooks are not ignored and need to be present
+* fileName filename without path of the workbook
+* commentAuthor default author for comments
+* commentWidth width of comments in terms of number of columns
+* commentHeight height of commments in terms of number of rows
+* password Password of this document (null if no password)
+* encryptAlgorithm algorithm use for encryption. It is recommended to carefully choose the algorithm. Supported for .xlsx: aes128,aes192,aes256,des,des3,des3_112,rc2,rc4,rsa. Support for .xls: rc4
+* hashAlgorithm Hash algorithm,  Supported for .xslx: sha512, sha384, sha256, sha224, whirlpool, sha1, ripemd160,ripemd128,  md5, md4, md2,none. Ignored for .xls
+* encryptMode Encrypt mode, Supported for .xlsx: binaryRC4,standard,agile,cryptoAPI. Ignored for .xls
+* chainMode Chain mode, Supported for .xlsx: cbc, cfb, ecb.  Ignored for .xls 
+* metadata properties as metadata.  Currently the following are supported for .xlsx documents: category,contentstatus, contenttype,created (date),creator,description,identifier,keywords,lastmodifiedbyuser,lastprinted (date),modified (date),revision,subject,title. Everything refering to a date needs to be in the format (EEE MMM dd hh:mm:ss zzz yyyy) see http://docs.oracle.com/javase/7/docs/api/java/util/Date.html#toString() Additionally all custom.* are defined as custom properties. Example custom.myproperty. 
  Currently the following are supported for .xls documents: applicationname,author,charcount, comments, createdatetime,edittime,keywords,lastauthor,lastprinted,lastsavedatetime,pagecount,revnumber,security,subject,template,title,wordcount
 *
 * @throws org.zuinnote.hadoop.office.format.common.writer.InvalidWriterConfigurationException in case the writer is not configured correctly 
 *
 */
 
-public MSExcelWriter(String excelFormat, Locale useLocale, boolean ignoreMissingLinkedWorkbooks, String fileName, String commentAuthor, int commentWidth, int commentHeight,String password,String encryptAlgorithm,  String hashAlgorithm, String encryptMode, String chainMode, Map<String,String> metadata) throws InvalidWriterConfigurationException {
+public MSExcelWriter(String excelFormat, HadoopOfficeWriteConfiguration howc) throws InvalidWriterConfigurationException {
 	boolean formatFound=isSupportedFormat(excelFormat);
 	if (!(formatFound)) {
 		 LOG.error("Unknown Excel format: "+this.format);
 		 throw new InvalidWriterConfigurationException("Unknown Excel format: "+this.format);
 	}
 	this.format=excelFormat;
-	this.useLocale=useLocale;
-	this.ignoreMissingLinkedWorkbooks=ignoreMissingLinkedWorkbooks;
-	this.fileName=fileName;
-	this.commentAuthor=commentAuthor;
-	this.commentWidth=commentWidth;
-	this.commentHeight=commentHeight;
-	this.password=password;
-	this.encryptAlgorithmCipher=getAlgorithmCipher(encryptAlgorithm);
-	this.hashAlgorithmCipher=getHashAlgorithm(hashAlgorithm);
-	this.encryptionModeCipher=getEncryptionModeCipher(encryptMode);
-	this.chainModeCipher=getChainMode(chainMode);
-	this.metadata=metadata;
+	this.howc=howc;
+	this.encryptAlgorithmCipher=getAlgorithmCipher(this.howc.getEncryptAlgorithm());
+	this.hashAlgorithmCipher=getHashAlgorithm(this.howc.getHashAlgorithm());
+	this.encryptionModeCipher=getEncryptionModeCipher(this.howc.getEncryptMode());
+	this.chainModeCipher=getChainMode(this.howc.getChainMode());
 }
 
 
@@ -159,7 +147,7 @@ public void create(OutputStream oStream, Map<String,InputStream> linkedWorkbooks
 	} 
 	FormulaEvaluator currentFormulaEvaluator=this.currentWorkbook.getCreationHelper().createFormulaEvaluator();
 	HashMap<String,FormulaEvaluator> linkedFormulaEvaluators=new HashMap<>();
-	linkedFormulaEvaluators.put(this.fileName,currentFormulaEvaluator);
+	linkedFormulaEvaluators.put(this.howc.getFileName(),currentFormulaEvaluator);
 	this.mappedDrawings=new HashMap<>();
 	// add current workbook to list of linked workbooks
 	this.listOfWorkbooks=new ArrayList<>();
@@ -168,9 +156,9 @@ public void create(OutputStream oStream, Map<String,InputStream> linkedWorkbooks
 		for (Map.Entry<String,InputStream> entry: linkedWorkbooks.entrySet()) {
 			// parse linked workbook
 			HadoopOfficeReadConfiguration currentLinkedWBHOCR = new HadoopOfficeReadConfiguration();
-			currentLinkedWBHOCR.setLocale(this.useLocale);
+			currentLinkedWBHOCR.setLocale(this.howc.getLocale());
 			currentLinkedWBHOCR.setSheets(null);
-			currentLinkedWBHOCR.setIgnoreMissingLinkedWorkbooks(this.ignoreMissingLinkedWorkbooks);
+			currentLinkedWBHOCR.setIgnoreMissingLinkedWorkbooks(this.howc.getIgnoreMissingLinkedWorkbooks());
 			currentLinkedWBHOCR.setFileName(entry.getKey());
 			currentLinkedWBHOCR.setPassword(linkedWorkbooksPasswords.get(entry.getKey()));
 			currentLinkedWBHOCR.setMetaDataFilter(null);
@@ -255,13 +243,13 @@ public void write(Object newDAO) throws InvalidCellSpecificationException,Object
 		/** Define size of the comment window **/
 		    ClientAnchor anchor = this.currentWorkbook.getCreationHelper().createClientAnchor();
     		    anchor.setCol1(currentCell.getColumnIndex());
-    		    anchor.setCol2(currentCell.getColumnIndex()+this.commentWidth);
+    		    anchor.setCol2(currentCell.getColumnIndex()+this.howc.getCommentWidth());
     		    anchor.setRow1(currentRow.getRowNum());
-    		    anchor.setRow2(currentRow.getRowNum()+this.commentHeight);
+    		    anchor.setRow2(currentRow.getRowNum()+this.howc.getCommentHeight());
 		/** create comment **/
 		    Comment currentComment = mappedDrawings.get(safeSheetName).createCellComment(anchor);
     		    currentComment.setString(this.currentWorkbook.getCreationHelper().createRichTextString(sscd.getComment()));
-    		    currentComment.setAuthor(this.commentAuthor);
+    		    currentComment.setAuthor(this.howc.getCommentAuthor());
 		    currentCell.setCellComment(currentComment);
 
 	}
@@ -282,13 +270,13 @@ public void finalizeWrite() throws IOException, GeneralSecurityException {
 	prepareMetaData();
 	// write
 	if (this.oStream!=null) {
-		if (this.password==null) { // no encryption
+		if (this.howc.getPassword()==null) { // no encryption
 			this.currentWorkbook.write(this.oStream);
 			this.oStream.close();
 		} else {	// encryption
 			if (this.currentWorkbook instanceof HSSFWorkbook) { // old Excel format
 				LOG.debug("encrypting HSSFWorkbook");
-				Biff8EncryptionKey.setCurrentUserPassword(this.password);
+				Biff8EncryptionKey.setCurrentUserPassword(this.howc.getPassword());
 				this.currentWorkbook.write(this.oStream);
 				this.oStream.close();
 				Biff8EncryptionKey.setCurrentUserPassword(null);
@@ -309,7 +297,7 @@ public void finalizeWrite() throws IOException, GeneralSecurityException {
 					try {
 						EncryptionInfo info = new EncryptionInfo(this.encryptionModeCipher, this.encryptAlgorithmCipher, this.hashAlgorithmCipher, -1, -1, this.chainModeCipher);
 						Encryptor enc = info.getEncryptor();
-						enc.confirmPassword(this.password);
+						enc.confirmPassword(this.howc.getPassword());
 						OutputStream os = enc.getDataStream(ooxmlDocumentFileSystem);	
 						this.currentWorkbook.write(os);
 						ooxmlDocumentFileSystem.writeFilesystem(this.oStream);
@@ -510,7 +498,7 @@ private void prepareHSSFMetaData() {
 		 summaryInfo = currentHSSFWorkbook.getSummaryInformation(); 
 	}
 	SimpleDateFormat formatSDF = new SimpleDateFormat(MSExcelParser.DATE_FORMAT); 
-	for (Map.Entry<String,String> entry: this.metadata.entrySet()) {
+	for (Map.Entry<String,String> entry: this.howc.getMetadata().entrySet()) {
 		// process general properties
 		try {
 		switch(entry.getKey()) {
@@ -588,7 +576,7 @@ private void prepareXSSFMetaData() {
 	POIXMLProperties.CoreProperties coreProp=props.getCoreProperties();
 	POIXMLProperties.CustomProperties custProp = props.getCustomProperties();
 	SimpleDateFormat formatSDF = new SimpleDateFormat(MSExcelParser.DATE_FORMAT); 
-	for (Map.Entry<String,String> entry: this.metadata.entrySet()) {
+	for (Map.Entry<String,String> entry: this.howc.getMetadata().entrySet()) {
 		// process general properties
 		boolean attribMatch=false;
 		try {

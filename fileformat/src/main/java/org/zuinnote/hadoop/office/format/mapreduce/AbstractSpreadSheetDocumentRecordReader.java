@@ -74,7 +74,6 @@ private HadoopOfficeReadConfiguration hocr;
 /**
 * Creates an Abstract Record Reader for tables from various document formats
 * @param conf Configuration: configuration to be parsed by HadoopOfficeConfiguration class
-
 *
 *
 */
