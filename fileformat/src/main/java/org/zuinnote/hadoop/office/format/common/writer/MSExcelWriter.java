@@ -352,6 +352,9 @@ public void finalizeWrite() throws OfficeWriterException {
 	if (this.currentWorkbook!=null) {
 		try {
 			this.currentWorkbook.close();
+			if (this.oStream!=null) {
+				this.oStream.close();
+			}
 		} catch (IOException e) {
 			LOG.error(e);
 		}
