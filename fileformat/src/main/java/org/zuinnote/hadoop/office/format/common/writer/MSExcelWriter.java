@@ -131,7 +131,7 @@ public MSExcelWriter(String excelFormat, HadoopOfficeWriteConfiguration howc) th
 * @param linkedWorkbooks linked workbooks that are already existing and linked to this spreadsheet
 * @param linkedWorkbooksPasswords a map of passwords and linkedworkbooks. The key is the filename without path of the linkedworkbook and the value is the password
 *
-* @throws java.io.IOException if there is an issue with the OutputStream
+* @throws org.zuinnote.hadoop.office.format.common.writer.OfficeWriterException in  case of errors writing to the outputstream
 *
 */
 
@@ -264,8 +264,7 @@ public void write(Object newDAO) throws OfficeWriterException {
 /**
 * Writes the document in-memory representation to the OutputStream. Aferwards, it closes all related workbooks.
 *
-* @throws java.io.IOException in case of issues writing.
-* @throws java.security.GeneralSecurityException in case of issues encrypting
+* @throws org.zuinnote.hadoop.office.format.common.writer.OfficeWriterException in case of issues writing or issues encrypting
 *
 *
 */

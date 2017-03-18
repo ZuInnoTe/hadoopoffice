@@ -65,6 +65,8 @@ import org.apache.hadoop.util.ReflectionUtils;
 import org.apache.poi.EncryptedDocumentException;
 
 import org.zuinnote.hadoop.office.format.common.dao.*;
+import org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException;
+import org.zuinnote.hadoop.office.format.common.writer.OfficeWriterException;
 
 public class OfficeFormatHadoopExcelTest {
   @Rule
@@ -508,7 +510,7 @@ assertEquals("Input Split for Excel file contains row 1 with cell 3 == \"test3\"
     	List<InputSplit> splits = format.getSplits(job);
     	assertEquals("Only one split generated for Excel file", 1, splits.size());
     	RecordReader<Text, ArrayWritable> reader = format.createRecordReader(splits.get(0), context);	
-	exception.expect(EncryptedDocumentException.class);
+	exception.expect(InterruptedException.class);
 	reader.initialize(splits.get(0),context);
     }
 
@@ -566,7 +568,7 @@ assertEquals("Input Split for Excel file contains row 1 with cell 3 == \"test3\"
    	List<InputSplit> splits = format.getSplits(job);
     	assertEquals("Only one split generated for Excel file", 1, splits.size());
     	RecordReader<Text, ArrayWritable> reader = format.createRecordReader(splits.get(0), context);
-	exception.expect(EncryptedDocumentException.class);
+	exception.expect(InterruptedException.class);
 	reader.initialize(splits.get(0),context);
     }
 
@@ -1408,7 +1410,7 @@ assertEquals("Input Split for Excel file contains row 1 with cell 3 == \"test3\"
 	List<InputSplit> splits = inputFormat.getSplits(job);
     	assertEquals("Only one split generated for Excel file", 1, splits.size());
    	RecordReader<Text, ArrayWritable> reader = inputFormat.createRecordReader(splits.get(0), context);
-	exception.expect(EncryptedDocumentException.class);
+	exception.expect(InterruptedException.class);
 	reader.initialize(splits.get(0),context);
     }
 

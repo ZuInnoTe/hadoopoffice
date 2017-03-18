@@ -149,9 +149,11 @@ try {
 } catch (FormatNotUnderstoodException fnue) {
 	LOG.error(fnue); 	
 	this.close();
+	throw new InterruptedException();
 }  catch (GeneralSecurityException gse) {
 	LOG.error(gse);
 	this.close();
+	throw new InterruptedException();
 }
 }
 

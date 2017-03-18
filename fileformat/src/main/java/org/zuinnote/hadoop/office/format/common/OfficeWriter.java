@@ -16,25 +16,21 @@
 
 package org.zuinnote.hadoop.office.format.common;
 
-import java.io.IOException;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import java.security.GeneralSecurityException;
 
 import java.util.Map;
 
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 
-import org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException;
 
 import org.zuinnote.hadoop.office.format.common.writer.MSExcelWriter;
 import org.zuinnote.hadoop.office.format.common.writer.OfficeSpreadSheetWriterInterface;
 import org.zuinnote.hadoop.office.format.common.writer.OfficeWriterException;
 import org.zuinnote.hadoop.office.format.common.writer.InvalidWriterConfigurationException;
-import org.zuinnote.hadoop.office.format.common.writer.InvalidCellSpecificationException;
  
 
 /*
@@ -79,7 +75,6 @@ public OfficeWriter(HadoopOfficeWriteConfiguration howc) throws InvalidWriterCon
 * @param linkedWorkbooks linked workbooks that are already existing and linked to this document. Only if supported by the format
 * @param linkedWorkbooksPasswords a map of passwords and linkedworkbooks. The key is the filename without path of the linkedworkbook and the value is the password
 *
-* @throws java.io.IOException if there is an issue with the OutputStream
 * @throws org.zuinnote.hadoop.office.format.common.writer.OfficeWriterException in case no proper writer has been instantiated or linked workbooks have invalid format
 * 
 */
@@ -98,7 +93,7 @@ public void create(OutputStream oStream, Map<String,InputStream> linkedWorkbooks
 *
 * @param o object 
 *
-* @throws org.zuinnote.hadoop.office.format.common.writer.OfficeWriterExceptiobn in case the specification of the cell is incorrect
+* @throws org.zuinnote.hadoop.office.format.common.writer.OfficeWriterException in case the specification of the cell is incorrect
 *
 */
 public void write(Object o) throws OfficeWriterException {
@@ -112,10 +107,9 @@ if (this.currentOfficeSpreadSheetWriter!=null) {
 
 
 /**
-* Writes the document in-memory representation to the OutputStream. Aferwards, it closes all related workbooks.
+* Writes the document in-memory representation to the OutputStream. Afterwards, it closes all related workbooks.
 *
-* @throws java.io.IOException in case of issues writing.
-* @throws org.zuinnote.hadoop.office.format.common.writer.OfficeWriterException in case no proper writer has been instantiated or security issues have emerged
+* @throws org.zuinnote.hadoop.office.format.common.writer.OfficeWriterException in case no proper writer has been instantiated, an IO exception or security issues have emerged
 *
 *
 */

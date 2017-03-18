@@ -67,6 +67,8 @@ import org.apache.hadoop.util.ReflectionUtils;
 import org.apache.poi.EncryptedDocumentException;
 
 import org.zuinnote.hadoop.office.format.common.dao.*;
+import org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException;
+import org.zuinnote.hadoop.office.format.common.writer.OfficeWriterException;
 
 public class OfficeFormatHadoopExcelTest {
   @Rule
@@ -478,8 +480,8 @@ assertEquals("Input Split for Excel file contains row 1 with cell 3 == \"test3\"
     	format.configure(job);
     	InputSplit[] inputSplits = format.getSplits(job,1);
     	assertEquals("Only one split generated for Excel file", 1, inputSplits.length);
-	exception.expect(EncryptedDocumentException.class);
     	RecordReader<Text, ArrayWritable> reader = format.getRecordReader(inputSplits[0], job, reporter);	
+    	assertNull("Null record reader implies invalid password",reader);
     }
 
     @Test
@@ -529,8 +531,8 @@ assertEquals("Input Split for Excel file contains row 1 with cell 3 == \"test3\"
     	format.configure(job);
     	InputSplit[] inputSplits = format.getSplits(job,1);
     	assertEquals("Only one split generated for Excel file", 1, inputSplits.length);
-	exception.expect(EncryptedDocumentException.class);
     	RecordReader<Text, ArrayWritable> reader = format.getRecordReader(inputSplits[0], job, reporter);
+    	assertNull("Null record reader implies invalid password",reader);
     }
 
     @Test
@@ -1177,9 +1179,8 @@ JobConf job = new JobConf(defaultConf);
     	inputFormat.configure(job);
     	InputSplit[] inputSplits = inputFormat.getSplits(job,1);
     	assertEquals("Only one split generated for Excel file", 1, inputSplits.length);
-	exception.expect(EncryptedDocumentException.class);
     	RecordReader<Text, ArrayWritable> reader = inputFormat.getRecordReader(inputSplits[0], job, reporter);
-	
+    	assertNull("Null record reader implies invalid password",reader);
     }
 
 

@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 
-import java.security.GeneralSecurityException;
 
 import java.util.Map;
 
@@ -38,7 +37,6 @@ import org.zuinnote.hadoop.office.format.common.HadoopFileReader;
 import org.zuinnote.hadoop.office.format.common.HadoopOfficeWriteConfiguration;
 import org.zuinnote.hadoop.office.format.common.OfficeWriter;
 import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
-import org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException;
 import org.zuinnote.hadoop.office.format.common.writer.*;
 
 /**
@@ -75,7 +73,7 @@ public AbstractSpreadSheetDocumentRecordWriter() {
 *
 * @throws java.io.IOException in case of errors reading from the filestream provided by Hadoop
 * @throws org.zuinnote.hadoop.office.format.common.writer.InvalidWriterConfigurationException in case the writer could not be configured correctly
-* @throws org.zuinnote.hadoop.office.format.common.writer.OfficeWriterExeption in case of issues creating the initial document
+* @throws org.zuinnote.hadoop.office.format.common.writer.OfficeWriterException in case of issues creating the initial document
 *
 */
 public AbstractSpreadSheetDocumentRecordWriter(DataOutputStream out, String fileName, Configuration conf) throws InvalidWriterConfigurationException, IOException, OfficeWriterException {
