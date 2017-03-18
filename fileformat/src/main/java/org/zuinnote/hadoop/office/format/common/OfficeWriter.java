@@ -17,6 +17,7 @@
 package org.zuinnote.hadoop.office.format.common;
 
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -109,16 +110,16 @@ if (this.currentOfficeSpreadSheetWriter!=null) {
 /**
 * Writes the document in-memory representation to the OutputStream. Afterwards, it closes all related workbooks.
 *
-* @throws org.zuinnote.hadoop.office.format.common.writer.OfficeWriterException in case no proper writer has been instantiated, an IO exception or security issues have emerged
+* @throws java.io.IOException in case it cannot properly close the outputstream
 *
 *
 */
-public void close() throws OfficeWriterException {
+public void close() throws IOException {
 	
 if (this.currentOfficeSpreadSheetWriter!=null) {
 		this.currentOfficeSpreadSheetWriter.close();
 	} else {
-		throw new OfficeWriterException(EX_NO_WRITER_INSTANTIATED);
+		LOG.error(EX_NO_WRITER_INSTANTIATED);
 	}
 }
 

@@ -17,6 +17,7 @@
 package org.zuinnote.hadoop.office.format.common.writer;
 
 import java.util.Map;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -26,6 +27,6 @@ public void create(OutputStream osStream, Map<String,InputStream> linkedWorkbook
 
 public void write(Object newDAO) throws OfficeWriterException;
 
-public void close() throws OfficeWriterException;
+public void close() throws IOException;
 
 }

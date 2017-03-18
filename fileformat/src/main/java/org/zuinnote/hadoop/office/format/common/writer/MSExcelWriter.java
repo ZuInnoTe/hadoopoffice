@@ -264,12 +264,12 @@ public void write(Object newDAO) throws OfficeWriterException {
 /**
 * Writes the document in-memory representation to the OutputStream. Afterwards, it closes all related workbooks.
 *
-* @throws org.zuinnote.hadoop.office.format.common.writer.OfficeWriterException in case of issues writing or issues encrypting
+* @throws java.io.IOException in case of issues writing 
 *
 *
 */
 
-public void close() throws OfficeWriterException {
+public void close() throws IOException {
 	try {
 		// prepare metadata
 		prepareMetaData();
@@ -312,33 +312,21 @@ public void close() throws OfficeWriterException {
 				}
 			}
 		}
-		} catch(IOException|GeneralSecurityException e){
+		} catch(GeneralSecurityException e){
 			LOG.error(e);
 		}
 		finally {
 		// close main workbook
 		if (this.currentWorkbook!=null) {
-			try {
 				this.currentWorkbook.close();
-			} catch (IOException e) {
-				LOG.error(e);
-			}
 		}
 		if (this.oStream!=null) {
-			try {
 				this.oStream.close();
-			} catch (IOException e) {
-				LOG.error(e);
-			}
 		}
 		// close linked workbooks
 		 	for (Workbook currentWorkbook: this.listOfWorkbooks) {
 				if (currentWorkbook!=null) {
-					try {
 					currentWorkbook.close();
-					} catch (IOException e) {
-						LOG.error(e);
-					}
 				}
 			}
 		}

@@ -112,11 +112,9 @@ public synchronized void write(NullWritable key, SpreadSheetCellDAO value) throw
 @Override
 public synchronized void  close(Reporter reporter) throws IOException {
 
-		try {
+	try {
 			this.officeWriter.close();
-		} catch (OfficeWriterException e) {
-			LOG.error(e);
-		} finally {
+		}  finally {
 			if (this.currentReader!=null) {
 				this.currentReader.close();
 			}

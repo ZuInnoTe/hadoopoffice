@@ -121,9 +121,7 @@ public synchronized void  close(TaskAttemptContext context) throws IOException {
 
 		try {
 			this.officeWriter.close();
-		} catch (OfficeWriterException e) {
-			LOG.error(e);
-		} finally {
+		}  finally {
 			if (this.currentReader!=null) {
 				this.currentReader.close();
 			}
