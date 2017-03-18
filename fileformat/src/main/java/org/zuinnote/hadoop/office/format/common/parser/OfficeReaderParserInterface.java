@@ -28,10 +28,10 @@ import java.util.List;
 
 public interface OfficeReaderParserInterface {
 
-public void parse(InputStream inputStream) throws IOException,FormatNotUnderstoodException,GeneralSecurityException;
+public void parse(InputStream inputStream) throws FormatNotUnderstoodException;
 public long getCurrentRow();
 public String getCurrentSheetName();
-public boolean addLinkedWorkbook(String name, InputStream inputStream,String password) throws IOException,FormatNotUnderstoodException,GeneralSecurityException;
+public boolean addLinkedWorkbook(String name, InputStream inputStream,String password) throws FormatNotUnderstoodException;
 public List<String> getLinkedWorkbooks();
 public Object[] getNext();
 public boolean getFiltered();

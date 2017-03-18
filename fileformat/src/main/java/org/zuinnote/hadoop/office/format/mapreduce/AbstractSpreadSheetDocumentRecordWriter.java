@@ -81,7 +81,7 @@ public AbstractSpreadSheetDocumentRecordWriter() {
 * @throws java.security.GeneralSecurityException in case of encrypted linkedworkbooks that could not be decrypted
 *
 */
-public AbstractSpreadSheetDocumentRecordWriter(DataOutputStream out, String fileName, Configuration conf) throws IOException,InvalidWriterConfigurationException,InvalidCellSpecificationException,FormatNotUnderstoodException, GeneralSecurityException {
+public AbstractSpreadSheetDocumentRecordWriter(DataOutputStream out, String fileName, Configuration conf) throws IOException,InvalidWriterConfigurationException,InvalidCellSpecificationException,FormatNotUnderstoodException, GeneralSecurityException, OfficeWriterException {
  	// parse configuration
      this.howc=new HadoopOfficeWriteConfiguration(conf,fileName);
        // load linked workbooks as inputstreams
@@ -102,15 +102,12 @@ public AbstractSpreadSheetDocumentRecordWriter(DataOutputStream out, String file
 @Override
 public synchronized void write(NullWritable key, SpreadSheetCellDAO value) throws IOException {
 
-	try {
-		this.officeWriter.write(value);
-	} catch (ObjectNotSupportedException onse) {
-		LOG.error(onse);
-	} catch (InvalidWriterConfigurationException iwce) {
-		LOG.error(iwce);
-	} catch (InvalidCellSpecificationException icse) {
-		LOG.error(icse);
-	}
+		try {
+			this.officeWriter.write(value);
+		} catch (OfficeWriterException e) {
+			LOG.error(e);
+		}
+	
 }
 
 
@@ -121,18 +118,18 @@ public synchronized void write(NullWritable key, SpreadSheetCellDAO value) throw
 */
 @Override
 public synchronized void  close(TaskAttemptContext context) throws IOException {
-	try {
-		this.officeWriter.finalizeWrite();
-	} catch (InvalidWriterConfigurationException iwce) {
-		LOG.error(iwce);
-	} catch (GeneralSecurityException gse) {
-		LOG.error(gse);
-	}
-	finally {
-		if (this.currentReader!=null) {
-			this.currentReader.close();
+
+		try {
+			this.officeWriter.finalizeWrite();
+		} catch (OfficeWriterException e) {
+			LOG.error(e);
+		} finally {
+			if (this.currentReader!=null) {
+				this.currentReader.close();
+			}
 		}
-	}
+	
+	
  }
 
 

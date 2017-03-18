@@ -31,6 +31,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException;
 
 import org.zuinnote.hadoop.office.format.common.writer.InvalidWriterConfigurationException;
+import org.zuinnote.hadoop.office.format.common.writer.OfficeWriterException;
 import org.zuinnote.hadoop.office.format.common.writer.InvalidCellSpecificationException;
 
 
@@ -60,7 +61,7 @@ public ExcelRecordWriter() {
 * Instantiate the constructor of AbstractSpreadSheetDocumentRecordWriter
 *
 */
-public ExcelRecordWriter(DataOutputStream out, String fileName, Configuration conf) throws IOException,InvalidWriterConfigurationException,InvalidCellSpecificationException,FormatNotUnderstoodException,GeneralSecurityException {
+public ExcelRecordWriter(DataOutputStream out, String fileName, Configuration conf) throws IOException, InvalidWriterConfigurationException, InvalidCellSpecificationException, FormatNotUnderstoodException, GeneralSecurityException, OfficeWriterException  {
 	super(out,fileName,conf);
 	LOG.debug("Initializing ExcelRecordWriter");
 }

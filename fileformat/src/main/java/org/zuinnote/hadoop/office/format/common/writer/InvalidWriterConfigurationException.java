@@ -18,6 +18,11 @@ package org.zuinnote.hadoop.office.format.common.writer;
 
 public class InvalidWriterConfigurationException extends Exception {
 
+/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6023721463200476462L;
+
 public InvalidWriterConfigurationException(String message) {
 	super(message);
 }

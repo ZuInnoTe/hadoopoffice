@@ -22,13 +22,10 @@ import java.io.InputStream;
 
 import java.security.GeneralSecurityException;
 
-import java.util.Map;
 import java.util.List;
-import java.util.Locale;
 
 
 import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.Seekable;
 import org.apache.hadoop.io.compress.CodecPool;
@@ -48,7 +45,6 @@ import org.apache.commons.logging.Log;
 
 import org.zuinnote.hadoop.office.format.common.HadoopFileReader;
 import org.zuinnote.hadoop.office.format.common.HadoopOfficeReadConfiguration;
-import org.zuinnote.hadoop.office.format.common.HadoopUtil;
 import org.zuinnote.hadoop.office.format.common.OfficeReader;
 import org.zuinnote.hadoop.office.format.common.parser.*;
 

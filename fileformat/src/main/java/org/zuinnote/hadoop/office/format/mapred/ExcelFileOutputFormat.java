@@ -36,6 +36,7 @@ import org.zuinnote.hadoop.office.format.common.HadoopUtil;
 import org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException;
 import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 import org.zuinnote.hadoop.office.format.common.writer.InvalidWriterConfigurationException;
+import org.zuinnote.hadoop.office.format.common.writer.OfficeWriterException;
 import org.zuinnote.hadoop.office.format.common.writer.InvalidCellSpecificationException;
 
 public class ExcelFileOutputFormat extends AbstractSpreadSheetDocumentFileOutputFormat implements Serializable {
@@ -71,17 +72,12 @@ public RecordWriter<NullWritable,SpreadSheetCellDAO> getRecordWriter(FileSystem 
 	Path file = getTaskOutputPath(conf, name);
 	// add suffix
 	file=file.suffix(ExcelFileOutputFormat.getSuffix(conf.get(HadoopOfficeWriteConfiguration.CONF_MIMETYPE)));
-	try {
-	 	return new ExcelRecordWriter<>(HadoopUtil.getDataOutputStream(conf,file,progress,getCompressOutput(conf),getOutputCompressorClass(conf, ExcelFileOutputFormat.defaultCompressorClass)),file.getName(),conf);
-	} catch (InvalidWriterConfigurationException iwe) {
-		LOG.error(iwe);
-	} catch (InvalidCellSpecificationException icse) {
-		LOG.error(icse);
-	} catch (FormatNotUnderstoodException fnue) {
-		LOG.error(fnue);
-	} catch (GeneralSecurityException gse) {
-		LOG.error(gse);
-	}
+	 	try {
+			return new ExcelRecordWriter<>(HadoopUtil.getDataOutputStream(conf,file,progress,getCompressOutput(conf),getOutputCompressorClass(conf, ExcelFileOutputFormat.defaultCompressorClass)),file.getName(),conf);
+		} catch (InvalidWriterConfigurationException | OfficeWriterException e) {
+			LOG.error(e);
+		}
+
 	return null;
 }
 

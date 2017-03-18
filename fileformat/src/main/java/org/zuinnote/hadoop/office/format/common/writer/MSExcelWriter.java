@@ -135,7 +135,7 @@ public MSExcelWriter(String excelFormat, HadoopOfficeWriteConfiguration howc) th
 *
 */
 
-public void create(OutputStream oStream, Map<String,InputStream> linkedWorkbooks,Map<String,String> linkedWorkbooksPasswords) throws IOException,FormatNotUnderstoodException, GeneralSecurityException {
+public void create(OutputStream oStream, Map<String,InputStream> linkedWorkbooks,Map<String,String> linkedWorkbooksPasswords) throws OfficeWriterException {
 	this.oStream=oStream;
 	// create a new Workbook either in old Excel or "new" Excel format
 	if (this.format.equals(MSExcelWriter.FORMAT_OOXML)) {
@@ -163,7 +163,12 @@ public void create(OutputStream oStream, Map<String,InputStream> linkedWorkbooks
 			currentLinkedWBHOCR.setPassword(linkedWorkbooksPasswords.get(entry.getKey()));
 			currentLinkedWBHOCR.setMetaDataFilter(null);
 			MSExcelParser currentLinkedWorkbookParser = new MSExcelParser(currentLinkedWBHOCR,null);
-			currentLinkedWorkbookParser.parse(entry.getValue());
+			try {
+				currentLinkedWorkbookParser.parse(entry.getValue());
+			} catch (FormatNotUnderstoodException e) {
+				LOG.error(e);
+				throw new OfficeWriterException(e.toString());
+			}
 			this.listOfWorkbooks.add(currentLinkedWorkbookParser.getCurrentWorkbook());
 			linkedFormulaEvaluators.put(entry.getKey(),currentLinkedWorkbookParser.getCurrentFormulaEvaluator());
 			this.currentWorkbook.linkExternalWorkbook(entry.getKey(),currentLinkedWorkbookParser.getCurrentWorkbook());
@@ -171,7 +176,11 @@ public void create(OutputStream oStream, Map<String,InputStream> linkedWorkbooks
 					
 	} finally {	// close linked workbook inputstreams
 		for (InputStream currentIS: linkedWorkbooks.values()) {
-			currentIS.close();
+			try {
+				currentIS.close();
+			} catch (IOException e) {
+				LOG.error(e);
+			}
 		}
 	}
 	LOG.debug("Size of linked formula evaluators map: "+linkedFormulaEvaluators.size());
@@ -185,27 +194,24 @@ public void create(OutputStream oStream, Map<String,InputStream> linkedWorkbooks
 *
 * @param newDAO cell to add. If it is already existing an exception will be thrown. Note that the sheet name is sanitized using  org.apache.poi.ss.util.WorkbookUtil.createSafeSheetName. The Cell address needs to be in A1 format. Either formula or formattedValue must be not null.
 *
-* @throws org.zuinnote.hadoop.office.format.common.writer.InvalidCellSpecificationException in case the cell cannot be added (e.g. invalid address, invalid formula, already existing etc.)
-* @throws org.zuinnote.hadoop.office.format.common.writer.ObjectNotSupportedException in case the object is not of type SpreadSheetCellDAO
-*
 */
 
-public void write(Object newDAO) throws InvalidCellSpecificationException,ObjectNotSupportedException {
+public void write(Object newDAO) throws OfficeWriterException {
 	if (!(newDAO instanceof SpreadSheetCellDAO)) {
-		throw new ObjectNotSupportedException("Objects which are not of the class SpreadSheetCellDAO are not supported.");
+		throw new OfficeWriterException("Objects which are not of the class SpreadSheetCellDAO are not supported for writing.");
 	}
 	SpreadSheetCellDAO sscd = (SpreadSheetCellDAO)newDAO;
 	// check sheetname (needs to be there)
 	if ((sscd.getSheetName()==null) || ("".equals(sscd.getSheetName()))) {
-		throw new InvalidCellSpecificationException("Empy sheet name not allowed.");
+		throw new OfficeWriterException("Invalid cell specification: empy sheet name not allowed.");
 	}
 	// check celladdress (needs to be there)
 	if ((sscd.getAddress()==null) || ("".equals(sscd.getAddress()))) {
-		throw new InvalidCellSpecificationException("Empy cell address not allowed.");
+		throw new OfficeWriterException("Invalid cell specification: empy cell address not allowed.");
 	}
 	// check that either formula or formatted value is filled
 	if ((sscd.getFormula()==null) && (sscd.getFormattedValue()==null))  {
-		throw new InvalidCellSpecificationException("Either formula or formattedValue needs to be specified for cell.");
+		throw new OfficeWriterException("Invalid cell specification: either formula or formattedValue needs to be specified for cell.");
 	}
 	String safeSheetName=WorkbookUtil.createSafeSheetName(sscd.getSheetName());
 	Sheet currentSheet=this.currentWorkbook.getSheet(safeSheetName);
@@ -225,7 +231,7 @@ public void write(Object newDAO) throws InvalidCellSpecificationException,Object
 	}
 	Cell currentCell = currentRow.getCell(currentCA.getColumn());
 	if (currentCell!=null) { // cell already exists? => throw exception
-		throw new InvalidCellSpecificationException("Cell already exists at "+currentCA);
+		throw new OfficeWriterException("Invalid cell specification: cell already exists at "+currentCA);
 	}
 	// create cell
 	currentCell=currentRow.createCell(currentCA.getColumn());		
@@ -264,22 +270,42 @@ public void write(Object newDAO) throws InvalidCellSpecificationException,Object
 *
 */
 
-public void finalizeWrite() throws IOException, GeneralSecurityException {
+public void finalizeWrite() throws OfficeWriterException {
 	try {
 	// prepare metadata
 	prepareMetaData();
 	// write
 	if (this.oStream!=null) {
 		if (this.howc.getPassword()==null) { // no encryption
-			this.currentWorkbook.write(this.oStream);
-			this.oStream.close();
+			try {
+				this.currentWorkbook.write(this.oStream);
+			} catch (IOException e) {
+				LOG.error(e);
+				throw new OfficeWriterException(e.toString());
+			} finally {
+					try {
+						this.oStream.close();
+					} catch (IOException e) {
+						LOG.error(e);
+					}
+			}
 		} else {	// encryption
 			if (this.currentWorkbook instanceof HSSFWorkbook) { // old Excel format
 				LOG.debug("encrypting HSSFWorkbook");
 				Biff8EncryptionKey.setCurrentUserPassword(this.howc.getPassword());
-				this.currentWorkbook.write(this.oStream);
-				this.oStream.close();
-				Biff8EncryptionKey.setCurrentUserPassword(null);
+				try {
+					this.currentWorkbook.write(this.oStream);
+				} catch (IOException e) {
+					LOG.error(e);
+					throw new OfficeWriterException(e.toString());
+				} finally {
+					Biff8EncryptionKey.setCurrentUserPassword(null);
+					try {
+						this.oStream.close();
+					} catch (IOException e) {
+						LOG.error(e);
+					}
+				}
 			} else if (this.currentWorkbook instanceof XSSFWorkbook) {
 				if (this.encryptAlgorithmCipher==null) {
 					LOG.error("No encryption algorithm specified");
@@ -301,8 +327,16 @@ public void finalizeWrite() throws IOException, GeneralSecurityException {
 						OutputStream os = enc.getDataStream(ooxmlDocumentFileSystem);	
 						this.currentWorkbook.write(os);
 						ooxmlDocumentFileSystem.writeFilesystem(this.oStream);
+					} catch (IOException | GeneralSecurityException e) {
+						// TODO Auto-generated catch block
+						LOG.error(e);
+						throw new OfficeWriterException(e.toString());
 					} finally {
-					 this.oStream.close();
+					 try {
+						this.oStream.close();
+					} catch (IOException e) {
+						LOG.error(e);
+					}
 					}
 				}
 			} else {
@@ -313,16 +347,30 @@ public void finalizeWrite() throws IOException, GeneralSecurityException {
 	} finally {
 	// close filesystems
 	if (this.ooxmlDocumentFileSystem!=null)  {
-		 ooxmlDocumentFileSystem.close();
+		 try {
+			ooxmlDocumentFileSystem.close();
+		} catch (IOException e) {
+			LOG.error(e);
+			throw new OfficeWriterException(e.toString());
+		}
 	}
 	// close main workbook
 	if (this.currentWorkbook!=null) {
-		this.currentWorkbook.close();
+		try {
+			this.currentWorkbook.close();
+		} catch (IOException e) {
+			LOG.error(e);
+			throw new OfficeWriterException(e.toString());
+		}
 	}
 	// close linked workbooks
 	 	for (Workbook currentWorkbookItem: this.listOfWorkbooks) {
 			if (currentWorkbookItem!=null) {
-				currentWorkbookItem.close();
+				try {
+					currentWorkbookItem.close();
+				} catch (IOException e) {
+					LOG.error(e);
+				}
 			}
 		}
 	}

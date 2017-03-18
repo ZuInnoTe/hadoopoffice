@@ -23,7 +23,6 @@ import java.io.OutputStream;
 
 import java.security.GeneralSecurityException;
 
-import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.logging.LogFactory;
@@ -33,7 +32,7 @@ import org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodExcept
 
 import org.zuinnote.hadoop.office.format.common.writer.MSExcelWriter;
 import org.zuinnote.hadoop.office.format.common.writer.OfficeSpreadSheetWriterInterface;
-import org.zuinnote.hadoop.office.format.common.writer.ObjectNotSupportedException;
+import org.zuinnote.hadoop.office.format.common.writer.OfficeWriterException;
 import org.zuinnote.hadoop.office.format.common.writer.InvalidWriterConfigurationException;
 import org.zuinnote.hadoop.office.format.common.writer.InvalidCellSpecificationException;
  
@@ -45,6 +44,7 @@ import org.zuinnote.hadoop.office.format.common.writer.InvalidCellSpecificationE
 */
 
 public class OfficeWriter {
+private static final String EX_NO_WRITER_INSTANTIATED = "No writer instantiated";
 private static final Log LOG = LogFactory.getLog(OfficeWriter.class.getName());
 private OfficeSpreadSheetWriterInterface currentOfficeSpreadSheetWriter=null;
 private HadoopOfficeWriteConfiguration howc;
@@ -63,7 +63,7 @@ public OfficeWriter(HadoopOfficeWriteConfiguration howc) throws InvalidWriterCon
 	LOG.debug("Initialize OfficeWriter");
 	this.howc=howc;
 	// check mimetype and create parser, this is based on some heuristics on the mimetype
-	String writerFormat=getInternalWriterFormatFromMimeType(this.howc.getMimeType());
+	String writerFormat=OfficeWriter.getInternalWriterFormatFromMimeType(this.howc.getMimeType());
 	if (MSExcelWriter.isSupportedFormat(writerFormat)) {
 		currentOfficeSpreadSheetWriter=new MSExcelWriter(writerFormat,this.howc);
 	} else {
@@ -80,16 +80,15 @@ public OfficeWriter(HadoopOfficeWriteConfiguration howc) throws InvalidWriterCon
 * @param linkedWorkbooksPasswords a map of passwords and linkedworkbooks. The key is the filename without path of the linkedworkbook and the value is the password
 *
 * @throws java.io.IOException if there is an issue with the OutputStream
-* @throws org.zuinnote.hadoop.office.format.common.writer.InvalidWriterConfigurationException in case no proper writer has been instantiated
-* @throws org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException in case one of the linked workbooks has an invalid format
+* @throws org.zuinnote.hadoop.office.format.common.writer.OfficeWriterException in case no proper writer has been instantiated or linked workbooks have invalid format
 * 
 */
 
-public void create(OutputStream oStream, Map<String,InputStream> linkedWorkbooks,Map<String,String> linkedWorkbooksPasswords) throws IOException, InvalidWriterConfigurationException,FormatNotUnderstoodException,GeneralSecurityException {
+public void create(OutputStream oStream, Map<String,InputStream> linkedWorkbooks,Map<String,String> linkedWorkbooksPasswords) throws OfficeWriterException {
 	if (this.currentOfficeSpreadSheetWriter!=null) {
 		this.currentOfficeSpreadSheetWriter.create(oStream,linkedWorkbooks,linkedWorkbooksPasswords);
 	} else {
-		throw new InvalidWriterConfigurationException("No writer instantiated");
+		throw new OfficeWriterException(EX_NO_WRITER_INSTANTIATED);
 	}
 }
 
@@ -99,17 +98,15 @@ public void create(OutputStream oStream, Map<String,InputStream> linkedWorkbooks
 *
 * @param o object 
 *
-* @throws org.zuinnote.hadoop.office.format.common.writer.ObjectNotSupportedException in case the underlying writer cannot handle this type of object
-* @throws org.zuinnote.hadoop.office.format.common.writer.InvalidWriterConfigurationException in case no proper writer has been instantiated
-* @throws org.zuinnote.hadoop.office.format.common.writer.InvalidCellSpecificationException in case the specification of the cell is incorrect
+* @throws org.zuinnote.hadoop.office.format.common.writer.OfficeWriterExceptiobn in case the specification of the cell is incorrect
 *
 */
-public void write(Object o) throws ObjectNotSupportedException,InvalidWriterConfigurationException,InvalidCellSpecificationException {
+public void write(Object o) throws OfficeWriterException {
 	
 if (this.currentOfficeSpreadSheetWriter!=null) {
 		this.currentOfficeSpreadSheetWriter.write(o);
 	} else {
-		throw new InvalidWriterConfigurationException("No writer instantiated");
+		throw new OfficeWriterException(EX_NO_WRITER_INSTANTIATED);
 	}
 }
 
@@ -118,17 +115,16 @@ if (this.currentOfficeSpreadSheetWriter!=null) {
 * Writes the document in-memory representation to the OutputStream. Aferwards, it closes all related workbooks.
 *
 * @throws java.io.IOException in case of issues writing.
-* @throws org.zuinnote.hadoop.office.format.common.writer.InvalidWriterConfigurationException in case no proper writer has been instantiated
-* @throws java.security.GeneralSecurityException in case of issues of writing encrypted documents
+* @throws org.zuinnote.hadoop.office.format.common.writer.OfficeWriterException in case no proper writer has been instantiated or security issues have emerged
 *
 *
 */
-public void finalizeWrite() throws IOException,InvalidWriterConfigurationException,GeneralSecurityException {
+public void finalizeWrite() throws OfficeWriterException {
 	
 if (this.currentOfficeSpreadSheetWriter!=null) {
 		this.currentOfficeSpreadSheetWriter.finalizeWrite();
 	} else {
-		throw new InvalidWriterConfigurationException("No writer instantiated");
+		throw new OfficeWriterException(EX_NO_WRITER_INSTANTIATED);
 	}
 }
 
@@ -144,7 +140,7 @@ if (this.currentOfficeSpreadSheetWriter!=null) {
 * @throws org.zuinnote.hadoop.office.format.common.writer.InvalidWriterConfigurationException in case the format is not recognized
 *
 */
-private String getInternalWriterFormatFromMimeType(String mimeType) throws InvalidWriterConfigurationException {
+private static String getInternalWriterFormatFromMimeType(String mimeType) throws InvalidWriterConfigurationException {
  // for MS Office it is based on https://blogs.msdn.microsoft.com/vsofficedeveloper/2008/05/08/office-2007-file-format-mime-types-for-http-content-streaming-2/
  if (mimeType.contains("ms-excel")) { 
 	return MSExcelWriter.FORMAT_OLD;

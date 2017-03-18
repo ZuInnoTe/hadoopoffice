@@ -42,6 +42,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory; 
 import org.apache.poi.xssf.model.ExternalLinksTable;
+import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.POIXMLProperties;
 import org.apache.poi.hpsf.SummaryInformation;
 
@@ -135,26 +136,28 @@ private HadoopOfficeReadConfiguration hocr;
 	*
 	* @param in InputStream containing Excel data
 	*
-	* @throws java.io.IOException in case of issues reading from in
 	* @throws org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException in case there are issues reading from the Excel file, e.g. wrong password or unknown format
-	* @throws java.security.GeneralSecurityException in case of issues decrypting the document
 	*
 	*/
 	@Override
-	public void parse(InputStream in) throws IOException,FormatNotUnderstoodException, GeneralSecurityException {
+	public void parse(InputStream in) throws FormatNotUnderstoodException {
 		// read xls
-		try {
-			this.currentWorkbook=WorkbookFactory.create(in,this.hocr.getPassword());
-		} catch (InvalidFormatException e) {
-			LOG.error(e);
-			throw new FormatNotUnderstoodException(e.toString());
-		}
-		finally 
-		{
-			if (this.in!=null) {
-				this.in.close();
+	
+			try {
+				this.currentWorkbook=WorkbookFactory.create(in,this.hocr.getPassword());
+			} catch (EncryptedDocumentException | InvalidFormatException | IOException e) {
+				LOG.error(e);
+				throw new FormatNotUnderstoodException(e.toString());
+			} finally 
+			{
+				if (this.in!=null) {
+					try {
+						this.in.close();
+					} catch (IOException e) {
+						LOG.error(e);
+					}
+				}
 			}
-		}
 		 this.formulaEvaluator = this.currentWorkbook.getCreationHelper().createFormulaEvaluator();
 		  // add the formulator evaluator of this file as well or we will see a strange Exception
 		 this.addedFormulaEvaluators.put(this.hocr.getFileName(),this.formulaEvaluator);
@@ -185,7 +188,7 @@ private HadoopOfficeReadConfiguration hocr;
 	*
 	**/
 	@Override
-	public boolean addLinkedWorkbook(String name, InputStream inputStream, String password) throws IOException,FormatNotUnderstoodException,GeneralSecurityException {
+	public boolean addLinkedWorkbook(String name, InputStream inputStream, String password) throws FormatNotUnderstoodException {
 		// check if already added
 		if (this.addedFormulaEvaluators.containsKey(name)) {
 			return false;
@@ -201,7 +204,9 @@ private HadoopOfficeReadConfiguration hocr;
 		linkedWBHOCR.setMetaDataFilter(null);
 		MSExcelParser linkedWBMSExcelParser = new MSExcelParser(linkedWBHOCR,null);
 		// parse workbook 
-		linkedWBMSExcelParser.parse(inputStream);
+	
+			linkedWBMSExcelParser.parse(inputStream);
+		
 		// add linked workbook
 		this.addedWorkbooks.add(linkedWBMSExcelParser.getCurrentWorkbook());
 		this.addedFormulaEvaluators.put(name,linkedWBMSExcelParser.getCurrentFormulaEvaluator());

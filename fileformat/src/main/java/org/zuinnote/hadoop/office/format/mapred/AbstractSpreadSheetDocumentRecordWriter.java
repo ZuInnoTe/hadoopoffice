@@ -75,12 +75,10 @@ public AbstractSpreadSheetDocumentRecordWriter() {
 *
 * @throws java.io.IOException in case of errors reading from the filestream provided by Hadoop
 * @throws org.zuinnote.hadoop.office.format.common.writer.InvalidWriterConfigurationException in case the writer could not be configured correctly
-* @throws org.zuinnote.hadoop.office.format.common.writer.InvalidCellSpecificationException in case there are not enough information in SpreadSheetDAO to fill out cell
-* @throws org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException in case of invalid format of linkeded workbooks
-* @throws java.security.GeneralSecurityException in case of encrypted linkedworkbooks that could not be decrypted
+* @throws org.zuinnote.hadoop.office.format.common.writer.OfficeWriterExeption in case of issues creating the initial document
 *
 */
-public AbstractSpreadSheetDocumentRecordWriter(DataOutputStream out, String fileName, Configuration conf) throws IOException,InvalidWriterConfigurationException,InvalidCellSpecificationException,FormatNotUnderstoodException, GeneralSecurityException {
+public AbstractSpreadSheetDocumentRecordWriter(DataOutputStream out, String fileName, Configuration conf) throws InvalidWriterConfigurationException, IOException, OfficeWriterException {
 	// parse configuration
     this.howc=new HadoopOfficeWriteConfiguration(conf,fileName);
       // load linked workbooks as inputstreams
@@ -100,15 +98,11 @@ public AbstractSpreadSheetDocumentRecordWriter(DataOutputStream out, String file
 */
 @Override
 public synchronized void write(NullWritable key, SpreadSheetCellDAO value) throws IOException {
-	try {
-		this.officeWriter.write(value);
-	} catch (ObjectNotSupportedException onse) {
-		LOG.error(onse);
-	} catch (InvalidWriterConfigurationException iwce) {
-		LOG.error(iwce);
-	} catch (InvalidCellSpecificationException icse) {
-		LOG.error(icse);
-	}
+		try {
+			this.officeWriter.write(value);
+		} catch (OfficeWriterException e) {
+			LOG.error(e);
+		}
 }
 
 
@@ -119,18 +113,16 @@ public synchronized void write(NullWritable key, SpreadSheetCellDAO value) throw
 */
 @Override
 public synchronized void  close(Reporter reporter) throws IOException {
-	try {
-		this.officeWriter.finalizeWrite();
-	} catch (InvalidWriterConfigurationException iwce) {
-		LOG.error(iwce);
-	} catch (GeneralSecurityException gse) {
-		LOG.error(gse);
-	}
-	finally {
-		if (this.currentReader!=null) {
-			this.currentReader.close();
+
+		try {
+			this.officeWriter.finalizeWrite();
+		} catch (OfficeWriterException e) {
+			LOG.error(e);
+		} finally {
+			if (this.currentReader!=null) {
+				this.currentReader.close();
+			}
 		}
-	}
  }
 
 

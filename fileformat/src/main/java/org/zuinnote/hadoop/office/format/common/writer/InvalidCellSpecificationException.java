@@ -18,6 +18,11 @@ package org.zuinnote.hadoop.office.format.common.writer;
 
 public class InvalidCellSpecificationException extends Exception {
 
+/**
+	 * 
+	 */
+	private static final long serialVersionUID = 444426442150628702L;
+
 public InvalidCellSpecificationException(String message) {
 	super(message);
 }

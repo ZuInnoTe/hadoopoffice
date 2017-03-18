@@ -13,13 +13,16 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 **/
-
 package org.zuinnote.hadoop.office.format.common.writer;
 
-public class ObjectNotSupportedException extends Exception {
 
-public ObjectNotSupportedException(String message) {
-	super(message);
-}
+public class OfficeWriterException  extends Exception {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6845496067941643152L;
 
+	public OfficeWriterException(String message) {
+		super(message);
+	}
 }
