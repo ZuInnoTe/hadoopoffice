@@ -45,7 +45,7 @@ private static final String EX_NO_WRITER_INSTANTIATED = "No writer instantiated"
 private static final Log LOG = LogFactory.getLog(OfficeWriter.class.getName());
 private OfficeSpreadSheetWriterInterface currentOfficeSpreadSheetWriter=null;
 private HadoopOfficeWriteConfiguration howc;
-
+private OutputStream oStream;
 
 /**
 *
@@ -81,6 +81,7 @@ public OfficeWriter(HadoopOfficeWriteConfiguration howc) throws InvalidWriterCon
 */
 
 public void create(OutputStream oStream, Map<String,InputStream> linkedWorkbooks,Map<String,String> linkedWorkbooksPasswords) throws OfficeWriterException {
+	this.oStream=oStream;
 	if (this.currentOfficeSpreadSheetWriter!=null) {
 		this.currentOfficeSpreadSheetWriter.create(oStream,linkedWorkbooks,linkedWorkbooksPasswords);
 	} else {
@@ -115,12 +116,17 @@ if (this.currentOfficeSpreadSheetWriter!=null) {
 *
 */
 public void close() throws IOException {
-	
+try {
 if (this.currentOfficeSpreadSheetWriter!=null) {
 		this.currentOfficeSpreadSheetWriter.close();
 	} else {
 		LOG.error(EX_NO_WRITER_INSTANTIATED);
 	}
+} finally {
+	if (this.oStream!=null) {
+		this.oStream.close();
+	}
+}
 }
 
 
