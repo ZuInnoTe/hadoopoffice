@@ -39,12 +39,13 @@ import org.apache.hadoop.mapred.Reporter;
 
 public abstract class AbstractSpreadSheetDocumentFileInputFormat  extends FileInputFormat<Text,ArrayWritable> {
 
-
+	@Override
 	public abstract RecordReader<Text,ArrayWritable> getRecordReader(InputSplit split, JobConf job, Reporter reporter) throws IOException;
-	
+	@Override
+	protected abstract boolean isSplitable(FileSystem fs, Path file);
 
 	public abstract void configure(JobConf conf);
-	protected abstract boolean isSplitable(FileSystem fs, Path file);
+	
 	
 
 

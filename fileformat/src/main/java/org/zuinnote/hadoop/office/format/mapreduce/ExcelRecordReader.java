@@ -24,9 +24,6 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.ArrayWritable;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
-import org.apache.hadoop.mapreduce.InputSplit;
-import org.apache.hadoop.mapreduce.TaskAttemptContext;
-import org.apache.hadoop.mapreduce.RecordReader;
 
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
@@ -51,6 +48,7 @@ private ArrayWritable currentValue=new ArrayWritable(SpreadSheetCellDAO.class);
 
 public ExcelRecordReader(Configuration conf, FileSplit split) throws IOException,FormatNotUnderstoodException,GeneralSecurityException {
  super(conf);
+ LOG.debug("Initalizing ExcelRecordReader");
  this.split=split;
 }
 
@@ -60,6 +58,7 @@ public ExcelRecordReader(Configuration conf, FileSplit split) throws IOException
 *
 * @return key is a text containing a reference for the SpreadSheet (e.g. [name.xlsx]Sheet1!A1)
 */
+@Override
 public Text getCurrentKey() {
 	return this.currentKey;
 }
@@ -70,6 +69,7 @@ public Text getCurrentKey() {
 *
 * @return is an array of type SpreadSheetDAO
 */
+@Override
 public ArrayWritable getCurrentValue() {
 	return this.currentValue;
 }
@@ -81,10 +81,15 @@ public ArrayWritable getCurrentValue() {
 *
 * @return true if next more rows are available, false if not
 */
+@Override
 public boolean nextKeyValue() throws IOException {
-	if (this.getOfficeReader().getFiltered()==false) return false;
+	if (!(this.getOfficeReader().getFiltered())) {
+		return false;
+	}
 	Object[] objectArray = this.getOfficeReader().getNext();
-	if (objectArray==null) return false; // no more to read
+	if (objectArray==null) {
+		return false; // no more to read
+	}
 	SpreadSheetCellDAO[] cellRows = (SpreadSheetCellDAO[])objectArray;
 	this.currentKey.set(new Text("["+this.split.getPath().getName()+"]"+this.getOfficeReader().getCurrentSheetName()+"!A"+this.getOfficeReader().getCurrentRow()));
 	this.currentValue.set(cellRows);

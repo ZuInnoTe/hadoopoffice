@@ -21,11 +21,7 @@ import java.io.IOException;
 
 
 
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.compress.CompressionCodec;
-import org.apache.hadoop.io.compress.CompressionCodecFactory;
-import org.apache.hadoop.io.compress.SplittableCompressionCodec;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.ArrayWritable;
 import org.apache.hadoop.mapreduce.JobContext;
@@ -34,21 +30,16 @@ import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
-
-
 
 
 /* The input format will return an array of strings that it reads per "row" from the source formats */
 
 public abstract class AbstractSpreadSheetDocumentFileInputFormat  extends FileInputFormat<Text,ArrayWritable> {
-private static final Log LOG = LogFactory.getLog(AbstractSpreadSheetDocumentFileInputFormat.class.getName());
 
-
+	@Override
 	public abstract RecordReader<Text,ArrayWritable> createRecordReader(InputSplit split, TaskAttemptContext ctx) throws IOException;
 	
-
+	@Override
 	protected abstract boolean isSplitable(JobContext context, Path file);
 	
 

@@ -61,7 +61,7 @@ public static final String SUFFIX_OLDEXCEL = org.zuinnote.hadoop.office.format.m
 * @return Excel Record Writer
 *
 */
-
+@Override
 public RecordWriter<NullWritable,SpreadSheetCellDAO> getRecordWriter(FileSystem ignored, JobConf conf, String name, Progressable progress) throws IOException {
 	// check if mimeType is set. If not assume new Excel format (.xlsx)
 	

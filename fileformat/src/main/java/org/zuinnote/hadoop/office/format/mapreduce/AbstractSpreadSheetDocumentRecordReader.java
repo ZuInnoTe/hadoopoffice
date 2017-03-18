@@ -19,30 +19,21 @@ package org.zuinnote.hadoop.office.format.mapreduce;
 import java.io.IOException;
 import java.io.InputStream;
 
-import java.nio.ByteBuffer;
 
 import java.security.GeneralSecurityException;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 import java.util.Locale;
-import java.util.Locale.Builder;
-
-import org.apache.hadoop.io.BytesWritable; 
 
 import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.Seekable;
-import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.CodecPool;
 import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.CompressionCodecFactory;
 import org.apache.hadoop.io.compress.SplitCompressionInputStream;
 import org.apache.hadoop.io.compress.SplittableCompressionCodec;
-import org.apache.hadoop.io.compress.CompressionCodecFactory;
 import org.apache.hadoop.io.compress.Decompressor;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
@@ -88,25 +79,20 @@ private String mimeType=null;
 private String localeStrBCP47=null;
 private String sheets=null;
 private Locale locale=null;
-private boolean readLinkedWorkbooks=this.DEFAULT_LINKEDWB;
-private boolean ignoreMissingLinkedWorkbooks=this.DEFAULT_IGNOREMISSINGLINKEDWB;
+private boolean readLinkedWorkbooks=AbstractSpreadSheetDocumentRecordReader.DEFAULT_LINKEDWB;
+private boolean ignoreMissingLinkedWorkbooks=AbstractSpreadSheetDocumentRecordReader.DEFAULT_IGNOREMISSINGLINKEDWB;
 private OfficeReader officeReader=null;
 private String password=null;
-private String linkedWBpassword=null;
 private Map<String,String> metadataFilter;
 private Map<String,String> linkedWBCredentialMap;
 
 private CompressionCodec codec;
-private CompressionCodecFactory compressionCodecs = null;
 private Decompressor decompressor;
 private Configuration conf;
 private long start;
-private long pos;
 private long end;
 private Seekable filePosition;
-private FSDataInputStream fileIn;
 private HadoopFileReader currentHFR;
-private FileSystem fs;
 
 
 /**
@@ -127,18 +113,17 @@ private FileSystem fs;
 public AbstractSpreadSheetDocumentRecordReader(Configuration conf) {
  	// parse configuration
      this.conf=conf;	
-     this.mimeType=conf.get(this.CONF_MIMETYPE,this.DEFAULT_MIMETYPE);
-     this.sheets=conf.get(this.CONF_SHEETS,this.DEFAULT_SHEETS);
-     this.localeStrBCP47=conf.get(this.CONF_LOCALE, this.DEFAULT_LOCALE);
+     this.mimeType=conf.get(AbstractSpreadSheetDocumentRecordReader.CONF_MIMETYPE,AbstractSpreadSheetDocumentRecordReader.DEFAULT_MIMETYPE);
+     this.sheets=conf.get(AbstractSpreadSheetDocumentRecordReader.CONF_SHEETS,AbstractSpreadSheetDocumentRecordReader.DEFAULT_SHEETS);
+     this.localeStrBCP47=conf.get(AbstractSpreadSheetDocumentRecordReader.CONF_LOCALE, AbstractSpreadSheetDocumentRecordReader.DEFAULT_LOCALE);
      if (!("".equals(localeStrBCP47))) { // create locale
 	this.locale=new Locale.Builder().setLanguageTag(this.localeStrBCP47).build();
       }
-      this.readLinkedWorkbooks=conf.getBoolean(this.CONF_LINKEDWB,this.DEFAULT_LINKEDWB);
-      this.ignoreMissingLinkedWorkbooks=conf.getBoolean(CONF_IGNOREMISSINGWB,this.DEFAULT_IGNOREMISSINGLINKEDWB);
-      this.password=conf.get(this.CONF_DECRYPT); // null if no password is set
-      this.linkedWBpassword=conf.get(CONF_DECRYPTLINKEDWBBASE); // null if no password is set
-      this.metadataFilter=HadoopUtil.parsePropertiesFromBase(conf,this.CONF_FILTERMETADATA);
-      this.linkedWBCredentialMap=HadoopUtil.parsePropertiesFromBase(conf,this.CONF_DECRYPTLINKEDWBBASE);
+      this.readLinkedWorkbooks=conf.getBoolean(AbstractSpreadSheetDocumentRecordReader.CONF_LINKEDWB,AbstractSpreadSheetDocumentRecordReader.DEFAULT_LINKEDWB);
+      this.ignoreMissingLinkedWorkbooks=conf.getBoolean(AbstractSpreadSheetDocumentRecordReader.CONF_IGNOREMISSINGWB,AbstractSpreadSheetDocumentRecordReader.DEFAULT_IGNOREMISSINGLINKEDWB);
+      this.password=conf.get(AbstractSpreadSheetDocumentRecordReader.CONF_DECRYPT); // null if no password is set
+       this.metadataFilter=HadoopUtil.parsePropertiesFromBase(conf,AbstractSpreadSheetDocumentRecordReader.CONF_FILTERMETADATA);
+      this.linkedWBCredentialMap=HadoopUtil.parsePropertiesFromBase(conf,AbstractSpreadSheetDocumentRecordReader.CONF_DECRYPTLINKEDWBBASE);
 }
 
 
@@ -161,10 +146,9 @@ try {
     start = fSplit.getStart();
     end = start + fSplit.getLength();
     final Path file = fSplit.getPath();
-     compressionCodecs = new CompressionCodecFactory(context.getConfiguration());
-    codec = compressionCodecs.getCodec(file);
-     fs = file.getFileSystem(conf);
-    fileIn = fs.open(file);
+    codec = new CompressionCodecFactory(context.getConfiguration()).getCodec(file);
+
+    FSDataInputStream fileIn = file.getFileSystem(conf).open(file);
     // open stream
       if (isCompressedInput()) { // decompress
       	decompressor = CodecPool.getDecompressor(codec);
@@ -187,10 +171,9 @@ try {
       filePosition = fileIn;
     }
     // initialize reader
-    this.pos=start;
     this.officeReader.parse();
     // read linked workbooks
-    if (this.readLinkedWorkbooks==true) {
+    if (this.readLinkedWorkbooks) {
 	// get current path
 	Path currentPath = fSplit.getPath();
 	Path parentPath = currentPath.getParent();
@@ -224,6 +207,7 @@ try {
 *
 * @return true if next more rows are available, false if not
 */
+@Override
 public abstract boolean nextKeyValue() throws IOException;
 
 
@@ -270,7 +254,7 @@ public long getEnd() {
 * @throws java.io.IOException in case of errors reading from the filestream provided by Hadoop
 *
 */
-
+@Override
 public synchronized float getProgress() throws IOException {
 if (start == end) {
       return 0.0f;
@@ -285,7 +269,7 @@ if (start == end) {
 * @return true if compressed, false if not
 */
 private boolean  isCompressedInput() {
-    return (codec != null);
+    return codec != null;
   }
 
 /*
@@ -311,7 +295,7 @@ public  synchronized long getPos() throws IOException {
 * @throws java.io.IOException in case of errors reading from the filestream provided by Hadoop
 *
 */
-
+@Override
 public synchronized void  close() throws IOException {
 try {
     if (officeReader!=null) {

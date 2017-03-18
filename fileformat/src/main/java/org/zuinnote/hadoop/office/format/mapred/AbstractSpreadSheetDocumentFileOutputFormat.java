@@ -37,7 +37,7 @@ import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 
 public abstract class AbstractSpreadSheetDocumentFileOutputFormat  extends FileOutputFormat<NullWritable,SpreadSheetCellDAO> {
 
-
+@Override
 public abstract RecordWriter<NullWritable,SpreadSheetCellDAO> getRecordWriter(FileSystem ignored, JobConf conf, String name, Progressable progress) throws IOException;
 	
 

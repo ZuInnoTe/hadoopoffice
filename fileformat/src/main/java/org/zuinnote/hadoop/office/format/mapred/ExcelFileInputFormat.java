@@ -40,9 +40,9 @@ import org.zuinnote.hadoop.office.format.common.parser.*;
 
 public class ExcelFileInputFormat extends AbstractSpreadSheetDocumentFileInputFormat {
 
-private static final Log LOG = LogFactory.getLog(ExcelFileInputFormat.class.getName());
+private static final Log LOGIF = LogFactory.getLog(ExcelFileInputFormat.class.getName());
 
-
+@Override
 public  RecordReader<Text,ArrayWritable> getRecordReader(InputSplit split, JobConf job, Reporter reporter) throws IOException {
 /** Create reader **/
 try {
@@ -51,13 +51,14 @@ try {
 		return new ExcelRecordReader( (FileSplit) split,job,reporter);
 	} catch (FormatNotUnderstoodException e) {
 		// log
-		LOG.error(e);
+		LOGIF.error(e);
 	} catch (GeneralSecurityException gse) {
-		LOG.error(gse);
+		LOGIF.error(gse);
 	}
 return null;
 }
-	
+
+@Override
 public void configure (JobConf conf) {
 		// not used
 	} 
@@ -70,9 +71,10 @@ public void configure (JobConf conf) {
 	 * Hence, you should put them in Hadoop Archives (HAR) either uncompressed or compressed to reduce load on namenode.
 	 *
 	*/
-  	protected boolean isSplitable(FileSystem fs, Path file) {
-		return false;
-  	}	
+@Override
+protected boolean isSplitable(FileSystem fs, Path file) {
+	return false;
+}	
 
 
 }

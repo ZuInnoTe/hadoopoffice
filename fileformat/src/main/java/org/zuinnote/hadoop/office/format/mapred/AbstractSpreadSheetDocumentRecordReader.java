@@ -183,33 +183,6 @@ public AbstractSpreadSheetDocumentRecordReader(FileSplit split, JobConf job, Rep
 }
 
 
-/**
-*
-* Create an empty key
-*
-* @return key
-*/
-public abstract K createKey();
-
-/**
-*
-* Create an empty value
-*
-* @return value
-*/
-public abstract V createValue();
-
-
-
-/**
-*
-* Read row from Office document
-*
-* @return true if next more rows are available, false if not
-*/
-public abstract boolean next(K key, V value) throws IOException;
-
-
 /*
 * Get the office reader for the current file
 *
@@ -253,7 +226,7 @@ public long getEnd() {
 * @throws java.io.IOException in case of errors reading from the filestream provided by Hadoop
 *
 */
-
+@Override
 public synchronized float getProgress() throws IOException {
 if (start == end) {
       return 0.0f;
@@ -279,7 +252,7 @@ private boolean  isCompressedInput() {
 * @throws java.io.IOException in case of errors reading from the filestream provided by Hadoop
 *
 */
-
+@Override
 public  synchronized long getPos() throws IOException {
 	return filePosition.getPos();
 }
@@ -294,7 +267,7 @@ public  synchronized long getPos() throws IOException {
 * @throws java.io.IOException in case of errors reading from the filestream provided by Hadoop
 *
 */
-
+@Override
 public synchronized void  close() throws IOException {
 try {
     if (officeReader!=null) {

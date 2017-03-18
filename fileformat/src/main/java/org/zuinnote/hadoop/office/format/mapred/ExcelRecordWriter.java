@@ -41,7 +41,7 @@ import org.zuinnote.hadoop.office.format.common.writer.InvalidCellSpecificationE
 **/
 
 public class ExcelRecordWriter<NullWritable,SpreadSheetCellDAO>  extends AbstractSpreadSheetDocumentRecordWriter<NullWritable,SpreadSheetCellDAO>  implements Serializable {
-private static final Log LOG = LogFactory.getLog(ExcelRecordWriter.class.getName());
+private static final Log LOGRW = LogFactory.getLog(ExcelRecordWriter.class.getName());
 
 /*
 * Non-arg constructor for Serialization
@@ -58,7 +58,7 @@ public ExcelRecordWriter() {
 */
 public ExcelRecordWriter(DataOutputStream out, String fileName, Configuration conf) throws IOException,InvalidWriterConfigurationException,InvalidCellSpecificationException,FormatNotUnderstoodException,GeneralSecurityException {
 	super(out,fileName,conf);
-	LOG.debug("Initialize ExcelRecordWriter");
+	LOGRW.debug("Initialize ExcelRecordWriter");
 }
 
 
