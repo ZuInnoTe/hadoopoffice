@@ -262,14 +262,14 @@ public void write(Object newDAO) throws OfficeWriterException {
 }
 
 /**
-* Writes the document in-memory representation to the OutputStream. Aferwards, it closes all related workbooks.
+* Writes the document in-memory representation to the OutputStream. Afterwards, it closes all related workbooks.
 *
 * @throws org.zuinnote.hadoop.office.format.common.writer.OfficeWriterException in case of issues writing or issues encrypting
 *
 *
 */
 
-public void finalizeWrite() throws OfficeWriterException {
+public void close() throws OfficeWriterException {
 	try {
 	// prepare metadata
 	prepareMetaData();
@@ -336,6 +336,11 @@ public void finalizeWrite() throws OfficeWriterException {
 				}
 			} else {
 				LOG.error("Could not write encrypted workbook, because type of workbook is unknown");
+				 try {
+						this.oStream.close();
+					} catch (IOException e) {
+						LOG.error(e);
+					}
 			}
 		}
 	}
@@ -352,11 +357,16 @@ public void finalizeWrite() throws OfficeWriterException {
 	if (this.currentWorkbook!=null) {
 		try {
 			this.currentWorkbook.close();
-			if (this.oStream!=null) {
-				this.oStream.close();
-			}
 		} catch (IOException e) {
 			LOG.error(e);
+		} finally {
+			if (this.oStream!=null) {
+				 try {
+						this.oStream.close();
+					} catch (IOException e) {
+						LOG.error(e);
+					}
+			}
 		}
 	}
 	// close linked workbooks

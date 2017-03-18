@@ -26,6 +26,6 @@ public void create(OutputStream osStream, Map<String,InputStream> linkedWorkbook
 
 public void write(Object newDAO) throws OfficeWriterException;
 
-public void finalizeWrite() throws OfficeWriterException;
+public void close() throws OfficeWriterException;
 
 }

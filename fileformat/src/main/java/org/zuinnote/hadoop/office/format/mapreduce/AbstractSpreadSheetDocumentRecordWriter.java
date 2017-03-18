@@ -120,7 +120,7 @@ public synchronized void write(NullWritable key, SpreadSheetCellDAO value) throw
 public synchronized void  close(TaskAttemptContext context) throws IOException {
 
 		try {
-			this.officeWriter.finalizeWrite();
+			this.officeWriter.close();
 		} catch (OfficeWriterException e) {
 			LOG.error(e);
 		} finally {

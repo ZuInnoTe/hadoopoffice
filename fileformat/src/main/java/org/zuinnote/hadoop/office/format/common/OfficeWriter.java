@@ -113,10 +113,10 @@ if (this.currentOfficeSpreadSheetWriter!=null) {
 *
 *
 */
-public void finalizeWrite() throws OfficeWriterException {
+public void close() throws OfficeWriterException {
 	
 if (this.currentOfficeSpreadSheetWriter!=null) {
-		this.currentOfficeSpreadSheetWriter.finalizeWrite();
+		this.currentOfficeSpreadSheetWriter.close();
 	} else {
 		throw new OfficeWriterException(EX_NO_WRITER_INSTANTIATED);
 	}
