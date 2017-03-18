@@ -25,7 +25,6 @@ import org.apache.hadoop.io.ArrayWritable;
 
 import org.apache.hadoop.mapred.FileSplit;
 import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.RecordReader;
 import org.apache.hadoop.mapred.Reporter;
 
 import org.apache.commons.logging.LogFactory;
@@ -49,6 +48,7 @@ private FileSplit split;
 
 public ExcelRecordReader(FileSplit split, JobConf job, Reporter reporter) throws IOException,FormatNotUnderstoodException,GeneralSecurityException {
  super(split,job,reporter);
+ LOG.debug("Initialize ExcelRecordReader");
  this.split=split;
 }
 
@@ -83,9 +83,13 @@ public ArrayWritable createValue() {
 * @return true if next more rows are available, false if not
 */
 public boolean next(Text key, ArrayWritable value) throws IOException {
-	if (this.getOfficeReader().getFiltered()==false) return false;
+	if (!(this.getOfficeReader().getFiltered())) {
+		return false;
+	}
 	Object[] objectArray = this.getOfficeReader().getNext();
-	if (objectArray==null) return false; // no more to read
+	if (objectArray==null) {
+		return false; // no more to read
+	}
 	SpreadSheetCellDAO[] cellRows = (SpreadSheetCellDAO[])objectArray;
 	key.set(new Text("["+this.split.getPath().getName()+"]"+this.getOfficeReader().getCurrentSheetName()+"!A"+this.getOfficeReader().getCurrentRow()));
 	value.set(cellRows);

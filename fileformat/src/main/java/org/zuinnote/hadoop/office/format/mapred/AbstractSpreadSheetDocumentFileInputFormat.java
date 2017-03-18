@@ -23,22 +23,14 @@ import java.io.IOException;
 
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.compress.CompressionCodec;
-import org.apache.hadoop.io.compress.CompressionCodecFactory;
-import org.apache.hadoop.io.compress.SplittableCompressionCodec;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.ArrayWritable;
 import org.apache.hadoop.mapred.FileInputFormat;
-import org.apache.hadoop.mapred.FileSplit;
 import org.apache.hadoop.mapred.InputSplit;
 import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.JobConfigurable;
-import org.apache.hadoop.mapred.JobContext;
 import org.apache.hadoop.mapred.RecordReader;
 import org.apache.hadoop.mapred.Reporter;
 
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
 
 
 
@@ -46,7 +38,6 @@ import org.apache.commons.logging.Log;
 /* The input format will return an array of strings that it reads per "row" from the source formats */
 
 public abstract class AbstractSpreadSheetDocumentFileInputFormat  extends FileInputFormat<Text,ArrayWritable> {
-private static final Log LOG = LogFactory.getLog(AbstractSpreadSheetDocumentFileInputFormat.class.getName());
 
 
 	public abstract RecordReader<Text,ArrayWritable> getRecordReader(InputSplit split, JobConf job, Reporter reporter) throws IOException;

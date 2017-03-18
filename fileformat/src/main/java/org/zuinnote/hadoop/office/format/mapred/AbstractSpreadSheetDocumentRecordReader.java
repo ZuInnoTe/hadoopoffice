@@ -19,30 +19,23 @@ package org.zuinnote.hadoop.office.format.mapred;
 import java.io.IOException;
 import java.io.InputStream;
 
-import java.nio.ByteBuffer;
 
 import java.security.GeneralSecurityException;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 import java.util.Locale;
-import java.util.Locale.Builder;
 
-import org.apache.hadoop.io.BytesWritable; 
 
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.Seekable;
-import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.CodecPool;
 import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.CompressionCodecFactory;
 import org.apache.hadoop.io.compress.SplitCompressionInputStream;
 import org.apache.hadoop.io.compress.SplittableCompressionCodec;
-import org.apache.hadoop.io.compress.CompressionCodecFactory;
 import org.apache.hadoop.io.compress.Decompressor;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapred.FileSplit;
@@ -88,11 +81,10 @@ private String mimeType=null;
 private String localeStrBCP47=null;
 private String sheets=null;
 private Locale locale=null;
-private boolean readLinkedWorkbooks=this.DEFAULT_LINKEDWB;
-private boolean ignoreMissingLinkedWorkbooks=this.DEFAULT_IGNOREMISSINGLINKEDWB;
+private boolean readLinkedWorkbooks=AbstractSpreadSheetDocumentRecordReader.DEFAULT_LINKEDWB;
+private boolean ignoreMissingLinkedWorkbooks=AbstractSpreadSheetDocumentRecordReader.DEFAULT_IGNOREMISSINGLINKEDWB;
 private OfficeReader officeReader=null;
 private String password=null;
-private String linkedWBpassword=null;
 private Map<String,String> metadataFilter;
 private Map<String,String> linkedWBCredentialMap;
 
@@ -101,7 +93,6 @@ private CompressionCodecFactory compressionCodecs = null;
 private Decompressor decompressor;
 private Configuration conf;
 private long start;
-private long pos;
 private long end;
 private final Seekable filePosition;
 private FSDataInputStream fileIn;
@@ -130,18 +121,17 @@ private FileSystem fs;
 public AbstractSpreadSheetDocumentRecordReader(FileSplit split, JobConf job, Reporter reporter) throws IOException,FormatNotUnderstoodException,GeneralSecurityException {
  	// parse configuration
      this.conf=job;	
-     this.mimeType=conf.get(this.CONF_MIMETYPE,this.DEFAULT_MIMETYPE);
-     this.sheets=conf.get(this.CONF_SHEETS,this.DEFAULT_SHEETS);
-     this.localeStrBCP47=conf.get(this.CONF_LOCALE, this.DEFAULT_LOCALE);
+     this.mimeType=conf.get(AbstractSpreadSheetDocumentRecordReader.CONF_MIMETYPE,AbstractSpreadSheetDocumentRecordReader.DEFAULT_MIMETYPE);
+     this.sheets=conf.get(AbstractSpreadSheetDocumentRecordReader.CONF_SHEETS,AbstractSpreadSheetDocumentRecordReader.DEFAULT_SHEETS);
+     this.localeStrBCP47=conf.get(AbstractSpreadSheetDocumentRecordReader.CONF_LOCALE, AbstractSpreadSheetDocumentRecordReader.DEFAULT_LOCALE);
      if (!("".equals(localeStrBCP47))) { // create locale
 	this.locale=new Locale.Builder().setLanguageTag(this.localeStrBCP47).build();
       }
-      this.readLinkedWorkbooks=conf.getBoolean(this.CONF_LINKEDWB,this.DEFAULT_LINKEDWB);
-      this.ignoreMissingLinkedWorkbooks=conf.getBoolean(CONF_IGNOREMISSINGWB,this.DEFAULT_IGNOREMISSINGLINKEDWB);
-      this.password=conf.get(this.CONF_DECRYPT); // null if no password is set
-      this.linkedWBpassword=conf.get(CONF_DECRYPTLINKEDWBBASE); // null if no password is set
-      this.metadataFilter=HadoopUtil.parsePropertiesFromBase(job,this.CONF_FILTERMETADATA);
-      this.linkedWBCredentialMap=HadoopUtil.parsePropertiesFromBase(job,this.CONF_DECRYPTLINKEDWBBASE);
+      this.readLinkedWorkbooks=conf.getBoolean(AbstractSpreadSheetDocumentRecordReader.CONF_LINKEDWB,AbstractSpreadSheetDocumentRecordReader.DEFAULT_LINKEDWB);
+      this.ignoreMissingLinkedWorkbooks=conf.getBoolean(AbstractSpreadSheetDocumentRecordReader.CONF_IGNOREMISSINGWB,AbstractSpreadSheetDocumentRecordReader.DEFAULT_IGNOREMISSINGLINKEDWB);
+      this.password=conf.get(AbstractSpreadSheetDocumentRecordReader.CONF_DECRYPT); // null if no password is set
+      this.metadataFilter=HadoopUtil.parsePropertiesFromBase(job,AbstractSpreadSheetDocumentRecordReader.CONF_FILTERMETADATA);
+      this.linkedWBCredentialMap=HadoopUtil.parsePropertiesFromBase(job,AbstractSpreadSheetDocumentRecordReader.CONF_DECRYPTLINKEDWBBASE);
  // Initialize start and end of split
     start = split.getStart();
     end = start + split.getLength();
@@ -172,10 +162,9 @@ public AbstractSpreadSheetDocumentRecordReader(FileSplit split, JobConf job, Rep
       filePosition = fileIn;
     }
     // initialize reader
-    this.pos=start;
     this.officeReader.parse();
     // read linked workbooks
-    if (this.readLinkedWorkbooks==true) {
+    if (this.readLinkedWorkbooks) {
 	// get current path
 	Path currentPath = split.getPath();
 	Path parentPath = currentPath.getParent();
@@ -279,7 +268,7 @@ if (start == end) {
 * @return true if compressed, false if not
 */
 private boolean  isCompressedInput() {
-    return (codec != null);
+    return codec != null;
   }
 
 /*

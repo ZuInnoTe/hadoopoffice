@@ -23,8 +23,6 @@ import org.apache.hadoop.mapred.InputSplit;
 
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.compress.CompressionCodec;
-import org.apache.hadoop.io.compress.CompressionCodecFactory;
 import org.apache.hadoop.mapred.FileSplit;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.Reporter;
@@ -43,7 +41,7 @@ import org.zuinnote.hadoop.office.format.common.parser.*;
 public class ExcelFileInputFormat extends AbstractSpreadSheetDocumentFileInputFormat {
 
 private static final Log LOG = LogFactory.getLog(ExcelFileInputFormat.class.getName());
-private CompressionCodecFactory compressionCodecs = null;
+
 
 public  RecordReader<Text,ArrayWritable> getRecordReader(InputSplit split, JobConf job, Reporter reporter) throws IOException {
 /** Create reader **/
@@ -61,7 +59,7 @@ return null;
 }
 	
 public void configure (JobConf conf) {
-		this.compressionCodecs = new CompressionCodecFactory(conf); // not really needed for now since isSplitable is always false
+		// not used
 	} 
 
 	

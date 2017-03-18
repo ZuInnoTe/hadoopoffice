@@ -24,7 +24,6 @@ import java.security.GeneralSecurityException;
 
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.mapred.JobConf;
 
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
@@ -50,6 +49,7 @@ private static final Log LOG = LogFactory.getLog(ExcelRecordWriter.class.getName
 */
 
 public ExcelRecordWriter() {
+		// only needed for serialization
 }
 
 /*
@@ -58,6 +58,7 @@ public ExcelRecordWriter() {
 */
 public ExcelRecordWriter(DataOutputStream out, String fileName, Configuration conf) throws IOException,InvalidWriterConfigurationException,InvalidCellSpecificationException,FormatNotUnderstoodException,GeneralSecurityException {
 	super(out,fileName,conf);
+	LOG.debug("Initialize ExcelRecordWriter");
 }
 
 

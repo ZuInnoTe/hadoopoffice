@@ -20,27 +20,17 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import java.nio.ByteBuffer;
 
 import java.security.GeneralSecurityException;
 
 import java.util.Locale;
-import java.util.Locale.Builder;
-import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
-import java.util.ArrayList;
 
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapred.RecordWriter;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.util.Progressable;
-
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 
@@ -88,7 +78,6 @@ public static final String DEFAULT_ALGORITHM=org.zuinnote.hadoop.office.format.m
 private String[] linkedWorkbooksName;
 private Configuration conf;
 private String fileName;
-private Progressable progress;
 private String mimeType;
 private Locale locale;
 private String localeStrBCP47;
@@ -147,25 +136,25 @@ public AbstractSpreadSheetDocumentRecordWriter() {
 public AbstractSpreadSheetDocumentRecordWriter(DataOutputStream out, String fileName, Configuration conf) throws IOException,InvalidWriterConfigurationException,InvalidCellSpecificationException,FormatNotUnderstoodException, GeneralSecurityException {
  	// parse configuration
      this.conf=conf;
-     this.mimeType=conf.get(this.CONF_MIMETYPE,this.DEFAULT_MIMETYPE);
-     this.localeStrBCP47=conf.get(this.CONF_LOCALE, this.DEFAULT_LOCALE);
+     this.mimeType=conf.get(AbstractSpreadSheetDocumentRecordWriter.CONF_MIMETYPE,AbstractSpreadSheetDocumentRecordWriter.DEFAULT_MIMETYPE);
+     this.localeStrBCP47=conf.get(AbstractSpreadSheetDocumentRecordWriter.CONF_LOCALE, AbstractSpreadSheetDocumentRecordWriter.DEFAULT_LOCALE);
      if (!("".equals(localeStrBCP47))) { // create locale
 	this.locale=new Locale.Builder().setLanguageTag(this.localeStrBCP47).build();
       }
       this.fileName=fileName;
-      this.commentAuthor=conf.get(this.CONF_COMMENTAUTHOR,this.DEFAULT_AUTHOR);
-      this.commentWidth=conf.getInt(this.CONF_COMMENTWIDTH,this.DEFAULT_COMMENTWIDTH);
-      this.commentHeight=conf.getInt(this.CONF_COMMENTHEIGHT,this.DEFAULT_COMMENTHEIGHT);
-      String linkedWorkbooksStr=conf.get(this.CONF_LINKEDWB,this.DEFAULT_LINKEDWB);
+      this.commentAuthor=conf.get(AbstractSpreadSheetDocumentRecordWriter.CONF_COMMENTAUTHOR,AbstractSpreadSheetDocumentRecordWriter.DEFAULT_AUTHOR);
+      this.commentWidth=conf.getInt(AbstractSpreadSheetDocumentRecordWriter.CONF_COMMENTWIDTH,AbstractSpreadSheetDocumentRecordWriter.DEFAULT_COMMENTWIDTH);
+      this.commentHeight=conf.getInt(AbstractSpreadSheetDocumentRecordWriter.CONF_COMMENTHEIGHT,AbstractSpreadSheetDocumentRecordWriter.DEFAULT_COMMENTHEIGHT);
+      String linkedWorkbooksStr=conf.get(AbstractSpreadSheetDocumentRecordWriter.CONF_LINKEDWB,AbstractSpreadSheetDocumentRecordWriter.DEFAULT_LINKEDWB);
       this.linkedWorkbooksName=HadoopUtil.parseLinkedWorkbooks(linkedWorkbooksStr);
-      this.ignoreMissingLinkedWorkbooks=conf.getBoolean(this.CONF_IGNOREMISSINGWB,this.DEFAULT_IGNOREMISSINGLINKEDWB);
-      this.encryptAlgorithm=conf.get(this.CONF_SECURITYALGORITHM);
-      this.password=conf.get(this.CONF_SECURITYCRED);
-      this.hashAlgorithm=conf.get(this.CONF_HASHALGORITHM);
-      this.encryptMode=conf.get(this.CONF_SECURITYMODE);
-      this.chainMode=conf.get(this.CONF_CHAINMODE);
-      this.metadata=HadoopUtil.parsePropertiesFromBase(conf,this.CONF_METADATA);
-      this.linkedWBCredentialMap=HadoopUtil.parsePropertiesFromBase(conf,this.CONF_DECRYPTLINKEDWBBASE);
+      this.ignoreMissingLinkedWorkbooks=conf.getBoolean(AbstractSpreadSheetDocumentRecordWriter.CONF_IGNOREMISSINGWB,AbstractSpreadSheetDocumentRecordWriter.DEFAULT_IGNOREMISSINGLINKEDWB);
+      this.encryptAlgorithm=conf.get(AbstractSpreadSheetDocumentRecordWriter.CONF_SECURITYALGORITHM);
+      this.password=conf.get(AbstractSpreadSheetDocumentRecordWriter.CONF_SECURITYCRED);
+      this.hashAlgorithm=conf.get(AbstractSpreadSheetDocumentRecordWriter.CONF_HASHALGORITHM);
+      this.encryptMode=conf.get(AbstractSpreadSheetDocumentRecordWriter.CONF_SECURITYMODE);
+      this.chainMode=conf.get(AbstractSpreadSheetDocumentRecordWriter.CONF_CHAINMODE);
+      this.metadata=HadoopUtil.parsePropertiesFromBase(conf,AbstractSpreadSheetDocumentRecordWriter.CONF_METADATA);
+      this.linkedWBCredentialMap=HadoopUtil.parsePropertiesFromBase(conf,AbstractSpreadSheetDocumentRecordWriter.CONF_DECRYPTLINKEDWBBASE);
       // load linked workbooks as inputstreams
       this.currentReader= new HadoopFileReader(this.conf);
       this.linkedWorkbooksMap=this.currentReader.loadLinkedWorkbooks(linkedWorkbooksName);

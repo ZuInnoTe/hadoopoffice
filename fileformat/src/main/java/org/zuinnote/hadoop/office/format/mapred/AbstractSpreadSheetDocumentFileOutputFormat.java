@@ -29,8 +29,6 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.mapred.RecordWriter;
 
 
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
 
 import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 
@@ -38,7 +36,6 @@ import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 /* The input format will return an array of strings that it reads per "row" from the source formats */
 
 public abstract class AbstractSpreadSheetDocumentFileOutputFormat  extends FileOutputFormat<NullWritable,SpreadSheetCellDAO> {
-private static final Log LOG = LogFactory.getLog(AbstractSpreadSheetDocumentFileOutputFormat.class.getName());
 
 
 public abstract RecordWriter<NullWritable,SpreadSheetCellDAO> getRecordWriter(FileSystem ignored, JobConf conf, String name, Progressable progress) throws IOException;
