@@ -54,10 +54,7 @@ public static final String SUFFIX_OLDEXCEL = ".xls";
 /*
 * Returns a new record writer, if mimetype is not specified it is assumed that the new Excel format (.xlsx) should be used 
 *
-* @param ignored Filesystem - is determined from the configuration
-* @param conf Job configuration
-* @param name Name of the file
-* @paramprogress progress
+* @param context MR context
 *
 * @return Excel Record Writer
 *

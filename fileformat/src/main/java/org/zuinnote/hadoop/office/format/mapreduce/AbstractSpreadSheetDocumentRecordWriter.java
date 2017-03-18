@@ -55,6 +55,7 @@ private OfficeWriter officeWriter;
 private Map<String,InputStream> linkedWorkbooksMap;
 private HadoopOfficeWriteConfiguration howc;
 private HadoopFileReader currentReader;
+private DataOutputStream out;
 
 
 
@@ -82,7 +83,8 @@ public AbstractSpreadSheetDocumentRecordWriter() {
 *
 */
 public AbstractSpreadSheetDocumentRecordWriter(DataOutputStream out, String fileName, Configuration conf) throws IOException,InvalidWriterConfigurationException,InvalidCellSpecificationException,FormatNotUnderstoodException, GeneralSecurityException, OfficeWriterException {
- 	// parse configuration
+ 	this.out=out;
+	// parse configuration
      this.howc=new HadoopOfficeWriteConfiguration(conf,fileName);
        // load linked workbooks as inputstreams
       this.currentReader= new HadoopFileReader(conf);
@@ -122,6 +124,9 @@ public synchronized void  close(TaskAttemptContext context) throws IOException {
 		try {
 			this.officeWriter.close();
 		}  finally {
+			if (this.out!=null) {
+				this.out.close();
+			}
 			if (this.currentReader!=null) {
 				this.currentReader.close();
 			}
