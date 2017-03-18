@@ -22,8 +22,6 @@ import java.io.InputStream;
 
 import java.security.GeneralSecurityException;
 
-import java.util.Map;
-import java.util.Locale;
 
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
