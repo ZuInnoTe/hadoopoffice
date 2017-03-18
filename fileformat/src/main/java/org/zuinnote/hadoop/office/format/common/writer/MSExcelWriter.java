@@ -60,7 +60,7 @@ import org.apache.poi.openxml4j.util.Nullable;
 
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
-
+import org.zuinnote.hadoop.office.format.common.HadoopOfficeReadConfiguration;
 import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 import org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException;
 import org.zuinnote.hadoop.office.format.common.parser.MSExcelParser;
@@ -167,7 +167,14 @@ public void create(OutputStream oStream, Map<String,InputStream> linkedWorkbooks
 	try {
 		for (Map.Entry<String,InputStream> entry: linkedWorkbooks.entrySet()) {
 			// parse linked workbook
-			MSExcelParser currentLinkedWorkbookParser = new MSExcelParser(this.useLocale, null, this.ignoreMissingLinkedWorkbooks,entry.getKey(),linkedWorkbooksPasswords.get(entry.getKey()),null);
+			HadoopOfficeReadConfiguration currentLinkedWBHOCR = new HadoopOfficeReadConfiguration();
+			currentLinkedWBHOCR.setLocale(this.useLocale);
+			currentLinkedWBHOCR.setSheets(null);
+			currentLinkedWBHOCR.setIgnoreMissingLinkedWorkbooks(this.ignoreMissingLinkedWorkbooks);
+			currentLinkedWBHOCR.setFileName(entry.getKey());
+			currentLinkedWBHOCR.setPassword(linkedWorkbooksPasswords.get(entry.getKey()));
+			currentLinkedWBHOCR.setMetaDataFilter(null);
+			MSExcelParser currentLinkedWorkbookParser = new MSExcelParser(currentLinkedWBHOCR,null);
 			currentLinkedWorkbookParser.parse(entry.getValue());
 			this.listOfWorkbooks.add(currentLinkedWorkbookParser.getCurrentWorkbook());
 			linkedFormulaEvaluators.put(entry.getKey(),currentLinkedWorkbookParser.getCurrentFormulaEvaluator());

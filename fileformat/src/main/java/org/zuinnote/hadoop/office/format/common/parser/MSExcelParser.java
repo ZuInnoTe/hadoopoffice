@@ -54,6 +54,7 @@ import java.lang.reflect.Method;
 
 import java.lang.reflect.InvocationTargetException;
 
+import org.zuinnote.hadoop.office.format.common.HadoopOfficeReadConfiguration;
 import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 
 /*
@@ -80,57 +81,49 @@ private int currentRow=0;
 private String currentSheetName="";
 private HashMap<String,FormulaEvaluator> addedFormulaEvaluators;
 private ArrayList<Workbook> addedWorkbooks;
-private Locale locale;
-private boolean ignoreMissingLinkedWorkbooks;
-private String fileName;
-private String password;
-private Map<String,String> linkedWorkbooksPasswords;
-private Map<String,String> metadataFilter;
-private boolean filtered=false;
 
+private boolean filtered=false;
+private HadoopOfficeReadConfiguration hocr;
 	/*
 	* In the default case all sheets are parsed one after the other.
-	*
-	* @param useLocale Locale to use (if null then default locale will be used), see java.util.Locale
-	* @param ignoreMissingLinkedWorkbooks ignore missing linked Workbooks
-	* @param filename filename of the file to parse (without directory). Required for linked workbooks
-	* @param password Password of this document (null if no password)
-	* @param metadataFilter filter on metadata. The name is the metadata attribute name and the property is a filter which contains a regular expression. Currently the following are supported for .xlsx documents: category,contentstatus, contenttype,created,creator,description,identifier,keywords,lastmodifiedbyuser,lastprinted,modified,revision,subject,title. Additionally all custom.* are defined as custom properties. Example custom.myproperty. Finally, matchAll can be set to true (all metadata needs to be matched), or false (at least one of the metadata item needs to match).
+	* @param hocr HadoopOffice configuration for reading files:
+	* locale to use (if null then default locale will be used), see java.util.Locale
+	* filename Filename of the document
+	* ignoreMissingLinkedWorkbooks ignore missing linked Workbooks
+	* password Password of this document (null if no password)
+	* metadataFilter filter on metadata. The name is the metadata attribute name and the property is a filter which contains a regular expression. Currently the following are supported for .xlsx documents: category,contentstatus, contenttype,created,creator,description,identifier,keywords,lastmodifiedbyuser,lastprinted,modified,revision,subject,title. Additionally all custom.* are defined as custom properties. Example custom.myproperty. Finally, matchAll can be set to true (all metadata needs to be matched), or false (at least one of the metadata item needs to match).
  Currently the following are supported for .xls documents: applicationname,author,charcount, comments, createdatetime,edittime,keywords,lastauthor,lastprinted,lastsavedatetime,pagecount,revnumber,security,subject,template,title,wordcount. Finally, matchAll can be set to true (all metadata needs to be matched), or false (at least one of the metadata item needs to match).
 	*
 	*/
 
 
 
-	public MSExcelParser(Locale useLocale,boolean ignoreMissingLinkedWorkbooks, String fileName, String password,  Map<String,String> metadataFilter) {
-		this(useLocale,null,ignoreMissingLinkedWorkbooks,fileName,password,metadataFilter);
+	public MSExcelParser(HadoopOfficeReadConfiguration hocr) {
+		this(hocr, null);
 	}
 
 	/*
 	*
 	* Only process selected sheets (one after the other)
 	*
-	* @param useLocale Locale to use (if null then default locale will be used), see java.util.Locale
-	* @param sheets Set of sheets to be read. Note in linked workbooks all sheets are read
-	* @param ignoreMissingLinkedWorkbooks ignore missing linked Workbooks
-	* @param filename filename of the file to parse (without directory). Required for linked workbooks
-	* @param password Password of this document (null if no password)
-	* @param metadataFilter filter on metadata. The name is the metadata attribute name and the property is a filter which contains a regular expression. Currently the following are supported for .xlsx documents: category,contentstatus, contenttype,created,creator,description,identifier,keywords,lastmodifiedbyuser,lastprinted,modified,revision,subject,title. Additionally all custom.* are defined as custom properties. Example custom.myproperty. Finally, matchAll can be set to true (all metadata needs to be matched), or false (at least one of the metadata item needs to match).
+	* @param hocr HadoopOffice configuration for reading files:
+	* locale to use (if null then default locale will be used), see java.util.Locale
+	* ignoreMissingLinkedWorkbooks ignore missing linked Workbooks
+	* password Password of this document (null if no password)
+	* metadataFilter filter on metadata. The name is the metadata attribute name and the property is a filter which contains a regular expression. Currently the following are supported for .xlsx documents: category,contentstatus, contenttype,created,creator,description,identifier,keywords,lastmodifiedbyuser,lastprinted,modified,revision,subject,title. Additionally all custom.* are defined as custom properties. Example custom.myproperty. Finally, matchAll can be set to true (all metadata needs to be matched), or false (at least one of the metadata item needs to match).
  Currently the following are supported for .xls documents: applicationname,author,charcount, comments, createdatetime,edittime,keywords,lastauthor,lastprinted,lastsavedatetime,pagecount,revnumber,security,subject,template,title,wordcount. Finally, matchAll can be set to true (all metadata needs to be matched), or false (at least one of the metadata item needs to match).
+	* @param sheets selecrted sheets
 	*
 	*/
-	public MSExcelParser(Locale useLocale, String[] sheets,boolean ignoreMissingLinkedWorkbooks, String fileName,String password, Map<String,String> metadataFilter) {
+	public MSExcelParser(HadoopOfficeReadConfiguration hocr, String[] sheets) {
 		this.sheets=sheets;
-		if (useLocale==null)  {
+		this.hocr=hocr;
+		if (hocr.getLocale()==null)  {
 			useDataFormatter=new DataFormatter(); // use default locale
 		} else {
-			useDataFormatter=new DataFormatter(useLocale);
+			useDataFormatter=new DataFormatter(hocr.getLocale());
 		}
-		this.ignoreMissingLinkedWorkbooks=ignoreMissingLinkedWorkbooks;
-		this.fileName=fileName;
-		this.password=password;
-		this.linkedWorkbooksPasswords=linkedWorkbooksPasswords;
-		this.metadataFilter=metadataFilter;
+		
 		this.addedFormulaEvaluators = new HashMap<>();
 		this.addedWorkbooks = new ArrayList<>();
 	}
@@ -151,7 +144,7 @@ private boolean filtered=false;
 	public void parse(InputStream in) throws IOException,FormatNotUnderstoodException, GeneralSecurityException {
 		// read xls
 		try {
-			this.currentWorkbook=WorkbookFactory.create(in,this.password);
+			this.currentWorkbook=WorkbookFactory.create(in,this.hocr.getPassword());
 		} catch (InvalidFormatException e) {
 			LOG.error(e);
 			throw new FormatNotUnderstoodException(e.toString());
@@ -164,8 +157,8 @@ private boolean filtered=false;
 		}
 		 this.formulaEvaluator = this.currentWorkbook.getCreationHelper().createFormulaEvaluator();
 		  // add the formulator evaluator of this file as well or we will see a strange Exception
-		 this.addedFormulaEvaluators.put(this.fileName,this.formulaEvaluator);
-		 this.formulaEvaluator.setIgnoreMissingWorkbooks(this.ignoreMissingLinkedWorkbooks);
+		 this.addedFormulaEvaluators.put(this.hocr.getFileName(),this.formulaEvaluator);
+		 this.formulaEvaluator.setIgnoreMissingWorkbooks(this.hocr.getIgnoreMissingLinkedWorkbooks());
 		 this.filtered=this.checkFiltered();
 		 this.currentRow=0;
 		 if (this.sheets==null) {
@@ -199,7 +192,14 @@ private boolean filtered=false;
 		}
 		LOG.debug("Start adding  \""+name+"\" to current workbook");
 		// create new parser, select all sheets, no linkedworkbookpasswords,no metadatafilter
-		MSExcelParser linkedWBMSExcelParser = new MSExcelParser(this.locale,null,this.ignoreMissingLinkedWorkbooks,name,password,null);
+		HadoopOfficeReadConfiguration linkedWBHOCR = new HadoopOfficeReadConfiguration();
+		linkedWBHOCR.setLocale(this.hocr.getLocale());
+		linkedWBHOCR.setSheets(null);
+		linkedWBHOCR.setIgnoreMissingLinkedWorkbooks(this.hocr.getIgnoreMissingLinkedWorkbooks());
+		linkedWBHOCR.setFileName(name);
+		linkedWBHOCR.setPassword(password);
+		linkedWBHOCR.setMetaDataFilter(null);
+		MSExcelParser linkedWBMSExcelParser = new MSExcelParser(linkedWBHOCR,null);
 		// parse workbook 
 		linkedWBMSExcelParser.parse(inputStream);
 		// add linked workbook
@@ -414,7 +414,7 @@ private boolean filtered=false;
 			in.close();
 		}
 		if (this.currentWorkbook!=null) {
-			LOG.debug("Closing current Workbook \""+this.fileName+"\"");
+			LOG.debug("Closing current Workbook \""+this.hocr.getFileName()+"\"");
 			this.currentWorkbook.close();
 		}
 		for (Workbook addedWorkbook: this.addedWorkbooks) {
@@ -432,7 +432,7 @@ private boolean filtered=false;
 	*
 	*/
 	private boolean checkFiltered() {	
-		if ((this.metadataFilter==null) || (this.metadataFilter.size()==0)) { // if no filter is defined it does match by definition
+		if ((this.hocr.getMetaDataFilter()==null) || (this.hocr.getMetaDataFilter().size()==0)) { // if no filter is defined it does match by definition
 			return true;
 		}
 		if (this.currentWorkbook instanceof XSSFWorkbook) {
@@ -460,11 +460,11 @@ private boolean filtered=false;
 		boolean matchAll=true;
 		boolean matchFull=true;
 		boolean matchOnce=false;
-		if (this.metadataFilter.get(MATCH_ALL)!=null) {
-			if ("true".equalsIgnoreCase(this.metadataFilter.get(MATCH_ALL))) {
+		if (this.hocr.getMetaDataFilter().get(MATCH_ALL)!=null) {
+			if ("true".equalsIgnoreCase(this.hocr.getMetaDataFilter().get(MATCH_ALL))) {
 				matchAll=true;
 				LOG.info("matching all metadata properties");
-			} else if ("false".equalsIgnoreCase(this.metadataFilter.get(MATCH_ALL)))	{
+			} else if ("false".equalsIgnoreCase(this.hocr.getMetaDataFilter().get(MATCH_ALL)))	{
 				matchAll=false;
 				LOG.info("matching at least one metadata property");
 			} else {
@@ -475,151 +475,151 @@ private boolean filtered=false;
 		String corePropertyName;
 		POIXMLProperties.CoreProperties coreProp=props.getCoreProperties();
 		corePropertyName="category";
-		if (this.metadataFilter.get(corePropertyName)!=null) {
+		if (this.hocr.getMetaDataFilter().get(corePropertyName)!=null) {
 				String corePropStr=coreProp.getCategory();
-				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName)))) {
+				if ((corePropStr!=null) && (corePropStr.matches(this.hocr.getMetaDataFilter().get(corePropertyName)))) {
 					matchOnce=true;
 				 } else {
 						matchFull=false;
-					LOG.debug(NOT_MATCHING+corePropStr+":"+this.metadataFilter.get(corePropertyName));
+					LOG.debug(NOT_MATCHING+corePropStr+":"+this.hocr.getMetaDataFilter().get(corePropertyName));
 				}
 		}
 		corePropertyName="contentstatus";
-		if (this.metadataFilter.get(corePropertyName)!=null) {
+		if (this.hocr.getMetaDataFilter().get(corePropertyName)!=null) {
 				String corePropStr=coreProp.getContentStatus();
-				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName)))) {
+				if ((corePropStr!=null) && (corePropStr.matches(this.hocr.getMetaDataFilter().get(corePropertyName)))) {
 					matchOnce=true;
 				 } else {
 						matchFull=false;
-						LOG.debug(NOT_MATCHING+corePropStr+":"+this.metadataFilter.get(corePropertyName));
+						LOG.debug(NOT_MATCHING+corePropStr+":"+this.hocr.getMetaDataFilter().get(corePropertyName));
 				}
 		}
 		corePropertyName="contenttype";
-		if (this.metadataFilter.get(corePropertyName)!=null) {
+		if (this.hocr.getMetaDataFilter().get(corePropertyName)!=null) {
 				String corePropStr=coreProp.getContentType();
-				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName)))) {
+				if ((corePropStr!=null) && (corePropStr.matches(this.hocr.getMetaDataFilter().get(corePropertyName)))) {
 					matchOnce=true;
 				 } else {
 						matchFull=false;
-						LOG.debug(NOT_MATCHING+corePropStr+":"+this.metadataFilter.get(corePropertyName));
+						LOG.debug(NOT_MATCHING+corePropStr+":"+this.hocr.getMetaDataFilter().get(corePropertyName));
 				}
 		}
 		corePropertyName="created";
-		if (this.metadataFilter.get(corePropertyName)!=null) {
+		if (this.hocr.getMetaDataFilter().get(corePropertyName)!=null) {
 				Date corePropStr=coreProp.getCreated();
-				if ((corePropStr!=null) && (format.format(corePropStr).matches(this.metadataFilter.get(corePropertyName)))) {
+				if ((corePropStr!=null) && (format.format(corePropStr).matches(this.hocr.getMetaDataFilter().get(corePropertyName)))) {
 					matchOnce=true;
 				 } else {
 						matchFull=false;
-						LOG.debug(NOT_MATCHING+format.format(corePropStr)+":"+this.metadataFilter.get(corePropertyName));
+						LOG.debug(NOT_MATCHING+format.format(corePropStr)+":"+this.hocr.getMetaDataFilter().get(corePropertyName));
 						LOG.debug(corePropertyName);
 				}
 		}
 		corePropertyName="creator";
-		if (this.metadataFilter.get(corePropertyName)!=null) {
+		if (this.hocr.getMetaDataFilter().get(corePropertyName)!=null) {
 				String corePropStr=coreProp.getCreator();
-				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName)))) {
+				if ((corePropStr!=null) && (corePropStr.matches(this.hocr.getMetaDataFilter().get(corePropertyName)))) {
 					matchOnce=true;
 				 } else {
 						matchFull=false;
-						LOG.debug(NOT_MATCHING+corePropStr+":"+this.metadataFilter.get(corePropertyName));
+						LOG.debug(NOT_MATCHING+corePropStr+":"+this.hocr.getMetaDataFilter().get(corePropertyName));
 				}
 		}
 		corePropertyName="description";
-		if (this.metadataFilter.get(corePropertyName)!=null) {
+		if (this.hocr.getMetaDataFilter().get(corePropertyName)!=null) {
 				String corePropStr=coreProp.getDescription();
-				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName)))) {
+				if ((corePropStr!=null) && (corePropStr.matches(this.hocr.getMetaDataFilter().get(corePropertyName)))) {
 					matchOnce=true;
 				 } else {
 						matchFull=false;
-						LOG.debug(NOT_MATCHING+corePropStr+":"+this.metadataFilter.get(corePropertyName));
+						LOG.debug(NOT_MATCHING+corePropStr+":"+this.hocr.getMetaDataFilter().get(corePropertyName));
 				}
 		}
 		corePropertyName="identifier";
-		if (this.metadataFilter.get(corePropertyName)!=null) {
+		if (this.hocr.getMetaDataFilter().get(corePropertyName)!=null) {
 				String corePropStr=coreProp.getIdentifier();
-				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName)))) {
+				if ((corePropStr!=null) && (corePropStr.matches(this.hocr.getMetaDataFilter().get(corePropertyName)))) {
 					matchOnce=true;
 				 } else {
 						matchFull=false;
-						LOG.debug(NOT_MATCHING+corePropStr+":"+this.metadataFilter.get(corePropertyName));
+						LOG.debug(NOT_MATCHING+corePropStr+":"+this.hocr.getMetaDataFilter().get(corePropertyName));
 				}
 		}
 		corePropertyName="keywords";
-		if (this.metadataFilter.get(corePropertyName)!=null) {
+		if (this.hocr.getMetaDataFilter().get(corePropertyName)!=null) {
 				String corePropStr=coreProp.getKeywords();
-				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName)))) {
+				if ((corePropStr!=null) && (corePropStr.matches(this.hocr.getMetaDataFilter().get(corePropertyName)))) {
 					matchOnce=true;
 				 } else {
 						matchFull=false;
-						LOG.debug(NOT_MATCHING+corePropStr+":"+this.metadataFilter.get(corePropertyName));
+						LOG.debug(NOT_MATCHING+corePropStr+":"+this.hocr.getMetaDataFilter().get(corePropertyName));
 				}
 		}
 		corePropertyName="lastmodifiedbyuser";
-		if (this.metadataFilter.get(corePropertyName)!=null) {
+		if (this.hocr.getMetaDataFilter().get(corePropertyName)!=null) {
 				String corePropStr=coreProp.getLastModifiedByUser();
-				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName)))) {
+				if ((corePropStr!=null) && (corePropStr.matches(this.hocr.getMetaDataFilter().get(corePropertyName)))) {
 					matchOnce=true;
 				 } else {
 						matchFull=false;
-						LOG.debug(NOT_MATCHING+corePropStr+":"+this.metadataFilter.get(corePropertyName));
+						LOG.debug(NOT_MATCHING+corePropStr+":"+this.hocr.getMetaDataFilter().get(corePropertyName));
 				}
 		}
 		corePropertyName="lastprinted";
-		if (this.metadataFilter.get(corePropertyName)!=null) {
+		if (this.hocr.getMetaDataFilter().get(corePropertyName)!=null) {
 				Date corePropStr=coreProp.getLastPrinted();
-				if ((corePropStr!=null) && (format.format(corePropStr).matches(this.metadataFilter.get(corePropertyName)))) {
+				if ((corePropStr!=null) && (format.format(corePropStr).matches(this.hocr.getMetaDataFilter().get(corePropertyName)))) {
 					matchOnce=true;
 				 } else {
 						matchFull=false;
-						LOG.debug(NOT_MATCHING+format.format(corePropStr)+":"+this.metadataFilter.get(corePropertyName));
+						LOG.debug(NOT_MATCHING+format.format(corePropStr)+":"+this.hocr.getMetaDataFilter().get(corePropertyName));
 						LOG.debug(corePropertyName);
 				}
 		}
 		corePropertyName="modified";
-		if (this.metadataFilter.get(corePropertyName)!=null) {
+		if (this.hocr.getMetaDataFilter().get(corePropertyName)!=null) {
 				Date corePropStr=coreProp.getModified();
-				if ((corePropStr!=null) && (format.format(corePropStr).matches(this.metadataFilter.get(corePropertyName)))) {
+				if ((corePropStr!=null) && (format.format(corePropStr).matches(this.hocr.getMetaDataFilter().get(corePropertyName)))) {
 					matchOnce=true;
 				 } else {
 						matchFull=false;
-						LOG.debug(NOT_MATCHING+corePropStr+":"+this.metadataFilter.get(corePropertyName));
+						LOG.debug(NOT_MATCHING+corePropStr+":"+this.hocr.getMetaDataFilter().get(corePropertyName));
 						LOG.debug(corePropertyName);
 				}
 		}
 		corePropertyName="revision";
-		if (this.metadataFilter.get(corePropertyName)!=null) {
+		if (this.hocr.getMetaDataFilter().get(corePropertyName)!=null) {
 				String corePropStr=coreProp.getRevision();
-				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName)))) {
+				if ((corePropStr!=null) && (corePropStr.matches(this.hocr.getMetaDataFilter().get(corePropertyName)))) {
 					matchOnce=true;
 				 } else {
 						matchFull=false;
-						LOG.debug(NOT_MATCHING+corePropStr+":"+this.metadataFilter.get(corePropertyName));
+						LOG.debug(NOT_MATCHING+corePropStr+":"+this.hocr.getMetaDataFilter().get(corePropertyName));
 				}
 		}
 		corePropertyName="subject";
-		if (this.metadataFilter.get(corePropertyName)!=null) {
+		if (this.hocr.getMetaDataFilter().get(corePropertyName)!=null) {
 				String corePropStr=coreProp.getSubject();
-				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName)))) {
+				if ((corePropStr!=null) && (corePropStr.matches(this.hocr.getMetaDataFilter().get(corePropertyName)))) {
 					matchOnce=true;
 				 } else {
 						matchFull=false;
-						LOG.debug(NOT_MATCHING+corePropStr+":"+this.metadataFilter.get(corePropertyName));
+						LOG.debug(NOT_MATCHING+corePropStr+":"+this.hocr.getMetaDataFilter().get(corePropertyName));
 				}
 		}
 		corePropertyName="title";
-		if (this.metadataFilter.get(corePropertyName)!=null) {
+		if (this.hocr.getMetaDataFilter().get(corePropertyName)!=null) {
 				String corePropStr=coreProp.getTitle();
-				if ((corePropStr!=null) && (corePropStr.matches(this.metadataFilter.get(corePropertyName)))) {
+				if ((corePropStr!=null) && (corePropStr.matches(this.hocr.getMetaDataFilter().get(corePropertyName)))) {
 					matchOnce=true;
 				 } else {
 						matchFull=false;
-						LOG.debug(NOT_MATCHING+corePropStr+":"+this.metadataFilter.get(corePropertyName));
+						LOG.debug(NOT_MATCHING+corePropStr+":"+this.hocr.getMetaDataFilter().get(corePropertyName));
 				}
 		}
 		// check for custom properties
 		POIXMLProperties.CustomProperties custProp = props.getCustomProperties();
-		for (Map.Entry<String,String> entry: this.metadataFilter.entrySet()) {
+		for (Map.Entry<String,String> entry: this.hocr.getMetaDataFilter().entrySet()) {
 			if (entry.getKey().startsWith("custom.")) {
 				String strippedKey=entry.getKey().substring("custom.".length());
 				if (strippedKey.length()>0) {
@@ -656,10 +656,10 @@ private boolean filtered=false;
 
 		boolean matchFull=true;
 		boolean matchOnce=false;
-		if (this.metadataFilter.get(MATCH_ALL)!=null) {
-			if ("true".equalsIgnoreCase(this.metadataFilter.get(MATCH_ALL))) {
+		if (this.hocr.getMetaDataFilter().get(MATCH_ALL)!=null) {
+			if ("true".equalsIgnoreCase(this.hocr.getMetaDataFilter().get(MATCH_ALL))) {
 				matchAll=true;
-			} else if ("false".equalsIgnoreCase(this.metadataFilter.get(MATCH_ALL))) {
+			} else if ("false".equalsIgnoreCase(this.hocr.getMetaDataFilter().get(MATCH_ALL))) {
 				matchAll=false;
 			} else {
 				LOG.error("Metadata property matchAll not defined correctly. Assuming that at only least one attribute needs to match");
@@ -667,153 +667,153 @@ private boolean filtered=false;
 		}
 		String corePropertyName;
 		corePropertyName="applicationname";
-		if (this.metadataFilter.get(corePropertyName)!=null) {
+		if (this.hocr.getMetaDataFilter().get(corePropertyName)!=null) {
 			String coreProp=summaryInfo.getApplicationName();
-			if ((coreProp!=null) && (coreProp.matches(this.metadataFilter.get(corePropertyName)))) {
+			if ((coreProp!=null) && (coreProp.matches(this.hocr.getMetaDataFilter().get(corePropertyName)))) {
 				matchOnce=true;
 			} else {
 				matchFull=false;
 			}
 		}
 		corePropertyName="author";
-		if (this.metadataFilter.get(corePropertyName)!=null) {
+		if (this.hocr.getMetaDataFilter().get(corePropertyName)!=null) {
 			String coreProp=summaryInfo.getAuthor();
-			if ((coreProp!=null) && (coreProp.matches(this.metadataFilter.get(corePropertyName)))) {
+			if ((coreProp!=null) && (coreProp.matches(this.hocr.getMetaDataFilter().get(corePropertyName)))) {
 				matchOnce=true;
 			} else {
 				matchFull=false;
 			}
 		}
 		corePropertyName="charcount";
-		if (this.metadataFilter.get(corePropertyName)!=null) {
+		if (this.hocr.getMetaDataFilter().get(corePropertyName)!=null) {
 			int coreProp=summaryInfo.getCharCount();
-			if (String.valueOf(coreProp).matches(this.metadataFilter.get(corePropertyName))) {
+			if (String.valueOf(coreProp).matches(this.hocr.getMetaDataFilter().get(corePropertyName))) {
 				matchOnce=true;
 			} else {
 				matchFull=false;
 			}
 		}
 		corePropertyName="comments";
-		if (this.metadataFilter.get(corePropertyName)!=null) {
+		if (this.hocr.getMetaDataFilter().get(corePropertyName)!=null) {
 			String coreProp=summaryInfo.getComments();
-			if ((coreProp!=null) && (coreProp.matches(this.metadataFilter.get(corePropertyName)))) {
+			if ((coreProp!=null) && (coreProp.matches(this.hocr.getMetaDataFilter().get(corePropertyName)))) {
 				matchOnce=true;
 			} else {
 				matchFull=false;
 			}
 		}
 		corePropertyName="createddatetime";
-		if (this.metadataFilter.get(corePropertyName)!=null) {
+		if (this.hocr.getMetaDataFilter().get(corePropertyName)!=null) {
 			Date coreProp=summaryInfo.getCreateDateTime();
-			if ((coreProp!=null) && (coreProp.toString().matches(this.metadataFilter.get(corePropertyName)))) {
+			if ((coreProp!=null) && (coreProp.toString().matches(this.hocr.getMetaDataFilter().get(corePropertyName)))) {
 				matchOnce=true;
 			} else {
 				matchFull=false;
 			}
 		}
 		corePropertyName="edittime";
-		if (this.metadataFilter.get(corePropertyName)!=null) {
+		if (this.hocr.getMetaDataFilter().get(corePropertyName)!=null) {
 			long coreProp=summaryInfo.getEditTime();
-			if (String.valueOf(coreProp).matches(this.metadataFilter.get(corePropertyName))) {
+			if (String.valueOf(coreProp).matches(this.hocr.getMetaDataFilter().get(corePropertyName))) {
 				matchOnce=true;
 			} else {
 				matchFull=false;
 			}
 		}
 		corePropertyName="keywords";
-		if (this.metadataFilter.get(corePropertyName)!=null) {
+		if (this.hocr.getMetaDataFilter().get(corePropertyName)!=null) {
 			String coreProp=summaryInfo.getKeywords();
-			if ((coreProp!=null) && (coreProp.matches(this.metadataFilter.get(corePropertyName)))) {
+			if ((coreProp!=null) && (coreProp.matches(this.hocr.getMetaDataFilter().get(corePropertyName)))) {
 				matchOnce=true;
 			} else {
 				matchFull=false;
 			}
 		}
 		corePropertyName="lastauthor";
-		if (this.metadataFilter.get(corePropertyName)!=null) {
+		if (this.hocr.getMetaDataFilter().get(corePropertyName)!=null) {
 			String coreProp=summaryInfo.getLastAuthor();
-			if ((coreProp!=null) && (coreProp.matches(this.metadataFilter.get(corePropertyName)))) {
+			if ((coreProp!=null) && (coreProp.matches(this.hocr.getMetaDataFilter().get(corePropertyName)))) {
 				matchOnce=true;
 			} else {
 				matchFull=false;
 			}
 		}
 		corePropertyName="lastprinted";
-		if (this.metadataFilter.get(corePropertyName)!=null) {
+		if (this.hocr.getMetaDataFilter().get(corePropertyName)!=null) {
 			Date coreProp=summaryInfo.getLastPrinted();
-			if ((coreProp!=null) && (coreProp.toString().matches(this.metadataFilter.get(corePropertyName)))) {
+			if ((coreProp!=null) && (coreProp.toString().matches(this.hocr.getMetaDataFilter().get(corePropertyName)))) {
 				matchOnce=true;
 			} else {
 				matchFull=false;
 			}
 		}
 		corePropertyName="lastsavedatetime";
-		if (this.metadataFilter.get(corePropertyName)!=null) {
+		if (this.hocr.getMetaDataFilter().get(corePropertyName)!=null) {
 			Date coreProp=summaryInfo.getLastSaveDateTime();
-			if ((coreProp!=null) && (coreProp.toString().matches(this.metadataFilter.get(corePropertyName)))) {
+			if ((coreProp!=null) && (coreProp.toString().matches(this.hocr.getMetaDataFilter().get(corePropertyName)))) {
 				matchOnce=true;
 			} else {
 				matchFull=false;
 			}
 		}
 		corePropertyName="pagecount";
-		if (this.metadataFilter.get(corePropertyName)!=null) {
+		if (this.hocr.getMetaDataFilter().get(corePropertyName)!=null) {
 			int coreProp=summaryInfo.getPageCount();
-			if (String.valueOf(coreProp).matches(this.metadataFilter.get(corePropertyName))) {
+			if (String.valueOf(coreProp).matches(this.hocr.getMetaDataFilter().get(corePropertyName))) {
 				matchOnce=true;
 			} else {
 				matchFull=false;
 			}
 		}
 		corePropertyName="revnumber";
-		if (this.metadataFilter.get(corePropertyName)!=null) {
+		if (this.hocr.getMetaDataFilter().get(corePropertyName)!=null) {
 			String coreProp=summaryInfo.getRevNumber();
-			if ((coreProp!=null) && (coreProp.matches(this.metadataFilter.get(corePropertyName)))) {
+			if ((coreProp!=null) && (coreProp.matches(this.hocr.getMetaDataFilter().get(corePropertyName)))) {
 				matchOnce=true;
 			} else {
 				matchFull=false;
 			}
 		}
 		corePropertyName="security";
-		if (this.metadataFilter.get(corePropertyName)!=null) {
+		if (this.hocr.getMetaDataFilter().get(corePropertyName)!=null) {
 			int coreProp=summaryInfo.getSecurity();
-			if (String.valueOf(coreProp).matches(this.metadataFilter.get(corePropertyName))) {
+			if (String.valueOf(coreProp).matches(this.hocr.getMetaDataFilter().get(corePropertyName))) {
 				matchOnce=true;
 			} else {
 				matchFull=false;
 			}
 		}
 		corePropertyName="subject";
-		if (this.metadataFilter.get(corePropertyName)!=null) {
+		if (this.hocr.getMetaDataFilter().get(corePropertyName)!=null) {
 			String coreProp=summaryInfo.getSubject();
-			if ((coreProp!=null) && (coreProp.matches(this.metadataFilter.get(corePropertyName)))) {
+			if ((coreProp!=null) && (coreProp.matches(this.hocr.getMetaDataFilter().get(corePropertyName)))) {
 				matchOnce=true;
 			} else {
 				matchFull=false;
 			}
 		}
 		corePropertyName="template";
-		if (this.metadataFilter.get(corePropertyName)!=null) {
+		if (this.hocr.getMetaDataFilter().get(corePropertyName)!=null) {
 			String coreProp=summaryInfo.getTemplate();
-			if ((coreProp!=null) && (coreProp.matches(this.metadataFilter.get(corePropertyName)))) {
+			if ((coreProp!=null) && (coreProp.matches(this.hocr.getMetaDataFilter().get(corePropertyName)))) {
 				matchOnce=true;
 			} else {
 				matchFull=false;
 			}
 		}
 		corePropertyName="title";
-		if (this.metadataFilter.get(corePropertyName)!=null) {
+		if (this.hocr.getMetaDataFilter().get(corePropertyName)!=null) {
 			String coreProp=summaryInfo.getTitle();
-			if ((coreProp!=null) && (coreProp.matches(this.metadataFilter.get(corePropertyName)))) {
+			if ((coreProp!=null) && (coreProp.matches(this.hocr.getMetaDataFilter().get(corePropertyName)))) {
 				matchOnce=true;
 			} else {
 				matchFull=false;
 			}
 		}
 		corePropertyName="wordcount";
-		if (this.metadataFilter.get(corePropertyName)!=null) {
+		if (this.hocr.getMetaDataFilter().get(corePropertyName)!=null) {
 			int coreProp=summaryInfo.getWordCount();
-			if (String.valueOf(coreProp).matches(this.metadataFilter.get(corePropertyName))) {
+			if (String.valueOf(coreProp).matches(this.hocr.getMetaDataFilter().get(corePropertyName))) {
 				matchOnce=true;
 			} else {
 				matchFull=false;

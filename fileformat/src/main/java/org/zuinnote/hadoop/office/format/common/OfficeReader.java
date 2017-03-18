@@ -40,48 +40,29 @@ import org.zuinnote.hadoop.office.format.common.parser.*;
 public class OfficeReader {
 private static final Log LOG = LogFactory.getLog(OfficeReader.class.getName());
 private static final String FORMAT_EXCEL = "ms-excel";
+private HadoopOfficeReadConfiguration hocr;
+private InputStream in;
 private String[] sheetsArray=null;
-private Locale locale=null;
-private InputStream in=null;
-private String mimeType; 
-private boolean ignoreMissingLinkedWorkbooks;
-private String fileName;
-private String password;
-private Map<String,String> metadataFilter;
+
 private OfficeReaderParserInterface currentParser=null;
 
 	/*
 	* Creates a new OfficeReaderObject for a given content and Mime Type (cf. https://tika.apache.org/1.13/formats.html#Full_list_of_Supported_Formats)
 	*
 	* @param in InputStream holding the document
-	* @param bufferSize size of Buffer (BufferedInputStream)
-	* @param mimeType Mime Type of the office document
-	* @param String sheets list of sheets to read (only for spreadsheet formats), sheetnames separated by :, empty string means read all sheets, sheets that are not found by name are logged as a warning
-	* @param locale Locale to be used for interpreting content in spreadsheets and databases
-	* @param ignoreMissingLinkedWorkbooks only for formats supporting references to other files. Ignores if these files are not available. 
-	* @param fileName fileName of the file to read. Optional parameter and should not contain information about the directory.
-	* @param password Password of this document (null if no password)
-	* @param metadataFilter filter on metadata. The name is the metadata attribute name and the property is a filter. See the individual parser implementation what attributes are supported and if the filter, for example, supports regular expressions
+	* @param hocr HadoopOfficeConfiguration object for reading files
+	* 	
 	*/
 
-	public OfficeReader(InputStream in, String mimeType, String sheets, Locale locale, boolean ignoreMissingLinkedWorkbooks, String fileName,String password, Map<String,String> metadataFilter) {
+	public OfficeReader(InputStream in, HadoopOfficeReadConfiguration hocr) {
 		LOG.debug("Initializing OfficeReader");
 		this.in=in;
-		if (mimeType==null) {
-			this.mimeType="";
-		} else {
-			this.mimeType=mimeType;
-		}
-		if ((sheets!=null) && !("".equals(sheets))){
-			this.sheetsArray=sheets.split(":");
+		this.hocr=hocr;
+		if ((hocr.getSheets()!=null) && !("".equals(hocr.getSheets()))){
+			this.sheetsArray=hocr.getSheets().split(":");
 		} else {
 			this.sheetsArray=null;
 		}
-		this.locale=locale;
-		this.ignoreMissingLinkedWorkbooks=ignoreMissingLinkedWorkbooks;
-		this.fileName=fileName;
-		this.password=password;
-		this.metadataFilter=metadataFilter;
 	}
 
 	/**
@@ -94,9 +75,9 @@ private OfficeReaderParserInterface currentParser=null;
 	*/
 	public void parse() throws IOException, FormatNotUnderstoodException,GeneralSecurityException {
 		// do content detection of document
-			if (this.mimeType.contains(OfficeReader.FORMAT_EXCEL))	{
+			if (this.hocr.getMimeType().contains(OfficeReader.FORMAT_EXCEL))	{
 			// if it contains Excel then use MSExcelParser
-				this.currentParser=new MSExcelParser(this.locale,this.sheetsArray,this.ignoreMissingLinkedWorkbooks, this.fileName,this.password,this.metadataFilter);
+				this.currentParser=new MSExcelParser(this.hocr, this.sheetsArray);
 			} else {
 			// if it cannot be detected throw an exception
 				throw new FormatNotUnderstoodException("Format not understood");

@@ -36,6 +36,7 @@ import org.apache.commons.logging.Log;
 
 import java.security.GeneralSecurityException;
 
+import org.zuinnote.hadoop.office.format.common.HadoopOfficeReadConfiguration;
 import org.zuinnote.hadoop.office.format.common.parser.*;
 
 public class ExcelFileInputFormat extends AbstractSpreadSheetDocumentFileInputFormat {
@@ -47,7 +48,7 @@ public  RecordReader<Text,ArrayWritable> getRecordReader(InputSplit split, JobCo
 /** Create reader **/
 try {
 		 // send configuration option to ms excel. The format of the Excel (old vs new) is detected automaitcally
- 		job.set(AbstractSpreadSheetDocumentRecordReader.CONF_MIMETYPE,"ms-excel");
+ 		job.set(HadoopOfficeReadConfiguration.CONF_MIMETYPE,"ms-excel");
 		return new ExcelRecordReader( (FileSplit) split,job,reporter);
 	} catch (FormatNotUnderstoodException e) {
 		// log
