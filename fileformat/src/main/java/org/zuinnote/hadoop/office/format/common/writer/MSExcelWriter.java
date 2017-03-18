@@ -282,7 +282,9 @@ public void close() throws OfficeWriterException {
 				LOG.error(e);
 			} finally {
 					try {
-						this.oStream.close();
+						if (this.oStream!=null) {
+							this.oStream.close();
+						}
 					} catch (IOException e) {
 						LOG.error(e);
 					}
@@ -298,7 +300,9 @@ public void close() throws OfficeWriterException {
 				} finally {
 					Biff8EncryptionKey.setCurrentUserPassword(null);
 					try {
-						this.oStream.close();
+						if (this.oStream!=null) {
+							this.oStream.close();
+						}
 					} catch (IOException e) {
 						LOG.error(e);
 					}
@@ -328,7 +332,9 @@ public void close() throws OfficeWriterException {
 						LOG.error(e);
 					} finally {
 					 try {
-						this.oStream.close();
+							if (this.oStream!=null) {
+								this.oStream.close();
+							}
 					} catch (IOException e) {
 						LOG.error(e);
 					}
@@ -337,7 +343,9 @@ public void close() throws OfficeWriterException {
 			} else {
 				LOG.error("Could not write encrypted workbook, because type of workbook is unknown");
 				 try {
-						this.oStream.close();
+						if (this.oStream!=null) {
+							this.oStream.close();
+						}
 					} catch (IOException e) {
 						LOG.error(e);
 					}
@@ -360,12 +368,14 @@ public void close() throws OfficeWriterException {
 		} catch (IOException e) {
 			LOG.error(e);
 		} finally {
-			if (this.oStream!=null) {
+			
 				 try {
+					 if (this.oStream!=null) {
 						this.oStream.close();
+					 }
 					} catch (IOException e) {
 						LOG.error(e);
-					}
+					
 			}
 		}
 	}
