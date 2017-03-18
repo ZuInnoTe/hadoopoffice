@@ -298,35 +298,43 @@ public void close() throws IOException {
 					if (this.chainModeCipher==null) {
 						LOG.error("No chain mode specified");
 					} else {
-						POIFSFileSystem ooxmlDocumentFileSystem = new POIFSFileSystem();
-						EncryptionInfo info = new EncryptionInfo(this.encryptionModeCipher, this.encryptAlgorithmCipher, this.hashAlgorithmCipher, -1, -1, this.chainModeCipher);
-						Encryptor enc = info.getEncryptor();
-						enc.confirmPassword(this.howc.getPassword());
-						OutputStream os = enc.getDataStream(ooxmlDocumentFileSystem);	
-						this.currentWorkbook.write(os);
-						ooxmlDocumentFileSystem.writeFilesystem(this.oStream);
-						this.oStream.close();
+						
+						try {
+							EncryptionInfo info = new EncryptionInfo(this.encryptionModeCipher, this.encryptAlgorithmCipher, this.hashAlgorithmCipher, -1, -1, this.chainModeCipher);
+							Encryptor enc = info.getEncryptor();
+							enc.confirmPassword(this.howc.getPassword());
+							OutputStream os = null;
+							try {
+								os = enc.getDataStream(ooxmlDocumentFileSystem);
+							} catch (GeneralSecurityException e) {
+								LOG.error(e);
+							}	
+							if (os!=null) {
+								this.currentWorkbook.write(os);
+							}
+							ooxmlDocumentFileSystem.writeFilesystem(this.oStream);
+						} finally {
+						 this.oStream.close();
+						}
 					}
 				} else {
 					LOG.error("Could not write encrypted workbook, because type of workbook is unknown");
 				}
 			}
 		}
-		} catch(GeneralSecurityException e){
-			LOG.error(e);
+		} finally {
+		// close filesystems
+		if (this.ooxmlDocumentFileSystem!=null)  {
+			 ooxmlDocumentFileSystem.close();
 		}
-		finally {
 		// close main workbook
 		if (this.currentWorkbook!=null) {
-				this.currentWorkbook.close();
-		}
-		if (this.oStream!=null) {
-				this.oStream.close();
+			this.currentWorkbook.close();
 		}
 		// close linked workbooks
-		 	for (Workbook currentWorkbook: this.listOfWorkbooks) {
-				if (currentWorkbook!=null) {
-					currentWorkbook.close();
+		 	for (Workbook currentWorkbookItem: this.listOfWorkbooks) {
+				if (currentWorkbookItem!=null) {
+					currentWorkbookItem.close();
 				}
 			}
 		}
