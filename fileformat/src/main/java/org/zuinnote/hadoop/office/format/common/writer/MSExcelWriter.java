@@ -195,7 +195,7 @@ public void create(OutputStream oStream, Map<String,InputStream> linkedWorkbooks
 * @param newDAO cell to add. If it is already existing an exception will be thrown. Note that the sheet name is sanitized using  org.apache.poi.ss.util.WorkbookUtil.createSafeSheetName. The Cell address needs to be in A1 format. Either formula or formattedValue must be not null.
 *
 */
-
+@Override
 public void write(Object newDAO) throws OfficeWriterException {
 	if (!(newDAO instanceof SpreadSheetCellDAO)) {
 		throw new OfficeWriterException("Objects which are not of the class SpreadSheetCellDAO are not supported for writing.");
@@ -268,7 +268,7 @@ public void write(Object newDAO) throws OfficeWriterException {
 *
 *
 */
-
+@Override
 public void close() throws IOException {
 	try {
 		// prepare metadata
