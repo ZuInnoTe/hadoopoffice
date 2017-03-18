@@ -280,7 +280,6 @@ public void finalizeWrite() throws OfficeWriterException {
 				this.currentWorkbook.write(this.oStream);
 			} catch (IOException e) {
 				LOG.error(e);
-				throw new OfficeWriterException(e.toString());
 			} finally {
 					try {
 						this.oStream.close();
@@ -296,7 +295,6 @@ public void finalizeWrite() throws OfficeWriterException {
 					this.currentWorkbook.write(this.oStream);
 				} catch (IOException e) {
 					LOG.error(e);
-					throw new OfficeWriterException(e.toString());
 				} finally {
 					Biff8EncryptionKey.setCurrentUserPassword(null);
 					try {
@@ -327,7 +325,6 @@ public void finalizeWrite() throws OfficeWriterException {
 						this.currentWorkbook.write(os);
 						ooxmlDocumentFileSystem.writeFilesystem(this.oStream);
 					} catch (IOException | GeneralSecurityException e) {
-						// TODO Auto-generated catch block
 						LOG.error(e);
 						throw new OfficeWriterException(e.toString());
 					} finally {
