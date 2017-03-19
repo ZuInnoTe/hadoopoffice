@@ -27,17 +27,14 @@ import org.apache.hadoop.io.compress.GzipCodec;
 import java.io.IOException;
 import java.io.Serializable;
 
-import java.security.GeneralSecurityException;
 
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 import org.zuinnote.hadoop.office.format.common.HadoopOfficeWriteConfiguration;
 import org.zuinnote.hadoop.office.format.common.HadoopUtil;
-import org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException;
 import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 import org.zuinnote.hadoop.office.format.common.writer.InvalidWriterConfigurationException;
 import org.zuinnote.hadoop.office.format.common.writer.OfficeWriterException;
-import org.zuinnote.hadoop.office.format.common.writer.InvalidCellSpecificationException;
 
 public class ExcelFileOutputFormat extends AbstractSpreadSheetDocumentFileOutputFormat implements Serializable {
 /**

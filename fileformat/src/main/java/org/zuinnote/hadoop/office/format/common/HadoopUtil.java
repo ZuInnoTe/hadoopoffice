@@ -87,8 +87,7 @@ if (!compressed) { // uncompressed
       Path compressedFile = file.suffix(codec.getDefaultExtension());
       // build the filename including the extension
       FileSystem fs = compressedFile.getFileSystem(conf);
-      FSDataOutputStream realFileOut = fs.create(compressedFile, progress);
-      return new DataOutputStream(codec.createOutputStream(realFileOut));
+      return new DataOutputStream(codec.createOutputStream(fs.create(compressedFile, progress)));
 }
 }
 

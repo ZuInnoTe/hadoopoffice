@@ -46,7 +46,7 @@ public class ExcelRecordWriter<NullWritable,SpreadSheetCellDAO>  extends Abstrac
 	 * 
 	 */
 	private static final long serialVersionUID = 4172969599328960241L;
-private static final Log LOG = LogFactory.getLog(ExcelRecordWriter.class.getName());
+private static final Log LOGEW = LogFactory.getLog(ExcelRecordWriter.class.getName());
 
 /*
 * Non-arg constructor for Serialization
@@ -61,9 +61,9 @@ public ExcelRecordWriter() {
 * Instantiate the constructor of AbstractSpreadSheetDocumentRecordWriter
 *
 */
-public ExcelRecordWriter(DataOutputStream out, String fileName, Configuration conf) throws IOException, InvalidWriterConfigurationException, InvalidCellSpecificationException, FormatNotUnderstoodException, GeneralSecurityException, OfficeWriterException  {
+public ExcelRecordWriter(DataOutputStream out, String fileName, Configuration conf) throws IOException, InvalidWriterConfigurationException, InvalidCellSpecificationException, FormatNotUnderstoodException, GeneralSecurityException, OfficeWriterException   {
 	super(out,fileName,conf);
-	LOG.debug("Initializing ExcelRecordWriter");
+	LOGEW.debug("Initializing ExcelRecordWriter");
 }
 
 
