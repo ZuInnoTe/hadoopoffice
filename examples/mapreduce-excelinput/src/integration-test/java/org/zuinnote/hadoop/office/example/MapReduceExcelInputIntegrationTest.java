@@ -184,7 +184,7 @@ public final class MapReduceExcelInputIntegrationTest {
 		List<String> resultLines = readDefaultResults(6);
 	    	// compare results
 		assertEquals("Number of result line is 6",6,resultLines.size());
-		assertEquals("First Line CSV correct","test1,test2,test3,test",resultLines.get(0));
+		assertEquals("First Line CSV correct","test1,test2,test3,test4",resultLines.get(0));
 		assertEquals("Second Line CSV correct","4",resultLines.get(0));
 		assertEquals("Third Line CSV correct","31/12/99,5,,null",resultLines.get(0));
 		assertEquals("Forth Line CSV correct","1",resultLines.get(0));
