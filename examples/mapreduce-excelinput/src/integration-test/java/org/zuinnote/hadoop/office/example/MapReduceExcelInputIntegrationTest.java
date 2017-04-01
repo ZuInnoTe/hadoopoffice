@@ -185,11 +185,11 @@ public final class MapReduceExcelInputIntegrationTest {
 	    	// compare results
 		assertEquals("Number of result line is 6",6,resultLines.size());
 		assertEquals("First Line CSV correct","test1,test2,test3,test4",resultLines.get(0));
-		assertEquals("Second Line CSV correct","4",resultLines.get(0));
-		assertEquals("Third Line CSV correct","31/12/99,5,,null",resultLines.get(0));
-		assertEquals("Forth Line CSV correct","1",resultLines.get(0));
-		assertEquals("Fifth Line CSV correct","2,6,10",resultLines.get(0));
-		assertEquals("Sixth Line CSV correct","3,4,15",resultLines.get(0));
+		assertEquals("Second Line CSV correct","4",resultLines.get(1));
+		assertEquals("Third Line CSV correct","31/12/99,5,,null",resultLines.get(2));
+		assertEquals("Forth Line CSV correct","1",resultLines.get(3));
+		assertEquals("Fifth Line CSV correct","2,6,10",resultLines.get(4));
+		assertEquals("Sixth Line CSV correct","3,4,15",resultLines.get(5));
 	    }
 
 	      /**
