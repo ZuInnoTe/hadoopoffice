@@ -19,8 +19,6 @@
  */
 package org.zuinnote.hadoop.office.example.driver;
 
-import java.io.IOException;
-import java.util.*;
         
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.conf.*;
@@ -28,11 +26,11 @@ import org.apache.hadoop.io.*;
 import org.apache.hadoop.mapreduce.*;
 import org.apache.hadoop.mapreduce.lib.input.*;
 import org.apache.hadoop.mapreduce.lib.output.*;
-import org.apache.hadoop.util.*;
+import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
 import org.zuinnote.hadoop.office.example.tasks.HadoopOfficeExcelMap;
 import org.zuinnote.hadoop.office.example.tasks.HadoopOfficeExcelReducer;
   
-import org.zuinnote.hadoop.office.format.common.*;
 import org.zuinnote.hadoop.office.format.mapreduce.*;
 
 import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
@@ -43,30 +41,38 @@ import org.zuinnote.hadoop.office.format.common.dao.TextArrayWritable;
 *
 */
 
-public class CSV2ExcelDriver  {
+public class CSV2ExcelDriver  extends Configured implements Tool {
+	
 
+public CSV2ExcelDriver() {
+	// nothing here
+}
+
+
+public int run(String[] args) throws Exception {
+	Job job = Job.getInstance(getConf(),"example-hadoopoffice-CSV2Excel-job");
+    job.setJarByClass(CSV2ExcelDriver.class);     
+    job.setMapOutputKeyClass(Text.class);
+    job.setMapOutputValueClass(TextArrayWritable.class);
+    job.setOutputKeyClass(NullWritable.class);
+    job.setOutputValueClass(SpreadSheetCellDAO.class);
        
+   job.setMapperClass(HadoopOfficeExcelMap.class);
+   job.setReducerClass(HadoopOfficeExcelReducer.class);
+       
+   job.setInputFormatClass(TextInputFormat.class);
+   job.setOutputFormatClass(ExcelFileOutputFormat.class);
+   FileInputFormat.addInputPath(job, new Path(args[0]));
+   FileOutputFormat.setOutputPath(job, new Path(args[1]));
+   return job.waitForCompletion(true)?0:1;
+}
         
  public static void main(String[] args) throws Exception {
      Configuration conf = new Configuration();
    /** Set as an example some of the options to configure the HadoopOffice fileformat **/
-  
      conf.set("hadoopoffice.read.locale.bcp47","de");
-     Job job = Job.getInstance(conf,"example-hadoopoffice-CSV2Excel-job");
-     job.setJarByClass(CSV2ExcelDriver.class);     
-     job.setMapOutputKeyClass(Text.class);
-     job.setMapOutputValueClass(TextArrayWritable.class);
-     job.setOutputKeyClass(NullWritable.class);
-     job.setOutputValueClass(SpreadSheetCellDAO.class);
-        
-    job.setMapperClass(HadoopOfficeExcelMap.class);
-    job.setReducerClass(HadoopOfficeExcelReducer.class);
-        
-    job.setInputFormatClass(TextInputFormat.class);
-    job.setOutputFormatClass(ExcelFileOutputFormat.class);
-    FileInputFormat.addInputPath(job, new Path(args[0]));
-    FileOutputFormat.setOutputPath(job, new Path(args[1]));
-     System.exit(job.waitForCompletion(true)?0:1);
+     int res = ToolRunner.run(conf, new CSV2ExcelDriver(), args);
+     System.exit(res);
  }
         
 }

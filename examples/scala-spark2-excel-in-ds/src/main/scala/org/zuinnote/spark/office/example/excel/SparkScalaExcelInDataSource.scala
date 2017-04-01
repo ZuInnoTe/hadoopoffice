@@ -21,7 +21,10 @@ import org.apache.spark.SparkContext
 import org.apache.spark.SparkConf
 
 import org.apache.spark.sql.Row
+import org.apache.spark.sql.functions._
 import org.apache.hadoop.conf._
+
+import scala.collection.mutable.WrappedArray
 
    
 /**
@@ -40,18 +43,32 @@ object SparkScalaExcelInDataSource {
 	
    val sparkSession = SparkSession.builder.appName("Spark-Scala Excel Analytics (hadoopoffice) - Datasource API - In").getOrCreate()
    import sparkSession.implicits._
-	val sc=sparkSession.sparkContext
-val sqlContext = sparkSession.sqlContext
-val df = sqlContext.read
+	  val sc=sparkSession.sparkContext
+    val sqlContext = sparkSession.sqlContext
+     import sqlContext.implicits._
+
+    convertToCSV(sqlContext, args(0), args(1))
+    sc.stop()
+    }
+   
+   def convertToCSV(sqlContext: SQLContext, inputFile: String, outputFile: String): Unit = {
+     val df = sqlContext.read
     .format("org.zuinnote.spark.office.excel")
     .option("read.locale.bcp47", "de")  
-    .load(args(0))
-	val totalCount = df.count
-	// print to screen
-	println("Total number of rows in Excel: "+totalCount)	
-	df.printSchema
-	// print formattedValues
-	df.show	
-    }
+    .load(inputFile)
+     val rowsDF=df.select(explode(df("rows")).alias("rows"))
+     df.select("rows.formattedValue").rdd.map(formattedValueRow => {
+       val rowStrBuffer = new StringBuilder
+       val theRow = formattedValueRow.getAs[WrappedArray[String]](0)
+	      for ( x <- theRow) {
+	        			rowStrBuffer.append(x+",")
+	      }
+       if (rowStrBuffer.length>0) {
+		    rowStrBuffer.deleteCharAt(rowStrBuffer.length-1) // remove last comma
+		    } 
+		  rowStrBuffer.toString
+     } ).repartition(1).saveAsTextFile(outputFile)
+	
+   }
 }
 

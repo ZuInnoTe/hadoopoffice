@@ -1,3 +1,4 @@
+#!/bin/sh
 if [ "$TRAVIS_REPO_SLUG" == "ZuInnoTe/hadoopoffice" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then
 
 echo -e "Publishing javadoc...\n"

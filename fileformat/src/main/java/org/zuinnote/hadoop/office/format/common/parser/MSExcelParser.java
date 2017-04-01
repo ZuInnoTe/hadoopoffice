@@ -219,48 +219,9 @@ private HadoopOfficeReadConfiguration hocr;
 	*/
 	@Override
 	public List<String> getLinkedWorkbooks() {
-		ArrayList<String> result = new ArrayList<>();
+		List<String> result = new ArrayList<>();
 		if (this.currentWorkbook instanceof HSSFWorkbook) {
-			try {
-				// this is a hack to fetch linked workbooks in the Old Excel format
-				// we use reflection to access private fields
-				// might not work if internal structure of the class changes
-				InternalWorkbook intWb = ((HSSFWorkbook)this.currentWorkbook).getInternalWorkbook();
-				// method to fetch link table
-				Method linkTableMethod = InternalWorkbook.class.getDeclaredMethod("getOrCreateLinkTable");
-		        	linkTableMethod.setAccessible(true);
-        			Object linkTable = linkTableMethod.invoke(intWb);
-				// method to fetch external book and sheet name
-        			Method externalBooksMethod = linkTable.getClass().getDeclaredMethod("getExternalBookAndSheetName", int.class);
-        			externalBooksMethod.setAccessible(true);
-				// now we need to browse through the table until we hit an array out of bounds
-				int i = 0;
-				try {
-					while(i<MSExcelParser.MAX_LINKEDWB_OLDEXCEL) {
-						String[] externalBooks = (String[])externalBooksMethod.invoke(linkTable, i++);
-						if ((externalBooks!=null) && (externalBooks.length>0)){
-							result.add(externalBooks[0]);
-						}
-			        	}
-				} catch  ( java.lang.reflect.InvocationTargetException e) {
-           				 if ( !(e.getCause() instanceof java.lang.IndexOutOfBoundsException) ) {
-                			throw e;
-            				}
-				}
-        			
-			} catch (NoSuchMethodException nsme) {
-				LOG.error(COULD_NOT_RETRIEVE_LINKED_WORKBOOKS_FOR_OLD_EXCEL_FORMAT);
-				LOG.error(nsme);
-			}
-			 catch (IllegalAccessException iae) {
-				LOG.error(COULD_NOT_RETRIEVE_LINKED_WORKBOOKS_FOR_OLD_EXCEL_FORMAT);
-				LOG.error(iae);
-			}
-			catch (InvocationTargetException ite) {
-				LOG.error(COULD_NOT_RETRIEVE_LINKED_WORKBOOKS_FOR_OLD_EXCEL_FORMAT);
-				LOG.error(ite);
-			}
-			
+			result = getLinkedWorkbooksHSSF();
     
 		} else if (this.currentWorkbook instanceof XSSFWorkbook) {
 			// use its API
@@ -269,6 +230,50 @@ private HadoopOfficeReadConfiguration hocr;
 			}
 		} else {
 			LOG.warn("Cannot determine linked workbooks");
+		}
+		return result;
+	}
+	
+	private List<String> getLinkedWorkbooksHSSF() {
+		List<String> result = new ArrayList<>();
+		try {
+			// this is a hack to fetch linked workbooks in the Old Excel format
+			// we use reflection to access private fields
+			// might not work if internal structure of the class changes
+			InternalWorkbook intWb = ((HSSFWorkbook)this.currentWorkbook).getInternalWorkbook();
+			// method to fetch link table
+			Method linkTableMethod = InternalWorkbook.class.getDeclaredMethod("getOrCreateLinkTable");
+	        	linkTableMethod.setAccessible(true);
+    			Object linkTable = linkTableMethod.invoke(intWb);
+			// method to fetch external book and sheet name
+    			Method externalBooksMethod = linkTable.getClass().getDeclaredMethod("getExternalBookAndSheetName", int.class);
+    			externalBooksMethod.setAccessible(true);
+			// now we need to browse through the table until we hit an array out of bounds
+			int i = 0;
+			try {
+				while(i<MSExcelParser.MAX_LINKEDWB_OLDEXCEL) {
+					String[] externalBooks = (String[])externalBooksMethod.invoke(linkTable, i++);
+					if ((externalBooks!=null) && (externalBooks.length>0)){
+						result.add(externalBooks[0]);
+					}
+		        	}
+			} catch  ( java.lang.reflect.InvocationTargetException e) {
+       				 if ( !(e.getCause() instanceof java.lang.IndexOutOfBoundsException) ) {
+            			throw e;
+        				}
+			}
+    			
+		} catch (NoSuchMethodException nsme) {
+			LOG.error(COULD_NOT_RETRIEVE_LINKED_WORKBOOKS_FOR_OLD_EXCEL_FORMAT);
+			LOG.error(nsme);
+		}
+		 catch (IllegalAccessException iae) {
+			LOG.error(COULD_NOT_RETRIEVE_LINKED_WORKBOOKS_FOR_OLD_EXCEL_FORMAT);
+			LOG.error(iae);
+		}
+		catch (InvocationTargetException ite) {
+			LOG.error(COULD_NOT_RETRIEVE_LINKED_WORKBOOKS_FOR_OLD_EXCEL_FORMAT);
+			LOG.error(ite);
 		}
 		return result;
 	}
@@ -339,34 +344,12 @@ private HadoopOfficeReadConfiguration hocr;
 		SpreadSheetCellDAO[] result=null;
 		// all sheets?
 		if (this.sheets==null) { //  go on with all sheets
-				if (this.currentRow>this.currentWorkbook.getSheetAt(this.currentSheet).getLastRowNum()) { // end of row reached? => next sheet
-					this.currentSheet++;
-					this.currentRow=0;
-					if (this.currentSheet>=this.currentWorkbook.getNumberOfSheets()) {
-						return result; // no more sheets available?
-					}
-					this.currentSheetName=this.currentWorkbook.getSheetAt(this.currentSheet).getSheetName();
-				}
-
-		} else { // go on with specified sheets
-			// go through sheets specified until one found
-			while (this.sheetsIndex!=this.sheets.length) {
-				if (this.currentWorkbook.getSheet(this.sheets[this.sheetsIndex])==null) { // log only if sheet not found
-					LOG.warn("Sheet \""+this.sheets[this.sheetsIndex]+"\" not found");
-				} else { // sheet found, check number of rows
-				   if (this.currentRow>this.currentWorkbook.getSheet(this.sheets[this.sheetsIndex]).getLastRowNum()) {
-					// reset rows
-					this.currentRow=0;
-				   } else { // we have a sheet where we still need to process rows
-					this.currentSheet=this.currentWorkbook.getSheetIndex(this.currentWorkbook.getSheet(this.sheets[this.sheetsIndex]));
-					this.currentSheetName=this.currentWorkbook.getSheetAt(this.currentSheet).getSheetName();
-					break;
-				   }
-				}
-				this.sheetsIndex++;
+			if (!nextAllSheets()) {
+				return result;
 			}
-			if (this.sheetsIndex==this.sheets.length) {
-				return result; // all sheets processed
+		} else { // go on with specified sheets
+			if (!nextSpecificSheets()) {
+				return result;
 			}
 		}
 		// read row from the sheet currently to be processed
@@ -402,6 +385,41 @@ private HadoopOfficeReadConfiguration hocr;
 		// increase rows
 		this.currentRow++;
 		return result;
+	}
+	
+	private boolean nextAllSheets() {
+		if (this.currentRow>this.currentWorkbook.getSheetAt(this.currentSheet).getLastRowNum()) { // end of row reached? => next sheet
+			this.currentSheet++;
+			this.currentRow=0;
+			if (this.currentSheet>=this.currentWorkbook.getNumberOfSheets()) {
+				return false; // no more sheets available?
+			}
+			this.currentSheetName=this.currentWorkbook.getSheetAt(this.currentSheet).getSheetName();
+		}
+		return true;
+	}
+	
+	private boolean nextSpecificSheets() {
+		// go through sheets specified until one found
+					while (this.sheetsIndex!=this.sheets.length) {
+						if (this.currentWorkbook.getSheet(this.sheets[this.sheetsIndex])==null) { // log only if sheet not found
+							LOG.warn("Sheet \""+this.sheets[this.sheetsIndex]+"\" not found");
+						} else { // sheet found, check number of rows
+						   if (this.currentRow>this.currentWorkbook.getSheet(this.sheets[this.sheetsIndex]).getLastRowNum()) {
+							// reset rows
+							this.currentRow=0;
+						   } else { // we have a sheet where we still need to process rows
+							this.currentSheet=this.currentWorkbook.getSheetIndex(this.currentWorkbook.getSheet(this.sheets[this.sheetsIndex]));
+							this.currentSheetName=this.currentWorkbook.getSheetAt(this.currentSheet).getSheetName();
+							break;
+						   }
+						}
+						this.sheetsIndex++;
+					}
+					if (this.sheetsIndex==this.sheets.length) {
+						return false; // all sheets processed
+					}
+					return true;
 	}
 
 

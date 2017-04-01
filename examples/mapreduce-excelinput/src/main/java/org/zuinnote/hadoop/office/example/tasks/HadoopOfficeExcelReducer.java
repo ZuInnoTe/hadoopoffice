@@ -27,7 +27,6 @@ package org.zuinnote.hadoop.office.example.tasks;
 import java.io.IOException;
 import org.apache.hadoop.mapreduce.*;
 import org.apache.hadoop.io.*;
-import java.util.*;
 
 import org.zuinnote.hadoop.office.format.common.dao.TextArrayWritable;
  
@@ -46,12 +45,12 @@ private static final NullWritable EMPTYKEY = NullWritable.get();
 			if (currentCell!=null) {
 				currentCSVRowSB.append(currentCell.toString());
 			} 
-		    	currentCSVRowSB.append(this.CSV_SEPARATOR);
+		    	currentCSVRowSB.append(HadoopOfficeExcelReducer.CSV_SEPARATOR);
 	   	}
 	   	// remove last separator (new line does not need to be added anymore, apperantly this is done by textoutputformat
 	   	String currentCSVRowString = currentCSVRowSB.substring(0,currentCSVRowSB.length()-1);
 		// add new line
-	   	context.write(this.EMPTYKEY, new Text(currentCSVRowString));
+	   	context.write(HadoopOfficeExcelReducer.EMPTYKEY, new Text(currentCSVRowString));
 	   }
        }
    }

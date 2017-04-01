@@ -197,22 +197,8 @@ public void create(OutputStream oStream, Map<String,InputStream> linkedWorkbooks
 */
 @Override
 public void write(Object newDAO) throws OfficeWriterException {
-	if (!(newDAO instanceof SpreadSheetCellDAO)) {
-		throw new OfficeWriterException("Objects which are not of the class SpreadSheetCellDAO are not supported for writing.");
-	}
-	SpreadSheetCellDAO sscd = (SpreadSheetCellDAO)newDAO;
-	// check sheetname (needs to be there)
-	if ((sscd.getSheetName()==null) || ("".equals(sscd.getSheetName()))) {
-		throw new OfficeWriterException("Invalid cell specification: empy sheet name not allowed.");
-	}
-	// check celladdress (needs to be there)
-	if ((sscd.getAddress()==null) || ("".equals(sscd.getAddress()))) {
-		throw new OfficeWriterException("Invalid cell specification: empy cell address not allowed.");
-	}
-	// check that either formula or formatted value is filled
-	if ((sscd.getFormula()==null) && (sscd.getFormattedValue()==null))  {
-		throw new OfficeWriterException("Invalid cell specification: either formula or formattedValue needs to be specified for cell.");
-	}
+	
+	SpreadSheetCellDAO sscd = checkSpreadSheetCellDAO(newDAO);
 	String safeSheetName=WorkbookUtil.createSafeSheetName(sscd.getSheetName());
 	Sheet currentSheet=this.currentWorkbook.getSheet(safeSheetName);
 	if (currentSheet==null) {// create sheet if it does not exist yet
@@ -261,6 +247,35 @@ public void write(Object newDAO) throws OfficeWriterException {
 	}
 }
 
+/***
+ * Verifies that an object is a well-formed SpreadSheetCellDAO
+ * 
+ * 
+ * @param newDAO obejct
+ * @return SpreadsheetCellDAO if wellformed, otherwise null
+ */
+
+private SpreadSheetCellDAO checkSpreadSheetCellDAO(Object newDAO) throws OfficeWriterException {
+	if (!(newDAO instanceof SpreadSheetCellDAO)) {
+		throw new OfficeWriterException("Objects which are not of the class SpreadSheetCellDAO are not supported for writing.");
+	}
+	SpreadSheetCellDAO sscd = (SpreadSheetCellDAO)newDAO;
+	// check sheetname (needs to be there)
+	if ((sscd.getSheetName()==null) || ("".equals(sscd.getSheetName()))) {
+		throw new OfficeWriterException("Invalid cell specification: empy sheet name not allowed.");
+	}
+	// check celladdress (needs to be there)
+	if ((sscd.getAddress()==null) || ("".equals(sscd.getAddress()))) {
+		throw new OfficeWriterException("Invalid cell specification: empy cell address not allowed.");
+	}
+	// check that either formula or formatted value is filled
+	if ((sscd.getFormula()==null) && (sscd.getFormattedValue()==null))  {
+		throw new OfficeWriterException("Invalid cell specification: either formula or formattedValue needs to be specified for cell.");
+	}
+	return sscd;
+}
+
+
 /**
 * Writes the document in-memory representation to the OutputStream. Afterwards, it closes all related workbooks.
 *
@@ -276,57 +291,22 @@ public void close() throws IOException {
 		// write
 		if (this.oStream!=null) {
 			if (this.howc.getPassword()==null) { // no encryption
-				this.currentWorkbook.write(this.oStream);
-				this.oStream.close();
-			} else {	// encryption
+				finalizeWriteNotEncrypted();
+			} else 	// encryption
 				if (this.currentWorkbook instanceof HSSFWorkbook) { // old Excel format
-					LOG.debug("encrypting HSSFWorkbook");
-					Biff8EncryptionKey.setCurrentUserPassword(this.howc.getPassword());
-					this.currentWorkbook.write(this.oStream);
-					this.oStream.close();
-					Biff8EncryptionKey.setCurrentUserPassword(null);
+					finalizeWriteEncryptedHSSF();
 				} else if (this.currentWorkbook instanceof XSSFWorkbook) {
-					if (this.encryptAlgorithmCipher==null) {
-						LOG.error("No encryption algorithm specified");
-					} else
-					if (this.hashAlgorithmCipher==null) {
-						LOG.error("No hash algorithm specified");
-					} else
-					if (this.encryptionModeCipher==null) {
-						LOG.error("No encryption mode specified");
-					} else
-					if (this.chainModeCipher==null) {
-						LOG.error("No chain mode specified");
-					} else {
-						
-						try {
-							EncryptionInfo info = new EncryptionInfo(this.encryptionModeCipher, this.encryptAlgorithmCipher, this.hashAlgorithmCipher, -1, -1, this.chainModeCipher);
-							Encryptor enc = info.getEncryptor();
-							enc.confirmPassword(this.howc.getPassword());
-							OutputStream os = null;
-							try {
-								os = enc.getDataStream(ooxmlDocumentFileSystem);
-							} catch (GeneralSecurityException e) {
-								LOG.error(e);
-							}	
-							if (os!=null) {
-								this.currentWorkbook.write(os);
-							}
-							ooxmlDocumentFileSystem.writeFilesystem(this.oStream);
-						} finally {
-						 this.oStream.close();
-						}
+					finalizeWriteEncryptedXSSF();
 					}
-				} else {
+				 else {
 					LOG.error("Could not write encrypted workbook, because type of workbook is unknown");
 				}
 			}
-		}
 		} finally {
-		// close filesystems
-		if (this.ooxmlDocumentFileSystem!=null)  {
-			 ooxmlDocumentFileSystem.close();
-		}
+			// close filesystems
+			if (this.ooxmlDocumentFileSystem!=null)  {
+				 ooxmlDocumentFileSystem.close();
+			}
 		// close main workbook
 		if (this.currentWorkbook!=null) {
 			this.currentWorkbook.close();
@@ -340,6 +320,70 @@ public void close() throws IOException {
 		}
 }
 
+
+private void finalizeWriteNotEncrypted() throws IOException {
+	try {
+		this.currentWorkbook.write(this.oStream);
+	} finally {
+		if (this.oStream!=null) {
+			this.oStream.close();
+		}
+	}
+	
+	
+}
+
+private void finalizeWriteEncryptedHSSF() throws IOException {
+	LOG.debug("encrypting HSSFWorkbook");
+	Biff8EncryptionKey.setCurrentUserPassword(this.howc.getPassword());
+	try {
+		this.currentWorkbook.write(this.oStream);
+	} finally {
+		Biff8EncryptionKey.setCurrentUserPassword(null);
+		if (this.oStream!=null) {
+			this.oStream.close();
+		}
+	}
+}
+
+private void finalizeWriteEncryptedXSSF() throws IOException{
+	if (this.encryptAlgorithmCipher==null) {
+		LOG.error("No encryption algorithm specified");
+		return;
+	} else
+	if (this.hashAlgorithmCipher==null) {
+		LOG.error("No hash algorithm specified");
+		return;
+	} else
+	if (this.encryptionModeCipher==null) {
+		LOG.error("No encryption mode specified");
+		return;
+	} else
+	if (this.chainModeCipher==null) {
+		LOG.error("No chain mode specified");
+		return;
+	} 
+		OutputStream os = null;
+		try {
+			EncryptionInfo info = new EncryptionInfo(this.encryptionModeCipher, this.encryptAlgorithmCipher, this.hashAlgorithmCipher, -1, -1, this.chainModeCipher);
+			Encryptor enc = info.getEncryptor();
+			enc.confirmPassword(this.howc.getPassword());
+			
+			try {
+				os = enc.getDataStream(ooxmlDocumentFileSystem);
+				if (os!=null) {
+					this.currentWorkbook.write(os);
+				}
+			} catch (GeneralSecurityException e) {
+				LOG.error(e);
+			} 
+			ooxmlDocumentFileSystem.writeFilesystem(this.oStream);
+		} finally {
+		 if (this.oStream!=null) {
+			 this.oStream.close();
+		 }
+		}
+}
 
 /**
 * Checks if format is supported
@@ -654,19 +698,24 @@ private void prepareXSSFMetaData() {
 		} 
 		if (!(attribMatch)) {
 		// process custom properties
-		if (entry.getKey().startsWith("custom.")) {
-			String strippedKey=entry.getKey().substring("custom.".length());
-			if (strippedKey.length()>0) {
-				custProp.addProperty(strippedKey,entry.getValue());
-			}
-		} else {
-			LOG.warn("Unknown metadata key: "+entry.getKey());
-		}
+		processCustomProperties(entry.getKey(), entry.getValue(), custProp);
 		}
 		} catch (ParseException pe) {
 			LOG.error(pe);
 		}
+}
+}
+
+private void processCustomProperties(String key, String value, POIXMLProperties.CustomProperties custProp) {
+	if (key.startsWith("custom.")) {
+		String strippedKey=key.substring("custom.".length());
+		if (strippedKey.length()>0) {
+			custProp.addProperty(strippedKey,value);
+		}
+	} else {
+		LOG.warn("Unknown metadata key: "+key);
 	}
 }
+	
 
 }

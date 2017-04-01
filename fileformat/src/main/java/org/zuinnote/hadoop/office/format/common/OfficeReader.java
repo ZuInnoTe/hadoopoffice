@@ -66,12 +66,10 @@ private OfficeReaderParserInterface currentParser=null;
 	/**
 	* Parses the input stream and generates an in-memory representation of the document. In most cases (depending on the parser) the full document needs to be represented in-memory.
 	*
-	* @throws java.io.IOException in case of errors reading from the InputStream
 	* @throws org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException in case an invalid format is detected
-	* @throws java.security.GeneralSecurityException in case of issues decrypting the document, if document is encrypted
 	*
 	*/
-	public void parse() throws IOException, FormatNotUnderstoodException,GeneralSecurityException {
+	public void parse() throws FormatNotUnderstoodException {
 		// do content detection of document
 			if (this.hocr.getMimeType().contains(OfficeReader.FORMAT_EXCEL))	{
 			// if it contains Excel then use MSExcelParser

@@ -28,21 +28,21 @@ import java.io.IOException;
 import org.apache.hadoop.mapreduce.*;
 import org.apache.hadoop.io.*;
 
-import org.zuinnote.hadoop.office.format.mapreduce.*;
 import org.zuinnote.hadoop.office.format.common.dao.*;
 
-import java.util.*;
 
 import org.zuinnote.hadoop.office.format.common.dao.TextArrayWritable;
 
 public  class HadoopOfficeExcelMap  extends Mapper<Text, ArrayWritable, Text, TextArrayWritable> {
-private final static Text NULL = new Text(""); // ArrayWritable cannot handle nulls
+private static final Text NULL = new Text(""); // ArrayWritable cannot handle nulls
 
 
 
 @Override
 public void setup(Context context) throws IOException, InterruptedException {
+	 // nothing to setup
 }
+
 @Override
   public void map(Text key, ArrayWritable value, Context context) throws IOException, InterruptedException {
 		// get the cells of the current row
@@ -54,7 +54,7 @@ public void setup(Context context) throws IOException, InterruptedException {
 		// Create a simple ArrayWritable of Text
 		 for (int i=0;i<valueArray.length;i++) {
 			SpreadSheetCellDAO currentSpreadSheetCellDAO = valueArray[i];
-			Text currentCellText = this.NULL;
+			Text currentCellText = HadoopOfficeExcelMap.NULL;
 			if (currentSpreadSheetCellDAO!=null) {
 				currentCellText = new Text(currentSpreadSheetCellDAO.getFormattedValue());
 			} 
@@ -63,8 +63,10 @@ public void setup(Context context) throws IOException, InterruptedException {
 		valueOutArrayWritable.set(valueOutTextArray);
 	    	context.write(sheetNameText, valueOutArrayWritable);
 	   }
+
 @Override
 public void cleanup(Context context) {
+	 // nothing to cleanup
 } 
 	    
 }

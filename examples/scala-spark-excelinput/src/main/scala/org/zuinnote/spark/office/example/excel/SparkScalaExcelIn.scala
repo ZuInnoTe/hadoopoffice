@@ -37,37 +37,45 @@ import org.zuinnote.hadoop.office.format.mapreduce._
 */
 
 /**
-* Demonstrate the HadoopOffice library on Spark 1.x
+* Demonstrate the HadoopOffice library on Spark 1.x.
+* Converts an Excel file to CSV
 *
 *
 */
 
 object SparkScalaExcelIn {
    def main(args: Array[String]): Unit = {
- 	val conf = new SparkConf().setAppName("Spark-Scala Excel Analytics (hadoopoffice)")
-	val sc=new SparkContext(conf)
-	val sqlContext=new SQLContext(sc)
-	// example for configuration
-	val hadoopConf = new Configuration()
-	 hadoopConf.set("hadoopoffice.read.locale.bcp47","de");
-	// load using the new Hadoop API (mapreduce.*)
-	val excelRDD = sc.newAPIHadoopFile(args(0), classOf[ExcelFileInputFormat], classOf[Text], classOf[ArrayWritable], hadoopConf);
+ 	  val conf = new SparkConf().setAppName("Spark-Scala Excel Analytics (hadoopoffice)")
+	  val sc=new SparkContext(conf)
+	  val sqlContext=new SQLContext(sc)
+	  // example for configuration
+	  val hadoopConf = new Configuration()
+	   hadoopConf.set("hadoopoffice.read.locale.bcp47","de");
+	   convertToCSV(sc, hadoopConf, args(0), args(1));
+	   sc.stop()
+   }
+   
+   
+   def convertToCSV(sc: SparkContext, hadoopConf: Configuration, inputFile: String, outputFile: String): Unit = {
+     	// load using the new Hadoop API (mapreduce.*)
+	val excelRDD = sc.newAPIHadoopFile(inputFile, classOf[ExcelFileInputFormat], classOf[Text], classOf[ArrayWritable], hadoopConf);
 	// print the cell address and the formatted cell content
-	excelRDD.flatMap(hadoopKeyValueTuple => {
-		
-		val rowArray = new Array[String](hadoopKeyValueTuple._2.get.length)
+	excelRDD.map(hadoopKeyValueTuple => {
+		val rowStrBuffer = new StringBuilder
 		var i=0;
 		for (x <-hadoopKeyValueTuple._2.get) { // parse through the SpreadSheetCellDAO
 				if (x!=null) {
-					rowArray(i)=x.asInstanceOf[SpreadSheetCellDAO].getAddress+":"+x.asInstanceOf[SpreadSheetCellDAO].getFormattedValue
+					rowStrBuffer.append(x.asInstanceOf[SpreadSheetCellDAO].getAddress+":"+x.asInstanceOf[SpreadSheetCellDAO].getFormattedValue+",")
 				} else {
-					rowArray(i)=""
+					rowStrBuffer.append(",")
 				}
 		i+=1
 		}
-		rowArray
-	}).foreach({ row=>println(row)
-	})
-    }
+		if (rowStrBuffer.length>0) {
+		  rowStrBuffer.deleteCharAt(rowStrBuffer.length-1) // remove last comma
+		}
+		rowStrBuffer.toString
+	  }).repartition(1).saveAsTextFile(outputFile)
+   }
 }
 

@@ -70,6 +70,7 @@ private long end;
 private final Seekable filePosition;
 private HadoopFileReader currentHFR;
 private HadoopOfficeReadConfiguration hocr;
+private Reporter reporter;
 
 /**
 * Creates an Abstract Record Reader for tables from various document formats
@@ -92,6 +93,8 @@ private HadoopOfficeReadConfiguration hocr;
 public AbstractSpreadSheetDocumentRecordReader(FileSplit split, JobConf job, Reporter reporter) throws IOException,FormatNotUnderstoodException,GeneralSecurityException {
  	// parse configuration
      this.conf=job;	
+     this.reporter=reporter;
+     this.reporter.setStatus("Initialize Configuration");
      this.hocr=new HadoopOfficeReadConfiguration(this.conf);
   // Initialize start and end of split
     start = split.getStart();
@@ -122,9 +125,11 @@ public AbstractSpreadSheetDocumentRecordReader(FileSplit split, JobConf job, Rep
 	officeReader = new OfficeReader(fileIn, this.hocr);  
       filePosition = fileIn;
     }
+     this.reporter.setStatus("Parsing document");
     // initialize reader
     this.officeReader.parse();
     // read linked workbooks
+    this.reporter.setStatus("Reading linked documents");
     if (this.hocr.getReadLinkedWorkbooks()) {
 	// get current path
 	Path currentPath = split.getPath();

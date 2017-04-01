@@ -20,7 +20,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 
-import java.security.GeneralSecurityException;
 
 
 import org.apache.hadoop.conf.Configuration;
@@ -28,11 +27,9 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 
-import org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException;
 
 import org.zuinnote.hadoop.office.format.common.writer.InvalidWriterConfigurationException;
 import org.zuinnote.hadoop.office.format.common.writer.OfficeWriterException;
-import org.zuinnote.hadoop.office.format.common.writer.InvalidCellSpecificationException;
 
 
 /**
