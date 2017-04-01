@@ -64,7 +64,7 @@ import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.server.resourcemanager.scheduler.fifo.FifoScheduler;
 import org.apache.hadoop.yarn.server.resourcemanager.scheduler.ResourceScheduler;
 
-public final class MapReduceExcelInputIntegrationTest {
+public final class MapReduceExcelOutputIntegrationTest {
 	private static final String tmpPrefix = "hcl-integrationtest";
 	private static java.nio.file.Path tmpPath;
 	private static String CLUSTERNAME="hcl-minicluster";
