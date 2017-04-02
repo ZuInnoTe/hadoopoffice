@@ -1,7 +1,7 @@
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'application'
-
+apply plugin: 'jacoco'
 
 
 mainClassName = "org.zuinnote.hadoop.office.example.driver.CSV2ExcelDriver"
@@ -27,6 +27,12 @@ repositories {
     mavenLocal()
 }
 
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        csv.enabled true
+    }
+}
 
 configurations {
 	provided
