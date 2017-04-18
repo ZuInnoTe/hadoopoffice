@@ -1510,6 +1510,74 @@ assertEquals("Input Split for Excel file contains row 1 with cell 3 == \"test3\"
 	assertEquals("Input Split for Excel file contains row 3 with cell 1 == \"3\"", "3", ((SpreadSheetCellDAO)spreadSheetValue.get()[0]).getFormattedValue());
     }
 
+ @Test
+ public void writeExcelOutputFormatExcel2003SingleSheetEncryptedNegative() throws IOException, InterruptedException {
+	// one row string and three columns ("test1","test2","test3")
+	// (String formattedValue, String comment, String formula, String address,String sheetName)
+	SpreadSheetCellDAO a1 = new SpreadSheetCellDAO("test1","","","A1","Sheet1");
+	SpreadSheetCellDAO b1 = new SpreadSheetCellDAO("test2","","","B1","Sheet1");
+	SpreadSheetCellDAO c1 = new SpreadSheetCellDAO("test3","","","C1","Sheet1");
+	// empty row => nothing todo
+	// one row numbers (1,2,3)
+	SpreadSheetCellDAO a3 = new SpreadSheetCellDAO("","","1","A3","Sheet1");
+	SpreadSheetCellDAO b3 = new SpreadSheetCellDAO("","","2","B3","Sheet1");
+	SpreadSheetCellDAO c3 = new SpreadSheetCellDAO("","","3","C3","Sheet1");
+	// one row formulas (=A3+B3)
+	SpreadSheetCellDAO a4 = new SpreadSheetCellDAO("","","A3+B3","A4","Sheet1");
+	// write
+	Job job=Job.getInstance();
+	Configuration conf = job.getConfiguration();
+	String fileName="excel2003singlesheettestoutencryptedpositive";
+ 	String tmpDir=tmpPath.toString();	
+ 	Path outputPath = new Path(tmpDir);
+	conf.set("mapreduce.output.basename",fileName);
+	// set locale to the one of the test data
+	conf.set("hadoopoffice.read.locale.bcp47","de");
+	conf.set("hadoopoffice.write.mimeType","application/vnd.ms-excel"); // old excel format
+	// security
+	// for the old Excel format you simply need to define only a password
+	conf.set("hadoopoffice.write.security.crypt.password","test");
+	conf.set(MRJobConfig.TASK_ATTEMPT_ID,attempt);
+	conf.setInt(MRJobConfig.APPLICATION_ATTEMPT_ID, 0);
+ 	conf.setInt(FileOutputCommitter.FILEOUTPUTCOMMITTER_ALGORITHM_VERSION,1);
+  	FileOutputFormat.setOutputPath(job, outputPath);
+	JobContext jContext = new JobContextImpl(conf, taskID.getJobID());
+
+	TaskAttemptContext context = new TaskAttemptContextImpl(conf, taskID);
+	FileOutputCommitter committer = new FileOutputCommitter(outputPath, context);
+	 // setup
+	committer.setupJob(jContext);
+	committer.setupTask(context);
+	ExcelFileOutputFormat outputFormat = new ExcelFileOutputFormat();
+ 	RecordWriter<NullWritable,SpreadSheetCellDAO> writer = outputFormat.getRecordWriter(context);
+	assertNotNull("Format returned  null RecordWriter", writer);
+	writer.write(null,a1);
+	writer.write(null,b1);
+	writer.write(null,c1);
+	writer.write(null,a3);
+	writer.write(null,b3);
+	writer.write(null,c3);
+	writer.write(null,a4);
+	writer.close(context);
+	committer.commitTask(context);
+	// try to read it again
+	conf = new Configuration(defaultConf);
+	job = Job.getInstance(conf);
+	fileName=fileName+this.outputbaseAppendix;
+	Path inputFile = new Path(tmpDir+File.separator+"_temporary"+File.separator+"0"+File.separator+taskAttempt+File.separator+fileName+".xls");
+ 	FileInputFormat.setInputPaths(job, inputFile);
+	// set locale to the one of the test data
+	conf.set("hadoopoffice.read.locale.bcp47","de");
+	conf.set("hadoopoffice.read.security.crypt.password","test2");
+	ExcelFileInputFormat inputFormat = new ExcelFileInputFormat();
+ 	 FileInputFormat.setInputPaths(job, inputFile);
+	 context = new TaskAttemptContextImpl(conf, new TaskAttemptID());
+	List<InputSplit> splits = inputFormat.getSplits(job);
+ 	assertEquals("Only one split generated for Excel file", 1, splits.size());
+	RecordReader<Text, ArrayWritable> reader = inputFormat.createRecordReader(splits.get(0), context);
+	exception.expect(InterruptedException.class);
+	reader.initialize(splits.get(0),context);
+ }
 
   @Test
     public void writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchAllPositive() throws IOException, InterruptedException {
