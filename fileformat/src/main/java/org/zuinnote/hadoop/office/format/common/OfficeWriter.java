@@ -75,15 +75,15 @@ public OfficeWriter(HadoopOfficeWriteConfiguration howc) throws InvalidWriterCon
 * @param oStream OutputStream where the Workbook should be written when calling finalizeWrite
 * @param linkedWorkbooks linked workbooks that are already existing and linked to this document. Only if supported by the format
 * @param linkedWorkbooksPasswords a map of passwords and linkedworkbooks. The key is the filename without path of the linkedworkbook and the value is the password
-*
+* @param template
 * @throws org.zuinnote.hadoop.office.format.common.writer.OfficeWriterException in case no proper writer has been instantiated or linked workbooks have invalid format
 * 
 */
 
-public void create(OutputStream oStream, Map<String,InputStream> linkedWorkbooks,Map<String,String> linkedWorkbooksPasswords) throws OfficeWriterException {
+public void create(OutputStream oStream, Map<String,InputStream> linkedWorkbooks,Map<String,String> linkedWorkbooksPasswords, InputStream template) throws OfficeWriterException {
 	this.oStream=oStream;
 	if (this.currentOfficeSpreadSheetWriter!=null) {
-		this.currentOfficeSpreadSheetWriter.create(oStream,linkedWorkbooks,linkedWorkbooksPasswords);
+		this.currentOfficeSpreadSheetWriter.create(oStream,linkedWorkbooks,linkedWorkbooksPasswords,template);
 	} else {
 		throw new OfficeWriterException(EX_NO_WRITER_INSTANTIATED);
 	}

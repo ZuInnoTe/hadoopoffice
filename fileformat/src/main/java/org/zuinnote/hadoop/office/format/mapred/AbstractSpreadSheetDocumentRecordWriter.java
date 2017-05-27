@@ -84,7 +84,11 @@ public AbstractSpreadSheetDocumentRecordWriter(DataOutputStream out, String file
      this.linkedWorkbooksMap=this.currentReader.loadLinkedWorkbooks(this.howc.getLinkedWorkbooksName());
     // create OfficeWriter 
       this.officeWriter=new OfficeWriter(this.howc);
-     this.officeWriter.create(out,this.linkedWorkbooksMap,this.howc.getLinkedWBCredentialMap()); 
+      InputStream templateInputStream=null;
+      if ((this.howc.getTemplate()!=null) && (!"".equals(this.howc.getTemplate()))) {
+   	   templateInputStream=this.currentReader.loadTemplate(this.howc.getTemplate());
+      }
+     this.officeWriter.create(out,this.linkedWorkbooksMap,this.howc.getLinkedWBCredentialMap(),templateInputStream); 
 }
 
 /**

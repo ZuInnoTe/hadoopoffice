@@ -133,4 +133,19 @@ public Map<String,InputStream> loadLinkedWorkbooks(String[] fileNames) throws IO
 	return result;
 }
 
+/*
+* Loads template as InputStreams
+* 
+* @param fileName filename of template (full URI/path) to load
+*
+* @return InputStream of the template
+*
+* @throws java.io.IOException in case of issues loading a file
+*
+*/
+public InputStream loadTemplate(String fileName) throws IOException {
+	Path currentPath=new Path(fileName);
+	return openFile(currentPath);
+}
+
 }

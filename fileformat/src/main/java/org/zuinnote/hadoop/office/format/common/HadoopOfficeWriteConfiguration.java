@@ -41,6 +41,7 @@ public class HadoopOfficeWriteConfiguration {
 	public static final String CONF_HASHALGORITHM="hadoopoffice.write.security.crypt.hash.algorithm";
 	public static final String CONF_DECRYPTLINKEDWBBASE="hadoopoffice.write.security.crypt.linkedworkbooks.";
 	public static final String CONF_METADATA="hadoopoffice.write.metadata."; // base: all these properties (e.g. hadoopoffice.write.metadata.author) will be handed over to the corresponding writer
+	public static final String CONF_TEMPLATE="hadoopoffice.write.template.file";
 	public static final String DEFAULT_MIMETYPE="";
 	public static final String DEFAULT_LOCALE="";
 	public static final String DEFAULT_LINKEDWB="";
@@ -50,6 +51,7 @@ public class HadoopOfficeWriteConfiguration {
 	public static final int DEFAULT_COMMENTHEIGHT=3;
 	public static final String DEFAULT_PASSWORD=null;
 	public static final String DEFAULT_ALGORITHM="aes256";
+	public static final String DEFAULT_TEMPLATE ="";
 	private String[] linkedWorkbooksName;
 	private String fileName;
 	private String mimeType;
@@ -63,6 +65,7 @@ public class HadoopOfficeWriteConfiguration {
 	private String hashAlgorithm;
 	private String encryptMode;
 	private String chainMode;
+	private String template;
 	private Map<String,String> linkedWBCredentialMap;
 	private Map<String,String> metadata;
 /*
@@ -80,6 +83,7 @@ public class HadoopOfficeWriteConfiguration {
 * hadoopoffice.write.security.crypt.chain.mode: use the following mode to chain. Note that some writers do not support all modes and an exception will be thrown if the mode is not supported. See corresponding writer documentation for supported algorithms.
 * hadoopoffice.write.security.crypt.linkedworkbooks.*: if set then hadoopoffice will try to decrypt all the linked workbooks where a password has been specified. If no password is specified then it is assumed that the linked workbook is not encrypted. Example: Property key for file "linkedworkbook1.xlsx" is  "hadoopoffice.read.security.crypt.linkedworkbooks.linkedworkbook1.xslx". Value is the password. You must not include path or protocol information in the filename 
 * hadoopoffice.write.metadata.*: Write metadata properties of the document. All properties belonging to the base (e.g. hadoopoffice.write.metadata.author for author) will be handed over to the corresponding writer. See writer documentation which properties are supported
+* hadoopoffice.write.template.file: Use a template as input to modify selected cells of it
 * @param fileName filename to write
  * 
  */
@@ -104,6 +108,7 @@ public HadoopOfficeWriteConfiguration(Configuration conf, String fileName) {
      this.setMetadata(HadoopUtil.parsePropertiesFromBase(conf,HadoopOfficeWriteConfiguration.CONF_METADATA));
      this.setLinkedWBCredentialMap(HadoopUtil.parsePropertiesFromBase(conf,HadoopOfficeWriteConfiguration.CONF_DECRYPTLINKEDWBBASE));
      this.setFileName(fileName);
+     this.setTemplate(conf.get(HadoopOfficeWriteConfiguration.CONF_TEMPLATE,HadoopOfficeWriteConfiguration.DEFAULT_TEMPLATE));
 }
 public String[] getLinkedWorkbooksName() {
 	return linkedWorkbooksName;
@@ -194,6 +199,14 @@ public Map<String,String> getMetadata() {
 }
 public void setMetadata(Map<String,String> metadata) {
 	this.metadata = metadata;
+}
+
+public String getTemplate() {
+	return template;
+}
+
+public void setTemplate(String template) {
+	this.template=template;
 }
 
 }

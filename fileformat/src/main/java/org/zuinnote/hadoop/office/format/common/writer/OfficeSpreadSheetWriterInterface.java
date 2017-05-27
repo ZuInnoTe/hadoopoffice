@@ -22,8 +22,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public interface OfficeSpreadSheetWriterInterface {
+	
 
-public void create(OutputStream osStream, Map<String,InputStream> linkedWorkbooks,Map<String,String> linkedWorkbooksPasswords) throws OfficeWriterException;
+public void create(OutputStream osStream, Map<String,InputStream> linkedWorkbooks,Map<String,String> linkedWorkbooksPasswords, InputStream template) throws OfficeWriterException;
 
 public void write(Object newDAO) throws OfficeWriterException;
 

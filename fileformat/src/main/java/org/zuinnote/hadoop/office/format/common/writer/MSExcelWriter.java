@@ -83,6 +83,8 @@ private CipherAlgorithm encryptAlgorithmCipher;
 private HashAlgorithm hashAlgorithmCipher;
 private EncryptionMode encryptionModeCipher;
 private ChainingMode chainModeCipher;
+private boolean hasTemplate;
+
 
 /**
 *
@@ -120,6 +122,7 @@ public MSExcelWriter(String excelFormat, HadoopOfficeWriteConfiguration howc) th
 	this.hashAlgorithmCipher=getHashAlgorithm(this.howc.getHashAlgorithm());
 	this.encryptionModeCipher=getEncryptionModeCipher(this.howc.getEncryptMode());
 	this.chainModeCipher=getChainMode(this.howc.getChainMode());
+	this.hasTemplate=false;
 }
 
 
@@ -130,21 +133,41 @@ public MSExcelWriter(String excelFormat, HadoopOfficeWriteConfiguration howc) th
 * @param oStream OutputStream where the Workbook should be written when calling finalizeWrite
 * @param linkedWorkbooks linked workbooks that are already existing and linked to this spreadsheet
 * @param linkedWorkbooksPasswords a map of passwords and linkedworkbooks. The key is the filename without path of the linkedworkbook and the value is the password
-*
+* @param template a template that should be use as base for the document to write, null if there is no template
 * @throws org.zuinnote.hadoop.office.format.common.writer.OfficeWriterException in  case of errors writing to the outputstream
 *
 */
 @Override
-public void create(OutputStream oStream, Map<String,InputStream> linkedWorkbooks,Map<String,String> linkedWorkbooksPasswords) throws OfficeWriterException {
+public void create(OutputStream oStream, Map<String,InputStream> linkedWorkbooks,Map<String,String> linkedWorkbooksPasswords, InputStream template) throws OfficeWriterException {
 	this.oStream=oStream;
-	// create a new Workbook either in old Excel or "new" Excel format
-	if (this.format.equals(MSExcelWriter.FORMAT_OOXML)) {
-		this.currentWorkbook=new XSSFWorkbook();
-		this.ooxmlDocumentFileSystem = new POIFSFileSystem();					
-	} else if (this.format.equals(MSExcelWriter.FORMAT_OLD)) {
-		this.currentWorkbook=new HSSFWorkbook();
-		((HSSFWorkbook)this.currentWorkbook).createInformationProperties();
-	} 
+	// check if we should load a workbook from template
+	if(template!=null){
+		LOG.info("Loading template: "+this.howc.getTemplate());
+		this.hasTemplate=true;
+		HadoopOfficeReadConfiguration currentTemplateHOCR = new HadoopOfficeReadConfiguration();
+		currentTemplateHOCR.setLocale(this.howc.getLocale());
+		currentTemplateHOCR.setSheets(null);
+		currentTemplateHOCR.setIgnoreMissingLinkedWorkbooks(this.howc.getIgnoreMissingLinkedWorkbooks());
+		currentTemplateHOCR.setMetaDataFilter(null);
+		MSExcelParser currentTemplateParser = new MSExcelParser(currentTemplateHOCR,null);
+		try {
+			currentTemplateParser.parse(template);
+		} catch (FormatNotUnderstoodException e) {
+			LOG.error(e);
+			LOG.error("Cannot read template");
+			throw new OfficeWriterException(e.toString());
+		}
+		this.currentWorkbook=currentTemplateParser.getCurrentWorkbook();
+	} else {
+		// create a new Workbook either in old Excel or "new" Excel format
+		if (this.format.equals(MSExcelWriter.FORMAT_OOXML)) {
+			this.currentWorkbook=new XSSFWorkbook();
+			this.ooxmlDocumentFileSystem = new POIFSFileSystem();					
+		} else if (this.format.equals(MSExcelWriter.FORMAT_OLD)) {
+			this.currentWorkbook=new HSSFWorkbook();
+			((HSSFWorkbook)this.currentWorkbook).createInformationProperties();
+		} 
+	}
 	FormulaEvaluator currentFormulaEvaluator=this.currentWorkbook.getCreationHelper().createFormulaEvaluator();
 	HashMap<String,FormulaEvaluator> linkedFormulaEvaluators=new HashMap<>();
 	linkedFormulaEvaluators.put(this.howc.getFileName(),currentFormulaEvaluator);
@@ -185,6 +208,7 @@ public void create(OutputStream oStream, Map<String,InputStream> linkedWorkbooks
 	}
 	LOG.debug("Size of linked formula evaluators map: "+linkedFormulaEvaluators.size());
 	currentFormulaEvaluator.setupReferencedWorkbooks(linkedFormulaEvaluators);
+	
 }
 	
 
@@ -216,11 +240,13 @@ public void write(Object newDAO) throws OfficeWriterException {
 		currentRow=currentSheet.createRow(currentCA.getRow());
 	}
 	Cell currentCell = currentRow.getCell(currentCA.getColumn());
-	if (currentCell!=null) { // cell already exists? => throw exception
+	if ((currentCell!=null) && (this.hasTemplate==false)) { // cell already exists and no template loaded ? => throw exception
 		throw new OfficeWriterException("Invalid cell specification: cell already exists at "+currentCA);
 	}
-	// create cell
-	currentCell=currentRow.createCell(currentCA.getColumn());		
+	// create cell if no template is loaded
+	if (this.hasTemplate==false) {
+		currentCell=currentRow.createCell(currentCA.getColumn());		
+	}
 	// set the values accordingly
 	if (!("".equals(sscd.getFormula()))) { // if formula exists then use formula
 		currentCell.setCellFormula(sscd.getFormula());
