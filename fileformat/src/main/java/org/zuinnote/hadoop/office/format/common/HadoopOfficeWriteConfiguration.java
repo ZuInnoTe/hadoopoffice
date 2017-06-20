@@ -42,6 +42,7 @@ public class HadoopOfficeWriteConfiguration {
 	public static final String CONF_DECRYPTLINKEDWBBASE="hadoopoffice.write.security.crypt.linkedworkbooks.";
 	public static final String CONF_METADATA="hadoopoffice.write.metadata."; // base: all these properties (e.g. hadoopoffice.write.metadata.author) will be handed over to the corresponding writer
 	public static final String CONF_TEMPLATE="hadoopoffice.write.template.file";
+	public static final String CONF_TEMPLATEPW="hadoopoffice.write.template.password";
 	public static final String DEFAULT_MIMETYPE="";
 	public static final String DEFAULT_LOCALE="";
 	public static final String DEFAULT_LINKEDWB="";
@@ -52,6 +53,7 @@ public class HadoopOfficeWriteConfiguration {
 	public static final String DEFAULT_PASSWORD=null;
 	public static final String DEFAULT_ALGORITHM="aes256";
 	public static final String DEFAULT_TEMPLATE ="";
+	public static final String DEFAULT_TEMPLATEPW ="";
 	private String[] linkedWorkbooksName;
 	private String fileName;
 	private String mimeType;
@@ -66,6 +68,7 @@ public class HadoopOfficeWriteConfiguration {
 	private String encryptMode;
 	private String chainMode;
 	private String template;
+	private String templatePassword;
 	private Map<String,String> linkedWBCredentialMap;
 	private Map<String,String> metadata;
 /*
@@ -109,6 +112,9 @@ public HadoopOfficeWriteConfiguration(Configuration conf, String fileName) {
      this.setLinkedWBCredentialMap(HadoopUtil.parsePropertiesFromBase(conf,HadoopOfficeWriteConfiguration.CONF_DECRYPTLINKEDWBBASE));
      this.setFileName(fileName);
      this.setTemplate(conf.get(HadoopOfficeWriteConfiguration.CONF_TEMPLATE,HadoopOfficeWriteConfiguration.DEFAULT_TEMPLATE));
+
+     this.setTemplatePassword(conf.get(HadoopOfficeWriteConfiguration.CONF_TEMPLATEPW,HadoopOfficeWriteConfiguration.DEFAULT_TEMPLATEPW));
+     
 }
 public String[] getLinkedWorkbooksName() {
 	return linkedWorkbooksName;
@@ -207,6 +213,14 @@ public String getTemplate() {
 
 public void setTemplate(String template) {
 	this.template=template;
+}
+
+public String getTemplatePassword() {
+	return templatePassword;
+}
+
+public void setTemplatePassword(String templatePassword) {
+	this.templatePassword=templatePassword;
 }
 
 }

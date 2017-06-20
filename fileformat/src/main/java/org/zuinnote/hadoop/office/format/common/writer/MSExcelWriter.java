@@ -149,6 +149,7 @@ public void create(OutputStream oStream, Map<String,InputStream> linkedWorkbooks
 		currentTemplateHOCR.setSheets(null);
 		currentTemplateHOCR.setIgnoreMissingLinkedWorkbooks(this.howc.getIgnoreMissingLinkedWorkbooks());
 		currentTemplateHOCR.setMetaDataFilter(null);
+		currentTemplateHOCR.setPassword(this.howc.getTemplatePassword());
 		MSExcelParser currentTemplateParser = new MSExcelParser(currentTemplateHOCR,null);
 		try {
 			currentTemplateParser.parse(template);
@@ -243,8 +244,8 @@ public void write(Object newDAO) throws OfficeWriterException {
 	if ((currentCell!=null) && (this.hasTemplate==false)) { // cell already exists and no template loaded ? => throw exception
 		throw new OfficeWriterException("Invalid cell specification: cell already exists at "+currentCA);
 	}
-	// create cell if no template is loaded
-	if (this.hasTemplate==false) {
+	// create cell if no template is loaded or cell not available in template
+	if ((this.hasTemplate==false) || (currentCell==null)) {
 		currentCell=currentRow.createCell(currentCA.getColumn());		
 	}
 	// set the values accordingly
