@@ -322,6 +322,28 @@ private static java.nio.file.Path tmpPath;
 	assertTrue("Test Data File \""+fileName+"\" exists", file.exists());
 	assertFalse("Test Data File \""+fileName+"\" is not a directory", file.isDirectory());
     }
+   
+   @Test
+   public void checkTestExcel2013TemplateAvailable() {
+	ClassLoader classLoader = getClass().getClassLoader();
+	String fileName="templatetest1.xlsx";
+	String fileNameSpreadSheet=classLoader.getResource(fileName).getFile();	
+	assertNotNull("Test Data File \""+fileName+"\" is not null in resource path",fileNameSpreadSheet);
+	File file = new File(fileNameSpreadSheet);
+	assertTrue("Test Data File \""+fileName+"\" exists", file.exists());
+	assertFalse("Test Data File \""+fileName+"\" is not a directory", file.isDirectory());
+   }
+   
+   @Test
+   public void checkTestExcel2013TemplateEncryptedAvailable() {
+	ClassLoader classLoader = getClass().getClassLoader();
+	String fileName="templatetest1encrypt.xlsx";
+	String fileNameSpreadSheet=classLoader.getResource(fileName).getFile();	
+	assertNotNull("Test Data File \""+fileName+"\" is not null in resource path",fileNameSpreadSheet);
+	File file = new File(fileNameSpreadSheet);
+	assertTrue("Test Data File \""+fileName+"\" exists", file.exists());
+	assertFalse("Test Data File \""+fileName+"\" is not a directory", file.isDirectory());
+   }
 
     @Test
     public void checkTestExcel2013MultiSheetBzip2Available() {
@@ -2338,6 +2360,164 @@ JobConf job = new JobConf(defaultConf);
 	assertEquals("Input Split for Excel file contains row 1 with cell 3 == \"test5\"", "test5", ((SpreadSheetCellDAO)spreadSheetValue.get()[2]).getFormattedValue());
     }
 
+    @Test
+    public void writeExcelOutputFormatExcel2013TemplateSingleSheet() throws IOException {
+	// one row string and three columns ("test1","test2","test3")
+    // change the cell A4 from Test4 to Test5 from the template
+	SpreadSheetCellDAO a4 = new SpreadSheetCellDAO("Test5","","","A4","Table1");
+	// change b4 from 10 to 60
+	SpreadSheetCellDAO b4 = new SpreadSheetCellDAO("","","60","B4","Table1");
+	// write
+	JobConf job = new JobConf(defaultConf);
+    	String fileName="excel2013basedontemplate";
+    	String tmpDir=tmpPath.toString();	
+    	Path outputPath = new Path(tmpDir);
+    	FileOutputFormat.setOutputPath(job, outputPath);
+	// set generic outputformat settings
+	job.set(JobContext.TASK_ATTEMPT_ID, attempt);
+	// set locale to the one of the test data
+	job.set("hadoopoffice.read.locale.bcp47","de");
+	job.set("hadoopoffice.write.mimeType","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new excel format
+	// template
+	ClassLoader classLoader = getClass().getClassLoader();
+ 	String fileNameTemplate=classLoader.getResource("templatetest1.xlsx").getFile();	
+	job.set("hadoopoffice.write.template.file",fileNameTemplate);
+	// 
+   	ExcelFileOutputFormat outputFormat = new ExcelFileOutputFormat();
+    	RecordWriter<NullWritable,SpreadSheetCellDAO> writer = outputFormat.getRecordWriter(null, job, fileName, null);
+	assertNotNull("Format returned  null RecordWriter", writer);
+	writer.write(null,a4);
+	writer.write(null,b4);
+	writer.close(reporter);
+	// try to read it again
+	job = new JobConf(defaultConf);
+	Path inputFile = new Path(tmpDir+File.separator+"_temporary"+File.separator+"0"+File.separator+"_temporary"+File.separator+attempt+File.separator+fileName+".xlsx");
+    	FileInputFormat.setInputPaths(job, inputFile);
+	// set locale to the one of the test data
+	job.set("hadoopoffice.read.locale.bcp47","de");
+   	ExcelFileInputFormat inputFormat = new ExcelFileInputFormat();
+    	inputFormat.configure(job);
+    	InputSplit[] inputSplits = inputFormat.getSplits(job,1);
+    	assertEquals("Only one split generated for Excel file", 1, inputSplits.length);
+    	RecordReader<Text, ArrayWritable> reader = inputFormat.getRecordReader(inputSplits[0], job, reporter);
+	assertNotNull("Format returned  null RecordReader", reader);
+	Text spreadSheetKey = new Text();	
+	ArrayWritable spreadSheetValue = new ArrayWritable(SpreadSheetCellDAO.class);
+	assertTrue("Input Split for Excel file contains row 1", reader.next(spreadSheetKey,spreadSheetValue));	
+	assertEquals("Input Split for Excel file has keyname == \"["+fileName+".xlsx]Table1!A1\"", "["+fileName+".xlsx]Table1!A1", spreadSheetKey.toString());
+	assertEquals("Input Split for Excel file contains row 1 with 2 columns", 2, spreadSheetValue.get().length);
+	assertEquals("Input Split for Excel file contains row 1 with cell 1 == \"Test\"", "Test", ((SpreadSheetCellDAO)spreadSheetValue.get()[0]).getFormattedValue());
+	assertEquals("Input Split for Excel file contains row 1 with cell 2 == \"10\"", "10", ((SpreadSheetCellDAO)spreadSheetValue.get()[1]).getFormattedValue());
+	assertTrue("Input Split for Excel file contains row 2", reader.next(spreadSheetKey,spreadSheetValue));
+	assertEquals("Input Split for Excel file contains row 2 with 2 columns", 2, spreadSheetValue.get().length);
+	assertEquals("Input Split for Excel file contains row 2 with cell 1 == \"Test2\"", "Test2", ((SpreadSheetCellDAO)spreadSheetValue.get()[0]).getFormattedValue());
+	assertEquals("Input Split for Excel file contains row 2 with cell 2 == \"50\"", "50", ((SpreadSheetCellDAO)spreadSheetValue.get()[1]).getFormattedValue());	
+	assertTrue("Input Split for Excel file contains row 3", reader.next(spreadSheetKey,spreadSheetValue));
+	assertEquals("Input Split for Excel file contain row 3 with 2 columns", 2,spreadSheetValue.get().length);	
+	assertEquals("Input Split for Excel file contains row 3 with cell 1 == \"Test3\"", "Test3", ((SpreadSheetCellDAO)spreadSheetValue.get()[0]).getFormattedValue());
+	assertEquals("Input Split for Excel file contains row 3 with cell 2 == \"20\"", "20", ((SpreadSheetCellDAO)spreadSheetValue.get()[1]).getFormattedValue());
+	assertTrue("Input Split for Excel file contains row 4", reader.next(spreadSheetKey,spreadSheetValue));
+	assertEquals("Input Split for Excel file contain row 4 with 2 columns", 2,spreadSheetValue.get().length);	
+	assertEquals("Input Split for Excel file contains row 3 with cell 1 == \"Test5\"", "Test5", ((SpreadSheetCellDAO)spreadSheetValue.get()[0]).getFormattedValue());
+
+	assertEquals("Input Split for Excel file contains row 3 with cell 2 == \"60\"", "60", ((SpreadSheetCellDAO)spreadSheetValue.get()[1]).getFormattedValue());
+    }
+    
+    @Test
+    public void writeExcelOutputFormatExcel2013TemplateEncryptedSingleSheetPositive() throws IOException {
+	// one row string and three columns ("test1","test2","test3")
+    // change the cell A4 from Test4 to Test5 from the template
+	SpreadSheetCellDAO a4 = new SpreadSheetCellDAO("Test5","","","A4","Table1");
+	// change b4 from 10 to 60
+	SpreadSheetCellDAO b4 = new SpreadSheetCellDAO("","","60","B4","Table1");
+	// write
+	JobConf job = new JobConf(defaultConf);
+    	String fileName="excel2013basedontemplateencrypted";
+    	String tmpDir=tmpPath.toString();	
+    	Path outputPath = new Path(tmpDir);
+    	FileOutputFormat.setOutputPath(job, outputPath);
+	// set generic outputformat settings
+	job.set(JobContext.TASK_ATTEMPT_ID, attempt);
+	// set locale to the one of the test data
+	job.set("hadoopoffice.read.locale.bcp47","de");
+	job.set("hadoopoffice.write.mimeType","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new excel format
+	// template
+	ClassLoader classLoader = getClass().getClassLoader();
+ 	String fileNameTemplate=classLoader.getResource("templatetest1encrypt.xlsx").getFile();	
+	job.set("hadoopoffice.write.template.file",fileNameTemplate);
+	job.set("hadoopoffice.write.template.password", "test");
+	// 
+   	ExcelFileOutputFormat outputFormat = new ExcelFileOutputFormat();
+    	RecordWriter<NullWritable,SpreadSheetCellDAO> writer = outputFormat.getRecordWriter(null, job, fileName, null);
+	assertNotNull("Format returned  null RecordWriter", writer);
+	writer.write(null,a4);
+	writer.write(null,b4);
+	writer.close(reporter);
+	// try to read it again
+	job = new JobConf(defaultConf);
+	Path inputFile = new Path(tmpDir+File.separator+"_temporary"+File.separator+"0"+File.separator+"_temporary"+File.separator+attempt+File.separator+fileName+".xlsx");
+    	FileInputFormat.setInputPaths(job, inputFile);
+	// set locale to the one of the test data
+	job.set("hadoopoffice.read.locale.bcp47","de");
+   	ExcelFileInputFormat inputFormat = new ExcelFileInputFormat();
+    	inputFormat.configure(job);
+    	InputSplit[] inputSplits = inputFormat.getSplits(job,1);
+    	assertEquals("Only one split generated for Excel file", 1, inputSplits.length);
+    	RecordReader<Text, ArrayWritable> reader = inputFormat.getRecordReader(inputSplits[0], job, reporter);
+	assertNotNull("Format returned  null RecordReader", reader);
+	Text spreadSheetKey = new Text();	
+	ArrayWritable spreadSheetValue = new ArrayWritable(SpreadSheetCellDAO.class);
+	assertTrue("Input Split for Excel file contains row 1", reader.next(spreadSheetKey,spreadSheetValue));	
+	assertEquals("Input Split for Excel file has keyname == \"["+fileName+".xlsx]Table1!A1\"", "["+fileName+".xlsx]Table1!A1", spreadSheetKey.toString());
+	assertEquals("Input Split for Excel file contains row 1 with 2 columns", 2, spreadSheetValue.get().length);
+	assertEquals("Input Split for Excel file contains row 1 with cell 1 == \"Test\"", "Test", ((SpreadSheetCellDAO)spreadSheetValue.get()[0]).getFormattedValue());
+	assertEquals("Input Split for Excel file contains row 1 with cell 2 == \"10\"", "10", ((SpreadSheetCellDAO)spreadSheetValue.get()[1]).getFormattedValue());
+	assertTrue("Input Split for Excel file contains row 2", reader.next(spreadSheetKey,spreadSheetValue));
+	assertEquals("Input Split for Excel file contains row 2 with 2 columns", 2, spreadSheetValue.get().length);
+	assertEquals("Input Split for Excel file contains row 2 with cell 1 == \"Test2\"", "Test2", ((SpreadSheetCellDAO)spreadSheetValue.get()[0]).getFormattedValue());
+	assertEquals("Input Split for Excel file contains row 2 with cell 2 == \"50\"", "50", ((SpreadSheetCellDAO)spreadSheetValue.get()[1]).getFormattedValue());	
+	assertTrue("Input Split for Excel file contains row 3", reader.next(spreadSheetKey,spreadSheetValue));
+	assertEquals("Input Split for Excel file contain row 3 with 2 columns", 2,spreadSheetValue.get().length);	
+	assertEquals("Input Split for Excel file contains row 3 with cell 1 == \"Test3\"", "Test3", ((SpreadSheetCellDAO)spreadSheetValue.get()[0]).getFormattedValue());
+	assertEquals("Input Split for Excel file contains row 3 with cell 2 == \"20\"", "20", ((SpreadSheetCellDAO)spreadSheetValue.get()[1]).getFormattedValue());
+	assertTrue("Input Split for Excel file contains row 4", reader.next(spreadSheetKey,spreadSheetValue));
+	assertEquals("Input Split for Excel file contain row 4 with 2 columns", 2,spreadSheetValue.get().length);	
+	assertEquals("Input Split for Excel file contains row 3 with cell 1 == \"Test5\"", "Test5", ((SpreadSheetCellDAO)spreadSheetValue.get()[0]).getFormattedValue());
+
+	assertEquals("Input Split for Excel file contains row 3 with cell 2 == \"60\"", "60", ((SpreadSheetCellDAO)spreadSheetValue.get()[1]).getFormattedValue());
+    }
+    
+    @Test
+    public void writeExcelOutputFormatExcel2013TemplateEncryptedSingleSheetNegative() throws IOException {
+	// one row string and three columns ("test1","test2","test3")
+    // change the cell A4 from Test4 to Test5 from the template
+	SpreadSheetCellDAO a4 = new SpreadSheetCellDAO("Test5","","","A4","Table1");
+	// change b4 from 10 to 60
+	SpreadSheetCellDAO b4 = new SpreadSheetCellDAO("","","60","B4","Table1");
+	// write
+	JobConf job = new JobConf(defaultConf);
+    	String fileName="excel2013basedontemplateencrypted";
+    	String tmpDir=tmpPath.toString();	
+    	Path outputPath = new Path(tmpDir);
+    	FileOutputFormat.setOutputPath(job, outputPath);
+	// set generic outputformat settings
+	job.set(JobContext.TASK_ATTEMPT_ID, attempt);
+	// set locale to the one of the test data
+	job.set("hadoopoffice.read.locale.bcp47","de");
+	job.set("hadoopoffice.write.mimeType","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new excel format
+	// template
+	ClassLoader classLoader = getClass().getClassLoader();
+ 	String fileNameTemplate=classLoader.getResource("templatetest1encrypt.xlsx").getFile();	
+	job.set("hadoopoffice.write.template.file",fileNameTemplate);
+	job.set("hadoopoffice.write.template.password", "test2");
+	// 
+   	ExcelFileOutputFormat outputFormat = new ExcelFileOutputFormat();
+    	RecordWriter<NullWritable,SpreadSheetCellDAO> writer = outputFormat.getRecordWriter(null, job, fileName, null);
+	assertNull("Format returned  null RecordWriter", writer);
+	    }
+    
+    
+    
     @Ignore("This does not work yet due to a bug in Apache POI that prevents writing correct workbooks containing external references: https://bz.apache.org/bugzilla/show_bug.cgi?id=57184")
     @Test
     public void writeExcelOutputFormatExcel2013SingleSheetOneLinkedWorkbook() throws IOException {
