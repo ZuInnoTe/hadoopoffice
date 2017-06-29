@@ -35,11 +35,14 @@ public static final String CONF_IGNOREMISSINGWB="hadoopoffice.read.ignoremissing
 public static final String CONF_DECRYPT="hadoopoffice.read.security.crypt.password";
 public static final String CONF_DECRYPTLINKEDWBBASE="hadoopoffice.read.security.crypt.linkedworkbooks.";
 public static final String CONF_FILTERMETADATA = "hadoopoffice.read.filter.metadata."; // base: all these properties (e.g. hadoopoffice.read.filter.metadata.author) will be handed over to the corresponding reader which does the filtering!
+public static final String CONF_LOWFOOTPRINT="hadoopoffice.read.lowFootprint";
 public static final String DEFAULT_MIMETYPE="";
 public static final String DEFAULT_LOCALE="";
 public static final String DEFAULT_SHEETS="";
 public static final boolean DEFAULT_LINKEDWB=false;
 public static final boolean DEFAULT_IGNOREMISSINGLINKEDWB=false;
+
+public static final boolean DEFAULT_LOWFOOTPRINT=false;
 
 private String fileName;
 private String mimeType=null;
@@ -51,6 +54,7 @@ private boolean ignoreMissingLinkedWorkbooks=false;
 private String password=null;
 private Map<String,String> metadataFilter;
 private Map<String,String> linkedWBCredentialMap;
+private boolean lowFootprint;
 
 /*
  * Create an empty configuration
@@ -71,7 +75,7 @@ public HadoopOfficeReadConfiguration() {
 * hadoopoffice.read.security.crypt.password: if set then hadoopoffice will try to decrypt the file
 * hadoopoffice.read.security.crypt.linkedworkbooks.*: if set then hadoopoffice will try to decrypt all the linked workbooks where a password has been specified. If no password is specified then it is assumed that the linked workbook is not encrypted. Example: Property key for file "linkedworkbook1.xlsx" is  "hadoopoffice.read.security.crypt.linkedworkbooks.linkedworkbook1.xslx". Value is the password. You must not include path or protocol information in the filename 
 * hadoopoffice.read.filter.metadata: filters documents according to metadata. For example, hadoopoffice.read.filter.metadata.author will filter by author and the filter defined as value. Filtering is done by the parser and it is recommended that it supports regular expression for filtering, but this is up to the parser!
-
+* hadoopoffice.read.lowfootprint: uses low memory/cpu footprint for reading documents. Note: In this mode certain features are not availanble, such as reading formulas. Default: false
  * 
  * 
  */
@@ -87,7 +91,7 @@ public HadoopOfficeReadConfiguration(Configuration conf) {
      this.password=conf.get(HadoopOfficeReadConfiguration.CONF_DECRYPT); // null if no password is set
       this.metadataFilter=HadoopUtil.parsePropertiesFromBase(conf,HadoopOfficeReadConfiguration.CONF_FILTERMETADATA);
      this.linkedWBCredentialMap=HadoopUtil.parsePropertiesFromBase(conf,HadoopOfficeReadConfiguration.CONF_DECRYPTLINKEDWBBASE);
-
+     this.lowFootprint=conf.getBoolean(HadoopOfficeReadConfiguration.CONF_LOWFOOTPRINT,HadoopOfficeReadConfiguration.DEFAULT_LOWFOOTPRINT);
 }
 
 /*
@@ -271,6 +275,27 @@ public String getFileName() {
  */
 public void setFileName(String fileName) {
 	this.fileName=fileName;
+}
+
+/*
+ * Should files be read in low footprint mode or not
+ * 
+ * @return true, if yes, false if not
+ * 
+ */
+public boolean getLowFootprint() {
+	return this.lowFootprint;
+}
+
+/**
+ * Set if files should be read in low footprint mode or not
+ * 
+ * @param lowFootprint true, if yes, false, if not
+ * 
+ */
+
+public void setLowFootprint(boolean lowFootprint) {
+	this.lowFootprint=lowFootprint;
 }
 
 

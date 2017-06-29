@@ -43,6 +43,8 @@ public class HadoopOfficeWriteConfiguration {
 	public static final String CONF_METADATA="hadoopoffice.write.metadata."; // base: all these properties (e.g. hadoopoffice.write.metadata.author) will be handed over to the corresponding writer
 	public static final String CONF_TEMPLATE="hadoopoffice.write.template.file";
 	public static final String CONF_TEMPLATEPW="hadoopoffice.write.template.password";
+
+	public static final String CONF_LOWFOOTPRINT="hadoopoffice.write.lowFootprint";
 	public static final String DEFAULT_MIMETYPE="";
 	public static final String DEFAULT_LOCALE="";
 	public static final String DEFAULT_LINKEDWB="";
@@ -54,6 +56,8 @@ public class HadoopOfficeWriteConfiguration {
 	public static final String DEFAULT_ALGORITHM="aes256";
 	public static final String DEFAULT_TEMPLATE ="";
 	public static final String DEFAULT_TEMPLATEPW ="";
+
+	public static final boolean DEFAULT_LOWFOOTPRINT=false;
 	private String[] linkedWorkbooksName;
 	private String fileName;
 	private String mimeType;
@@ -71,6 +75,7 @@ public class HadoopOfficeWriteConfiguration {
 	private String templatePassword;
 	private Map<String,String> linkedWBCredentialMap;
 	private Map<String,String> metadata;
+	private boolean lowFootprint;
 /*
  * 	Read the configuration for writing office files from a Hadoop configuration
  * 
@@ -87,6 +92,7 @@ public class HadoopOfficeWriteConfiguration {
 * hadoopoffice.write.security.crypt.linkedworkbooks.*: if set then hadoopoffice will try to decrypt all the linked workbooks where a password has been specified. If no password is specified then it is assumed that the linked workbook is not encrypted. Example: Property key for file "linkedworkbook1.xlsx" is  "hadoopoffice.read.security.crypt.linkedworkbooks.linkedworkbook1.xslx". Value is the password. You must not include path or protocol information in the filename 
 * hadoopoffice.write.metadata.*: Write metadata properties of the document. All properties belonging to the base (e.g. hadoopoffice.write.metadata.author for author) will be handed over to the corresponding writer. See writer documentation which properties are supported
 * hadoopoffice.write.template.file: Use a template as input to modify selected cells of it
+* hadoopoffice.write.lowFootprint: if true then a file is written in low footprint mode to save cpu/memory resources, false if it should be written in normal mode. Note that if it is set to true then certain options are not available, such as formula evaluation. Default false. 
 * @param fileName filename to write
  * 
  */
@@ -114,7 +120,8 @@ public HadoopOfficeWriteConfiguration(Configuration conf, String fileName) {
      this.setTemplate(conf.get(HadoopOfficeWriteConfiguration.CONF_TEMPLATE,HadoopOfficeWriteConfiguration.DEFAULT_TEMPLATE));
 
      this.setTemplatePassword(conf.get(HadoopOfficeWriteConfiguration.CONF_TEMPLATEPW,HadoopOfficeWriteConfiguration.DEFAULT_TEMPLATEPW));
-     
+     this.setLowFootprint(conf.getBoolean(HadoopOfficeWriteConfiguration.CONF_LOWFOOTPRINT,HadoopOfficeWriteConfiguration.DEFAULT_LOWFOOTPRINT));
+
 }
 public String[] getLinkedWorkbooksName() {
 	return linkedWorkbooksName;
@@ -221,6 +228,13 @@ public String getTemplatePassword() {
 
 public void setTemplatePassword(String templatePassword) {
 	this.templatePassword=templatePassword;
+}
+
+public boolean getLowFootprint() {
+	return lowFootprint;
+}
+public void setLowFootprint(boolean lowFootprint) {
+	this.lowFootprint = lowFootprint;
 }
 
 }
