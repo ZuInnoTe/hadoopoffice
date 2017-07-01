@@ -92,7 +92,7 @@ public class HadoopOfficeWriteConfiguration {
 * hadoopoffice.write.security.crypt.linkedworkbooks.*: if set then hadoopoffice will try to decrypt all the linked workbooks where a password has been specified. If no password is specified then it is assumed that the linked workbook is not encrypted. Example: Property key for file "linkedworkbook1.xlsx" is  "hadoopoffice.read.security.crypt.linkedworkbooks.linkedworkbook1.xslx". Value is the password. You must not include path or protocol information in the filename 
 * hadoopoffice.write.metadata.*: Write metadata properties of the document. All properties belonging to the base (e.g. hadoopoffice.write.metadata.author for author) will be handed over to the corresponding writer. See writer documentation which properties are supported
 * hadoopoffice.write.template.file: Use a template as input to modify selected cells of it
-* hadoopoffice.write.lowFootprint: if true then a file is written in low footprint mode to save cpu/memory resources, false if it should be written in normal mode. Note that if it is set to true then certain options are not available, such as formula evaluation. Default false. 
+* hadoopoffice.write.lowFootprint: if true then a file is written in low footprint mode to save cpu/memory resources, false if it should be written in normal mode. Option is ignored for old Excel files (.xls). Note that if it is set to true then certain options are not available, such as formula evaluation. Default false. 
 * @param fileName filename to write
  * 
  */

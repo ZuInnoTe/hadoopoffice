@@ -72,8 +72,14 @@ private OfficeReaderParserInterface currentParser=null;
 	public void parse() throws FormatNotUnderstoodException {
 		// do content detection of document
 			if (this.hocr.getMimeType().contains(OfficeReader.FORMAT_EXCEL))	{
-			// if it contains Excel then use MSExcelParser
-				this.currentParser=new MSExcelParser(this.hocr, this.sheetsArray);
+				// check if low footprint
+				if (!this.hocr.getLowFootprint()) {
+					// if it contains Excel then use default MSExcelParser
+					this.currentParser=new MSExcelParser(this.hocr, this.sheetsArray);
+				} else {
+					// use low footprint parser
+					this.currentParser=new MSExcelLowFootprintParser(this.hocr, this.sheetsArray);
+				}
 			} else {
 			// if it cannot be detected throw an exception
 				throw new FormatNotUnderstoodException("Format not understood");

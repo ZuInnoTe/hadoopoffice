@@ -143,6 +143,9 @@ public void create(OutputStream oStream, Map<String,InputStream> linkedWorkbooks
 	// check if we should load a workbook from template
 	if(template!=null){
 		LOG.info("Loading template: "+this.howc.getTemplate());
+		if (this.howc.getLowFootprint()) {
+			LOG.warn("Low footprint mode is not supported with templates. Continuing normal mode");
+		}
 		this.hasTemplate=true;
 		HadoopOfficeReadConfiguration currentTemplateHOCR = new HadoopOfficeReadConfiguration();
 		currentTemplateHOCR.setLocale(this.howc.getLocale());
@@ -165,6 +168,9 @@ public void create(OutputStream oStream, Map<String,InputStream> linkedWorkbooks
 			this.currentWorkbook=new XSSFWorkbook();
 			this.ooxmlDocumentFileSystem = new POIFSFileSystem();					
 		} else if (this.format.equals(MSExcelWriter.FORMAT_OLD)) {
+			if (this.howc.getLowFootprint()) {
+				LOG.warn("Low footprint mode writing is not supported for old Excel files (.xls). Continuing normal mode");
+			}
 			this.currentWorkbook=new HSSFWorkbook();
 			((HSSFWorkbook)this.currentWorkbook).createInformationProperties();
 		} 

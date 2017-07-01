@@ -423,6 +423,7 @@ private HadoopOfficeReadConfiguration hocr;
 	}
 
 
+	
 	/**
 	* Close parser and linked workbooks
 	*
