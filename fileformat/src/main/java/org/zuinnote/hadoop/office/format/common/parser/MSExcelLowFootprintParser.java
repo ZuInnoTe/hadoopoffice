@@ -41,6 +41,7 @@ import org.apache.poi.hssf.record.RowRecord;
 import org.apache.poi.hssf.record.SSTRecord;
 import org.apache.poi.hssf.record.StringRecord;
 import org.apache.poi.hssf.record.chart.NumberFormatIndexRecord;
+import org.apache.poi.hssf.record.crypto.Biff8EncryptionKey;
 import org.apache.poi.poifs.filesystem.DocumentFactoryHelper;
 import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
 import org.apache.poi.ss.usermodel.DataFormatter;
@@ -149,6 +150,9 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 					LOG.info("Low footprint parsing of old Excel files (.xls)");
 					 // use event model API for old Excel files
 					this.format=MSExcelLowFootprintParser.FORMAT_OLDEXCEL;
+					if (this.hocr.getPassword()!=null) {
+						Biff8EncryptionKey.setCurrentUserPassword(this.hocr.getPassword());
+					}
 					NPOIFSFileSystem poifs = new NPOIFSFileSystem(in);
 					InputStream din = poifs.createDocumentInputStream("Workbook");
 					try {
@@ -158,6 +162,8 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 					  factory.processEvents(req, din);
 					}
 					  finally {
+
+						  Biff8EncryptionKey.setCurrentUserPassword(null);
 						  din.close();
 						  poifs.close();
 					  }
