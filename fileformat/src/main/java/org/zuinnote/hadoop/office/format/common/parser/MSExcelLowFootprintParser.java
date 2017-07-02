@@ -1,5 +1,5 @@
 /**
-* Copyright 2016 ZuInnoTe (Jörn Franke) <zuinnote@gmail.com>
+* Copyright 2017 ZuInnoTe (Jörn Franke) <zuinnote@gmail.com>
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -19,7 +19,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,6 +31,8 @@ import org.apache.poi.hssf.eventusermodel.HSSFListener;
 import org.apache.poi.hssf.eventusermodel.HSSFRequest;
 import org.apache.poi.hssf.record.BOFRecord;
 import org.apache.poi.hssf.record.BoundSheetRecord;
+import org.apache.poi.hssf.record.ExtendedFormatRecord;
+import org.apache.poi.hssf.record.FormatRecord;
 import org.apache.poi.hssf.record.FormulaRecord;
 import org.apache.poi.hssf.record.LabelSSTRecord;
 import org.apache.poi.hssf.record.NumberRecord;
@@ -36,9 +40,20 @@ import org.apache.poi.hssf.record.Record;
 import org.apache.poi.hssf.record.RowRecord;
 import org.apache.poi.hssf.record.SSTRecord;
 import org.apache.poi.hssf.record.StringRecord;
+import org.apache.poi.hssf.record.chart.NumberFormatIndexRecord;
 import org.apache.poi.poifs.filesystem.DocumentFactoryHelper;
 import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
+import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.util.IOUtils;
+import org.apache.poi.xssf.model.SharedStringsTable;
+import org.apache.poi.xssf.usermodel.XSSFRichTextString;
+import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.DefaultHandler;
+import org.xml.sax.helpers.XMLReaderFactory;
 import org.zuinnote.hadoop.office.format.common.HadoopOfficeReadConfiguration;
 import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 import org.zuinnote.hadoop.office.format.common.util.MSExcelUtil;
@@ -60,12 +75,16 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 	public final static int FORMAT_UNSUPPORTED=-1;
 	public final static int FORMAT_OLDEXCEL=0;
 	public final static int FORMAT_OOXML=1;
+
+	private DataFormatter useDataFormatter=null;
 	private static final Log LOG = LogFactory.getLog(MSExcelLowFootprintParser.class.getName());
-	private ArrayList<SpreadSheetCellDAO[]> spreadSheetCellDAOCache;
+	private Map<Integer,List<SpreadSheetCellDAO[]>> spreadSheetCellDAOCache;
+	private List<String> sheetNameList;
 	private InputStream in;
 	private String[] sheets=null;
 	private HadoopOfficeReadConfiguration hocr;
 	private int format;
+	private int currentSheet;
 	private int currentRow;
 	
 	public MSExcelLowFootprintParser(HadoopOfficeReadConfiguration hocr) {
@@ -86,8 +105,23 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 	public MSExcelLowFootprintParser(HadoopOfficeReadConfiguration hocr, String[] sheets) {
 		this.sheets=sheets;
 		this.hocr=hocr;
+		if (hocr.getLocale()==null)  {
+			useDataFormatter=new DataFormatter(); // use default locale
+		} else {
+			useDataFormatter=new DataFormatter(hocr.getLocale());
+		}
 		this.format=MSExcelLowFootprintParser.FORMAT_UNSUPPORTED; // will be detected when calling parse
-		this.spreadSheetCellDAOCache=new ArrayList<SpreadSheetCellDAO[]>();
+		this.spreadSheetCellDAOCache=new HashMap<>();
+		this.sheetNameList=new ArrayList<>();
+		this.currentRow=0;
+		this.currentSheet=0;
+		// check not supported things and log
+		if ((this.hocr.getReadLinkedWorkbooks()) || (this.hocr.getIgnoreMissingLinkedWorkbooks())) {
+			LOG.warn("Linked workbooks not supported in low footprint parsing mode");
+		}
+		if ((this.hocr.getMetaDataFilter()!=null) && (this.hocr.getMetaDataFilter().size()>0))  {
+			LOG.warn("Metadata filtering is not supported in low footprint parsing mode");
+		}
 	}
 	
 	/*
@@ -112,17 +146,25 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 			byte[] header8 = IOUtils.peekFirst8Bytes(in);
 		 
 				if(NPOIFSFileSystem.hasPOIFSHeader(header8)) {
+					LOG.info("Low footprint parsing of old Excel files (.xls)");
 					 // use event model API for old Excel files
 					this.format=MSExcelLowFootprintParser.FORMAT_OLDEXCEL;
-					  NPOIFSFileSystem poifs = new NPOIFSFileSystem(in);
-					  InputStream din = poifs.createDocumentInputStream("Workbook");
+					NPOIFSFileSystem poifs = new NPOIFSFileSystem(in);
+					InputStream din = poifs.createDocumentInputStream("Workbook");
+					try {
 					  HSSFRequest req = new HSSFRequest();
-					  req.addListenerForAllRecords(new HSSFEventParser(this.spreadSheetCellDAOCache,this.sheets));
+					  req.addListenerForAllRecords(new HSSFEventParser(this.sheetNameList,this.useDataFormatter,this.spreadSheetCellDAOCache,this.sheets));
 					  HSSFEventFactory factory = new HSSFEventFactory();
 					  factory.processEvents(req, din);
-					  din.close();
+					}
+					  finally {
+						  din.close();
+						  poifs.close();
+					  }
 				} else
 				if(DocumentFactoryHelper.hasOOXMLHeader(in)) {
+
+					LOG.info("Low footprint parsing of new Excel files (.xlsx)");
 							// use event model API for new Excel files
 					this.format=MSExcelLowFootprintParser.FORMAT_OOXML;
 				} else {
@@ -154,21 +196,10 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 
 	@Override
 	public String getCurrentSheetName() {
-		// check in currentRow if it is there?
-		SpreadSheetCellDAO[] currentRowDAO = this.spreadSheetCellDAOCache.get(this.currentRow);
-		if ((currentRowDAO!=null) && (currentRowDAO.length>0)) {
-			return currentRowDAO[0].getSheetName();
-		} else if (this.currentRow<this.spreadSheetCellDAOCache.size()) {
-			int i = this.currentRow;
-			while (i<this.spreadSheetCellDAOCache.size()) {
-				currentRowDAO = this.spreadSheetCellDAOCache.get(i);
-				if ((currentRowDAO!=null) && (currentRowDAO.length>0)) {
-					return currentRowDAO[0].getSheetName();
-				}
-			}
-			
-		} 
-		return "";
+		if (this.currentSheet>=this.sheetNameList.size()) {
+			return this.sheetNameList.get(this.sheetNameList.size()-1);
+		}
+		return this.sheetNameList.get(this.currentSheet);
 	}
 
 	@Override
@@ -184,15 +215,23 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 
 	@Override
 	public Object[] getNext() {
-		if (this.currentRow<this.spreadSheetCellDAOCache.size()) {
-			return this.spreadSheetCellDAOCache.get(this.currentRow++);
+		SpreadSheetCellDAO[] result = null;
+		if (this.currentRow<this.spreadSheetCellDAOCache.get(this.currentSheet).size()) {
+			result=this.spreadSheetCellDAOCache.get(this.currentSheet).get(this.currentRow++);
+		} 
+		if (this.currentRow==this.spreadSheetCellDAOCache.get(this.currentSheet).size()) { // next sheet
+			this.spreadSheetCellDAOCache.remove(this.currentSheet);
+			this.currentSheet++;
+			this.currentRow=0;
+			
 		}
-		return null;
+		
+		return result;
 	}
 
 	@Override
 	public boolean getFiltered() {
-		return false;
+		return true;
 	}
 
 	@Override
@@ -203,31 +242,104 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 		
 	}
 	
+	/** Adapted from the Apache POI HowTos 
+	 * https://poi.apache.org/spreadsheet/how-to.html
+	 * 
+	 * **/
+	private static class XSSFEventParser extends DefaultHandler {
+		private SharedStringsTable sst;
+		private String lastContents;
+		private boolean nextIsString;
+		private List<SpreadSheetCellDAO[]> spreadSheetCellDAOCache;
+		
+		
+
+		public void startElement(String uri, String localName, String name,
+				Attributes attributes) throws SAXException {
+			// c => cell
+			if(name.equals("c")) {
+				// Print the cell reference
+				System.out.print(attributes.getValue("r") + " - ");
+				// Figure out if the value is an index in the SST
+				String cellType = attributes.getValue("t");
+				if(cellType != null && cellType.equals("s")) {
+					nextIsString = true;
+				} else {
+					nextIsString = false;
+				}
+			}
+			// Clear contents cache
+			lastContents = "";
+		}
+		
+		public void endElement(String uri, String localName, String name)
+				throws SAXException {
+			// Process the last contents as required.
+			// Do now, as characters() may be called more than once
+			if(nextIsString) {
+				int idx = Integer.parseInt(lastContents);
+				lastContents = new XSSFRichTextString(sst.getEntryAt(idx)).toString();
+				nextIsString = false;
+			}
+
+			// v => contents of a cell
+			// Output after we've seen the string contents
+			if(name.equals("v")) {
+				System.out.println(lastContents);
+			}
+		}
+
+		public void characters(char[] ch, int start, int length)
+				throws SAXException {
+			lastContents += new String(ch, start, length);
+		}
+	}
+	
+	
+	/** Adapted the Apache POI HowTos 
+	 * https://poi.apache.org/spreadsheet/how-to.html
+	 * 
+	 * **/
 	private class HSSFEventParser implements HSSFListener {
-		private ArrayList<SpreadSheetCellDAO[]> spreadSheetCellDAOCache;
-		private String currentSheet;
-		private SpreadSheetCellDAO[] currentRow;
+		private Map<Integer,List<SpreadSheetCellDAO[]>> spreadSheetCellDAOCache; 
+		private List<String> sheetList;
+		private Map<Integer,Boolean> sheetMap;
+		private Map<Integer,Long> sheetSizeMap;
+		private List<Integer> extendedRecordFormatIndexList;
+		private Map<Integer,String> formatRecordIndexMap;
+		private DataFormatter useDataFormatter;
+		private int currentSheet;
 		private String[] sheets;
+		private long currentCellNum;
 		private int currentRowNum;
-		private int currentCellNum;
 		private boolean readCachedFormulaResult;
+		private int cachedRowNum;
+		private short cachedColumnNum;
 		private boolean currentSheetIgnore;
 		private SSTRecord currentSSTrecord;
 
-		public HSSFEventParser(ArrayList<SpreadSheetCellDAO[]> spreadSheetCellDAOCache, String[] sheets) {
+		public HSSFEventParser(List<String> sheetNameList,DataFormatter useDataFormatter, Map<Integer,List<SpreadSheetCellDAO[]>> spreadSheetCellDAOCache, String[] sheets) {
 			this.spreadSheetCellDAOCache=spreadSheetCellDAOCache;
-			this.currentSheet="";
 			this.sheets=sheets;
-			this.currentRow=null;
-			this.currentRowNum=-1;
-			this.currentCellNum=0;
+			this.currentCellNum=0L;
+			this.currentRowNum=0;
 			this.currentSheetIgnore=false;
 			this.readCachedFormulaResult=false;
+			this.cachedRowNum=0;
+			this.cachedColumnNum=0;
+			this.sheetList=new ArrayList<>();
+			this.sheetMap=new HashMap<>();
+			this.sheetSizeMap=new HashMap<>();
+			this.currentSheet=0;
+			this.extendedRecordFormatIndexList=new ArrayList<>();
+			this.formatRecordIndexMap=new HashMap<>();
+			this.sheetList=sheetNameList;
+			this.useDataFormatter=useDataFormatter;
 		}
 		
 		@Override
 		public void processRecord(Record record) {
-			switch (record.getSid())
+			switch (record.getSid()) // one should note that these do not arrive necessary in linear order. First all the sheets are processed. Then all the rows of the sheets
 	        {
 	            // the BOFRecord can represent either the beginning of a sheet or the workbook
 	            case BOFRecord.sid:
@@ -242,91 +354,154 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 	                break;
 	            case BoundSheetRecord.sid:
 	                BoundSheetRecord bsr = (BoundSheetRecord) record;
-	                this.currentSheet=bsr.getSheetname();
-	                if ((this.sheets!=null) && (this.currentSheet!=null)) { // check if sheet should be ignored
-	                	boolean found=false;
+	                String currentSheet=bsr.getSheetname();
+	                LOG.debug("Sheet found: "+currentSheet);
+	                if (this.sheets==null) { // no sheets filter
+	                	// ignore the filter
+	                	this.sheetMap.put(this.sheetList.size(), true);
+	                	this.sheetSizeMap.put(this.sheetList.size(), 0L);
+                    	this.sheetList.add(currentSheet);
+	                } else
+	                if (currentSheet!=null) { // sheets filter
+	                 	boolean found=false;
 	                    for(int i=0;i<this.sheets.length;i++) {
-	                    	if (this.currentSheet.equals(this.sheets[i])) {
+	                    	if (currentSheet.equals(this.sheets[i])) {
 	                    		found=true;
 	                    		break;
 	                    	}
 	                    }
-	                    this.currentSheetIgnore=found;
+	                    this.sheetMap.put(this.sheetList.size(), found);
+	                    this.sheetList.add(currentSheet);
 	                } 
+	                if (this.sheetMap.get(this.sheetList.size()-1)) { // create sheet
+	                	 this.spreadSheetCellDAOCache.put(this.sheetList.size()-1, new ArrayList<SpreadSheetCellDAO[]>());
+	                }
 	                break;
 	            case RowRecord.sid:
-	            	if (!this.currentSheetIgnore) { // only create a new row record if sheet should not be ignored
-		                RowRecord rowRec = (RowRecord) record;
-		                if (currentCellNum==this.currentRow.length) { // create a new row
-		                	this.currentRow=null;
-	            		}
-		                // create new Row
-		                if (this.currentRow==null) {
-		                	this.currentRow=new SpreadSheetCellDAO[rowRec.getLastCol()];
-		                	this.currentRowNum++;
-		                } else {
-		                	LOG.error("Unexpected new row in file.");
-		                }
-		                this.currentCellNum=0;
-	            	}
+	            	  RowRecord rowRec = (RowRecord) record;
+		              LOG.debug("Row found. Number of Cells: "+rowRec.getLastCol());
+		              if ((this.currentSheet==0) && (rowRec.getRowNumber()==0)) { // first sheet
+		            	  // special handling first sheet
+		            	  this.currentSheet++;
+		            	  this.currentCellNum=0;
+		            	  this.currentRowNum=0;
+		              } else
+		              if ((this.currentSheet>0) && (rowRec.getRowNumber()==0)) { // new sheet
+		            	  LOG.debug("Sheet number : "+this.currentSheet+" total number of cells "+this.currentCellNum);
+		            	  this.sheetSizeMap.put(this.currentSheet-1, this.currentCellNum);
+		            	  this.currentSheet++; // start processing next sheet
+		            	  this.currentCellNum=0;
+		            	  this.currentRowNum=0;
+		              }
+		              // create row if this sheet is supposed to be parsed
+		              if (this.sheetMap.get(this.currentSheet-1)) {
+		            	  this.spreadSheetCellDAOCache.get(this.currentSheet-1).add(new SpreadSheetCellDAO[rowRec.getLastCol()]);
+		              }
+		              this.currentRowNum++;
+		              this.currentCellNum+=rowRec.getLastCol();
 	                break;
 	            case FormulaRecord.sid:
+	            	LOG.debug("Formula Record found");
 	            	// check if formula has a cached value
 	            	FormulaRecord formRec=(FormulaRecord) record;
+	            	/** check if this one should be parsed **/
+	            	if (!this.sheetMap.get(this.currentSheet-1)) {// if not then do nothing
+	            		break;
+	            	}
+	            	/** **/
 	            	if (formRec.hasCachedResultString()) {
 	            		this.readCachedFormulaResult=true;
+	            		this.cachedColumnNum=formRec.getColumn();
+	            		this.cachedRowNum=formRec.getRow();
 	            	} else {
 	            		// try to read the result
-	            		if (this.currentCellNum>=this.currentRow.length) {
-	            			LOG.error("More cells in row than expected. Cell not added");
+	            		if (formRec.getColumn()>=this.spreadSheetCellDAOCache.get(this.currentSheet-1).get(this.currentRowNum-1).length) {
+	            			LOG.error("More cells in row than expected. Row number:"+(this.currentRowNum-1)+"Column number: "+formRec.getColumn()+"row length "+this.spreadSheetCellDAOCache.get(this.currentSheet-1).get(this.currentRowNum-1).length);
+	                    	
 	            		} else {
-	             			this.currentRow[this.currentCellNum] = new SpreadSheetCellDAO(String.valueOf(formRec.getValue()),"","",MSExcelUtil.getCellAddressA1Format(this.currentRowNum, this.currentCellNum),this.currentSheet);
-	            			this.currentCellNum++;
+
+	            			int formatIndex= this.extendedRecordFormatIndexList.get(formRec.getXFIndex());
+	            			String theNumber=this.useDataFormatter.formatRawCellContents(formRec.getValue(), formatIndex, this.formatRecordIndexMap.get(formatIndex));
+	            			this.spreadSheetCellDAOCache.get(this.currentSheet-1).get(formRec.getRow())[formRec.getColumn()]=new SpreadSheetCellDAO(theNumber,"","",MSExcelUtil.getCellAddressA1Format(formRec.getRow(), formRec.getColumn()),this.sheetList.get(this.currentSheet-1));          			
 	            		}
 	            	}
 	            	break;
 	            case StringRecord.sid:  // read cached formula results, if available
+	            	LOG.debug("String Record found");
 	            	StringRecord strRec=(StringRecord) record;
-	            	if (this.readCachedFormulaResult) {
-	            		if (this.currentCellNum>=this.currentRow.length) {
-	            			LOG.error("More cells in row than expected. Cell not added");
-	            		} else {
-	             			this.currentRow[this.currentCellNum] = new SpreadSheetCellDAO(strRec.getString(),"","",MSExcelUtil.getCellAddressA1Format(this.currentRowNum, this.currentCellNum),this.currentSheet);
-	            			this.readCachedFormulaResult=false;
-	            			this.currentCellNum++;
-	            		}
-	            	
+	            	/** check if this one should be parsed **/
+	               	if (!this.sheetMap.get(this.currentSheet-1)) {// if not then do nothing
+	            		break;
 	            	}
+	            	/** **/
+	              this.spreadSheetCellDAOCache.get(this.currentSheet-1).get(this.cachedRowNum)[this.cachedColumnNum]=new SpreadSheetCellDAO(strRec.getString(),"","",MSExcelUtil.getCellAddressA1Format(this.cachedRowNum,this.cachedColumnNum),this.sheetList.get(this.currentSheet-1));          			
+	    	         this.readCachedFormulaResult=false;	
+	            	
 	            	break;
 	            case NumberRecord.sid: // read number result
+	            	LOG.debug("Number Record found");
+	            	
 	                NumberRecord numrec = (NumberRecord) record;
-	                if (this.currentCellNum>=this.currentRow.length) {
-            			LOG.error("More cells in row than expected. Cell not added");
+	           
+	            
+	                /** check if this one should be parsed **/
+	               	if (!this.sheetMap.get(this.currentSheet-1)) {// if not then do nothing
+	            		break;
+	            	}
+	            	/** **/
+	            	// try to read the result
+            		if (numrec.getColumn()>=this.spreadSheetCellDAOCache.get(this.currentSheet-1).get(this.currentRowNum-1).length) {
+            			LOG.error("More cells in row than expected. Row number:"+(this.currentRowNum-1)+"Column number: "+numrec.getColumn()+"row length "+this.spreadSheetCellDAOCache.get(this.currentSheet-1).get(this.currentRowNum-1).length);
             		} else {
-             			this.currentRow[this.currentCellNum] = new SpreadSheetCellDAO(String.valueOf(numrec.getValue()),"","",MSExcelUtil.getCellAddressA1Format(this.currentRowNum, this.currentCellNum),this.currentSheet);
-            		
-            			this.currentCellNum++;
+            			// convert the number in the right format (can be date etc.)
+            			int formatIndex= this.extendedRecordFormatIndexList.get(numrec.getXFIndex());
+            			String theNumber=this.useDataFormatter.formatRawCellContents(numrec.getValue(), formatIndex, this.formatRecordIndexMap.get(formatIndex));
+            			   this.spreadSheetCellDAOCache.get(this.currentSheet-1).get(numrec.getRow())[numrec.getColumn()]=new SpreadSheetCellDAO(theNumber,"","",MSExcelUtil.getCellAddressA1Format(numrec.getRow(),numrec.getColumn()),this.sheetList.get(this.currentSheet-1));          		
             		}
 	                break;
-	                // SSTRecords store a array of unique strings used in Excel.
+	                // SSTRecords store a array of unique strings used in Excel. (one per sheet?)
 	            case SSTRecord.sid:
+	            	LOG.debug("SST record found");
+	          
 	                this.currentSSTrecord=(SSTRecord) record;
 	                break;
 	            case LabelSSTRecord.sid: // get the string out of unique string value table 
+	            	LOG.debug("Label found");
 	                LabelSSTRecord lrec = (LabelSSTRecord) record;
-	                if (this.currentCellNum>=this.currentRow.length) {
-            			LOG.error("More cells in row than expected. Cell not added");
+	              	/** check if this one should be parsed **/
+	               	if (!this.sheetMap.get(this.currentSheet-1)) {// if not then do nothing
+	            		break;
+	            	}
+	            	/** **/
+	            	if (lrec.getColumn()>=this.spreadSheetCellDAOCache.get(this.currentSheet-1).get(lrec.getRow()).length) {
+	            		LOG.error("More cells in row than expected. Row number:"+(this.currentRowNum-1)+"Column number: "+lrec.getColumn()+"row length "+this.spreadSheetCellDAOCache.get(this.currentSheet-1).get(this.currentRowNum-1).length);
+	                	
             		} else {
             			if ((lrec.getSSTIndex()<0) || (lrec.getSSTIndex()>=this.currentSSTrecord.getNumUniqueStrings())) {
             				LOG.error("Invalid SST record index. Cell ignored");
             			} else {
-            				this.currentRow[this.currentCellNum] = new SpreadSheetCellDAO(this.currentSSTrecord.getString(lrec.getSSTIndex()).getString(),"","",MSExcelUtil.getCellAddressA1Format(this.currentRowNum, this.currentCellNum),this.currentSheet);
-            				this.currentCellNum++;
+            				   this.spreadSheetCellDAOCache.get(this.currentSheet-1).get(lrec.getRow())[lrec.getColumn()]=new SpreadSheetCellDAO(this.currentSSTrecord.getString(lrec.getSSTIndex()).getString(),"","",MSExcelUtil.getCellAddressA1Format(lrec.getRow(),lrec.getColumn()),this.sheetList.get(this.currentSheet-1));          		
+            	            	
+            				
             			}
             		}
 	                break;
-	              
+	            case ExtendedFormatRecord.sid:
+	            	ExtendedFormatRecord nfir = (ExtendedFormatRecord)record;
+	            	this.extendedRecordFormatIndexList.add((int)nfir.getFormatIndex());
+	               	
+	            	
+	            	break;
+	            case FormatRecord.sid:
+	            	FormatRecord frec = (FormatRecord)record;
+	            	this.formatRecordIndexMap.put(frec.getIndexCode(),frec.getFormatString());
+	            	
+	            	break;
+	          default:
+	        	  //LOG.debug("Ignored record: "+record.getSid());
+	        	  break;    
 	        }
+			
 			
 		}
 		

@@ -74,10 +74,12 @@ private OfficeReaderParserInterface currentParser=null;
 			if (this.hocr.getMimeType().contains(OfficeReader.FORMAT_EXCEL))	{
 				// check if low footprint
 				if (!this.hocr.getLowFootprint()) {
+					LOG.info("Using standard API to parse Excel file");
 					// if it contains Excel then use default MSExcelParser
 					this.currentParser=new MSExcelParser(this.hocr, this.sheetsArray);
 				} else {
 					// use low footprint parser
+					LOG.info("Using low footprint API to parse Excel file");
 					this.currentParser=new MSExcelLowFootprintParser(this.hocr, this.sheetsArray);
 				}
 			} else {
@@ -118,6 +120,7 @@ private OfficeReaderParserInterface currentParser=null;
 	*/
 
 	public Object[] getNext() {
+	
 		if (currentParser==null) {
 				return new Object[0];
 		}
