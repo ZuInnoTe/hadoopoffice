@@ -29,6 +29,7 @@ import org.apache.poi.EmptyFileException;
 import org.apache.poi.hssf.eventusermodel.HSSFEventFactory;
 import org.apache.poi.hssf.eventusermodel.HSSFListener;
 import org.apache.poi.hssf.eventusermodel.HSSFRequest;
+import org.apache.poi.hssf.eventusermodel.MissingRecordAwareHSSFListener;
 import org.apache.poi.hssf.eventusermodel.dummyrecord.MissingRowDummyRecord;
 import org.apache.poi.hssf.record.BOFRecord;
 import org.apache.poi.hssf.record.BoundSheetRecord;
@@ -158,7 +159,7 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 					InputStream din = poifs.createDocumentInputStream("Workbook");
 					try {
 					  HSSFRequest req = new HSSFRequest();
-					  req.addListenerForAllRecords(new HSSFEventParser(this.sheetNameList,this.useDataFormatter,this.spreadSheetCellDAOCache,this.sheets));
+					  req.addListenerForAllRecords(new MissingRecordAwareHSSFListener(new HSSFEventParser(this.sheetNameList,this.useDataFormatter,this.spreadSheetCellDAOCache,this.sheets)));
 					  HSSFEventFactory factory = new HSSFEventFactory();
 					  factory.processEvents(req, din);
 					}
