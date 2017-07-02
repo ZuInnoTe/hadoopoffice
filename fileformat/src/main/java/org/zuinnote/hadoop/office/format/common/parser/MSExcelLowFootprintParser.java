@@ -29,6 +29,7 @@ import org.apache.poi.EmptyFileException;
 import org.apache.poi.hssf.eventusermodel.HSSFEventFactory;
 import org.apache.poi.hssf.eventusermodel.HSSFListener;
 import org.apache.poi.hssf.eventusermodel.HSSFRequest;
+import org.apache.poi.hssf.eventusermodel.dummyrecord.MissingRowDummyRecord;
 import org.apache.poi.hssf.record.BOFRecord;
 import org.apache.poi.hssf.record.BoundSheetRecord;
 import org.apache.poi.hssf.record.ExtendedFormatRecord;
@@ -504,6 +505,25 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 	        	  //LOG.debug("Ignored record: "+record.getSid());
 	        	  break;    
 	        }
+			if (record instanceof MissingRowDummyRecord) { // this is an empty row in the Excel
+				MissingRowDummyRecord emptyRow = (MissingRowDummyRecord)record;
+				 LOG.debug("Detected Empty row");
+	              if ((this.currentSheet==0) && (emptyRow.getRowNumber()==0)) { // first sheet
+	            	  // special handling first sheet
+	            	  this.currentSheet++;
+	            	  this.currentCellNum=0;
+	              } else
+	              if ((this.currentSheet>0) && (emptyRow.getRowNumber()==0)) { // new sheet
+	            	  LOG.debug("Sheet number : "+this.currentSheet+" total number of cells "+this.currentCellNum);
+	            	  this.sheetSizeMap.put(this.currentSheet-1, this.currentCellNum);
+	            	  this.currentSheet++; // start processing next sheet
+	            	  this.currentCellNum=0;
+	              }
+	              // create empty row if this sheet is supposed to be parsed
+	              if (this.sheetMap.get(this.currentSheet-1)) {
+	            	  this.spreadSheetCellDAOCache.get(this.currentSheet-1).add(new SpreadSheetCellDAO[0]);
+	              }
+			}
 			
 			
 		}
