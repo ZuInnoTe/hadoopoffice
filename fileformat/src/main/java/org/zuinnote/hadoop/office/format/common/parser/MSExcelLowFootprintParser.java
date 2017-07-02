@@ -317,7 +317,6 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 		private int currentSheet;
 		private String[] sheets;
 		private long currentCellNum;
-		private int currentRowNum;
 		private boolean readCachedFormulaResult;
 		private int cachedRowNum;
 		private short cachedColumnNum;
@@ -328,7 +327,6 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 			this.spreadSheetCellDAOCache=spreadSheetCellDAOCache;
 			this.sheets=sheets;
 			this.currentCellNum=0L;
-			this.currentRowNum=0;
 			this.currentSheetIgnore=false;
 			this.readCachedFormulaResult=false;
 			this.cachedRowNum=0;
@@ -390,20 +388,17 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 		            	  // special handling first sheet
 		            	  this.currentSheet++;
 		            	  this.currentCellNum=0;
-		            	  this.currentRowNum=0;
 		              } else
 		              if ((this.currentSheet>0) && (rowRec.getRowNumber()==0)) { // new sheet
 		            	  LOG.debug("Sheet number : "+this.currentSheet+" total number of cells "+this.currentCellNum);
 		            	  this.sheetSizeMap.put(this.currentSheet-1, this.currentCellNum);
 		            	  this.currentSheet++; // start processing next sheet
 		            	  this.currentCellNum=0;
-		            	  this.currentRowNum=0;
 		              }
 		              // create row if this sheet is supposed to be parsed
 		              if (this.sheetMap.get(this.currentSheet-1)) {
 		            	  this.spreadSheetCellDAOCache.get(this.currentSheet-1).add(new SpreadSheetCellDAO[rowRec.getLastCol()]);
 		              }
-		              this.currentRowNum++;
 		              this.currentCellNum+=rowRec.getLastCol();
 	                break;
 	            case FormulaRecord.sid:
@@ -421,8 +416,8 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 	            		this.cachedRowNum=formRec.getRow();
 	            	} else {
 	            		// try to read the result
-	            		if (formRec.getColumn()>=this.spreadSheetCellDAOCache.get(this.currentSheet-1).get(this.currentRowNum-1).length) {
-	            			LOG.error("More cells in row than expected. Row number:"+(this.currentRowNum-1)+"Column number: "+formRec.getColumn()+"row length "+this.spreadSheetCellDAOCache.get(this.currentSheet-1).get(this.currentRowNum-1).length);
+	            		if (formRec.getColumn()>=this.spreadSheetCellDAOCache.get(this.currentSheet-1).get(formRec.getRow()).length) {
+	            			LOG.error("More cells in row than expected. Row number:"+(formRec.getRow())+"Column number: "+formRec.getColumn()+"row length "+this.spreadSheetCellDAOCache.get(this.currentSheet-1).get(formRec.getRow()).length);
 	                    	
 	            		} else {
 
@@ -456,8 +451,8 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 	            	}
 	            	/** **/
 	            	// try to read the result
-            		if (numrec.getColumn()>=this.spreadSheetCellDAOCache.get(this.currentSheet-1).get(this.currentRowNum-1).length) {
-            			LOG.error("More cells in row than expected. Row number:"+(this.currentRowNum-1)+"Column number: "+numrec.getColumn()+"row length "+this.spreadSheetCellDAOCache.get(this.currentSheet-1).get(this.currentRowNum-1).length);
+            		if (numrec.getColumn()>=this.spreadSheetCellDAOCache.get(this.currentSheet-1).get(numrec.getRow()).length) {
+            			LOG.error("More cells in row than expected. Row number:"+(numrec.getRow())+"Column number: "+numrec.getColumn()+"row length "+this.spreadSheetCellDAOCache.get(this.currentSheet-1).get(numrec.getRow()).length);
             		} else {
             			// convert the number in the right format (can be date etc.)
             			int formatIndex= this.extendedRecordFormatIndexList.get(numrec.getXFIndex());
@@ -480,7 +475,7 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 	            	}
 	            	/** **/
 	            	if (lrec.getColumn()>=this.spreadSheetCellDAOCache.get(this.currentSheet-1).get(lrec.getRow()).length) {
-	            		LOG.error("More cells in row than expected. Row number:"+(this.currentRowNum-1)+"Column number: "+lrec.getColumn()+"row length "+this.spreadSheetCellDAOCache.get(this.currentSheet-1).get(this.currentRowNum-1).length);
+	            		LOG.error("More cells in row than expected. Row number:"+(lrec.getRow())+"Column number: "+lrec.getColumn()+"row length "+this.spreadSheetCellDAOCache.get(this.currentSheet-1).get(lrec.getRow()).length);
 	                	
             		} else {
             			if ((lrec.getSSTIndex()<0) || (lrec.getSSTIndex()>=this.currentSSTrecord.getNumUniqueStrings())) {
@@ -493,12 +488,14 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
             		}
 	                break;
 	            case ExtendedFormatRecord.sid:
+	            	LOG.debug("Found extended format record");
 	            	ExtendedFormatRecord nfir = (ExtendedFormatRecord)record;
 	            	this.extendedRecordFormatIndexList.add((int)nfir.getFormatIndex());
 	               	
 	            	
 	            	break;
 	            case FormatRecord.sid:
+	            	LOG.debug("Found format record");
 	            	FormatRecord frec = (FormatRecord)record;
 	            	this.formatRecordIndexMap.put(frec.getIndexCode(),frec.getFormatString());
 	            	
