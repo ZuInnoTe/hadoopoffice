@@ -25,38 +25,38 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.math3.optim.linear.LinearObjectiveFunction;
 import org.apache.poi.EmptyFileException;
+import org.apache.poi.hssf.eventusermodel.EventWorkbookBuilder.SheetRecordCollectingListener;
 import org.apache.poi.hssf.eventusermodel.HSSFEventFactory;
 import org.apache.poi.hssf.eventusermodel.HSSFListener;
 import org.apache.poi.hssf.eventusermodel.HSSFRequest;
 import org.apache.poi.hssf.eventusermodel.MissingRecordAwareHSSFListener;
 import org.apache.poi.hssf.eventusermodel.dummyrecord.MissingRowDummyRecord;
+import org.apache.poi.hssf.model.HSSFFormulaParser;
 import org.apache.poi.hssf.record.BOFRecord;
 import org.apache.poi.hssf.record.BoundSheetRecord;
 import org.apache.poi.hssf.record.ExtendedFormatRecord;
 import org.apache.poi.hssf.record.FormatRecord;
 import org.apache.poi.hssf.record.FormulaRecord;
 import org.apache.poi.hssf.record.LabelSSTRecord;
+import org.apache.poi.hssf.record.NameCommentRecord;
+import org.apache.poi.hssf.record.NameRecord;
 import org.apache.poi.hssf.record.NumberRecord;
 import org.apache.poi.hssf.record.Record;
 import org.apache.poi.hssf.record.RowRecord;
 import org.apache.poi.hssf.record.SSTRecord;
 import org.apache.poi.hssf.record.StringRecord;
-import org.apache.poi.hssf.record.chart.NumberFormatIndexRecord;
+import org.apache.poi.hssf.record.aggregates.FormulaRecordAggregate;
 import org.apache.poi.hssf.record.crypto.Biff8EncryptionKey;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.DocumentFactoryHelper;
 import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.util.IOUtils;
+import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
 import org.apache.poi.xssf.model.SharedStringsTable;
-import org.apache.poi.xssf.usermodel.XSSFRichTextString;
-import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.helpers.XMLReaderFactory;
+import org.apache.poi.xssf.usermodel.XSSFComment;
 import org.zuinnote.hadoop.office.format.common.HadoopOfficeReadConfiguration;
 import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 import org.zuinnote.hadoop.office.format.common.util.MSExcelUtil;
@@ -86,7 +86,6 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 	private InputStream in;
 	private String[] sheets=null;
 	private HadoopOfficeReadConfiguration hocr;
-	private int format;
 	private int currentSheet;
 	private int currentRow;
 	
@@ -113,7 +112,6 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 		} else {
 			useDataFormatter=new DataFormatter(hocr.getLocale());
 		}
-		this.format=MSExcelLowFootprintParser.FORMAT_UNSUPPORTED; // will be detected when calling parse
 		this.spreadSheetCellDAOCache=new HashMap<>();
 		this.sheetNameList=new ArrayList<>();
 		this.currentRow=0;
@@ -151,7 +149,6 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 				if(NPOIFSFileSystem.hasPOIFSHeader(header8)) {
 					LOG.info("Low footprint parsing of old Excel files (.xls)");
 					 // use event model API for old Excel files
-					this.format=MSExcelLowFootprintParser.FORMAT_OLDEXCEL;
 					if (this.hocr.getPassword()!=null) {
 						Biff8EncryptionKey.setCurrentUserPassword(this.hocr.getPassword());
 					}
@@ -159,7 +156,10 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 					InputStream din = poifs.createDocumentInputStream("Workbook");
 					try {
 					  HSSFRequest req = new HSSFRequest();
-					  req.addListenerForAllRecords(new MissingRecordAwareHSSFListener(new HSSFEventParser(this.sheetNameList,this.useDataFormatter,this.spreadSheetCellDAOCache,this.sheets)));
+					  HSSFEventParser parser = new HSSFEventParser(this.sheetNameList,this.useDataFormatter,this.spreadSheetCellDAOCache,this.sheets);
+					  SheetRecordCollectingListener listener = new SheetRecordCollectingListener(new MissingRecordAwareHSSFListener(parser));
+					  parser.setSheetRecordCollectingListener(listener);
+					  req.addListenerForAllRecords(listener);
 					  HSSFEventFactory factory = new HSSFEventFactory();
 					  factory.processEvents(req, din);
 					}
@@ -170,13 +170,11 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 						  poifs.close();
 					  }
 				} else
-				if(DocumentFactoryHelper.hasOOXMLHeader(in)) {
-
+				if(DocumentFactoryHelper.hasOOXMLHeader(in)) { // use event model API for new Excel files
 					LOG.info("Low footprint parsing of new Excel files (.xlsx)");
-							// use event model API for new Excel files
-					this.format=MSExcelLowFootprintParser.FORMAT_OOXML;
+					// decryption needed?
+							
 				} else {
-					this.format=MSExcelLowFootprintParser.FORMAT_UNSUPPORTED;
 					throw new FormatNotUnderstoodException("Could not detect Excel format in low footprint reading mode");
 				}
 		 } 
@@ -254,53 +252,35 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 	 * https://poi.apache.org/spreadsheet/how-to.html
 	 * 
 	 * **/
-	private static class XSSFEventParser extends DefaultHandler {
+	
+	private static class XSSFEventParser implements SheetContentsHandler {
 		private SharedStringsTable sst;
 		private String lastContents;
 		private boolean nextIsString;
 		private List<SpreadSheetCellDAO[]> spreadSheetCellDAOCache;
-		
-		
-
-		public void startElement(String uri, String localName, String name,
-				Attributes attributes) throws SAXException {
-			// c => cell
-			if(name.equals("c")) {
-				// Print the cell reference
-				System.out.print(attributes.getValue("r") + " - ");
-				// Figure out if the value is an index in the SST
-				String cellType = attributes.getValue("t");
-				if(cellType != null && cellType.equals("s")) {
-					nextIsString = true;
-				} else {
-					nextIsString = false;
-				}
-			}
-			// Clear contents cache
-			lastContents = "";
+		@Override
+		public void startRow(int rowNum) {
+			// TODO Auto-generated method stub
+			
+		}
+		@Override
+		public void endRow(int rowNum) {
+			// TODO Auto-generated method stub
+			
+		}
+		@Override
+		public void cell(String cellReference, String formattedValue, XSSFComment comment) {
+			// TODO Auto-generated method stub
+			
+		}
+		@Override
+		public void headerFooter(String text, boolean isHeader, String tagName) {
+			// TODO Auto-generated method stub
+			
 		}
 		
-		public void endElement(String uri, String localName, String name)
-				throws SAXException {
-			// Process the last contents as required.
-			// Do now, as characters() may be called more than once
-			if(nextIsString) {
-				int idx = Integer.parseInt(lastContents);
-				lastContents = new XSSFRichTextString(sst.getEntryAt(idx)).toString();
-				nextIsString = false;
-			}
-
-			// v => contents of a cell
-			// Output after we've seen the string contents
-			if(name.equals("v")) {
-				System.out.println(lastContents);
-			}
-		}
-
-		public void characters(char[] ch, int start, int length)
-				throws SAXException {
-			lastContents += new String(ch, start, length);
-		}
+		
+		
 	}
 	
 	
@@ -324,6 +304,8 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 		private short cachedColumnNum;
 		private boolean currentSheetIgnore;
 		private SSTRecord currentSSTrecord;
+		private SheetRecordCollectingListener workbookBuildingListener;
+		private HSSFWorkbook stubWorkbook;
 
 		public HSSFEventParser(List<String> sheetNameList,DataFormatter useDataFormatter, Map<Integer,List<SpreadSheetCellDAO[]>> spreadSheetCellDAOCache, String[] sheets) {
 			this.spreadSheetCellDAOCache=spreadSheetCellDAOCache;
@@ -343,6 +325,11 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 			this.useDataFormatter=useDataFormatter;
 		}
 		
+		public void setSheetRecordCollectingListener(SheetRecordCollectingListener listener) {
+			this.workbookBuildingListener=listener;
+			
+		}
+
 		@Override
 		public void processRecord(Record record) {
 			switch (record.getSid()) // one should note that these do not arrive necessary in linear order. First all the sheets are processed. Then all the rows of the sheets
@@ -353,6 +340,11 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 	                if (bof.getType() == bof.TYPE_WORKBOOK)
 	                {
 	                    // ignored
+	                	if ((stubWorkbook==null) && (workbookBuildingListener!=null)){
+	                		stubWorkbook= workbookBuildingListener.getStubHSSFWorkbook();
+	                	} else {
+	                		LOG.error("Cannot create stub network. Formula Strings cannot be parsed");
+	                	}
 	                } else if (bof.getType() == bof.TYPE_WORKSHEET)
 	                {
 	                    // ignored
@@ -407,11 +399,16 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 	            	LOG.debug("Formula Record found");
 	            	// check if formula has a cached value
 	            	FormulaRecord formRec=(FormulaRecord) record;
+	            	
 	            	/** check if this one should be parsed **/
 	            	if (!this.sheetMap.get(this.currentSheet-1)) {// if not then do nothing
 	            		break;
 	            	}
 	            	/** **/
+	            	String formulaString = "";
+	            	if (this.stubWorkbook!=null) {
+	            		formulaString=HSSFFormulaParser.toFormulaString(stubWorkbook, formRec.getParsedExpression());
+	            	}
 	            	if (formRec.hasCachedResultString()) {
 	            		this.readCachedFormulaResult=true;
 	            		this.cachedColumnNum=formRec.getColumn();
@@ -425,7 +422,7 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 
 	            			int formatIndex= this.extendedRecordFormatIndexList.get(formRec.getXFIndex());
 	            			String theNumber=this.useDataFormatter.formatRawCellContents(formRec.getValue(), formatIndex, this.formatRecordIndexMap.get(formatIndex));
-	            			this.spreadSheetCellDAOCache.get(this.currentSheet-1).get(formRec.getRow())[formRec.getColumn()]=new SpreadSheetCellDAO(theNumber,"","",MSExcelUtil.getCellAddressA1Format(formRec.getRow(), formRec.getColumn()),this.sheetList.get(this.currentSheet-1));          			
+	            			this.spreadSheetCellDAOCache.get(this.currentSheet-1).get(formRec.getRow())[formRec.getColumn()]=new SpreadSheetCellDAO(theNumber,"",formulaString,MSExcelUtil.getCellAddressA1Format(formRec.getRow(), formRec.getColumn()),this.sheetList.get(this.currentSheet-1));          			
 	            		}
 	            	}
 	            	break;
@@ -502,6 +499,7 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 	            	this.formatRecordIndexMap.put(frec.getIndexCode(),frec.getFormatString());
 	            	
 	            	break;
+	            	
 	          default:
 	        	  //LOG.debug("Ignored record: "+record.getSid());
 	        	  break;    
