@@ -45,6 +45,7 @@ public class HadoopOfficeWriteConfiguration {
 	public static final String CONF_TEMPLATEPW="hadoopoffice.write.template.password";
 
 	public static final String CONF_LOWFOOTPRINT="hadoopoffice.write.lowFootprint";
+	public static final String CONF_LOWFOOTPRINT_CACHEROWS="hadoopoffice.write.lowFootprint.cacherows";
 	public static final String DEFAULT_MIMETYPE="";
 	public static final String DEFAULT_LOCALE="";
 	public static final String DEFAULT_LINKEDWB="";
@@ -58,6 +59,7 @@ public class HadoopOfficeWriteConfiguration {
 	public static final String DEFAULT_TEMPLATEPW ="";
 
 	public static final boolean DEFAULT_LOWFOOTPRINT=false;
+	public static final int DEFAULT_LOWFOOTPRINT_CACHEROWS=1000;
 	private String[] linkedWorkbooksName;
 	private String fileName;
 	private String mimeType;
@@ -76,6 +78,7 @@ public class HadoopOfficeWriteConfiguration {
 	private Map<String,String> linkedWBCredentialMap;
 	private Map<String,String> metadata;
 	private boolean lowFootprint;
+	private int lowFootprintCacheRows;
 /*
  * 	Read the configuration for writing office files from a Hadoop configuration
  * 
@@ -121,7 +124,7 @@ public HadoopOfficeWriteConfiguration(Configuration conf, String fileName) {
 
      this.setTemplatePassword(conf.get(HadoopOfficeWriteConfiguration.CONF_TEMPLATEPW,HadoopOfficeWriteConfiguration.DEFAULT_TEMPLATEPW));
      this.setLowFootprint(conf.getBoolean(HadoopOfficeWriteConfiguration.CONF_LOWFOOTPRINT,HadoopOfficeWriteConfiguration.DEFAULT_LOWFOOTPRINT));
-
+     this.setLowFootprintCacheRows(conf.getInt(HadoopOfficeWriteConfiguration.CONF_LOWFOOTPRINT_CACHEROWS,HadoopOfficeWriteConfiguration.DEFAULT_LOWFOOTPRINT_CACHEROWS));
 }
 public String[] getLinkedWorkbooksName() {
 	return linkedWorkbooksName;
@@ -235,6 +238,12 @@ public boolean getLowFootprint() {
 }
 public void setLowFootprint(boolean lowFootprint) {
 	this.lowFootprint = lowFootprint;
+}
+public int getLowFootprintCacheRows() {
+	return lowFootprintCacheRows;
+}
+public void setLowFootprintCacheRows(int lowFootprintCacheRows) {
+	this.lowFootprintCacheRows = lowFootprintCacheRows;
 }
 
 }
