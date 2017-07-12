@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.math3.optim.linear.LinearObjectiveFunction;
@@ -50,13 +52,28 @@ import org.apache.poi.hssf.record.StringRecord;
 import org.apache.poi.hssf.record.aggregates.FormulaRecordAggregate;
 import org.apache.poi.hssf.record.crypto.Biff8EncryptionKey;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
+import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.poifs.crypt.Decryptor;
 import org.apache.poi.poifs.filesystem.DocumentFactoryHelper;
 import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
 import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.util.IOUtils;
+import org.apache.poi.util.SAXHelper;
+import org.apache.poi.xssf.eventusermodel.ReadOnlySharedStringsTable;
+import org.apache.poi.xssf.eventusermodel.XSSFReader;
+import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
+import org.apache.poi.xssf.model.CommentsTable;
 import org.apache.poi.xssf.model.SharedStringsTable;
+import org.apache.poi.xssf.model.StylesTable;
 import org.apache.poi.xssf.usermodel.XSSFComment;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 import org.zuinnote.hadoop.office.format.common.HadoopOfficeReadConfiguration;
 import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 import org.zuinnote.hadoop.office.format.common.util.MSExcelUtil;
@@ -147,12 +164,27 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 			byte[] header8 = IOUtils.peekFirst8Bytes(in);
 		 
 				if(NPOIFSFileSystem.hasPOIFSHeader(header8)) {
+					NPOIFSFileSystem poifs = new NPOIFSFileSystem(in);
+					// check if we need to decrypt a new Excel file
+					if (poifs.getRoot().hasEntry(Decryptor.DEFAULT_POIFS_ENTRY)) {
+						in = DocumentFactoryHelper.getDecryptedStream(poifs, this.hocr.getPassword());
+						OPCPackage pkg;
+						try {
+							pkg = OPCPackage.open(in);
+							this.processOPCPackage(pkg);
+						} catch (InvalidFormatException e) {
+							LOG.error(e);
+							throw new FormatNotUnderstoodException("Error cannot read new Excel file (.xlsx) in low footprint mdoe");
+						}
+						
+					}
+					// else we need to 
 					LOG.info("Low footprint parsing of old Excel files (.xls)");
 					 // use event model API for old Excel files
 					if (this.hocr.getPassword()!=null) {
 						Biff8EncryptionKey.setCurrentUserPassword(this.hocr.getPassword());
 					}
-					NPOIFSFileSystem poifs = new NPOIFSFileSystem(in);
+					
 					InputStream din = poifs.createDocumentInputStream("Workbook");
 					try {
 					  HSSFRequest req = new HSSFRequest();
@@ -170,9 +202,17 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 						  poifs.close();
 					  }
 				} else
-				if(DocumentFactoryHelper.hasOOXMLHeader(in)) { // use event model API for new Excel files
+				if(DocumentFactoryHelper.hasOOXMLHeader(in)) { // use event model API for uncrypted new Excel files
 					LOG.info("Low footprint parsing of new Excel files (.xlsx)");
-					// decryption needed?
+					// this is unencrypted
+					
+					try {
+						OPCPackage pkg = OPCPackage.open(in);
+						this.processOPCPackage(pkg);
+					} catch (InvalidFormatException e) {
+						LOG.error(e);
+						throw new FormatNotUnderstoodException("Error cannot read new Excel file (.xlsx)");
+					}
 							
 				} else {
 					throw new FormatNotUnderstoodException("Could not detect Excel format in low footprint reading mode");
@@ -195,6 +235,76 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 		 }
 	}
 
+	
+	/**
+	 * Processes a OPCPackage (new Excel format, .xlsx) in Streaming Mode
+	 * 
+	 * @param pkg
+	 * @throws OpenXML4JException 
+	 * @throws IOException 
+	 */
+	private void processOPCPackage(OPCPackage pkg) throws FormatNotUnderstoodException {
+		LOG.debug("Processing OPCPackage in low footprint mode");
+		XSSFReader r;
+		try {
+			r = new XSSFReader( pkg );
+		} catch (IOException | OpenXML4JException e) {
+			LOG.error(e);
+			throw new FormatNotUnderstoodException("Error cannot parse new Excel file (.xlsx)");
+		}
+		try {
+			
+			ReadOnlySharedStringsTable strings = new ReadOnlySharedStringsTable(pkg);
+			
+			StylesTable styles = r.getStylesTable();
+			XSSFReader.SheetIterator iter = (XSSFReader.SheetIterator)r.getSheetsData();
+			int sheetNumber = 0;
+			while (iter.hasNext()) {
+				
+				// check if we need to parse this sheet?
+				boolean parse=false;
+				if (this.sheets!=null) {
+					for (int i=0;i<this.sheets.length;i++) {
+						if (iter.getSheetName().equals(this.sheets[i])) {
+							parse=true;
+							break;
+						}
+					}
+				} else {
+					parse=true;
+				}
+				// sheet is supposed to be parsed
+				if (parse) {
+					
+					InputStream rawSheetInputStream = iter.next();
+					this.sheetNameList.add(iter.getSheetName());
+					InputSource rawSheetInputSource = new InputSource(rawSheetInputStream);
+					XMLReader sheetParser = SAXHelper.newXMLReader();
+					XSSFEventParser xssfp = new XSSFEventParser(sheetNumber,iter.getSheetName(), this.spreadSheetCellDAOCache);
+					
+		            ContentHandler handler = new XSSFSheetXMLHandler(
+		                  styles, iter.getSheetComments(), strings, xssfp, this.useDataFormatter, false);
+		            sheetParser.setContentHandler(handler);
+		            sheetParser.parse(rawSheetInputSource);
+		            sheetNumber++;
+
+				}
+						}
+		} catch (InvalidFormatException | IOException e) {
+			LOG.error(e);
+			throw new FormatNotUnderstoodException("Error cannot parse new Excel file (.xlsx)");
+		} catch (SAXException e) {
+			LOG.error(e);
+			throw new FormatNotUnderstoodException("Parsing Excel sheet in .xlsx format failed. Cannot read XML content");
+		} catch (ParserConfigurationException e) {
+			LOG.error(e);
+			throw new FormatNotUnderstoodException("Parsing Excel sheet in .xlsx format failed. Cannot read XML content");
+		}
+		
+		
+	
+	}
+	
 	@Override
 	public long getCurrentRow() {
 		return this.currentRow;
@@ -252,30 +362,70 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 	 * https://poi.apache.org/spreadsheet/how-to.html
 	 * 
 	 * **/
-	
+	//https://svn.apache.org/repos/asf/poi/trunk/src/examples/src/org/apache/poi/xssf/streaming/examples/HybridStreaming.java
 	private static class XSSFEventParser implements SheetContentsHandler {
-		private SharedStringsTable sst;
-		private String lastContents;
-		private boolean nextIsString;
-		private List<SpreadSheetCellDAO[]> spreadSheetCellDAOCache;
+		private Map<Integer,List<SpreadSheetCellDAO[]>> spreadSheetCellDAOCache; 
+		private ArrayList<SpreadSheetCellDAO> spreadSheetCellDAOCurrentRow;
+		private String sheetName;
+		private Integer currentSheet;
+
+		private int currentRow;
+		private int currentColumn;
+		
+		public XSSFEventParser(Integer currentSheet,String sheetName, Map<Integer,List<SpreadSheetCellDAO[]>> spreadSheetCellDAOCache) {
+			this.currentSheet=currentSheet;
+			this.spreadSheetCellDAOCache=spreadSheetCellDAOCache;
+			this.spreadSheetCellDAOCache.put(currentSheet, new ArrayList<SpreadSheetCellDAO[]>());
+			this.sheetName=sheetName;
+			this.currentRow=-1;
+		}
+		
+		
 		@Override
 		public void startRow(int rowNum) {
-			// TODO Auto-generated method stub
-			
+			if (rowNum>currentRow+1) {
+				// create empty rows
+				while (rowNum!=currentRow) {
+					this.spreadSheetCellDAOCache.get(this.currentSheet).add(new SpreadSheetCellDAO[0]);
+				}
+			}
+				// create for current Row temporary storage
+				this.spreadSheetCellDAOCurrentRow=new ArrayList<SpreadSheetCellDAO>();
+				this.currentColumn=0;
 		}
+		
 		@Override
 		public void endRow(int rowNum) {
-			// TODO Auto-generated method stub
+			currentRow+=1;
+			// store row
+			SpreadSheetCellDAO[] currentRowDAO = new SpreadSheetCellDAO[this.spreadSheetCellDAOCurrentRow.size()];
+			currentRowDAO=this.spreadSheetCellDAOCurrentRow.toArray(currentRowDAO);
+			this.spreadSheetCellDAOCache.get(this.currentSheet).add(currentRowDAO);
 			
 		}
 		@Override
 		public void cell(String cellReference, String formattedValue, XSSFComment comment) {
-			// TODO Auto-generated method stub
+			// create empty column, if needed
 			
+			CellAddress currentCellAddress = new CellAddress(cellReference);
+			for (int i=this.currentColumn;i<currentCellAddress.getColumn();i++) {
+				this.spreadSheetCellDAOCurrentRow.add(null);
+				this.currentColumn++;
+			}
+			// add column
+			SpreadSheetCellDAO currentDAO = null;
+			if (comment!=null) {
+				currentDAO = new SpreadSheetCellDAO(formattedValue,comment.getString().getString(), "", cellReference,this.sheetName);
+			} else {
+				currentDAO = new SpreadSheetCellDAO(formattedValue,"", "", cellReference,this.sheetName);
+			}
+			this.currentColumn++;
+			this.spreadSheetCellDAOCurrentRow.add(currentDAO);
 		}
 		@Override
 		public void headerFooter(String text, boolean isHeader, String tagName) {
-			// TODO Auto-generated method stub
+			// we do not care about header/footer
+			
 			
 		}
 		
