@@ -18,6 +18,7 @@ package org.zuinnote.hadoop.office.format.common.parser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +30,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.math3.optim.linear.LinearObjectiveFunction;
 import org.apache.poi.EmptyFileException;
+import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.hssf.eventusermodel.EventWorkbookBuilder.SheetRecordCollectingListener;
 import org.apache.poi.hssf.eventusermodel.HSSFEventFactory;
 import org.apache.poi.hssf.eventusermodel.HSSFListener;
@@ -56,6 +58,7 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.poifs.crypt.Decryptor;
+import org.apache.poi.poifs.crypt.EncryptionInfo;
 import org.apache.poi.poifs.filesystem.DocumentFactoryHelper;
 import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
 import org.apache.poi.ss.usermodel.DataFormatter;
@@ -164,18 +167,34 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 			byte[] header8 = IOUtils.peekFirst8Bytes(in);
 		 
 				if(NPOIFSFileSystem.hasPOIFSHeader(header8)) {
+				
 					NPOIFSFileSystem poifs = new NPOIFSFileSystem(in);
 					// check if we need to decrypt a new Excel file
 					if (poifs.getRoot().hasEntry(Decryptor.DEFAULT_POIFS_ENTRY)) {
-						in = DocumentFactoryHelper.getDecryptedStream(poifs, this.hocr.getPassword());
+							LOG.debug("Parsing OLE2 container in low footprint mode");
+							EncryptionInfo info = new EncryptionInfo(poifs);
+							Decryptor d = Decryptor.getInstance(info);
+							try {
+								if (!d.verifyPassword(this.hocr.getPassword())) {
+									throw new FormatNotUnderstoodException("Error: Cannot decrypt new Excel file (.xlsx) in low footprint mode: wrong password");
+								}
+								in = d.getDataStream(poifs);
+							} catch (GeneralSecurityException e) {
+								
+								LOG.error(e);
+								throw new FormatNotUnderstoodException("Error: Cannot decrypt new Excel file (.xlsx) in low footprint mode");
+							}
+						
 						OPCPackage pkg;
 						try {
 							pkg = OPCPackage.open(in);
 							this.processOPCPackage(pkg);
+							
 						} catch (InvalidFormatException e) {
 							LOG.error(e);
-							throw new FormatNotUnderstoodException("Error cannot read new Excel file (.xlsx) in low footprint mdoe");
+							throw new FormatNotUnderstoodException("Error: Cannot read new Excel file (.xlsx) in low footprint mode");
 						}
+						return;
 						
 					}
 					// else we need to 
@@ -194,6 +213,9 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 					  req.addListenerForAllRecords(listener);
 					  HSSFEventFactory factory = new HSSFEventFactory();
 					  factory.processEvents(req, din);
+					} catch (EncryptedDocumentException e) {
+						LOG.error(e);
+						throw new FormatNotUnderstoodException("Cannot decrypt document");
 					}
 					  finally {
 
@@ -307,6 +329,9 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 	
 	@Override
 	public long getCurrentRow() {
+		if (this.currentRow==0) { // to be checked this is a fix for HSSF in low footprint mode (if and only if) the HSSF is encrypted
+			return 1;
+		}
 		return this.currentRow;
 	}
 
@@ -385,8 +410,9 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 		public void startRow(int rowNum) {
 			if (rowNum>currentRow+1) {
 				// create empty rows
-				while (rowNum!=currentRow) {
+				while (rowNum-1!=currentRow) {
 					this.spreadSheetCellDAOCache.get(this.currentSheet).add(new SpreadSheetCellDAO[0]);
+					this.currentRow++;
 				}
 			}
 				// create for current Row temporary storage

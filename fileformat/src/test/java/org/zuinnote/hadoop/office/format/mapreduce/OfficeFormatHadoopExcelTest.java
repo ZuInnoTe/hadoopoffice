@@ -245,6 +245,17 @@ private static java.nio.file.Path tmpPath;
 	assertTrue("Test Data File \""+fileName+"\" exists", file.exists());
 	assertFalse("Test Data File \""+fileName+"\" is not a directory", file.isDirectory());
     }
+    
+    @Test
+    public void checkTestExcel2003EmptyRows() {
+	ClassLoader classLoader = getClass().getClassLoader();
+	String fileName="excel2003testemptyrows.xls";
+	String fileNameSpreadSheet=classLoader.getResource(fileName).getFile();	
+	assertNotNull("Test Data File \""+fileName+"\" is not null in resource path",fileNameSpreadSheet);
+	File file = new File(fileNameSpreadSheet);
+	assertTrue("Test Data File \""+fileName+"\" exists", file.exists());
+	assertFalse("Test Data File \""+fileName+"\" is not a directory", file.isDirectory());
+    }
 
 
     @Test
@@ -3438,6 +3449,257 @@ assertEquals("Input Split for Excel file contains row 1 with cell 4 == \"test4\"
 	assertEquals("Input Split for Excel file contains row 9 with cell 3 == \"seven\"", "seven", ((SpreadSheetCellDAO)spreadSheetValue.get()[2]).getFormattedValue());	
     }
 
+    @Test
+    public void readExcelInputFormatExcel2003SingleSheetEncryptedPositiveLowFootprint() throws IOException, InterruptedException {
+    	Configuration conf = new Configuration(defaultConf);
+    	ClassLoader classLoader = getClass().getClassLoader();
+    	String fileName="excel2003encrypt.xls";
+    	String fileNameSpreadSheet=classLoader.getResource(fileName).getFile();	
+    	Path file = new Path(fileNameSpreadSheet);
+ 
+	// set locale to the one of the test data
+	conf.set("hadoopoffice.read.locale.bcp47","de");
+
+	// low footprint
+	conf.set("hadoopoffice.read.lowFootprint", "true");
+	// for decryption simply set the password
+	conf.set("hadoopoffice.read.security.crypt.password","test");
+   	Job job = Job.getInstance(conf);
+    	FileInputFormat.setInputPaths(job, file);
+	TaskAttemptContext context = new TaskAttemptContextImpl(conf, new TaskAttemptID());
+   	ExcelFileInputFormat format = new ExcelFileInputFormat();
+  	List<InputSplit> splits = format.getSplits(job);
+    	assertEquals("Only one split generated for Excel file", 1, splits.size());
+    	RecordReader<Text, ArrayWritable> reader = format.createRecordReader(splits.get(0), context);
+	assertNotNull("Format returned  null RecordReader", reader);
+	reader.initialize(splits.get(0),context);
+	Text spreadSheetKey = new Text();	
+	ArrayWritable spreadSheetValue = new ArrayWritable(SpreadSheetCellDAO.class);
+	assertTrue("Input Split for Excel file contains row 1", reader.nextKeyValue());	
+	spreadSheetKey=reader.getCurrentKey();
+	spreadSheetValue=reader.getCurrentValue();
+	assertEquals("Input Split for Excel file has keyname == \"[excel2003encrypt.xls]Sheet1!A1\"", "[excel2003encrypt.xls]Sheet1!A1", spreadSheetKey.toString());
+	assertEquals("Input Split for Excel file contains row 1 with 3 columns", 3, spreadSheetValue.get().length);
+	assertEquals("Input Split for Excel file contains row 1 with cell 1 == \"test1\"", "test1", ((SpreadSheetCellDAO)spreadSheetValue.get()[0]).getFormattedValue());
+	assertEquals("Input Split for Excel file contains row 1 with cell 1 sheetname == \"Sheet1\"", "Sheet1", ((SpreadSheetCellDAO)spreadSheetValue.get()[0]).getSheetName());	
+	assertEquals("Input Split for Excel file contains row 1 with cell 1 address == \"A1\"", "A1", ((SpreadSheetCellDAO)spreadSheetValue.get()[0]).getAddress());	
+assertEquals("Input Split for Excel file contains row 1 with cell 2 == \"test2\"", "test2", ((SpreadSheetCellDAO)spreadSheetValue.get()[1]).getFormattedValue());	
+assertEquals("Input Split for Excel file contains row 1 with cell 3 == \"test3\"", "test3", ((SpreadSheetCellDAO)spreadSheetValue.get()[2]).getFormattedValue());	
+    }
+    
+    @Test
+    public void readExcelInputFormatExcel2003SingleSheetEncryptedNegativeLowFootprint() throws IOException, InterruptedException {
+    	Configuration conf = new Configuration(defaultConf);
+    	ClassLoader classLoader = getClass().getClassLoader();
+    	String fileName="excel2003encrypt.xls";
+    	String fileNameSpreadSheet=classLoader.getResource(fileName).getFile();	
+    	Path file = new Path(fileNameSpreadSheet);
+	// set locale to the one of the test data
+	conf.set("hadoopoffice.read.locale.bcp47","de");
+
+	// low footprint
+	conf.set("hadoopoffice.read.lowFootprint", "true");
+	// for decryption simply set the password
+	conf.set("hadoopoffice.read.security.crypt.password","test2");
+   	Job job = Job.getInstance(conf);
+    	FileInputFormat.setInputPaths(job, file);
+	TaskAttemptContext context = new TaskAttemptContextImpl(conf, new TaskAttemptID());
+   	ExcelFileInputFormat format = new ExcelFileInputFormat();
+   	List<InputSplit> splits = format.getSplits(job);
+    	assertEquals("Only one split generated for Excel file", 1, splits.size());
+    	RecordReader<Text, ArrayWritable> reader = format.createRecordReader(splits.get(0), context);
+	exception.expect(InterruptedException.class);
+	reader.initialize(splits.get(0),context);
+    }
+    
+    @Test
+    public void readExcelInputFormatExcel2013SingleSheetEncryptedNegativeLowFootprint() throws IOException, InterruptedException {
+	Configuration conf = new Configuration(defaultConf);
+    	ClassLoader classLoader = getClass().getClassLoader();
+    	String fileName="excel2013encrypt.xlsx";
+    	String fileNameSpreadSheet=classLoader.getResource(fileName).getFile();	
+    	Path file = new Path(fileNameSpreadSheet);
+	// set locale to the one of the test data
+	conf.set("hadoopoffice.read.locale.bcp47","de");
+
+	// low footprint
+	conf.set("hadoopoffice.read.lowFootprint", "true");
+	// for decryption simply set the password
+	conf.set("hadoopoffice.read.security.crypt.password","test2");
+  	Job job = Job.getInstance(conf);
+    	FileInputFormat.setInputPaths(job, file);
+	TaskAttemptContext context = new TaskAttemptContextImpl(conf, new TaskAttemptID());
+   	ExcelFileInputFormat format = new ExcelFileInputFormat();
+    	List<InputSplit> splits = format.getSplits(job);
+    	assertEquals("Only one split generated for Excel file", 1, splits.size());
+    	RecordReader<Text, ArrayWritable> reader = format.createRecordReader(splits.get(0), context);	
+	exception.expect(InterruptedException.class);
+	reader.initialize(splits.get(0),context);
+    }
+
+    @Test
+    public void readExcelInputFormatExcel2013SingleSheetEncryptedPositiveLowFootprint() throws IOException, InterruptedException {
+    	Configuration conf = new Configuration(defaultConf);
+    	ClassLoader classLoader = getClass().getClassLoader();
+    	String fileName="excel2013encrypt.xlsx";
+    	String fileNameSpreadSheet=classLoader.getResource(fileName).getFile();	
+    	Path file = new Path(fileNameSpreadSheet);
+ 
+	// set locale to the one of the test data
+	conf.set("hadoopoffice.read.locale.bcp47","de");
+	// low footprint
+	conf.set("hadoopoffice.read.lowFootprint", "true");
+	// for decryption simply set the password
+	conf.set("hadoopoffice.read.security.crypt.password","test");
+   	Job job = Job.getInstance(conf);
+    	FileInputFormat.setInputPaths(job, file);
+	TaskAttemptContext context = new TaskAttemptContextImpl(conf, new TaskAttemptID());
+   	ExcelFileInputFormat format = new ExcelFileInputFormat();
+	List<InputSplit> splits = format.getSplits(job);
+    	assertEquals("Only one split generated for Excel file", 1, splits.size());
+    	RecordReader<Text, ArrayWritable> reader = format.createRecordReader(splits.get(0), context);
+	assertNotNull("Format returned  null RecordReader", reader);
+	reader.initialize(splits.get(0),context);
+	Text spreadSheetKey = new Text();	
+	ArrayWritable spreadSheetValue = new ArrayWritable(SpreadSheetCellDAO.class);
+	assertTrue("Input Split for Excel file contains row 1", reader.nextKeyValue());	
+	spreadSheetKey=reader.getCurrentKey();
+	spreadSheetValue=reader.getCurrentValue();
+	assertEquals("Input Split for Excel file has keyname == \"[excel2013encrypt.xlsx]Sheet1!A1\"", "[excel2013encrypt.xlsx]Sheet1!A1", spreadSheetKey.toString());
+	assertEquals("Input Split for Excel file contains row 1 with 3 columns", 3, spreadSheetValue.get().length);
+	assertEquals("Input Split for Excel file contains row 1 with cell 1 == \"test1\"", "test1", ((SpreadSheetCellDAO)spreadSheetValue.get()[0]).getFormattedValue());
+	assertEquals("Input Split for Excel file contains row 1 with cell 1 sheetname == \"Sheet1\"", "Sheet1", ((SpreadSheetCellDAO)spreadSheetValue.get()[0]).getSheetName());	
+	assertEquals("Input Split for Excel file contains row 1 with cell 1 address == \"A1\"", "A1", ((SpreadSheetCellDAO)spreadSheetValue.get()[0]).getAddress());	
+assertEquals("Input Split for Excel file contains row 1 with cell 2 == \"test2\"", "test2", ((SpreadSheetCellDAO)spreadSheetValue.get()[1]).getFormattedValue());	
+assertEquals("Input Split for Excel file contains row 1 with cell 3 == \"test3\"", "test3", ((SpreadSheetCellDAO)spreadSheetValue.get()[2]).getFormattedValue());	
+    }
+    
+    @Test
+    public void readExcelInputFormatExcel2003EmptyRowsLowFootprint() throws IOException, InterruptedException {
+   	Configuration conf = new Configuration(defaultConf);
+    	ClassLoader classLoader = getClass().getClassLoader();
+    	String fileName="excel2003testemptyrows.xls";
+    	String fileNameSpreadSheet=classLoader.getResource(fileName).getFile();	
+    	Path file = new Path(fileNameSpreadSheet);
+     
+	// set locale to the one of the test data
+	conf.set("hadoopoffice.read.locale.bcp47","de");
+
+	// low footprint
+	conf.set("hadoopoffice.read.lowFootprint", "true");
+ 	Job job = Job.getInstance(conf);
+    	FileInputFormat.setInputPaths(job, file);
+	TaskAttemptContext context = new TaskAttemptContextImpl(conf, new TaskAttemptID());
+   	ExcelFileInputFormat format = new ExcelFileInputFormat();
+	List<InputSplit> splits = format.getSplits(job);
+    	assertEquals("Only one split generated for Excel file", 1, splits.size());
+    	RecordReader<Text, ArrayWritable> reader = format.createRecordReader(splits.get(0), context);
+	assertNotNull("Format returned  null RecordReader", reader);
+	reader.initialize(splits.get(0),context);
+	Text spreadSheetKey = new Text();	
+	ArrayWritable spreadSheetValue = new ArrayWritable(SpreadSheetCellDAO.class);
+	assertTrue("Input Split for Excel file contains row 1", reader.nextKeyValue());
+	spreadSheetKey=reader.getCurrentKey();
+	spreadSheetValue=reader.getCurrentValue();	
+	assertEquals("Input Split for Excel file has keyname == \"[excel2003testemptyrows.xls]Sheet1!A1\"", "[excel2003testemptyrows.xls]Sheet1!A1", spreadSheetKey.toString());
+	assertEquals("Input Split for Excel file contains row 1 with 0 columns", 0, spreadSheetValue.get().length);
+	
+	assertTrue("Input Split for Excel file contains row 2", reader.nextKeyValue());
+	spreadSheetKey=reader.getCurrentKey();
+	spreadSheetValue=reader.getCurrentValue();
+	assertEquals("Input Split for Excel file contains row 2 with 2 columns", 2, spreadSheetValue.get().length);
+	assertEquals("Input Split for Excel file contains row 2 with cell 1 == \"4\"", "4", ((SpreadSheetCellDAO)spreadSheetValue.get()[0]).getFormattedValue());	
+		assertEquals("Input Split for Excel file contains row 2 with cell 1 == \"1\"", "1", ((SpreadSheetCellDAO)spreadSheetValue.get()[1]).getFormattedValue());	
+	assertTrue("Input Split for Excel file contains row 3", reader.nextKeyValue());
+	spreadSheetKey=reader.getCurrentKey();
+	spreadSheetValue=reader.getCurrentValue();	
+	assertEquals("Input Split for Excel file contains row 3 with 0 columns", 0, spreadSheetValue.get().length);
+	
+	assertTrue("Input Split for Excel file contains row 4", reader.nextKeyValue());
+	spreadSheetKey=reader.getCurrentKey();
+	spreadSheetValue=reader.getCurrentValue();
+	assertEquals("Input Split for Excel file contains row 4 with 1 column", 1, spreadSheetValue.get().length);
+	assertEquals("Input Split for Excel file contains row 4 with cell 1 == \"1\"", "1", ((SpreadSheetCellDAO)spreadSheetValue.get()[0]).getFormattedValue());	
+	assertTrue("Input Split for Excel file contains row 5", reader.nextKeyValue());
+	spreadSheetKey=reader.getCurrentKey();
+	spreadSheetValue=reader.getCurrentValue();
+	assertEquals("Input Split for Excel file contains row 5 with 3 columns", 3, spreadSheetValue.get().length);
+	assertEquals("Input Split for Excel file contains row 5 with cell 1 == \"2\"", "2", ((SpreadSheetCellDAO)spreadSheetValue.get()[0]).getFormattedValue());			 
+	assertEquals("Input Split for Excel file contains row 5 with cell 2== \"6\"", "6", ((SpreadSheetCellDAO)spreadSheetValue.get()[1]).getFormattedValue());
+	assertEquals("Input Split for Excel file contains row 5 with cell 3== \"10\"", "10", ((SpreadSheetCellDAO)spreadSheetValue.get()[2]).getFormattedValue());
+	assertTrue("Input Split for Excel file contains row 6", reader.nextKeyValue());
+	spreadSheetKey=reader.getCurrentKey();
+	spreadSheetValue=reader.getCurrentValue();	
+	assertEquals("Input Split for Excel file contains row 6 with 3 columns", 3, spreadSheetValue.get().length);
+	assertEquals("Input Split for Excel file contains row 6 with cell 1 == \"3\"", "3", ((SpreadSheetCellDAO)spreadSheetValue.get()[0]).getFormattedValue());		 
+	assertEquals("Input Split for Excel file contains row 6 with cell 2== \"4\"", "4", ((SpreadSheetCellDAO)spreadSheetValue.get()[1]).getFormattedValue());
+	assertEquals("Input Split for Excel file contains row 6 with cell 3== \"10\"", "10", ((SpreadSheetCellDAO)spreadSheetValue.get()[2]).getFormattedValue());
+    }
+
+    
+    @Test
+    public void readExcelInputFormatExcel2013EmptyRowsLowFootprint() throws IOException, InterruptedException {
+   	Configuration conf = new Configuration(defaultConf);
+    	ClassLoader classLoader = getClass().getClassLoader();
+    	String fileName="excel2013testemptyrows.xlsx";
+    	String fileNameSpreadSheet=classLoader.getResource(fileName).getFile();	
+    	Path file = new Path(fileNameSpreadSheet);
+     
+	// set locale to the one of the test data
+	conf.set("hadoopoffice.read.locale.bcp47","de");
+
+	// low footprint
+	conf.set("hadoopoffice.read.lowFootprint", "true");
+ 	Job job = Job.getInstance(conf);
+    	FileInputFormat.setInputPaths(job, file);
+	TaskAttemptContext context = new TaskAttemptContextImpl(conf, new TaskAttemptID());
+   	ExcelFileInputFormat format = new ExcelFileInputFormat();
+	List<InputSplit> splits = format.getSplits(job);
+    	assertEquals("Only one split generated for Excel file", 1, splits.size());
+    	RecordReader<Text, ArrayWritable> reader = format.createRecordReader(splits.get(0), context);
+	assertNotNull("Format returned  null RecordReader", reader);
+	reader.initialize(splits.get(0),context);
+	Text spreadSheetKey = new Text();	
+	ArrayWritable spreadSheetValue = new ArrayWritable(SpreadSheetCellDAO.class);
+	assertTrue("Input Split for Excel file contains row 1", reader.nextKeyValue());
+	spreadSheetKey=reader.getCurrentKey();
+	spreadSheetValue=reader.getCurrentValue();	
+	assertEquals("Input Split for Excel file has keyname == \"[excel2013testemptyrows.xlsx]Sheet1!A1\"", "[excel2013testemptyrows.xlsx]Sheet1!A1", spreadSheetKey.toString());
+	assertEquals("Input Split for Excel file contains row 1 with 0 columns", 0, spreadSheetValue.get().length);
+	
+	assertTrue("Input Split for Excel file contains row 2", reader.nextKeyValue());
+	spreadSheetKey=reader.getCurrentKey();
+	spreadSheetValue=reader.getCurrentValue();
+	assertEquals("Input Split for Excel file contains row 2 with 2 columns", 2, spreadSheetValue.get().length);
+	assertEquals("Input Split for Excel file contains row 2 with cell 1 == \"4\"", "4", ((SpreadSheetCellDAO)spreadSheetValue.get()[0]).getFormattedValue());	
+		assertEquals("Input Split for Excel file contains row 2 with cell 1 == \"1\"", "1", ((SpreadSheetCellDAO)spreadSheetValue.get()[1]).getFormattedValue());	
+	assertTrue("Input Split for Excel file contains row 3", reader.nextKeyValue());
+	spreadSheetKey=reader.getCurrentKey();
+	spreadSheetValue=reader.getCurrentValue();	
+	assertEquals("Input Split for Excel file contains row 3 with 0 columns", 0, spreadSheetValue.get().length);
+	
+	assertTrue("Input Split for Excel file contains row 4", reader.nextKeyValue());
+	spreadSheetKey=reader.getCurrentKey();
+	spreadSheetValue=reader.getCurrentValue();
+	assertEquals("Input Split for Excel file contains row 4 with 1 column", 1, spreadSheetValue.get().length);
+	assertEquals("Input Split for Excel file contains row 4 with cell 1 == \"1\"", "1", ((SpreadSheetCellDAO)spreadSheetValue.get()[0]).getFormattedValue());	
+	assertTrue("Input Split for Excel file contains row 5", reader.nextKeyValue());
+	spreadSheetKey=reader.getCurrentKey();
+	spreadSheetValue=reader.getCurrentValue();
+	assertEquals("Input Split for Excel file contains row 5 with 3 columns", 3, spreadSheetValue.get().length);
+	assertEquals("Input Split for Excel file contains row 5 with cell 1 == \"2\"", "2", ((SpreadSheetCellDAO)spreadSheetValue.get()[0]).getFormattedValue());			 
+	assertEquals("Input Split for Excel file contains row 5 with cell 2== \"6\"", "6", ((SpreadSheetCellDAO)spreadSheetValue.get()[1]).getFormattedValue());
+	assertEquals("Input Split for Excel file contains row 5 with cell 3== \"10\"", "10", ((SpreadSheetCellDAO)spreadSheetValue.get()[2]).getFormattedValue());
+	assertTrue("Input Split for Excel file contains row 6", reader.nextKeyValue());
+	spreadSheetKey=reader.getCurrentKey();
+	spreadSheetValue=reader.getCurrentValue();	
+	assertEquals("Input Split for Excel file contains row 6 with 3 columns", 3, spreadSheetValue.get().length);
+	assertEquals("Input Split for Excel file contains row 6 with cell 1 == \"3\"", "3", ((SpreadSheetCellDAO)spreadSheetValue.get()[0]).getFormattedValue());		 
+	assertEquals("Input Split for Excel file contains row 6 with cell 2== \"4\"", "4", ((SpreadSheetCellDAO)spreadSheetValue.get()[1]).getFormattedValue());
+	assertEquals("Input Split for Excel file contains row 6 with cell 3== \"10\"", "10", ((SpreadSheetCellDAO)spreadSheetValue.get()[2]).getFormattedValue());
+    }
+
+    
     @Test
     public void writeExcelOutputFormatExcel2013SingleSheetLowFootprint() throws IOException, InterruptedException {
 	// one row string and three columns ("test1","test2","test3")
