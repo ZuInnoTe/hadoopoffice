@@ -63,6 +63,7 @@ import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 */
 
 public class MSExcelParser implements OfficeReaderParserInterface {
+private static final String MIMETYPE_EXCEL_BINARY_ID = "ms-excel.sheet.binary"; // application/vnd.ms-excel.sheet.binary.macroEnabled.12
 private static final String MATCH_ALL = "matchAll";
 private static final String NOT_MATCHING = "Not matching: ";
 private static final String COULD_NOT_RETRIEVE_LINKED_WORKBOOKS_FOR_OLD_EXCEL_FORMAT = "Could not retrieve linked workbooks for old Excel format.";

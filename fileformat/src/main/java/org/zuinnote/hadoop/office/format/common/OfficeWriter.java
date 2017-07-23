@@ -32,6 +32,7 @@ import org.zuinnote.hadoop.office.format.common.writer.MSExcelWriter;
 import org.zuinnote.hadoop.office.format.common.writer.OfficeSpreadSheetWriterInterface;
 import org.zuinnote.hadoop.office.format.common.writer.OfficeWriterException;
 import org.zuinnote.hadoop.office.format.common.writer.InvalidWriterConfigurationException;
+import org.zuinnote.hadoop.office.format.common.writer.MSExcelLowFootprintWriter;
  
 
 /*
@@ -62,7 +63,18 @@ public OfficeWriter(HadoopOfficeWriteConfiguration howc) throws InvalidWriterCon
 	// check mimetype and create parser, this is based on some heuristics on the mimetype
 	String writerFormat=OfficeWriter.getInternalWriterFormatFromMimeType(this.howc.getMimeType());
 	if (MSExcelWriter.isSupportedFormat(writerFormat)) {
-		currentOfficeSpreadSheetWriter=new MSExcelWriter(writerFormat,this.howc);
+		// check if it is low footprint
+		if (!this.howc.getLowFootprint()) {
+			currentOfficeSpreadSheetWriter=new MSExcelWriter(writerFormat,this.howc);
+		} else { // low footprint 
+			if (MSExcelWriter.FORMAT_OLD.equals(writerFormat)) {
+				LOG.warn("Low footprint mode is only supported for new Excel format .xlsx. Continuing with standard writing mode");
+				currentOfficeSpreadSheetWriter=new MSExcelWriter(writerFormat,this.howc);
+			} else {
+				LOG.info("Storing new Excel file ,xlsx in low footprint mode");
+				currentOfficeSpreadSheetWriter=new MSExcelLowFootprintWriter(writerFormat,this.howc);
+			}
+		}
 	} else {
 		throw new InvalidWriterConfigurationException("Error: Writer does not recognize format +\""+writerFormat+"\"");
 	}
@@ -123,9 +135,7 @@ if (this.currentOfficeSpreadSheetWriter!=null) {
 		LOG.error(EX_NO_WRITER_INSTANTIATED);
 	}
 } finally {
-	if (this.oStream!=null) {
-		this.oStream.close();
-	}
+	
 }
 }
 

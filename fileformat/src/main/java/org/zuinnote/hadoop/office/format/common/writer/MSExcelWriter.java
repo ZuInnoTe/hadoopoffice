@@ -288,7 +288,7 @@ public void write(Object newDAO) throws OfficeWriterException {
  * @return SpreadsheetCellDAO if wellformed, otherwise null
  */
 
-private SpreadSheetCellDAO checkSpreadSheetCellDAO(Object newDAO) throws OfficeWriterException {
+public static SpreadSheetCellDAO checkSpreadSheetCellDAO(Object newDAO) throws OfficeWriterException {
 	if (!(newDAO instanceof SpreadSheetCellDAO)) {
 		throw new OfficeWriterException("Objects which are not of the class SpreadSheetCellDAO are not supported for writing.");
 	}
@@ -445,7 +445,7 @@ return false;
 *
 */
 
-private static CipherAlgorithm getAlgorithmCipher(String encryptAlgorithm) {
+public static CipherAlgorithm getAlgorithmCipher(String encryptAlgorithm) {
 	if (encryptAlgorithm==null) { 
 		return null;
 	}
@@ -475,7 +475,7 @@ private static CipherAlgorithm getAlgorithmCipher(String encryptAlgorithm) {
 *
 *
 */
-private static HashAlgorithm getHashAlgorithm(String hashAlgorithm) {
+public static HashAlgorithm getHashAlgorithm(String hashAlgorithm) {
 	if (hashAlgorithm==null) {
 		return null;
 	}
@@ -512,7 +512,7 @@ private static HashAlgorithm getHashAlgorithm(String hashAlgorithm) {
 */
 
 
-private static EncryptionMode getEncryptionModeCipher(String encryptionMode) {
+public static EncryptionMode getEncryptionModeCipher(String encryptionMode) {
 	if (encryptionMode==null) {
 		return null;
 	}
@@ -541,7 +541,7 @@ private static EncryptionMode getEncryptionModeCipher(String encryptionMode) {
 */
 
 
-private static ChainingMode getChainMode(String chainMode) {
+public static ChainingMode getChainMode(String chainMode) {
 	if (chainMode==null) {
 		return null;
 	}
