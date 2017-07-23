@@ -161,7 +161,7 @@ public MSExcelLowFootprintWriter(String excelFormat, HadoopOfficeWriteConfigurat
 	    		    anchor.setRow1(currentRow.getRowNum());
 	    		    anchor.setRow2(currentRow.getRowNum()+this.howc.getCommentHeight());
 			/** create comment **/
-			    Comment currentComment = mappedDrawings.get(safeSheetName).createCellComment(anchor);
+			   Comment currentComment = mappedDrawings.get(safeSheetName).createCellComment(anchor);
 	    		    currentComment.setString(this.currentWorkbook.getCreationHelper().createRichTextString(sscd.getComment()));
 	    		    currentComment.setAuthor(this.howc.getCommentAuthor());
 			    currentCell.setCellComment(currentComment);
@@ -176,19 +176,22 @@ public MSExcelLowFootprintWriter(String excelFormat, HadoopOfficeWriteConfigurat
 			this.currentWorkbook.write(this.osStream);
 		} else {
 			// encrypt if needed
-			EncryptedTempData tempData = new EncryptedTempData(this.encryptAlgorithmCipher,this.chainModeCipher);
-			this.currentWorkbook.write(tempData.getOutputStream());
+	
 			POIFSFileSystem fs = new POIFSFileSystem();
-			EncryptionInfo info = new EncryptionInfo(this.encryptionModeCipher);
-			Encryptor enc = Encryptor.getInstance(info);
+			EncryptionInfo info = new EncryptionInfo(this.encryptionModeCipher, this.encryptAlgorithmCipher, this.hashAlgorithmCipher, -1, -1, this.chainModeCipher);
+			Encryptor enc = info.getEncryptor();
+			
 			enc.confirmPassword(this.howc.getPassword());
 			try {
-				OPCPackage opc = OPCPackage.open(tempData.getInputStream());
-				opc.save(enc.getDataStream(fs));
-				fs.writeFilesystem(this.osStream);
-			} catch (InvalidFormatException | GeneralSecurityException e) {
+				this.currentWorkbook.write(enc.getDataStream(fs));
+			} catch (GeneralSecurityException e) {
+				
 				LOG.error(e);
 				throw new IOException(e);
+			}
+			fs.writeFilesystem(this.osStream);
+			if (this.osStream!=null) {
+				this.osStream.close();
 			}
 		}
 		
@@ -249,20 +252,22 @@ public MSExcelLowFootprintWriter(String excelFormat, HadoopOfficeWriteConfigurat
 			if (ca!=null) {
 						SecureRandom sr = new SecureRandom();
 						byte[] iv = new byte[ca.blockSize];
-						byte[] key = new byte[ca.defaultKeySize];
+						byte[] key = new byte[ca.defaultKeySize/8];
 						sr.nextBytes(iv);
 						sr.nextBytes(key);
 						SecretKeySpec skeySpec = new SecretKeySpec(key,ca.jceId);
 						this.ca = ca;
 						this.cm = cm;
-						this.ciEncrypt=CryptoFunctions.getCipher(skeySpec, ca, cm, iv, Cipher.ENCRYPT_MODE);
-						this.ciDecrypt=CryptoFunctions.getCipher(skeySpec, ca, cm, iv, Cipher.DECRYPT_MODE);
+						this.ciEncrypt=CryptoFunctions.getCipher(skeySpec, ca, cm, iv, Cipher.ENCRYPT_MODE,"PKCS5Padding");
+						this.ciDecrypt=CryptoFunctions.getCipher(skeySpec, ca, cm, iv, Cipher.DECRYPT_MODE,"PKCS5Padding");
 			}
 					this.tempFile=TempFile.createTempFile("hadooffice-poi-temp-data",".tmp");
 		}
 		
 		public OutputStream getOutputStream() throws FileNotFoundException {
 			if (this.ciEncrypt!=null) { // encrypted tempdata
+				LOG.debug("Returning encrypted OutputStream for "+this.tempFile.getAbsolutePath());
+				
 				return new CipherOutputStream(new FileOutputStream(this.tempFile),this.ciEncrypt);
 			}
 			return new FileOutputStream(this.tempFile);
@@ -270,6 +275,8 @@ public MSExcelLowFootprintWriter(String excelFormat, HadoopOfficeWriteConfigurat
 		
 		public InputStream getInputStream() throws FileNotFoundException {
 			if (this.ciDecrypt!=null) { // decrypt tempdata
+				LOG.debug("Returning decrypted InputStream for "+this.tempFile.getAbsolutePath());
+				LOG.debug("Size of temp file: "+this.tempFile.length());
 				return new CipherInputStream(new FileInputStream(this.tempFile),this.ciDecrypt);
 			}
 			return new FileInputStream(this.tempFile);
@@ -295,14 +302,14 @@ public MSExcelLowFootprintWriter(String excelFormat, HadoopOfficeWriteConfigurat
 			if (ca!=null) { // encrypted files
 				SecureRandom sr = new SecureRandom();
 				byte[] iv = new byte[ca.blockSize];
-				byte[] key = new byte[ca.defaultKeySize];
+				byte[] key = new byte[ca.defaultKeySize/8];
 				sr.nextBytes(iv);
 				sr.nextBytes(key);
 				SecretKeySpec skeySpec = new SecretKeySpec(key,ca.jceId);
 				this.ca = ca;
 				this.cm = cm;
-				this.ciEncoder=CryptoFunctions.getCipher(skeySpec, ca, cm, iv, Cipher.ENCRYPT_MODE);
-				this.ciDecoder=CryptoFunctions.getCipher(skeySpec, ca, cm, iv, Cipher.DECRYPT_MODE);
+				this.ciEncoder=CryptoFunctions.getCipher(skeySpec, ca, cm, iv, Cipher.ENCRYPT_MODE,"PKCS5Padding");
+				this.ciDecoder=CryptoFunctions.getCipher(skeySpec, ca, cm, iv, Cipher.DECRYPT_MODE,"PKCS5Padding");
 			}
 			
 			
