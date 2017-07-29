@@ -50,16 +50,14 @@ import org.apache.hadoop.io.compress.SplitCompressionInputStream
 
 
 import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.sql.SQLContext
-import org.apache.spark.sql.functions._
 import scala.collection.mutable.ArrayBuffer
 import org.scalatest.{FlatSpec, BeforeAndAfterAll, GivenWhenThen, Matchers}
 
-class Spark2ScalaDSExcelOutIntegrationSpec extends FlatSpec with BeforeAndAfterAll with GivenWhenThen with Matchers {
+class SparkScalaExcelOutputIntegrationSpec extends FlatSpec with BeforeAndAfterAll with GivenWhenThen with Matchers {
  
 private var sc: SparkContext = _
 private val master: String = "local[2]"
-private val appName: String = "example-scalaspark2dsexceloutput-integrationtest"
+private val appName: String = "example-scalasparkexcelinput-integrationtest"
 private val tmpPrefix: String = "ho-integrationtest"
 private var tmpPath: java.nio.file.Path = _
 private val CLUSTERNAME: String ="hcl-minicluster"
@@ -133,39 +131,60 @@ override def beforeAll(): Unit = {
 }
 
 
-"A new Excel file" should "be created on DFS and reread correctly" in {
-Given("In-memory data input")
- val sqlContext=new SQLContext(sc)
-        import sqlContext.implicits._
-	When("store as Excel file on DFS")
-  SparkScalaExcelOutDataSource.saveAsExcelFile(sc,dfsCluster.getFileSystem().getUri().toString()+DFS_OUTPUT_DIR_NAME)
-	Then("stored Excel file on DFS can be read correctly")
+"The test excel file" should "be converted into a 6 lines CSV" in {
+	Given("Excel 2013 test file on DFS")
+	// create input directory
+	dfsCluster.getFileSystem().mkdirs(DFS_INPUT_DIR)
+	// copy bitcoin blocks
+	val classLoader = getClass().getClassLoader()
+    	// put testdata on DFS
+    	val fileName: String="excel2013test.xlsx"
+    	val fileNameFullLocal=classLoader.getResource(fileName).getFile()
+    	val inputFile=new Path(fileNameFullLocal)
+    	dfsCluster.getFileSystem().copyFromLocalFile(false, false, inputFile, DFS_INPUT_DIR)	
+	Given("Configuration")
+	conf.set("hadoopoffice.read.locale.bcp47","us");
+	When("convert to CSV")
+	SparkScalaExcelIn.convertToCSV(sc,conf,dfsCluster.getFileSystem().getUri().toString()+DFS_INPUT_DIR_NAME,dfsCluster.getFileSystem().getUri().toString()+DFS_OUTPUT_DIR_NAME)
+	Then("CSV correspond to Excel")
 	// fetch results
-  val dfIn = sqlContext.read.format("org.zuinnote.spark.office.excel").option("read.locale.bcp47", "us").load(dfsCluster.getFileSystem().getUri().toString()+DFS_OUTPUT_DIR_NAME)
-  assert(3==dfIn.count)
-  val rowsDF=dfIn.select(explode(dfIn("rows")).alias("rows"))
-  val formattedValues = rowsDF.select("rows.formattedValue").collect
-  val comments = rowsDF.select("rows.comment").collect
-  val formulas = rowsDF.select("rows.formula").collect
-  val addresses = rowsDF.select("rows.address").collect
-  val sheetNames = rowsDF.select("rows.sheetName").collect
-  // check data
-  // check row 1
-  assert("A1"==addresses(0).get(0))
-  assert("1"==formattedValues(0).get(0))
-  assert("B1"==addresses(1).get(0))
-  assert("5"==formattedValues(1).get(0))
-  assert("A2+A3"==formulas(1).get(0))
-  // check row 2
-  assert("A2"==addresses(2).get(0))
-  assert("2"==formattedValues(2).get(0))
-  assert("This is a comment"==comments(2).get(0))
-  // check row 3
-  assert("A3"==addresses(3).get(0))
-  assert("3"==formattedValues(3).get(0))
+	val resultLines = readDefaultResults(6)
+	assert(6==resultLines.size())
+	assert("A1:test1,B1:test2,C1:test3,D1:test4"==resultLines.get(0))
+	assert("A2:4"==resultLines.get(1))
+	assert("A3:31/12/99,B3:5,,,E3:null"==resultLines.get(2))
+	assert("A4:1"==resultLines.get(3))
+	assert("A5:2,B5:6,C5:10"==resultLines.get(4))
+	assert("A6:3,B6:4,C6:15"==resultLines.get(5))
 }
 
 
+
+	    /**
+	     * Read excel files from the default output directory and default excel outputfile 
+	     * @throws FormatNotUnderstoodException 
+	     * 
+	     * 
+	     */
+	    
+	    def  readDefaultExcelResults(numOfRows: Int): List[SpreadSheetCellDAO] = {
+	   val result : ArrayList[SpreadSheetCellDAO]= new ArrayList[SpreadSheetCellDAO]()
+		 val defaultOutputfile = new Path(DFS_OUTPUT_DIR_NAME+"/"+DEFAULT_OUTPUT_EXCEL_FILENAME)
+		val defaultInputStream = openFile(defaultOutputfile)
+		// Create a new MS Excel Parser
+		val hocr = new HadoopOfficeReadConfiguration()
+		val excelParser = new MSExcelParser(hocr,null)
+		excelParser.parse(defaultInputStream)
+		for (i <- 0 to numOfRows-1) {
+			val currentRow = (SpreadSheetCellDAO[]) excelParser.getNext()
+			if (currentRow!=null) {
+				result.add(currentRow)
+			}
+		}
+		excelParser.close()
+	    return result
+	    }
+	    
 
 
       /**

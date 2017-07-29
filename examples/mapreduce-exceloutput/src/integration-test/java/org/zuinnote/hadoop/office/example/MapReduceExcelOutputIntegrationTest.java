@@ -180,7 +180,7 @@ public final class MapReduceExcelOutputIntegrationTest {
 	    	Path inputFile=new Path(fileNameFullLocal);
 	    	dfsCluster.getFileSystem().copyFromLocalFile(false, false, inputFile, DFS_INPUT_DIR);
 	    	// submit the application
-	    	miniCluster.getConfig().set("hadoopoffice.read.locale.bcp47","de");
+	    	miniCluster.getConfig().set("hadoopoffice.read.locale.bcp47","us");
 	         // Let ToolRunner handle generic command-line options
 	  	int res = ToolRunner.run(miniCluster.getConfig(), new CSV2ExcelDriver(), new String[]{DFS_INPUT_DIR_NAME,DFS_OUTPUT_DIR_NAME}); 
 	    	// check if successfully executed

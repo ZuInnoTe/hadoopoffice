@@ -38,12 +38,12 @@ import org.zuinnote.hadoop.office.format.mapreduce._
 
 /**
 * Demonstrate the HadoopOffice library on Spark 1.x.
-* Converts an Excel file to CSV
+* Converts a CSV file to Excel
 *
 *
 */
 
-object SparkScalaExcelIn {
+object SparkScalaExcelOut {
    def main(args: Array[String]): Unit = {
  	  val conf = new SparkConf().setAppName("Spark-Scala Excel Analytics (hadoopoffice)")
 	  val sc=new SparkContext(conf)
@@ -53,31 +53,15 @@ object SparkScalaExcelIn {
  	       /** note this sets the locale to us-english, which means that numbers might be displayed differently then you expect. Change this to the locale of the Excel file **/
    
 	   hadoopConf.set("hadoopoffice.read.locale.bcp47","us");
-	   convertToCSV(sc, hadoopConf, args(0), args(1));
+	   convertToExcel(sc, hadoopConf, args(0), args(1));
 	   sc.stop()
    }
    
    
    def convertToCSV(sc: SparkContext, hadoopConf: Configuration, inputFile: String, outputFile: String): Unit = {
-     	// load using the new Hadoop API (mapreduce.*)
-	val excelRDD = sc.newAPIHadoopFile(inputFile, classOf[ExcelFileInputFormat], classOf[Text], classOf[ArrayWritable], hadoopConf);
-	// print the cell address and the formatted cell content
-	excelRDD.map(hadoopKeyValueTuple => {
-		val rowStrBuffer = new StringBuilder
-		var i=0;
-		for (x <-hadoopKeyValueTuple._2.get) { // parse through the SpreadSheetCellDAO
-				if (x!=null) {
-					rowStrBuffer.append(x.asInstanceOf[SpreadSheetCellDAO].getAddress+":"+x.asInstanceOf[SpreadSheetCellDAO].getFormattedValue+",")
-				} else {
-					rowStrBuffer.append(",")
-				}
-		i+=1
-		}
-		if (rowStrBuffer.length>0) {
-		  rowStrBuffer.deleteCharAt(rowStrBuffer.length-1) // remove last comma
-		}
-		rowStrBuffer.toString
-	  }).repartition(1).saveAsTextFile(outputFile)
-   }
+     	// load a text file using standard spark methods
+     // split it
+     // create a pair rdd (nullwritable, SpreadSheetCellDAO)
+     // use new hadoop api (mapreduce.*) 
 }
 

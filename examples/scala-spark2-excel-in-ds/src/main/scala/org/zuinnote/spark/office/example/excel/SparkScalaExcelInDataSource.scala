@@ -54,7 +54,9 @@ object SparkScalaExcelInDataSource {
    def convertToCSV(sqlContext: SQLContext, inputFile: String, outputFile: String): Unit = {
      val df = sqlContext.read
     .format("org.zuinnote.spark.office.excel")
-    .option("read.locale.bcp47", "de")  
+         /** note this sets the locale to us-english, which means that numbers might be displayed differently then you expect. Change this to the locale of the Excel file **/
+
+    .option("read.locale.bcp47", "us")  
     .load(inputFile)
      val rowsDF=df.select(explode(df("rows")).alias("rows"))
      df.select("rows.formattedValue").rdd.map(formattedValueRow => {

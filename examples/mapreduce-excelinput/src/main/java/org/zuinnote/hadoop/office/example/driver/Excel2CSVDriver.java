@@ -68,8 +68,8 @@ public int run(String[] args) throws Exception {
  public static void main(String[] args) throws Exception {
      Configuration conf = new Configuration();
    /** Set as an example some of the options to configure the HadoopOffice fileformat **/
-  
-     conf.set("hadoopoffice.read.locale.bcp47","de");
+     /** note this sets the locale to us-english, which means that numbers might be displayed differently then you expect. Change this to the locale of the Excel file **/
+     conf.set("hadoopoffice.read.locale.bcp47","us");
      int res = ToolRunner.run(conf, new Excel2CSVDriver(), args);
      System.exit(res);
  }

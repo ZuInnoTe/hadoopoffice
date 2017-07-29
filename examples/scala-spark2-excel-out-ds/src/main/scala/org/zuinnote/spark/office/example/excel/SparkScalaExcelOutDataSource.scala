@@ -54,7 +54,9 @@ val sparkSession = SparkSession.builder.appName("Spark-Scala Excel Analytics (ha
 	val df= sRdd.toDF()
 	df.write
       .format("org.zuinnote.spark.office.excel")
-    .option("write.locale.bcp47", "de") 
+           /** note this sets the locale to us-english, which means that numbers might be displayed differently then you expect. Change this to the locale of the Excel file **/
+     
+    .option("write.locale.bcp47", "us") 
     .save(outputFile)
 	 
     }

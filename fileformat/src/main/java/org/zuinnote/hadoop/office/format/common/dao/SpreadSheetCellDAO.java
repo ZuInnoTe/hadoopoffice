@@ -41,6 +41,7 @@ public SpreadSheetCellDAO() {
 	this.formula="";
 	this.address="";
 	this.sheetName="";
+	
 }
 
 
@@ -72,6 +73,7 @@ public String getAddress() {
 public String getSheetName() {
 	return this.sheetName;
 }
+
 
 
 public void set(SpreadSheetCellDAO newSpreadSheetCellDAO) {
@@ -107,11 +109,13 @@ public void set(SpreadSheetCellDAO newSpreadSheetCellDAO) {
     if (sheetName!=null) {
 	sheetNameText = new Text(sheetName);
     }
+
     formattedValueText.write(dataOutput);
     commentText.write(dataOutput);
     formulaText.write(dataOutput);
     addressText.write(dataOutput);
     sheetNameText.write(dataOutput);
+
 }
 
   @Override

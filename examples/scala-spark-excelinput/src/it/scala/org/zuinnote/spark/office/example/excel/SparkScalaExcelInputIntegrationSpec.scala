@@ -143,7 +143,7 @@ override def beforeAll(): Unit = {
     	val inputFile=new Path(fileNameFullLocal)
     	dfsCluster.getFileSystem().copyFromLocalFile(false, false, inputFile, DFS_INPUT_DIR)	
 	Given("Configuration")
-	conf.set("hadoopoffice.read.locale.bcp47","de");
+	conf.set("hadoopoffice.read.locale.bcp47","us");
 	When("convert to CSV")
 	SparkScalaExcelIn.convertToCSV(sc,conf,dfsCluster.getFileSystem().getUri().toString()+DFS_INPUT_DIR_NAME,dfsCluster.getFileSystem().getUri().toString()+DFS_OUTPUT_DIR_NAME)
 	Then("CSV correspond to Excel")
