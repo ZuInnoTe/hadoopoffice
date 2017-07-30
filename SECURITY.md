@@ -11,5 +11,5 @@ Currently all credentials in HadoopOffice are passed via Hadoop options. This ha
 HadoopOffice offers depending on the format different algorithms for encryption and signing of documents. Please consult always the documentation on the Wiki and get advice from security experts on which algorithms make sense for your requirements. This may change over time (algorithms get broken etc.) so do not forget to change them if needed.
 
 
-### Apache POI library depdency
-HadoopOffice is tested only with selected version of Apache POI. Using a different version then the one tested will have serious security implications, such as that encryption may not work in old Excel files without any error message.
+### Apache POI library dependency
+HadoopOffice is tested only with selected versions of Apache POI. Using a different version than the one tested will have serious security implications, such as that encryption may not work in old Excel files without any error message.
