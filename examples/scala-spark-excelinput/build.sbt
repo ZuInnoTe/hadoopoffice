@@ -28,7 +28,7 @@ jacoco.settings
 itJacoco.settings
 
 
-libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.0.3" % "compile"
+libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.0.4" % "compile"
 
 libraryDependencies += "org.apache.spark" %% "spark-core" % "1.5.0" % "provided"
 
