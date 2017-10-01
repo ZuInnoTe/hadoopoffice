@@ -28,7 +28,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.math3.optim.linear.LinearObjectiveFunction;
 import org.apache.poi.EmptyFileException;
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.hssf.eventusermodel.EventWorkbookBuilder.SheetRecordCollectingListener;
@@ -59,9 +58,12 @@ import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.poifs.crypt.Decryptor;
 import org.apache.poi.poifs.crypt.EncryptionInfo;
+
+import org.apache.poi.poifs.filesystem.FileMagic;
 import org.apache.poi.poifs.filesystem.DocumentFactoryHelper;
 import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
 import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.SAXHelper;
@@ -160,18 +162,16 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 		this.currentRow=0;
 		// detect workbook type (based on Workbookfactory code in Apache POI
 		// If clearly doesn't do mark/reset, wrap up
-		if(!in.markSupported()) {
-					in = new PushbackInputStream(in, 8);
-				}
+
 		 try {
-			byte[] header8 = IOUtils.peekFirst8Bytes(in);
-		 
-				if(NPOIFSFileSystem.hasPOIFSHeader(header8)) {
-				
-					NPOIFSFileSystem poifs = new NPOIFSFileSystem(in);
+			InputStream nin = FileMagic.prepareToCheckMagic(in);
+			FileMagic fm = FileMagic.valueOf(nin);
+				if(fm==FileMagic.OLE2) { // 
+					LOG.debug("Paersing OLE2 container");
+					NPOIFSFileSystem poifs = new NPOIFSFileSystem(nin);
 					// check if we need to decrypt a new Excel file
 					if (poifs.getRoot().hasEntry(Decryptor.DEFAULT_POIFS_ENTRY)) {
-							LOG.debug("Parsing OLE2 container in low footprint mode");
+						LOG.info("Low footprint parsing of new Excel files (.xlsx) - encrypted file");
 							EncryptionInfo info = new EncryptionInfo(poifs);
 							Decryptor d = Decryptor.getInstance(info);
 							try {
@@ -224,12 +224,12 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 						  poifs.close();
 					  }
 				} else
-				if(DocumentFactoryHelper.hasOOXMLHeader(in)) { // use event model API for uncrypted new Excel files
-					LOG.info("Low footprint parsing of new Excel files (.xlsx)");
+				if(fm==FileMagic.OOXML) { // use event model API for uncrypted new Excel files
+					LOG.info("Low footprint parsing of new Excel files (.xlsx) - not encrypted file");
 					// this is unencrypted
 					
 					try {
-						OPCPackage pkg = OPCPackage.open(in);
+						OPCPackage pkg = OPCPackage.open(nin);
 						this.processOPCPackage(pkg);
 					} catch (InvalidFormatException e) {
 						LOG.error(e);
@@ -632,7 +632,9 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
             			// convert the number in the right format (can be date etc.)
             			int formatIndex= this.extendedRecordFormatIndexList.get(numrec.getXFIndex());
             			String theNumber=this.useDataFormatter.formatRawCellContents(numrec.getValue(), formatIndex, this.formatRecordIndexMap.get(formatIndex));
-            			   this.spreadSheetCellDAOCache.get(this.currentSheet-1).get(numrec.getRow())[numrec.getColumn()]=new SpreadSheetCellDAO(theNumber,"","",MSExcelUtil.getCellAddressA1Format(numrec.getRow(),numrec.getColumn()),this.sheetList.get(this.currentSheet-1));          		
+            			SpreadSheetCellDAO mySpreadSheetCellDAO =   new SpreadSheetCellDAO(theNumber,"","",MSExcelUtil.getCellAddressA1Format(numrec.getRow(),numrec.getColumn()),this.sheetList.get(this.currentSheet-1));
+   
+            			this.spreadSheetCellDAOCache.get(this.currentSheet-1).get(numrec.getRow())[numrec.getColumn()]=mySpreadSheetCellDAO;          		
             		}
 	                break;
 	                // SSTRecords store a array of unique strings used in Excel. (one per sheet?)

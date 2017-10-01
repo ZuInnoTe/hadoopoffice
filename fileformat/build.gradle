@@ -84,8 +84,8 @@ publishing {
 
 dependencies {
    // Apache POI (for Excel parsing)
-   compile("org.apache.poi:poi:3.16")
-   compile("org.apache.poi:poi-ooxml:3.16")
+   compile("org.apache.poi:poi:3.17")
+   compile("org.apache.poi:poi-ooxml:3.17")
    // hadoop libraries
    provided("org.apache.hadoop:hadoop-common:2.7.0")
    provided("org.apache.hadoop:hadoop-mapreduce-client-common:2.7.0")
