@@ -16,19 +16,16 @@
 
 package org.zuinnote.hadoop.office.example;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-
-import org.junit.Test;
 import org.zuinnote.hadoop.office.example.driver.Excel2CSVDriver;
-import org.junit.BeforeClass;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.After;
+
 
 import java.lang.InterruptedException;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStream;
@@ -58,6 +55,11 @@ import org.apache.hadoop.mapreduce.v2.MiniMRYarnCluster;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.server.resourcemanager.scheduler.fifo.FifoScheduler;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.apache.hadoop.yarn.server.resourcemanager.scheduler.ResourceScheduler;
 
 public final class MapReduceExcelInputIntegrationTest {
@@ -77,7 +79,7 @@ public final class MapReduceExcelInputIntegrationTest {
 
 	private ArrayList<Decompressor> openDecompressors = new ArrayList<>();
 
-	   @BeforeClass
+	   @BeforeAll
 	    public static void oneTimeSetUp() throws IOException {
 	     	// Create temporary directory for HDFS base and shutdownhook 
 		// create temp directory
@@ -127,7 +129,7 @@ public final class MapReduceExcelInputIntegrationTest {
 		miniCluster.start();
 	    }
 
-	    @AfterClass
+	    @AfterAll
 	    public static void oneTimeTearDown() {
 	   	// destroy Yarn cluster
 		miniCluster.stop();
@@ -135,13 +137,13 @@ public final class MapReduceExcelInputIntegrationTest {
 		dfsCluster.shutdown();
 	      }
 
-	    @Before
+	    @BeforeEach
 	    public void setUp() throws IOException {
 		// create input directory
 		dfsCluster.getFileSystem().mkdirs(DFS_INPUT_DIR);
 	    }
 
-	    @After
+	    @AfterEach
 	    public void tearDown() throws IOException {
 		// Remove input and output directory
 		dfsCluster.getFileSystem().delete(DFS_INPUT_DIR,true);
@@ -160,10 +162,10 @@ public final class MapReduceExcelInputIntegrationTest {
 		ClassLoader classLoader = getClass().getClassLoader();
 		String fileName="excel2013test.xlsx";
 		String fileNameExcel=classLoader.getResource(fileName).getFile();	
-		assertNotNull("Test Data File \""+fileName+"\" is not null in resource path",fileNameExcel);
+		assertNotNull(fileNameExcel, "Test Data File \""+fileName+"\" is not null in resource path");
 		File file = new File(fileNameExcel);
-		assertTrue("Test Data File \""+fileName+"\" exists", file.exists());
-		assertFalse("Test Data File \""+fileName+"\" is not a directory", file.isDirectory());
+		assertTrue( file.exists(), "Test Data File \""+fileName+"\" exists");
+		assertFalse(file.isDirectory(), "Test Data File \""+fileName+"\" is not a directory");
 	     }
 
 	    @Test
@@ -179,17 +181,17 @@ public final class MapReduceExcelInputIntegrationTest {
 	         // Let ToolRunner handle generic command-line options
 	  	int res = ToolRunner.run(miniCluster.getConfig(), new Excel2CSVDriver(), new String[]{DFS_INPUT_DIR_NAME,DFS_OUTPUT_DIR_NAME}); 
 	    	// check if successfully executed
-		assertEquals("Successfully executed mapreduce application", 0, res);
+		assertEquals(0, res, "Successfully executed mapreduce application");
 	    	// fetch results
 		List<String> resultLines = readDefaultResults(6);
 	    	// compare results
-		assertEquals("Number of result line is 6",6,resultLines.size());
-		assertEquals("First Line CSV correct","test1,test2,test3,test4",resultLines.get(0));
-		assertEquals("Second Line CSV correct","4",resultLines.get(1));
-		assertEquals("Third Line CSV correct","31/12/99,5,,,null",resultLines.get(2));
-		assertEquals("Forth Line CSV correct","1",resultLines.get(3));
-		assertEquals("Fifth Line CSV correct","2,6,10",resultLines.get(4));
-		assertEquals("Sixth Line CSV correct","3,4,15",resultLines.get(5));
+		assertEquals(6,resultLines.size(), "Number of result line is 6");
+		assertEquals("test1,test2,test3,test4",resultLines.get(0), "First Line CSV correct");
+		assertEquals("4",resultLines.get(1), "Second Line CSV correct");
+		assertEquals("31/12/99,5,,,null",resultLines.get(2), "Third Line CSV correct");
+		assertEquals("1",resultLines.get(3), "Forth Line CSV correct");
+		assertEquals("2,6,10",resultLines.get(4), "Fifth Line CSV correct");
+		assertEquals("3,4,15",resultLines.get(5), "Sixth Line CSV correct");
 	    }
 
 	      /**

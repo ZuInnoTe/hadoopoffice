@@ -16,23 +16,21 @@
 
 package org.zuinnote.hadoop.office.example;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 
-import org.junit.Test;
 import org.zuinnote.hadoop.office.example.driver.CSV2ExcelDriver;
 import org.zuinnote.hadoop.office.format.common.HadoopOfficeReadConfiguration;
 import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 import org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException;
 import org.zuinnote.hadoop.office.format.common.parser.MSExcelParser;
-import org.junit.BeforeClass;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.After;
+
 
 import java.lang.InterruptedException;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStream;
@@ -62,6 +60,11 @@ import org.apache.hadoop.mapreduce.v2.MiniMRYarnCluster;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.server.resourcemanager.scheduler.fifo.FifoScheduler;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.apache.hadoop.yarn.server.resourcemanager.scheduler.ResourceScheduler;
 
 public final class MapReduceExcelOutputIntegrationTest {
@@ -82,7 +85,7 @@ public final class MapReduceExcelOutputIntegrationTest {
 
 	private ArrayList<Decompressor> openDecompressors = new ArrayList<>();
 
-	   @BeforeClass
+	   @BeforeAll
 	    public static void oneTimeSetUp() throws IOException {
 	     	// Create temporary directory for HDFS base and shutdownhook 
 		// create temp directory
@@ -132,7 +135,7 @@ public final class MapReduceExcelOutputIntegrationTest {
 		miniCluster.start();
 	    }
 
-	    @AfterClass
+	    @AfterAll
 	    public static void oneTimeTearDown() {
 	   	// destroy Yarn cluster
 		miniCluster.stop();
@@ -140,13 +143,13 @@ public final class MapReduceExcelOutputIntegrationTest {
 		dfsCluster.shutdown();
 	      }
 
-	    @Before
+	    @BeforeEach
 	    public void setUp() throws IOException {
 		// create input directory
 		dfsCluster.getFileSystem().mkdirs(DFS_INPUT_DIR);
 	    }
 
-	    @After
+	    @AfterEach
 	    public void tearDown() throws IOException {
 		// Remove input and output directory
 		dfsCluster.getFileSystem().delete(DFS_INPUT_DIR,true);
@@ -165,10 +168,10 @@ public final class MapReduceExcelOutputIntegrationTest {
 		ClassLoader classLoader = getClass().getClassLoader();
 		String fileName="simplecsv.csv";
 		String fileNameCSV=classLoader.getResource(fileName).getFile();	
-		assertNotNull("Test Data File \""+fileName+"\" is not null in resource path",fileNameCSV);
+		assertNotNull(fileNameCSV, "Test Data File \""+fileName+"\" is not null in resource path");
 		File file = new File(fileNameCSV);
-		assertTrue("Test Data File \""+fileName+"\" exists", file.exists());
-		assertFalse("Test Data File \""+fileName+"\" is not a directory", file.isDirectory());
+		assertTrue(file.exists(), "Test Data File \""+fileName+"\" exists");
+		assertFalse(file.isDirectory(), "Test Data File \""+fileName+"\" is not a directory");
 	     }
 
 	    @Test
@@ -184,19 +187,19 @@ public final class MapReduceExcelOutputIntegrationTest {
 	         // Let ToolRunner handle generic command-line options
 	  	int res = ToolRunner.run(miniCluster.getConfig(), new CSV2ExcelDriver(), new String[]{DFS_INPUT_DIR_NAME,DFS_OUTPUT_DIR_NAME}); 
 	    	// check if successfully executed
-		assertEquals("Successfully executed mapreduce application", 0, res);
+		assertEquals( 0, res, "Successfully executed mapreduce application");
 	    	// fetch results
 		List<SpreadSheetCellDAO[]> resultLines = readDefaultExcelResults(2);
 	    	// compare results
-		assertEquals("Number of result line is 2",2,resultLines.size());
-		assertEquals("Cell A1 has value 1","1",resultLines.get(0)[0].getFormattedValue());
-		assertEquals("Cell B1 has value 2","2",resultLines.get(0)[1].getFormattedValue());
-		assertEquals("Cell C1 has value 3","3",resultLines.get(0)[2].getFormattedValue());
-		assertEquals("Cell D1 has value 4","4",resultLines.get(0)[3].getFormattedValue());
-		assertEquals("Cell A2 has value test1","test1",resultLines.get(1)[0].getFormattedValue());
-		assertEquals("Cell B2 has value test2","test2",resultLines.get(1)[1].getFormattedValue());
-		assertEquals("Cell C2 has value test3","test3",resultLines.get(1)[2].getFormattedValue());
-		assertEquals("Cell D2 has value test4","test4",resultLines.get(1)[3].getFormattedValue());
+		assertEquals(2,resultLines.size(), "Number of result line is 2");
+		assertEquals("1",resultLines.get(0)[0].getFormattedValue(), "Cell A1 has value 1");
+		assertEquals("2",resultLines.get(0)[1].getFormattedValue(), "Cell B1 has value 2");
+		assertEquals("3",resultLines.get(0)[2].getFormattedValue(), "Cell C1 has value 3");
+		assertEquals("4",resultLines.get(0)[3].getFormattedValue(), "Cell D1 has value 4");
+		assertEquals("test1",resultLines.get(1)[0].getFormattedValue(),"Cell A2 has value test1");
+		assertEquals("test2",resultLines.get(1)[1].getFormattedValue(), "Cell B2 has value test2");
+		assertEquals("test3",resultLines.get(1)[2].getFormattedValue(), "Cell C2 has value test3");
+		assertEquals("test4",resultLines.get(1)[3].getFormattedValue(), "Cell D2 has value test4");
 	    }
 	    
 	    
