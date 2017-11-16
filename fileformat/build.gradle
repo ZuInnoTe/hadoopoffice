@@ -32,6 +32,24 @@ jacocoTestReport {
     }
 }
 
+// Integrate JaCoCo for jUnit5
+project.afterEvaluate {
+    def junitPlatformTestTask = project.tasks.getByName('junitPlatformTest')
+
+    // configure jacoco to analyze the junitPlatformTest task
+    jacoco {
+        applyTo junitPlatformTestTask
+    }
+
+    // create junit platform jacoco task
+    project.task(type: JacocoReport, "junitPlatformJacocoReport",
+            {
+                sourceDirectories = files("./src/main")
+                classDirectories = files("$buildDir/classes/main")
+                executionData junitPlatformTestTask
+            })
+}
+
 configurations {
 	provided
 }
