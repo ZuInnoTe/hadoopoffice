@@ -706,5 +706,22 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 		}
 		
 	}
+
+
+	@Override
+	public void setCurrentRow(long row) {
+		this.currentRow=(int) row;
+		
+	}
+
+	@Override
+	public void setCurrentSheet(long sheet) {
+		this.currentSheet=(int) sheet;
+	}
+
+	@Override
+	public long getCurrentSheet() {
+		return this.currentSheet;
+	}
 	
 }

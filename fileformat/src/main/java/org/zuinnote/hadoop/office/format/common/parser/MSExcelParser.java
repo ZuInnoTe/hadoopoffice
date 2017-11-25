@@ -31,8 +31,10 @@ import org.apache.poi.hssf.model.InternalWorkbook;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.CellValue;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Comment;
 import org.apache.poi.ss.usermodel.Row;
@@ -50,7 +52,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 
 import java.lang.reflect.Method;
-
+import java.math.BigDecimal;
 import java.lang.reflect.InvocationTargetException;
 
 import org.zuinnote.hadoop.office.format.common.HadoopOfficeReadConfiguration;
@@ -379,6 +381,7 @@ private HadoopOfficeReadConfiguration hocr;
 				String address = currentCell.getAddress().toString();
 				String sheetName = currentCell.getSheet().getSheetName();
 				SpreadSheetCellDAO mySpreadSheetCellDAO = new SpreadSheetCellDAO(formattedValue,comment,formula,address,sheetName);
+				
 				result[i]=mySpreadSheetCellDAO;
 			}
 		}
@@ -846,6 +849,23 @@ private HadoopOfficeReadConfiguration hocr;
 		} else {
 			return matchFull;
 		}
+	}
+
+	@Override
+	public void setCurrentRow(long row) {
+		this.currentRow=(int) row;
+		
+	}
+
+	@Override
+	public void setCurrentSheet(long sheet) {
+		this.currentSheet=(int) sheet;
+		
+	}
+
+	@Override
+	public long getCurrentSheet() {
+		return this.currentSheet;
 	}
 
 }
