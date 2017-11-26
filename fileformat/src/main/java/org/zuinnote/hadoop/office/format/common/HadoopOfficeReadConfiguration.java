@@ -36,6 +36,10 @@ public static final String CONF_DECRYPT="hadoopoffice.read.security.crypt.passwo
 public static final String CONF_DECRYPTLINKEDWBBASE="hadoopoffice.read.security.crypt.linkedworkbooks.";
 public static final String CONF_FILTERMETADATA = "hadoopoffice.read.filter.metadata."; // base: all these properties (e.g. hadoopoffice.read.filter.metadata.author) will be handed over to the corresponding reader which does the filtering!
 public static final String CONF_LOWFOOTPRINT="hadoopoffice.read.lowFootprint";
+public static final String CONF_KEYSTOREFILE = "hadoopoffice.read.security.crypt.credential.keystore.file";
+public static final String CONF_KEYSTORETYPE = "hadoopoffice.read.security.crypt.credential.keystore.type";
+public static final String CONF_KEYSTOREPW = "hadoopoffice.read.security.crypt.credential.keystore.password";
+
 public static final String DEFAULT_MIMETYPE="";
 public static final String DEFAULT_LOCALE="";
 public static final String DEFAULT_SHEETS="";
@@ -43,6 +47,9 @@ public static final boolean DEFAULT_LINKEDWB=false;
 public static final boolean DEFAULT_IGNOREMISSINGLINKEDWB=false;
 
 public static final boolean DEFAULT_LOWFOOTPRINT=false;
+public static final String DEFAULT_KEYSTOREFILE="";
+public static final String DEFAULT_KEYSTORETYPE = "JCEKS";
+public static final String DEFAULT_KEYSTOREPW="";
 
 private String fileName;
 private String mimeType=null;
@@ -55,6 +62,9 @@ private String password=null;
 private Map<String,String> metadataFilter;
 private Map<String,String> linkedWBCredentialMap;
 private boolean lowFootprint;
+private String keystoreFile;
+private String keystoreType;
+private String keystorePassword;
 
 /*
  * Create an empty configuration
@@ -76,6 +86,9 @@ public HadoopOfficeReadConfiguration() {
 * hadoopoffice.read.security.crypt.linkedworkbooks.*: if set then hadoopoffice will try to decrypt all the linked workbooks where a password has been specified. If no password is specified then it is assumed that the linked workbook is not encrypted. Example: Property key for file "linkedworkbook1.xlsx" is  "hadoopoffice.read.security.crypt.linkedworkbooks.linkedworkbook1.xslx". Value is the password. You must not include path or protocol information in the filename 
 * hadoopoffice.read.filter.metadata: filters documents according to metadata. For example, hadoopoffice.read.filter.metadata.author will filter by author and the filter defined as value. Filtering is done by the parser and it is recommended that it supports regular expression for filtering, but this is up to the parser!
 * hadoopoffice.read.lowfootprint: uses low memory/cpu footprint for reading documents. Note: In this mode certain features are not availanble, such as reading formulas. Default: false
+ * hadoopoffice.read.security.crypt.credential.keystore.file: keystore file that is used to store credentials, such as passwords, for reading secured office documents. Note that the alias in the keystore needs to correspond to the filename (without the path)
+* hadoopoffice.read.security.crypt.credential.keystore.type: keystore type. Default: JCEKS
+* hadoopoffice.read.security.crypt.credential.keystore.password: keystore password: password of the keystore
  * 
  * 
  */
@@ -92,6 +105,10 @@ public HadoopOfficeReadConfiguration(Configuration conf) {
       this.metadataFilter=HadoopUtil.parsePropertiesFromBase(conf,HadoopOfficeReadConfiguration.CONF_FILTERMETADATA);
      this.linkedWBCredentialMap=HadoopUtil.parsePropertiesFromBase(conf,HadoopOfficeReadConfiguration.CONF_DECRYPTLINKEDWBBASE);
      this.lowFootprint=conf.getBoolean(HadoopOfficeReadConfiguration.CONF_LOWFOOTPRINT,HadoopOfficeReadConfiguration.DEFAULT_LOWFOOTPRINT);
+
+     this.setKeystoreFile(conf.get(HadoopOfficeReadConfiguration.CONF_KEYSTOREFILE,HadoopOfficeReadConfiguration.DEFAULT_KEYSTOREFILE));
+     this.setKeystoreType(conf.get(HadoopOfficeReadConfiguration.CONF_KEYSTORETYPE,HadoopOfficeReadConfiguration.DEFAULT_KEYSTORETYPE));
+     this.setKeystorePassword(conf.get(HadoopOfficeReadConfiguration.CONF_KEYSTORETYPE,HadoopOfficeReadConfiguration.DEFAULT_KEYSTOREPW));
 }
 
 /*
@@ -296,6 +313,30 @@ public boolean getLowFootprint() {
 
 public void setLowFootprint(boolean lowFootprint) {
 	this.lowFootprint=lowFootprint;
+}
+
+public String getKeystoreFile() {
+	return keystoreFile;
+}
+
+public void setKeystoreFile(String keystoreFile) {
+	this.keystoreFile = keystoreFile;
+}
+
+public String getKeystoreType() {
+	return keystoreType;
+}
+
+public void setKeystoreType(String keystoreType) {
+	this.keystoreType = keystoreType;
+}
+
+public String getKeystorePassword() {
+	return keystorePassword;
+}
+
+public void setKeystorePassword(String keystorePassword) {
+	this.keystorePassword = keystorePassword;
 }
 
 

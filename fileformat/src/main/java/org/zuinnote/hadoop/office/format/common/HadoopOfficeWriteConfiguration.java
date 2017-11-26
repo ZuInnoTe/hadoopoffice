@@ -46,6 +46,10 @@ public class HadoopOfficeWriteConfiguration {
 
 	public static final String CONF_LOWFOOTPRINT="hadoopoffice.write.lowFootprint";
 	public static final String CONF_LOWFOOTPRINT_CACHEROWS="hadoopoffice.write.lowFootprint.cacherows";
+	public static final String CONF_KEYSTOREFILE = "hadoopoffice.write.security.crypt.credential.keystore.file";
+	public static final String CONF_KEYSTORETYPE = "hadoopoffice.write.security.crypt.credential.keystore.type";
+	public static final String CONF_KEYSTOREPW = "hadoopoffice.write.security.crypt.credential.keystore.password";
+
 	public static final String DEFAULT_MIMETYPE="";
 	public static final String DEFAULT_LOCALE="";
 	public static final String DEFAULT_LINKEDWB="";
@@ -60,6 +64,9 @@ public class HadoopOfficeWriteConfiguration {
 
 	public static final boolean DEFAULT_LOWFOOTPRINT=false;
 	public static final int DEFAULT_LOWFOOTPRINT_CACHEROWS=1000;
+	public static final String DEFAULT_KEYSTOREFILE="";
+	public static final String DEFAULT_KEYSTORETYPE = "JCEKS";
+	public static final String DEFAULT_KEYSTOREPW="";
 	private String[] linkedWorkbooksName;
 	private String fileName;
 	private String mimeType;
@@ -79,6 +86,9 @@ public class HadoopOfficeWriteConfiguration {
 	private Map<String,String> metadata;
 	private boolean lowFootprint;
 	private int lowFootprintCacheRows;
+	private String keystoreFile;
+	private String keystoreType;
+	private String keystorePassword;
 /*
  * 	Read the configuration for writing office files from a Hadoop configuration
  * 
@@ -96,6 +106,11 @@ public class HadoopOfficeWriteConfiguration {
 * hadoopoffice.write.metadata.*: Write metadata properties of the document. All properties belonging to the base (e.g. hadoopoffice.write.metadata.author for author) will be handed over to the corresponding writer. See writer documentation which properties are supported
 * hadoopoffice.write.template.file: Use a template as input to modify selected cells of it
 * hadoopoffice.write.lowFootprint: if true then a file is written in low footprint mode to save cpu/memory resources, false if it should be written in normal mode. Option is ignored for old Excel files (.xls). Note that if it is set to true then certain options are not available, such as formula evaluation. Default false. 
+* hadoopoffice.write.security.crypt.credential.keystore.file: keystore file that is used to store credentials, such as passwords, for securing office documents. Note that the alias in the keystore needs to correspond to the filename (without the path)
+* hadoopoffice.write.security.crypt.credential.keystore.type: keystore type. Default: JCEKS
+* hadoopoffice.write.security.crypt.credential.keystore.password: keystore password: password of the keystore
+*
+*
 * @param fileName filename to write
  * 
  */
@@ -125,6 +140,11 @@ public HadoopOfficeWriteConfiguration(Configuration conf, String fileName) {
      this.setTemplatePassword(conf.get(HadoopOfficeWriteConfiguration.CONF_TEMPLATEPW,HadoopOfficeWriteConfiguration.DEFAULT_TEMPLATEPW));
      this.setLowFootprint(conf.getBoolean(HadoopOfficeWriteConfiguration.CONF_LOWFOOTPRINT,HadoopOfficeWriteConfiguration.DEFAULT_LOWFOOTPRINT));
      this.setLowFootprintCacheRows(conf.getInt(HadoopOfficeWriteConfiguration.CONF_LOWFOOTPRINT_CACHEROWS,HadoopOfficeWriteConfiguration.DEFAULT_LOWFOOTPRINT_CACHEROWS));
+     
+
+     this.setKeystoreFile(conf.get(HadoopOfficeWriteConfiguration.CONF_KEYSTOREFILE,HadoopOfficeWriteConfiguration.DEFAULT_KEYSTOREFILE));
+     this.setKeystoreType(conf.get(HadoopOfficeWriteConfiguration.CONF_KEYSTORETYPE,HadoopOfficeWriteConfiguration.DEFAULT_KEYSTORETYPE));
+     this.setKeystorePassword(conf.get(HadoopOfficeWriteConfiguration.CONF_KEYSTORETYPE,HadoopOfficeWriteConfiguration.DEFAULT_KEYSTOREPW));
 }
 public String[] getLinkedWorkbooksName() {
 	return linkedWorkbooksName;
@@ -244,6 +264,24 @@ public int getLowFootprintCacheRows() {
 }
 public void setLowFootprintCacheRows(int lowFootprintCacheRows) {
 	this.lowFootprintCacheRows = lowFootprintCacheRows;
+}
+public String getKeystoreFile() {
+	return keystoreFile;
+}
+public void setKeystoreFile(String keystoreFile) {
+	this.keystoreFile = keystoreFile;
+}
+public String getKeystoreType() {
+	return keystoreType;
+}
+public void setKeystoreType(String keystoreType) {
+	this.keystoreType = keystoreType;
+}
+public String getKeystorePassword() {
+	return keystorePassword;
+}
+public void setKeystorePassword(String keystorePassword) {
+	this.keystorePassword = keystorePassword;
 }
 
 }
