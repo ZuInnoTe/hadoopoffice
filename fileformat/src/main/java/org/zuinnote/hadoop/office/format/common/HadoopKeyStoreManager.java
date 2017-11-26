@@ -18,10 +18,13 @@ package org.zuinnote.hadoop.office.format.common;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableEntryException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
 
@@ -79,6 +82,33 @@ public class HadoopKeyStoreManager {
 		} else {
 			this.keystore.load(null, keyStorePassword.toCharArray());
 		}
+	}
+	
+	/**
+	 * Reads a private key from  keystore
+	 * 
+	 * @param alias
+	 * @param password
+	 * @return
+	 * @throws UnrecoverableKeyException
+	 * @throws KeyStoreException
+	 * @throws NoSuchAlgorithmException
+	 */
+	public Key getPrivateKey(String alias, String password) throws UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException {
+		return this.keystore.getKey(alias, password.toCharArray());
+	}
+	
+	/**
+	 * Reads the certificate for a private key from keystore
+	 * 
+	 * @param alias
+	 * @return
+	 * @throws KeyStoreException
+	 */
+	
+	
+	public Certificate getCertificate(String alias) throws KeyStoreException {
+		return this.keystore.getCertificate(alias);
 	}
 	
 	/***

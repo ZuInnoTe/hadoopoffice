@@ -26,11 +26,15 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.security.Key;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableEntryException;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
+
+import java.security.cert.Certificate;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -137,7 +141,7 @@ private static java.nio.file.Path tmpPath;
 
     
     @Test
-    public void createKeyStore() throws IOException, NoSuchAlgorithmException, CertificateException, KeyStoreException, InvalidKeySpecException, UnrecoverableEntryException {
+    public void createKeyStoreforPasswords() throws IOException, NoSuchAlgorithmException, CertificateException, KeyStoreException, InvalidKeySpecException, UnrecoverableEntryException {
      	Configuration conf = new Configuration(HadoopKeyStoreManagerTest.defaultConf);
        	String tmpDir=tmpPath.toString();	
        	Path outputFile= new Path(tmpDir,"keystore2.jceks");
@@ -152,5 +156,23 @@ private static java.nio.file.Path tmpPath;
        	String password=hksm.getPassword("test.xlsx", "changeit");
   		assertEquals(expectedPassword,password,"Password is correctly read from new keystore");
     }
+ 
     
+    @Test
+    public void getPrivateKeyAndCertificate() throws IOException, UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, CertificateException {
+    		Configuration conf = new Configuration(HadoopKeyStoreManagerTest.defaultConf);
+    		ClassLoader classLoader = getClass().getClassLoader();
+    		String fileName="testsigning.pfx";
+    		String fileNameKeyStore=classLoader.getResource(fileName).getFile();	
+		Path file = new Path(fileNameKeyStore);
+     	HadoopKeyStoreManager hksm = new HadoopKeyStoreManager(conf);
+       	hksm.openKeyStore(file, "PKCS12", "changeit");
+    		// load private key
+       	Key privateKey = hksm.getPrivateKey("testalias", "changeit");
+       	assertNotNull(privateKey,"Private key could be loaded");
+       	// load certificate
+       	Certificate certificate = hksm.getCertificate("testalias");
+       	assertNotNull(certificate,"Certificate for private key could be loaded");
+       	
+    }
 }
