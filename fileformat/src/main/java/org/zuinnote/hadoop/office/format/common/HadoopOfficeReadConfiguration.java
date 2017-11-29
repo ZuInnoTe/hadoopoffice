@@ -108,7 +108,7 @@ public HadoopOfficeReadConfiguration(Configuration conf) {
 
      this.setKeystoreFile(conf.get(HadoopOfficeReadConfiguration.CONF_KEYSTOREFILE,HadoopOfficeReadConfiguration.DEFAULT_KEYSTOREFILE));
      this.setKeystoreType(conf.get(HadoopOfficeReadConfiguration.CONF_KEYSTORETYPE,HadoopOfficeReadConfiguration.DEFAULT_KEYSTORETYPE));
-     this.setKeystorePassword(conf.get(HadoopOfficeReadConfiguration.CONF_KEYSTORETYPE,HadoopOfficeReadConfiguration.DEFAULT_KEYSTOREPW));
+     this.setKeystorePassword(conf.get(HadoopOfficeReadConfiguration.CONF_KEYSTOREPW,HadoopOfficeReadConfiguration.DEFAULT_KEYSTOREPW));
 }
 
 /*

@@ -2010,6 +2010,39 @@ JobConf job = new JobConf(defaultConf);
 	assertFalse(reader.next(spreadSheetKey,spreadSheetValue),"Input Split for Excel file contains row 1");	
     }
 
+    @Test
+    public void readExcelInputFormatExcel2013SingleSheetEncryptedKeyStorePositive() throws IOException {
+    	JobConf job = new JobConf(defaultConf);
+    	ClassLoader classLoader = getClass().getClassLoader();
+    	String fileName="excel2013encrypt.xlsx";
+    	String fileNameSpreadSheet=classLoader.getResource(fileName).getFile();	
+    	Path file = new Path(fileNameSpreadSheet);
+    	FileInputFormat.setInputPaths(job, file);
+    String keystoreFilename="keystore.jceks";
+    	String filenameKeyStore=classLoader.getResource(keystoreFilename).getFile().toString();
+	// set locale to the one of the test data
+	job.set("hadoopoffice.read.locale.bcp47","de");
+	// for decryption set the keystore to retrieve the password
+	job.set("hadoopoffice.read.security.crypt.credential.keystore.file", filenameKeyStore);
+	job.set("hadoopoffice.read.security.crypt.credential.keystore.type","JCEKS");
+	job.set("hadoopoffice.read.security.crypt.credential.keystore.password","changeit");
+   	ExcelFileInputFormat format = new ExcelFileInputFormat();
+    	format.configure(job);
+    	InputSplit[] inputSplits = format.getSplits(job,1);
+    	assertEquals( 1, inputSplits.length, "Only one split generated for Excel file");
+    	RecordReader<Text, ArrayWritable> reader = format.getRecordReader(inputSplits[0], job, reporter);
+	assertNotNull(reader, "Format returned  null RecordReader");
+	Text spreadSheetKey = new Text();	
+	ArrayWritable spreadSheetValue = new ArrayWritable(SpreadSheetCellDAO.class);
+	assertTrue( reader.next(spreadSheetKey,spreadSheetValue), "Input Split for Excel file contains row 1");	
+	assertEquals("[excel2013encrypt.xlsx]Sheet1!A1", spreadSheetKey.toString(), "Input Split for Excel file has keyname == \"[excel2013encrypt.xlsx]Sheet1!A1\"");
+	assertEquals(3, spreadSheetValue.get().length, "Input Split for Excel file contains row 1 with 3 columns");
+	assertEquals("test1", ((SpreadSheetCellDAO)spreadSheetValue.get()[0]).getFormattedValue(), "Input Split for Excel file contains row 1 with cell 1 == \"test1\"");
+	assertEquals("Sheet1", ((SpreadSheetCellDAO)spreadSheetValue.get()[0]).getSheetName(), "Input Split for Excel file contains row 1 with cell 1 sheetname == \"Sheet1\"");	
+	assertEquals("A1", ((SpreadSheetCellDAO)spreadSheetValue.get()[0]).getAddress(), "Input Split for Excel file contains row 1 with cell 1 address == \"A1\"");	
+assertEquals("test2", ((SpreadSheetCellDAO)spreadSheetValue.get()[1]).getFormattedValue(), "Input Split for Excel file contains row 1 with cell 2 == \"test2\"");	
+assertEquals("test3", ((SpreadSheetCellDAO)spreadSheetValue.get()[2]).getFormattedValue(), "Input Split for Excel file contains row 1 with cell 3 == \"test3\"");	
+    }
 
  @Test
     public void writeExcelOutputFormatExcel2013SingleSheetGZipCompressed() throws IOException {

@@ -144,7 +144,7 @@ public HadoopOfficeWriteConfiguration(Configuration conf, String fileName) {
 
      this.setKeystoreFile(conf.get(HadoopOfficeWriteConfiguration.CONF_KEYSTOREFILE,HadoopOfficeWriteConfiguration.DEFAULT_KEYSTOREFILE));
      this.setKeystoreType(conf.get(HadoopOfficeWriteConfiguration.CONF_KEYSTORETYPE,HadoopOfficeWriteConfiguration.DEFAULT_KEYSTORETYPE));
-     this.setKeystorePassword(conf.get(HadoopOfficeWriteConfiguration.CONF_KEYSTORETYPE,HadoopOfficeWriteConfiguration.DEFAULT_KEYSTOREPW));
+     this.setKeystorePassword(conf.get(HadoopOfficeWriteConfiguration.CONF_KEYSTOREPW,HadoopOfficeWriteConfiguration.DEFAULT_KEYSTOREPW));
 }
 public String[] getLinkedWorkbooksName() {
 	return linkedWorkbooksName;

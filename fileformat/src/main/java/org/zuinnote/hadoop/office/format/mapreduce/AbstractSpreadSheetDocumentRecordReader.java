@@ -21,7 +21,11 @@ import java.io.InputStream;
 
 
 import java.security.GeneralSecurityException;
-
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableEntryException;
+import java.security.cert.CertificateException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 
 import org.apache.hadoop.fs.FSDataInputStream;
@@ -43,6 +47,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 
 import org.zuinnote.hadoop.office.format.common.HadoopFileReader;
+import org.zuinnote.hadoop.office.format.common.HadoopKeyStoreManager;
 import org.zuinnote.hadoop.office.format.common.HadoopOfficeReadConfiguration;
 import org.zuinnote.hadoop.office.format.common.OfficeReader;
 import org.zuinnote.hadoop.office.format.common.parser.*;
@@ -104,6 +109,7 @@ try {
     final Path file = fSplit.getPath();
     codec = new CompressionCodecFactory(context.getConfiguration()).getCodec(file);
     this.hocr.setFileName(file.getName());
+    this.readKeyStore(context.getConfiguration());
     FSDataInputStream fileIn = file.getFileSystem(conf).open(file);
     // open stream
       if (isCompressedInput()) { // decompress
@@ -151,6 +157,31 @@ try {
 	this.close();
 	throw new InterruptedException();
 }  
+}
+
+
+/**
+ * Reads the keystore to obtain credentials
+ * 
+ * @param conf Configuration provided by the Hadoop environment
+ * @throws IOException 
+ * @throws FormatNotUnderstoodException
+ * 
+ */
+private void readKeyStore(Configuration conf) throws IOException, FormatNotUnderstoodException {
+	if ((this.hocr.getKeystoreFile()!=null) && (!"".equals(this.hocr.getKeystoreFile()))) {
+		LOG.info("Using keystore to obtain credentials instead of passwords");
+		HadoopKeyStoreManager hksm = new HadoopKeyStoreManager(conf);
+		try {
+			hksm.openKeyStore(new Path(this.hocr.getKeystoreFile()), this.hocr.getKeystoreType(), this.hocr.getKeystorePassword());
+			String password=hksm.getPassword(this.hocr.getFileName(), this.hocr.getKeystorePassword());
+			this.hocr.setPassword(password);
+		} catch (NoSuchAlgorithmException | CertificateException | KeyStoreException | IllegalArgumentException | UnrecoverableEntryException | InvalidKeySpecException e) {
+			LOG.error(e);
+			throw new FormatNotUnderstoodException("Cannot read keystore to obtain credentials to access encrypted documents "+e);
+		}
+		
+	}
 }
 
 
@@ -267,6 +298,9 @@ try {
 	// do not close the filesystem! will cause exceptions in Spark
  
 }
+
+
+
 
 
 }
