@@ -42,8 +42,6 @@ import javax.crypto.spec.SecretKeySpec;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.util.ZipEntrySource;
 import org.apache.poi.poifs.crypt.ChainingMode;
 import org.apache.poi.poifs.crypt.CipherAlgorithm;
@@ -52,14 +50,10 @@ import org.apache.poi.poifs.crypt.EncryptionInfo;
 import org.apache.poi.poifs.crypt.EncryptionMode;
 import org.apache.poi.poifs.crypt.Encryptor;
 import org.apache.poi.poifs.crypt.HashAlgorithm;
-import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.ClientAnchor;
 import org.apache.poi.ss.usermodel.Comment;
 import org.apache.poi.ss.usermodel.Drawing;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.util.TempFile;
@@ -283,7 +277,9 @@ public MSExcelLowFootprintWriter(String excelFormat, HadoopOfficeWriteConfigurat
 		}
 		
 		public void dispose() {
-			this.tempFile.delete();
+			if (!this.tempFile.delete()) {
+				LOG.error("Could not delete temporary files");
+			}
 		}
 	}
 	
@@ -378,7 +374,9 @@ public MSExcelLowFootprintWriter(String excelFormat, HadoopOfficeWriteConfigurat
 				this.zipFile.close();
 				if (this.tmpFile!=null) {
 					
-					this.tmpFile.delete();
+					if (!this.tmpFile.delete()) {
+						LOG.warn("Could not delete temporary files");
+					}
 				}
 			}
 			this.closed=true;
