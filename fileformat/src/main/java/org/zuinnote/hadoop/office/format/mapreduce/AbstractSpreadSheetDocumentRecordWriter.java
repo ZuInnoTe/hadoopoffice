@@ -22,11 +22,16 @@ import java.io.InputStream;
 
 
 import java.security.GeneralSecurityException;
-
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableEntryException;
+import java.security.cert.CertificateException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Map;
 
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.RecordWriter;
@@ -36,6 +41,7 @@ import org.apache.commons.logging.Log;
 
 
 import org.zuinnote.hadoop.office.format.common.HadoopFileReader;
+import org.zuinnote.hadoop.office.format.common.HadoopKeyStoreManager;
 import org.zuinnote.hadoop.office.format.common.HadoopOfficeWriteConfiguration;
 import org.zuinnote.hadoop.office.format.common.OfficeWriter;
 import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
@@ -82,10 +88,12 @@ public AbstractSpreadSheetDocumentRecordWriter() {
 * @throws java.security.GeneralSecurityException in case of encrypted linkedworkbooks that could not be decrypted
 *
 */
-public AbstractSpreadSheetDocumentRecordWriter(DataOutputStream out, String fileName, Configuration conf) throws IOException,InvalidWriterConfigurationException,InvalidCellSpecificationException,FormatNotUnderstoodException, GeneralSecurityException, OfficeWriterException {
+public AbstractSpreadSheetDocumentRecordWriter(DataOutputStream out, String fileName, Configuration conf) throws IOException,InvalidWriterConfigurationException,InvalidCellSpecificationException, FormatNotUnderstoodException,GeneralSecurityException, OfficeWriterException {
  	this.out=out;
 	// parse configuration
      this.howc=new HadoopOfficeWriteConfiguration(conf,fileName);
+  
+     this.readKeyStore(conf);
        // load linked workbooks as inputstreams
       this.currentReader= new HadoopFileReader(conf);
       this.linkedWorkbooksMap=this.currentReader.loadLinkedWorkbooks(this.howc.getLinkedWorkbooksName());
@@ -96,6 +104,30 @@ public AbstractSpreadSheetDocumentRecordWriter(DataOutputStream out, String file
     	   templateInputStream=this.currentReader.loadTemplate(this.howc.getTemplate());
        }
       this.officeWriter.create(out,this.linkedWorkbooksMap,this.howc.getLinkedWBCredentialMap(), templateInputStream);
+}
+
+/**
+ * Reads the keystore to obtain credentials
+ * 
+ * @param conf Configuration provided by the Hadoop environment
+ * @throws IOException 
+ * @throws OfficeWriterException
+ * 
+ */
+private void readKeyStore(Configuration conf) throws IOException, OfficeWriterException {
+	if ((this.howc.getKeystoreFile()!=null) && (!"".equals(this.howc.getKeystoreFile()))) {
+		LOG.info("Using keystore to obtain credentials instead of passwords");
+		HadoopKeyStoreManager hksm = new HadoopKeyStoreManager(conf);
+		try {
+			hksm.openKeyStore(new Path(this.howc.getKeystoreFile()), this.howc.getKeystoreType(), this.howc.getKeystorePassword());
+			String password=hksm.getPassword(this.howc.getFileName(), this.howc.getKeystorePassword());
+			this.howc.setPassword(password);
+		} catch (NoSuchAlgorithmException | CertificateException | KeyStoreException | IllegalArgumentException | UnrecoverableEntryException | InvalidKeySpecException e) {
+			LOG.error(e);
+			throw new OfficeWriterException("Cannot read keystore to obtain credentials used to encrypt office documents "+e);
+		}
+		
+	}
 }
 
 /**

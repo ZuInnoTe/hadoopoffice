@@ -19,13 +19,16 @@ package org.zuinnote.hadoop.office.format.mapred;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
-
-
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableEntryException;
+import java.security.cert.CertificateException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Map;
 
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapred.RecordWriter;
@@ -34,6 +37,7 @@ import org.apache.commons.logging.Log;
 
 
 import org.zuinnote.hadoop.office.format.common.HadoopFileReader;
+import org.zuinnote.hadoop.office.format.common.HadoopKeyStoreManager;
 import org.zuinnote.hadoop.office.format.common.HadoopOfficeWriteConfiguration;
 import org.zuinnote.hadoop.office.format.common.OfficeWriter;
 import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
@@ -79,6 +83,8 @@ public AbstractSpreadSheetDocumentRecordWriter() {
 public AbstractSpreadSheetDocumentRecordWriter(DataOutputStream out, String fileName, Configuration conf) throws InvalidWriterConfigurationException, IOException, OfficeWriterException {
 	// parse configuration
     this.howc=new HadoopOfficeWriteConfiguration(conf,fileName);
+  
+    this.readKeyStore(conf);
       // load linked workbooks as inputstreams
      this.currentReader= new HadoopFileReader(conf);
      this.linkedWorkbooksMap=this.currentReader.loadLinkedWorkbooks(this.howc.getLinkedWorkbooksName());
@@ -89,6 +95,31 @@ public AbstractSpreadSheetDocumentRecordWriter(DataOutputStream out, String file
    	   templateInputStream=this.currentReader.loadTemplate(this.howc.getTemplate());
       }
      this.officeWriter.create(out,this.linkedWorkbooksMap,this.howc.getLinkedWBCredentialMap(),templateInputStream); 
+}
+
+
+/**
+ * Reads the keystore to obtain credentials
+ * 
+ * @param conf Configuration provided by the Hadoop environment
+ * @throws IOException 
+ * @throws OfficeWriterException
+ * 
+ */
+private void readKeyStore(Configuration conf) throws IOException, OfficeWriterException {
+	if ((this.howc.getKeystoreFile()!=null) && (!"".equals(this.howc.getKeystoreFile()))) {
+		LOG.info("Using keystore to obtain credentials instead of passwords");
+		HadoopKeyStoreManager hksm = new HadoopKeyStoreManager(conf);
+		try {
+			hksm.openKeyStore(new Path(this.howc.getKeystoreFile()), this.howc.getKeystoreType(), this.howc.getKeystorePassword());
+			String password=hksm.getPassword(this.howc.getFileName(), this.howc.getKeystorePassword());
+			this.howc.setPassword(password);
+		} catch (NoSuchAlgorithmException | CertificateException | KeyStoreException | IllegalArgumentException | UnrecoverableEntryException | InvalidKeySpecException e) {
+			LOG.error(e);
+			throw new OfficeWriterException("Cannot read keystore to obtain credentials used to encrypt office documents "+e);
+		}
+		
+	}
 }
 
 /**
