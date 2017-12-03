@@ -115,16 +115,16 @@ public AbstractSpreadSheetDocumentRecordWriter(DataOutputStream out, String file
  * 
  */
 private void readKeyStore(Configuration conf) throws IOException, OfficeWriterException {
-	if ((this.howc.getKeystoreFile()!=null) && (!"".equals(this.howc.getKeystoreFile()))) {
+	if ((this.howc.getCryptKeystoreFile()!=null) && (!"".equals(this.howc.getCryptKeystoreFile()))) {
 		LOG.info("Using keystore to obtain credentials instead of passwords");
 		HadoopKeyStoreManager hksm = new HadoopKeyStoreManager(conf);
 		try {
-			hksm.openKeyStore(new Path(this.howc.getKeystoreFile()), this.howc.getKeystoreType(), this.howc.getKeystorePassword());
+			hksm.openKeyStore(new Path(this.howc.getCryptKeystoreFile()), this.howc.getCryptKeystoreType(), this.howc.getCryptKeystorePassword());
 			String password="";
-			if ((this.howc.getKeystoreAlias()!=null) && (!"".equals(this.howc.getKeystoreAlias()))) {
-				password=hksm.getPassword(this.howc.getKeystoreAlias(), this.howc.getKeystorePassword());
+			if ((this.howc.getCryptKeystoreAlias()!=null) && (!"".equals(this.howc.getCryptKeystoreAlias()))) {
+				password=hksm.getPassword(this.howc.getCryptKeystoreAlias(), this.howc.getCryptKeystorePassword());
 			} else {
-				password=hksm.getPassword(this.howc.getFileName(), this.howc.getKeystorePassword());
+				password=hksm.getPassword(this.howc.getFileName(), this.howc.getCryptKeystorePassword());
 			}
 			this.howc.setPassword(password);
 		} catch (NoSuchAlgorithmException | CertificateException | KeyStoreException | IllegalArgumentException | UnrecoverableEntryException | InvalidKeySpecException e) {

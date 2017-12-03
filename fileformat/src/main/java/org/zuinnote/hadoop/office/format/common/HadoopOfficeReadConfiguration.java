@@ -36,10 +36,11 @@ public static final String CONF_DECRYPT="hadoopoffice.read.security.crypt.passwo
 public static final String CONF_DECRYPTLINKEDWBBASE="hadoopoffice.read.security.crypt.linkedworkbooks.";
 public static final String CONF_FILTERMETADATA = "hadoopoffice.read.filter.metadata."; // base: all these properties (e.g. hadoopoffice.read.filter.metadata.author) will be handed over to the corresponding reader which does the filtering!
 public static final String CONF_LOWFOOTPRINT="hadoopoffice.read.lowFootprint";
-public static final String CONF_KEYSTOREFILE = "hadoopoffice.read.security.crypt.credential.keystore.file";
-public static final String CONF_KEYSTORETYPE = "hadoopoffice.read.security.crypt.credential.keystore.type";
-public static final String CONF_KEYSTOREPW = "hadoopoffice.read.security.crypt.credential.keystore.password";
-public static final String CONF_KEYSTOREALIAS = "hadoopoffice.read.security.crypt.credential.keystore.alias";
+public static final String CONF_CRYKEYSTOREFILE = "hadoopoffice.read.security.crypt.credential.keystore.file";
+public static final String CONF_CRYKEYSTORETYPE = "hadoopoffice.read.security.crypt.credential.keystore.type";
+public static final String CONF_CRYKEYSTOREPW = "hadoopoffice.read.security.crypt.credential.keystore.password";
+public static final String CONF_CRYKEYSTOREALIAS = "hadoopoffice.read.security.crypt.credential.keystore.alias";
+public static final String CONF_VERIFYSIGNATURE = "hadoopoffice.read.security.sign.verifysignature";
 
 public static final String DEFAULT_MIMETYPE="";
 public static final String DEFAULT_LOCALE="";
@@ -48,10 +49,12 @@ public static final boolean DEFAULT_LINKEDWB=false;
 public static final boolean DEFAULT_IGNOREMISSINGLINKEDWB=false;
 
 public static final boolean DEFAULT_LOWFOOTPRINT=false;
-public static final String DEFAULT_KEYSTOREFILE="";
-public static final String DEFAULT_KEYSTORETYPE = "JCEKS";
-public static final String DEFAULT_KEYSTOREPW="";
-public static final String DEFAULT_KEYSTOREALIAS="";
+public static final String DEFAULT_CRYKEYSTOREFILE="";
+public static final String DEFAULT_CRYKEYSTORETYPE = "JCEKS";
+public static final String DEFAULT_CRYKEYSTOREPW="";
+public static final String DEFAULT_CRYKEYSTOREALIAS="";
+
+public static final boolean DEFAULT_VERIFYSIGNATURE=false;
 
 private String fileName;
 private String mimeType=null;
@@ -64,10 +67,11 @@ private String password=null;
 private Map<String,String> metadataFilter;
 private Map<String,String> linkedWBCredentialMap;
 private boolean lowFootprint;
-private String keystoreFile;
-private String keystoreType;
-private String keystorePassword;
-private String keystoreAlias;
+private String cryptKeystoreFile;
+private String cryptKeystoreType;
+private String cryptKeystorePassword;
+private String cryptKeystoreAlias;
+private boolean verifySignature;
 
 /*
  * Create an empty configuration
@@ -93,7 +97,7 @@ public HadoopOfficeReadConfiguration() {
  * hadoopoffice.read.security.crypt.credential.keystore.alias: alias for the password if different from filename
 * hadoopoffice.read.security.crypt.credential.keystore.type: keystore type. Default: JCEKS
 * hadoopoffice.read.security.crypt.credential.keystore.password: keystore password: password of the keystore
- * 
+ * hadoopoffice.read.security.sign.verifysignature: verify digital signature, true if it should be verfied, false if not. Default: false. Requires to add bc libaries to your dependencies (use latest version and upgrade regularly!). Note: The public key is included in the document itself and Excel (similarly to POI) does only verify if the signature belongs to the supplied public key. The link between the public key and a real identity (person) is part of other processes.
  * 
  */
 public HadoopOfficeReadConfiguration(Configuration conf) {
@@ -110,10 +114,12 @@ public HadoopOfficeReadConfiguration(Configuration conf) {
      this.linkedWBCredentialMap=HadoopUtil.parsePropertiesFromBase(conf,HadoopOfficeReadConfiguration.CONF_DECRYPTLINKEDWBBASE);
      this.lowFootprint=conf.getBoolean(HadoopOfficeReadConfiguration.CONF_LOWFOOTPRINT,HadoopOfficeReadConfiguration.DEFAULT_LOWFOOTPRINT);
 
-     this.setKeystoreFile(conf.get(HadoopOfficeReadConfiguration.CONF_KEYSTOREFILE,HadoopOfficeReadConfiguration.DEFAULT_KEYSTOREFILE));
-     this.setKeystoreType(conf.get(HadoopOfficeReadConfiguration.CONF_KEYSTORETYPE,HadoopOfficeReadConfiguration.DEFAULT_KEYSTORETYPE));
-     this.setKeystorePassword(conf.get(HadoopOfficeReadConfiguration.CONF_KEYSTOREPW,HadoopOfficeReadConfiguration.DEFAULT_KEYSTOREPW));
-     this.setKeystoreAlias(conf.get(HadoopOfficeReadConfiguration.CONF_KEYSTOREALIAS,HadoopOfficeReadConfiguration.DEFAULT_KEYSTOREALIAS));
+     this.setCryptKeystoreFile(conf.get(HadoopOfficeReadConfiguration.CONF_CRYKEYSTOREFILE,HadoopOfficeReadConfiguration.DEFAULT_CRYKEYSTOREFILE));
+     this.setCryptKeystoreType(conf.get(HadoopOfficeReadConfiguration.CONF_CRYKEYSTORETYPE,HadoopOfficeReadConfiguration.DEFAULT_CRYKEYSTORETYPE));
+     this.setCryptKeystorePassword(conf.get(HadoopOfficeReadConfiguration.CONF_CRYKEYSTOREPW,HadoopOfficeReadConfiguration.DEFAULT_CRYKEYSTOREPW));
+     this.setCryptKeystoreAlias(conf.get(HadoopOfficeReadConfiguration.CONF_CRYKEYSTOREALIAS,HadoopOfficeReadConfiguration.DEFAULT_CRYKEYSTOREALIAS));
+
+     this.setVerifySignature(conf.getBoolean(HadoopOfficeReadConfiguration.CONF_VERIFYSIGNATURE,HadoopOfficeReadConfiguration.DEFAULT_VERIFYSIGNATURE));
 }
 
 /*
@@ -320,36 +326,45 @@ public void setLowFootprint(boolean lowFootprint) {
 	this.lowFootprint=lowFootprint;
 }
 
-public String getKeystoreFile() {
-	return keystoreFile;
+
+public boolean isVerifySignature() {
+	return verifySignature;
 }
 
-public void setKeystoreFile(String keystoreFile) {
-	this.keystoreFile = keystoreFile;
+public void setVerifySignature(boolean verifySignature) {
+	this.verifySignature = verifySignature;
 }
 
-public String getKeystoreType() {
-	return keystoreType;
+public String getCryptKeystoreFile() {
+	return cryptKeystoreFile;
 }
 
-public void setKeystoreType(String keystoreType) {
-	this.keystoreType = keystoreType;
+public void setCryptKeystoreFile(String cryptKeystoreFile) {
+	this.cryptKeystoreFile = cryptKeystoreFile;
 }
 
-public String getKeystorePassword() {
-	return keystorePassword;
+public String getCryptKeystoreType() {
+	return cryptKeystoreType;
 }
 
-public void setKeystorePassword(String keystorePassword) {
-	this.keystorePassword = keystorePassword;
+public void setCryptKeystoreType(String cryptKeystoreType) {
+	this.cryptKeystoreType = cryptKeystoreType;
 }
 
-public String getKeystoreAlias() {
-	return keystoreAlias;
+public String getCryptKeystorePassword() {
+	return cryptKeystorePassword;
 }
 
-public void setKeystoreAlias(String keystoreAlias) {
-	this.keystoreAlias = keystoreAlias;
+public void setCryptKeystorePassword(String cryptKeystorePassword) {
+	this.cryptKeystorePassword = cryptKeystorePassword;
+}
+
+public String getCryptKeystoreAlias() {
+	return cryptKeystoreAlias;
+}
+
+public void setCryptKeystoreAlias(String cryptKeystoreAlias) {
+	this.cryptKeystoreAlias = cryptKeystoreAlias;
 }
 
 

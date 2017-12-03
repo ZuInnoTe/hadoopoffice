@@ -169,16 +169,16 @@ try {
  * 
  */
 private void readKeyStore(Configuration conf) throws IOException, FormatNotUnderstoodException {
-	if ((this.hocr.getKeystoreFile()!=null) && (!"".equals(this.hocr.getKeystoreFile()))) {
+	if ((this.hocr.getCryptKeystoreFile()!=null) && (!"".equals(this.hocr.getCryptKeystoreFile()))) {
 		LOG.info("Using keystore to obtain credentials instead of passwords");
 		HadoopKeyStoreManager hksm = new HadoopKeyStoreManager(conf);
 		try {
-			hksm.openKeyStore(new Path(this.hocr.getKeystoreFile()), this.hocr.getKeystoreType(), this.hocr.getKeystorePassword());
+			hksm.openKeyStore(new Path(this.hocr.getCryptKeystoreFile()), this.hocr.getCryptKeystoreType(), this.hocr.getCryptKeystorePassword());
 			String password="";
-			if ((this.hocr.getKeystoreAlias()!=null) && (!"".equals(this.hocr.getKeystoreAlias()))) {
-				password=hksm.getPassword(this.hocr.getKeystoreAlias(), this.hocr.getKeystorePassword());
+			if ((this.hocr.getCryptKeystoreAlias()!=null) && (!"".equals(this.hocr.getCryptKeystoreAlias()))) {
+				password=hksm.getPassword(this.hocr.getCryptKeystoreAlias(), this.hocr.getCryptKeystorePassword());
 			} else {
-				password=hksm.getPassword(this.hocr.getFileName(), this.hocr.getKeystorePassword());
+				password=hksm.getPassword(this.hocr.getFileName(), this.hocr.getCryptKeystorePassword());
 			}
 			this.hocr.setPassword(password);
 		} catch (NoSuchAlgorithmException | CertificateException | KeyStoreException | IllegalArgumentException | UnrecoverableEntryException | InvalidKeySpecException e) {

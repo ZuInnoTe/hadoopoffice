@@ -46,10 +46,10 @@ public class HadoopOfficeWriteConfiguration {
 
 	public static final String CONF_LOWFOOTPRINT="hadoopoffice.write.lowFootprint";
 	public static final String CONF_LOWFOOTPRINT_CACHEROWS="hadoopoffice.write.lowFootprint.cacherows";
-	public static final String CONF_KEYSTOREFILE = "hadoopoffice.write.security.crypt.credential.keystore.file";
-	public static final String CONF_KEYSTORETYPE = "hadoopoffice.write.security.crypt.credential.keystore.type";
-	public static final String CONF_KEYSTOREPW = "hadoopoffice.write.security.crypt.credential.keystore.password";
-	public static final String CONF_KEYSTOREALIAS = "hadoopoffice.write.security.crypt.credential.keystore.alias";
+	public static final String CONF_CRYKEYSTOREFILE = "hadoopoffice.write.security.crypt.credential.keystore.file";
+	public static final String CONF_CRYKEYSTORETYPE = "hadoopoffice.write.security.crypt.credential.keystore.type";
+	public static final String CONF_CRYKEYSTOREPW = "hadoopoffice.write.security.crypt.credential.keystore.password";
+	public static final String CONF_CRYKEYSTOREALIAS = "hadoopoffice.write.security.crypt.credential.keystore.alias";
 
 	public static final String DEFAULT_MIMETYPE="";
 	public static final String DEFAULT_LOCALE="";
@@ -65,10 +65,10 @@ public class HadoopOfficeWriteConfiguration {
 
 	public static final boolean DEFAULT_LOWFOOTPRINT=false;
 	public static final int DEFAULT_LOWFOOTPRINT_CACHEROWS=1000;
-	public static final String DEFAULT_KEYSTOREFILE="";
-	public static final String DEFAULT_KEYSTORETYPE = "JCEKS";
-	public static final String DEFAULT_KEYSTOREPW="";
-	public static final String DEFAULT_KEYSTOREALIAS="";
+	public static final String DEFAULT_CRYKEYSTOREFILE="";
+	public static final String DEFAULT_CRYKEYSTORETYPE = "JCEKS";
+	public static final String DEFAULT_CRYKEYSTOREPW="";
+	public static final String DEFAULT_CRYKEYSTOREALIAS="";
 	private String[] linkedWorkbooksName;
 	private String fileName;
 	private String mimeType;
@@ -88,11 +88,10 @@ public class HadoopOfficeWriteConfiguration {
 	private Map<String,String> metadata;
 	private boolean lowFootprint;
 	private int lowFootprintCacheRows;
-	private String keystoreFile;
-	private String keystoreType;
-	private String keystorePassword;
-
-	private String keystoreAlias;
+	private String cryptKeystoreFile;
+	private String cryptKeystoreType;
+	private String cryptKeystorePassword;
+	private String cryptKeystoreAlias;
 /*
  * 	Read the configuration for writing office files from a Hadoop configuration
  * 
@@ -147,10 +146,10 @@ public HadoopOfficeWriteConfiguration(Configuration conf, String fileName) {
      this.setLowFootprintCacheRows(conf.getInt(HadoopOfficeWriteConfiguration.CONF_LOWFOOTPRINT_CACHEROWS,HadoopOfficeWriteConfiguration.DEFAULT_LOWFOOTPRINT_CACHEROWS));
      
 
-     this.setKeystoreFile(conf.get(HadoopOfficeWriteConfiguration.CONF_KEYSTOREFILE,HadoopOfficeWriteConfiguration.DEFAULT_KEYSTOREFILE));
-     this.setKeystoreType(conf.get(HadoopOfficeWriteConfiguration.CONF_KEYSTORETYPE,HadoopOfficeWriteConfiguration.DEFAULT_KEYSTORETYPE));
-     this.setKeystorePassword(conf.get(HadoopOfficeWriteConfiguration.CONF_KEYSTOREPW,HadoopOfficeWriteConfiguration.DEFAULT_KEYSTOREPW));
-     this.setKeystoreAlias(conf.get(HadoopOfficeWriteConfiguration.CONF_KEYSTOREALIAS,HadoopOfficeWriteConfiguration.DEFAULT_KEYSTOREALIAS));
+     this.setCryptKeystoreFile(conf.get(HadoopOfficeWriteConfiguration.CONF_CRYKEYSTOREFILE,HadoopOfficeWriteConfiguration.DEFAULT_CRYKEYSTOREFILE));
+     this.setCryptKeystoreType(conf.get(HadoopOfficeWriteConfiguration.CONF_CRYKEYSTORETYPE,HadoopOfficeWriteConfiguration.DEFAULT_CRYKEYSTORETYPE));
+     this.setCryptKeystorePassword(conf.get(HadoopOfficeWriteConfiguration.CONF_CRYKEYSTOREPW,HadoopOfficeWriteConfiguration.DEFAULT_CRYKEYSTOREPW));
+     this.setCryptKeystoreAlias(conf.get(HadoopOfficeWriteConfiguration.CONF_CRYKEYSTOREALIAS,HadoopOfficeWriteConfiguration.DEFAULT_CRYKEYSTOREALIAS));
 }
 public String[] getLinkedWorkbooksName() {
 	return linkedWorkbooksName;
@@ -271,29 +270,28 @@ public int getLowFootprintCacheRows() {
 public void setLowFootprintCacheRows(int lowFootprintCacheRows) {
 	this.lowFootprintCacheRows = lowFootprintCacheRows;
 }
-public String getKeystoreFile() {
-	return keystoreFile;
+public String getCryptKeystoreFile() {
+	return cryptKeystoreFile;
 }
-public void setKeystoreFile(String keystoreFile) {
-	this.keystoreFile = keystoreFile;
+public void setCryptKeystoreFile(String cryptKeystoreFile) {
+	this.cryptKeystoreFile = cryptKeystoreFile;
 }
-public String getKeystoreType() {
-	return keystoreType;
+public String getCryptKeystoreType() {
+	return cryptKeystoreType;
 }
-public void setKeystoreType(String keystoreType) {
-	this.keystoreType = keystoreType;
+public void setCryptKeystoreType(String cryptKeystoreType) {
+	this.cryptKeystoreType = cryptKeystoreType;
 }
-public String getKeystorePassword() {
-	return keystorePassword;
+public String getCryptKeystorePassword() {
+	return cryptKeystorePassword;
 }
-public void setKeystorePassword(String keystorePassword) {
-	this.keystorePassword = keystorePassword;
+public void setCryptKeystorePassword(String cryptKeystorePassword) {
+	this.cryptKeystorePassword = cryptKeystorePassword;
 }
-public String getKeystoreAlias() {
-	return keystoreAlias;
+public String getCryptKeystoreAlias() {
+	return cryptKeystoreAlias;
 }
-public void setKeystoreAlias(String keystoreAlias) {
-	this.keystoreAlias = keystoreAlias;
+public void setCryptKeystoreAlias(String cryptKeystoreAlias) {
+	this.cryptKeystoreAlias = cryptKeystoreAlias;
 }
-
 }
