@@ -105,6 +105,9 @@ dependencies {
    // Apache POI (for Excel parsing)
    compile("org.apache.poi:poi:3.17")
    compile("org.apache.poi:poi-ooxml:3.17")
+   // for signing and verfication of signatures
+    provided("org.bouncycastle:bcprov-ext-jdk15on:1.58")
+    provided("org.apache.santuario:xmlsec:2.1.0")
    // hadoop libraries
    provided("org.apache.hadoop:hadoop-common:2.7.0")
    provided("org.apache.hadoop:hadoop-mapreduce-client-common:2.7.0")
