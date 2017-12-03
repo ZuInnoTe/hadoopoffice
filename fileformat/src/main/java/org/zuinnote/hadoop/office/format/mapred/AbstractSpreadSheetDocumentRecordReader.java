@@ -168,7 +168,12 @@ private void readKeyStore(Configuration conf) throws IOException, FormatNotUnder
 		HadoopKeyStoreManager hksm = new HadoopKeyStoreManager(conf);
 		try {
 			hksm.openKeyStore(new Path(this.hocr.getKeystoreFile()), this.hocr.getKeystoreType(), this.hocr.getKeystorePassword());
-			String password=hksm.getPassword(this.hocr.getFileName(), this.hocr.getKeystorePassword());
+			String password="";
+			if ((this.hocr.getKeystoreAlias()!=null) && (!"".equals(this.hocr.getKeystoreAlias()))) {
+				password=hksm.getPassword(this.hocr.getKeystoreAlias(), this.hocr.getKeystorePassword());
+			} else {
+				password=hksm.getPassword(this.hocr.getFileName(), this.hocr.getKeystorePassword());
+			}
 			this.hocr.setPassword(password);
 		} catch (NoSuchAlgorithmException | CertificateException | KeyStoreException | IllegalArgumentException | UnrecoverableEntryException | InvalidKeySpecException e) {
 			LOG.error(e);

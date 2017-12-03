@@ -112,7 +112,12 @@ private void readKeyStore(Configuration conf) throws IOException, OfficeWriterEx
 		HadoopKeyStoreManager hksm = new HadoopKeyStoreManager(conf);
 		try {
 			hksm.openKeyStore(new Path(this.howc.getKeystoreFile()), this.howc.getKeystoreType(), this.howc.getKeystorePassword());
-			String password=hksm.getPassword(this.howc.getFileName(), this.howc.getKeystorePassword());
+			String password="";
+			if ((this.howc.getKeystoreAlias()!=null) && (!"".equals(this.howc.getKeystoreAlias()))) {
+				password=hksm.getPassword(this.howc.getKeystoreAlias(), this.howc.getKeystorePassword());
+			} else {
+				password=hksm.getPassword(this.howc.getFileName(), this.howc.getKeystorePassword());
+			}
 			this.howc.setPassword(password);
 		} catch (NoSuchAlgorithmException | CertificateException | KeyStoreException | IllegalArgumentException | UnrecoverableEntryException | InvalidKeySpecException e) {
 			LOG.error(e);
