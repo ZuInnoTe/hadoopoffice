@@ -50,6 +50,11 @@ public class HadoopOfficeWriteConfiguration {
 	public static final String CONF_CRYKEYSTORETYPE = "hadoopoffice.write.security.crypt.credential.keystore.type";
 	public static final String CONF_CRYKEYSTOREPW = "hadoopoffice.write.security.crypt.credential.keystore.password";
 	public static final String CONF_CRYKEYSTOREALIAS = "hadoopoffice.write.security.crypt.credential.keystore.alias";
+	
+	public static final String CONF_SIGKEYSTOREFILE = "hadoopoffice.write.security.sign.keystore.file";
+	public static final String CONF_SIGKEYSTORETYPE = "hadoopoffice.write.security.sign.keystore.type";
+	public static final String CONF_SIGKEYSTOREPW = "hadoopoffice.write.security.sign.keystore.password";
+	public static final String CONF_SIGKEYSTOREALIAS = "hadoopoffice.write.security.sign.keystore.alias";
 
 	public static final String DEFAULT_MIMETYPE="";
 	public static final String DEFAULT_LOCALE="";
@@ -69,6 +74,11 @@ public class HadoopOfficeWriteConfiguration {
 	public static final String DEFAULT_CRYKEYSTORETYPE = "JCEKS";
 	public static final String DEFAULT_CRYKEYSTOREPW="";
 	public static final String DEFAULT_CRYKEYSTOREALIAS="";
+	
+	public static final String DEFAULT_SIGKEYSTOREFILE = "";
+	public static final String DEFAULT_SIGKEYSTORETYPE = "PKCS12";
+	public static final String DEFAULT_SIGKEYSTOREPW = "";
+	public static final String DEFAULT_SIGKEYSTOREALIAS = "";
 	private String[] linkedWorkbooksName;
 	private String fileName;
 	private String mimeType;
@@ -92,6 +102,11 @@ public class HadoopOfficeWriteConfiguration {
 	private String cryptKeystoreType;
 	private String cryptKeystorePassword;
 	private String cryptKeystoreAlias;
+	
+	private String sigKeystoreFile;
+	private String sigKeystoreType;
+	private String sigKeystorePassword;
+	private String sigKeystoreAlias;
 /*
  * 	Read the configuration for writing office files from a Hadoop configuration
  * 
@@ -113,6 +128,10 @@ public class HadoopOfficeWriteConfiguration {
 * hadoopoffice.write.security.crypt.credential.keystore.type: keystore type. Default: JCEKS
 * hadoopoffice.write.security.crypt.credential.keystore.password: keystore password: password of the keystore
 * hadoopoffice.write.security.crypt.credential.keystore.alias: alias for the password if different from filename
+* hadoopoffice.write.security.sign.keystore.file: keystore file that contains the private key used for signing a document
+* hadoopoffice.write.security.sign.keystore.type: keystore type of the private key. Default PKCS12
+* hadoopoffice.write.security.sign.keystore.password: keystore password for the private key.
+* hadoopoffice.write.security.sign.keystore.alias: alias of private key in keystore
 *
 *
 * @param fileName filename to write
@@ -150,6 +169,11 @@ public HadoopOfficeWriteConfiguration(Configuration conf, String fileName) {
      this.setCryptKeystoreType(conf.get(HadoopOfficeWriteConfiguration.CONF_CRYKEYSTORETYPE,HadoopOfficeWriteConfiguration.DEFAULT_CRYKEYSTORETYPE));
      this.setCryptKeystorePassword(conf.get(HadoopOfficeWriteConfiguration.CONF_CRYKEYSTOREPW,HadoopOfficeWriteConfiguration.DEFAULT_CRYKEYSTOREPW));
      this.setCryptKeystoreAlias(conf.get(HadoopOfficeWriteConfiguration.CONF_CRYKEYSTOREALIAS,HadoopOfficeWriteConfiguration.DEFAULT_CRYKEYSTOREALIAS));
+     
+     this.setSigKeystoreFile(conf.get(HadoopOfficeWriteConfiguration.CONF_SIGKEYSTOREFILE,HadoopOfficeWriteConfiguration.DEFAULT_SIGKEYSTOREFILE));
+     this.setSigKeystoreType(conf.get(HadoopOfficeWriteConfiguration.CONF_SIGKEYSTORETYPE,HadoopOfficeWriteConfiguration.DEFAULT_SIGKEYSTORETYPE));
+     this.setSigKeystorePassword(conf.get(HadoopOfficeWriteConfiguration.CONF_SIGKEYSTOREPW,HadoopOfficeWriteConfiguration.DEFAULT_SIGKEYSTOREPW));
+     this.setSigKeystoreAlias(conf.get(HadoopOfficeWriteConfiguration.CONF_SIGKEYSTOREALIAS,HadoopOfficeWriteConfiguration.DEFAULT_SIGKEYSTOREALIAS));
 }
 public String[] getLinkedWorkbooksName() {
 	return linkedWorkbooksName;
@@ -293,5 +317,29 @@ public String getCryptKeystoreAlias() {
 }
 public void setCryptKeystoreAlias(String cryptKeystoreAlias) {
 	this.cryptKeystoreAlias = cryptKeystoreAlias;
+}
+public String getSigKeystoreFile() {
+	return sigKeystoreFile;
+}
+public void setSigKeystoreFile(String sigKeystoreFile) {
+	this.sigKeystoreFile = sigKeystoreFile;
+}
+public String getSigKeystoreType() {
+	return sigKeystoreType;
+}
+public void setSigKeystoreType(String sigKeystoreType) {
+	this.sigKeystoreType = sigKeystoreType;
+}
+public String getSigKeystorePassword() {
+	return sigKeystorePassword;
+}
+public void setSigKeystorePassword(String sigKeystorePassword) {
+	this.sigKeystorePassword = sigKeystorePassword;
+}
+public String getSigKeystoreAlias() {
+	return sigKeystoreAlias;
+}
+public void setSigKeystoreAlias(String sigKeystoreAlias) {
+	this.sigKeystoreAlias = sigKeystoreAlias;
 }
 }
