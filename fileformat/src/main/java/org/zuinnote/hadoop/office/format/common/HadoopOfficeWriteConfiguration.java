@@ -49,6 +49,7 @@ public class HadoopOfficeWriteConfiguration {
 	public static final String CONF_KEYSTOREFILE = "hadoopoffice.write.security.crypt.credential.keystore.file";
 	public static final String CONF_KEYSTORETYPE = "hadoopoffice.write.security.crypt.credential.keystore.type";
 	public static final String CONF_KEYSTOREPW = "hadoopoffice.write.security.crypt.credential.keystore.password";
+	public static final String CONF_KEYSTOREALIAS = "hadoopoffice.write.security.crypt.credential.keystore.alias";
 
 	public static final String DEFAULT_MIMETYPE="";
 	public static final String DEFAULT_LOCALE="";
@@ -67,6 +68,7 @@ public class HadoopOfficeWriteConfiguration {
 	public static final String DEFAULT_KEYSTOREFILE="";
 	public static final String DEFAULT_KEYSTORETYPE = "JCEKS";
 	public static final String DEFAULT_KEYSTOREPW="";
+	public static final String DEFAULT_KEYSTOREALIAS="";
 	private String[] linkedWorkbooksName;
 	private String fileName;
 	private String mimeType;
@@ -89,6 +91,8 @@ public class HadoopOfficeWriteConfiguration {
 	private String keystoreFile;
 	private String keystoreType;
 	private String keystorePassword;
+
+	private String keystoreAlias;
 /*
  * 	Read the configuration for writing office files from a Hadoop configuration
  * 
@@ -109,6 +113,7 @@ public class HadoopOfficeWriteConfiguration {
 * hadoopoffice.write.security.crypt.credential.keystore.file: keystore file that is used to store credentials, such as passwords, for securing office documents. Note that the alias in the keystore needs to correspond to the filename (without the path)
 * hadoopoffice.write.security.crypt.credential.keystore.type: keystore type. Default: JCEKS
 * hadoopoffice.write.security.crypt.credential.keystore.password: keystore password: password of the keystore
+* hadoopoffice.write.security.crypt.credential.keystore.alias: alias for the password if different from filename
 *
 *
 * @param fileName filename to write
@@ -145,6 +150,7 @@ public HadoopOfficeWriteConfiguration(Configuration conf, String fileName) {
      this.setKeystoreFile(conf.get(HadoopOfficeWriteConfiguration.CONF_KEYSTOREFILE,HadoopOfficeWriteConfiguration.DEFAULT_KEYSTOREFILE));
      this.setKeystoreType(conf.get(HadoopOfficeWriteConfiguration.CONF_KEYSTORETYPE,HadoopOfficeWriteConfiguration.DEFAULT_KEYSTORETYPE));
      this.setKeystorePassword(conf.get(HadoopOfficeWriteConfiguration.CONF_KEYSTOREPW,HadoopOfficeWriteConfiguration.DEFAULT_KEYSTOREPW));
+     this.setKeystoreAlias(conf.get(HadoopOfficeWriteConfiguration.CONF_KEYSTOREALIAS,HadoopOfficeWriteConfiguration.DEFAULT_KEYSTOREALIAS));
 }
 public String[] getLinkedWorkbooksName() {
 	return linkedWorkbooksName;
@@ -282,6 +288,12 @@ public String getKeystorePassword() {
 }
 public void setKeystorePassword(String keystorePassword) {
 	this.keystorePassword = keystorePassword;
+}
+public String getKeystoreAlias() {
+	return keystoreAlias;
+}
+public void setKeystoreAlias(String keystoreAlias) {
+	this.keystoreAlias = keystoreAlias;
 }
 
 }

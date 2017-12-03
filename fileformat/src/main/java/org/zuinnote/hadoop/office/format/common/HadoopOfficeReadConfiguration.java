@@ -39,6 +39,7 @@ public static final String CONF_LOWFOOTPRINT="hadoopoffice.read.lowFootprint";
 public static final String CONF_KEYSTOREFILE = "hadoopoffice.read.security.crypt.credential.keystore.file";
 public static final String CONF_KEYSTORETYPE = "hadoopoffice.read.security.crypt.credential.keystore.type";
 public static final String CONF_KEYSTOREPW = "hadoopoffice.read.security.crypt.credential.keystore.password";
+public static final String CONF_KEYSTOREALIAS = "hadoopoffice.read.security.crypt.credential.keystore.alias";
 
 public static final String DEFAULT_MIMETYPE="";
 public static final String DEFAULT_LOCALE="";
@@ -50,6 +51,7 @@ public static final boolean DEFAULT_LOWFOOTPRINT=false;
 public static final String DEFAULT_KEYSTOREFILE="";
 public static final String DEFAULT_KEYSTORETYPE = "JCEKS";
 public static final String DEFAULT_KEYSTOREPW="";
+public static final String DEFAULT_KEYSTOREALIAS="";
 
 private String fileName;
 private String mimeType=null;
@@ -65,6 +67,7 @@ private boolean lowFootprint;
 private String keystoreFile;
 private String keystoreType;
 private String keystorePassword;
+private String keystoreAlias;
 
 /*
  * Create an empty configuration
@@ -87,6 +90,7 @@ public HadoopOfficeReadConfiguration() {
 * hadoopoffice.read.filter.metadata: filters documents according to metadata. For example, hadoopoffice.read.filter.metadata.author will filter by author and the filter defined as value. Filtering is done by the parser and it is recommended that it supports regular expression for filtering, but this is up to the parser!
 * hadoopoffice.read.lowfootprint: uses low memory/cpu footprint for reading documents. Note: In this mode certain features are not availanble, such as reading formulas. Default: false
  * hadoopoffice.read.security.crypt.credential.keystore.file: keystore file that is used to store credentials, such as passwords, for reading secured office documents. Note that the alias in the keystore needs to correspond to the filename (without the path)
+ * hadoopoffice.read.security.crypt.credential.keystore.alias: alias for the password if different from filename
 * hadoopoffice.read.security.crypt.credential.keystore.type: keystore type. Default: JCEKS
 * hadoopoffice.read.security.crypt.credential.keystore.password: keystore password: password of the keystore
  * 
@@ -109,6 +113,7 @@ public HadoopOfficeReadConfiguration(Configuration conf) {
      this.setKeystoreFile(conf.get(HadoopOfficeReadConfiguration.CONF_KEYSTOREFILE,HadoopOfficeReadConfiguration.DEFAULT_KEYSTOREFILE));
      this.setKeystoreType(conf.get(HadoopOfficeReadConfiguration.CONF_KEYSTORETYPE,HadoopOfficeReadConfiguration.DEFAULT_KEYSTORETYPE));
      this.setKeystorePassword(conf.get(HadoopOfficeReadConfiguration.CONF_KEYSTOREPW,HadoopOfficeReadConfiguration.DEFAULT_KEYSTOREPW));
+     this.setKeystoreAlias(conf.get(HadoopOfficeReadConfiguration.CONF_KEYSTOREALIAS,HadoopOfficeReadConfiguration.DEFAULT_KEYSTOREALIAS));
 }
 
 /*
@@ -337,6 +342,14 @@ public String getKeystorePassword() {
 
 public void setKeystorePassword(String keystorePassword) {
 	this.keystorePassword = keystorePassword;
+}
+
+public String getKeystoreAlias() {
+	return keystoreAlias;
+}
+
+public void setKeystoreAlias(String keystoreAlias) {
+	this.keystoreAlias = keystoreAlias;
 }
 
 
