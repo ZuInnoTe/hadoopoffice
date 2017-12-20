@@ -54,7 +54,8 @@ import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.poifs.crypt.Decryptor;
 import org.apache.poi.poifs.crypt.EncryptionInfo;
-
+import org.apache.poi.poifs.crypt.dsig.SignatureConfig;
+import org.apache.poi.poifs.crypt.dsig.SignatureInfo;
 import org.apache.poi.poifs.filesystem.FileMagic;
 import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
 import org.apache.poi.ss.usermodel.DataFormatter;
@@ -67,6 +68,7 @@ import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandl
 
 import org.apache.poi.xssf.model.StylesTable;
 import org.apache.poi.xssf.usermodel.XSSFComment;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -222,6 +224,7 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 					
 					try {
 						OPCPackage pkg = OPCPackage.open(nin);
+						
 						this.processOPCPackage(pkg);
 					} catch (InvalidFormatException e) {
 						LOG.error(e);
@@ -259,6 +262,20 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 	 */
 	private void processOPCPackage(OPCPackage pkg) throws FormatNotUnderstoodException {
 		LOG.debug("Processing OPCPackage in low footprint mode");
+		// check if signature should be verified
+		if (this.hocr.getVerifySignature()) {
+				LOG.info("Verifying signature of document");
+				SignatureConfig sic = new SignatureConfig();
+				sic.setOpcPackage(pkg);
+				SignatureInfo si = new SignatureInfo();
+				si.setSignatureConfig(sic);
+				if (!si.verifySignature()) {
+						throw new FormatNotUnderstoodException("Cannot verify signature of OOXML (.xlsx) file: "+this.hocr.getFileName());
+				} else {
+						LOG.info("Successfully verifed signature of OXXML (.xlsx) file: "+this.hocr.getFileName());
+				}
+		}
+		// continue in lowfootprint mode
 		XSSFReader r;
 		try {
 			r = new XSSFReader( pkg );

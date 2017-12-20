@@ -327,7 +327,7 @@ public void setLowFootprint(boolean lowFootprint) {
 }
 
 
-public boolean isVerifySignature() {
+public boolean getVerifySignature() {
 	return verifySignature;
 }
 

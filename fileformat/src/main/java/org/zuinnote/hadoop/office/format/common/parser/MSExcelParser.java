@@ -45,7 +45,9 @@ import org.apache.poi.POIXMLProperties;
 import org.apache.poi.hpsf.SummaryInformation;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-
+import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.poifs.crypt.dsig.SignatureConfig;
+import org.apache.poi.poifs.crypt.dsig.SignatureInfo;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 
@@ -156,6 +158,25 @@ private HadoopOfficeReadConfiguration hocr;
 					}
 				}
 			}
+			// check if signature should be verified
+			if (this.hocr.getVerifySignature()) {
+				LOG.info("Verifying signature of document");
+				if (!(this.currentWorkbook instanceof XSSFWorkbook)) {
+					throw new FormatNotUnderstoodException("Can only verify signatures for files using the OOXML (.xlsx) format");
+				} else {
+					OPCPackage pgk = ((XSSFWorkbook)this.currentWorkbook).getPackage();
+					SignatureConfig sic = new SignatureConfig();
+					sic.setOpcPackage(pgk);
+					SignatureInfo si = new SignatureInfo();
+					si.setSignatureConfig(sic);
+					if (!si.verifySignature()) {
+						throw new FormatNotUnderstoodException("Cannot verify signature of OOXML (.xlsx) file: "+this.hocr.getFileName());
+					} else {
+						LOG.info("Successfully verifed signature of OXXML (.xlsx) file: "+this.hocr.getFileName());
+					}
+				}
+			}
+		// formulaEvaluator
 		 this.formulaEvaluator = this.currentWorkbook.getCreationHelper().createFormulaEvaluator();
 		  // add the formulator evaluator of this file as well or we will see a strange Exception
 		 this.addedFormulaEvaluators.put(this.hocr.getFileName(),this.formulaEvaluator);

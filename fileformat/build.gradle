@@ -102,11 +102,13 @@ publishing {
 
 
 dependencies {
+
    // Apache POI (for Excel parsing)
    compile("org.apache.poi:poi:3.17")
    compile("org.apache.poi:poi-ooxml:3.17")
-   // for signing and verfication of signatures
+   // for signing and verification of signatures
     provided("org.bouncycastle:bcprov-ext-jdk15on:1.58")
+    provided("org.bouncycastle:bcpkix-jdk15on:1.58")
     provided("org.apache.santuario:xmlsec:2.1.0")
    // hadoop libraries
    provided("org.apache.hadoop:hadoop-common:2.7.0")
@@ -115,6 +117,6 @@ dependencies {
    provided("org.apache.logging.log4j:log4j-api:2.8.1")
    // test
    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.0.2'
- 
+   
    testRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.0.2'
 }

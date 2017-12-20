@@ -38,10 +38,8 @@ import org.apache.hadoop.io.ArrayWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileOutputFormat;
-import org.apache.hadoop.mapred.FileSplit;
 import org.apache.hadoop.mapred.InputSplit;
 import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.JobConfigurable;
 import org.apache.hadoop.mapred.JobContext;
 import org.apache.hadoop.mapred.RecordReader;
 import org.apache.hadoop.mapred.RecordWriter;
@@ -53,7 +51,6 @@ import org.apache.hadoop.io.compress.CompressionCodec;
 
 import org.apache.hadoop.util.ReflectionUtils;
 
-import org.apache.poi.EncryptedDocumentException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -61,8 +58,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.zuinnote.hadoop.office.format.common.dao.*;
-import org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException;
-import org.zuinnote.hadoop.office.format.common.writer.OfficeWriterException;
 
 public class OfficeFormatHadoopExcelTest {
 

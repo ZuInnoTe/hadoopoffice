@@ -55,6 +55,7 @@ public class HadoopOfficeWriteConfiguration {
 	public static final String CONF_SIGKEYSTORETYPE = "hadoopoffice.write.security.sign.keystore.type";
 	public static final String CONF_SIGKEYSTOREPW = "hadoopoffice.write.security.sign.keystore.password";
 	public static final String CONF_SIGKEYSTOREALIAS = "hadoopoffice.write.security.sign.keystore.alias";
+	public static final String CONF_SIGHASH = "hadoopoffice.write.security.sign.hash.algorithm";
 
 	public static final String DEFAULT_MIMETYPE="";
 	public static final String DEFAULT_LOCALE="";
@@ -79,6 +80,8 @@ public class HadoopOfficeWriteConfiguration {
 	public static final String DEFAULT_SIGKEYSTORETYPE = "PKCS12";
 	public static final String DEFAULT_SIGKEYSTOREPW = "";
 	public static final String DEFAULT_SIGKEYSTOREALIAS = "";
+	public static final String DEFAULT_SIGHASH = "sha512";
+	
 	private String[] linkedWorkbooksName;
 	private String fileName;
 	private String mimeType;
@@ -107,6 +110,7 @@ public class HadoopOfficeWriteConfiguration {
 	private String sigKeystoreType;
 	private String sigKeystorePassword;
 	private String sigKeystoreAlias;
+	private String sigHash;
 /*
  * 	Read the configuration for writing office files from a Hadoop configuration
  * 
@@ -132,6 +136,8 @@ public class HadoopOfficeWriteConfiguration {
 * hadoopoffice.write.security.sign.keystore.type: keystore type of the private key. Default PKCS12
 * hadoopoffice.write.security.sign.keystore.password: keystore password for the private key.
 * hadoopoffice.write.security.sign.keystore.alias: alias of private key in keystore
+* hadoopoffice.write.security.sign.hash.algorithm: use the following algorithm to hash. Note that some writers do not support all algorithms and an exception will be thrown if the algorithm is not supported. See corresponding writer documentation for supported algorithms.
+
 *
 *
 * @param fileName filename to write
@@ -174,6 +180,7 @@ public HadoopOfficeWriteConfiguration(Configuration conf, String fileName) {
      this.setSigKeystoreType(conf.get(HadoopOfficeWriteConfiguration.CONF_SIGKEYSTORETYPE,HadoopOfficeWriteConfiguration.DEFAULT_SIGKEYSTORETYPE));
      this.setSigKeystorePassword(conf.get(HadoopOfficeWriteConfiguration.CONF_SIGKEYSTOREPW,HadoopOfficeWriteConfiguration.DEFAULT_SIGKEYSTOREPW));
      this.setSigKeystoreAlias(conf.get(HadoopOfficeWriteConfiguration.CONF_SIGKEYSTOREALIAS,HadoopOfficeWriteConfiguration.DEFAULT_SIGKEYSTOREALIAS));
+     this.setSigHash(conf.get(HadoopOfficeWriteConfiguration.CONF_SIGHASH,HadoopOfficeWriteConfiguration.DEFAULT_SIGHASH));
 }
 public String[] getLinkedWorkbooksName() {
 	return linkedWorkbooksName;
@@ -341,5 +348,11 @@ public String getSigKeystoreAlias() {
 }
 public void setSigKeystoreAlias(String sigKeystoreAlias) {
 	this.sigKeystoreAlias = sigKeystoreAlias;
+}
+public String getSigHash() {
+	return sigHash;
+}
+public void setSigHash(String sigHash) {
+	this.sigHash = sigHash;
 }
 }
