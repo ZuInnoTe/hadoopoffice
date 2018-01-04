@@ -25,7 +25,9 @@ import java.security.GeneralSecurityException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableEntryException;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Map;
 
@@ -94,6 +96,7 @@ public AbstractSpreadSheetDocumentRecordWriter(DataOutputStream out, String file
      this.howc=new HadoopOfficeWriteConfiguration(conf,fileName);
   
      this.readKeyStore(conf);
+     this.readSigningKeyAndCertificate(conf);
        // load linked workbooks as inputstreams
       this.currentReader= new HadoopFileReader(conf);
       this.linkedWorkbooksMap=this.currentReader.loadLinkedWorkbooks(this.howc.getLinkedWorkbooksName());
@@ -131,6 +134,40 @@ private void readKeyStore(Configuration conf) throws IOException, OfficeWriterEx
 			LOG.error(e);
 			throw new OfficeWriterException("Cannot read keystore to obtain credentials used to encrypt office documents "+e);
 		}
+		
+	}
+}
+
+
+/***
+ * Reads the  (private) key and certificate from keystore to sign
+ * 
+ * @param conf
+ * @throws OfficeWriterException
+ * @throws IOException
+ */
+private void readSigningKeyAndCertificate(Configuration conf) throws OfficeWriterException, IOException {
+	if ((this.howc.getSigKeystoreFile()!=null) && (!"".equals(this.howc.getSigKeystoreFile()))) {
+		LOG.info("Signing document");
+		if ((this.howc.getSigKeystoreAlias()==null) || ("".equals(this.howc.getSigKeystoreAlias()))) {
+				LOG.error("Keystore alias for signature keystore not defined. Cannot sign document");
+				throw new OfficeWriterException("Keystore alias for signature keystore not defined. Cannot sign document");
+		}
+		if ((this.howc.getSigKeystoreType()==null) || ("".equals(this.howc.getSigKeystoreType()))) {
+			LOG.error("Keystore type for signature keystore not defined. Cannot sign document");
+			throw new OfficeWriterException("Keystore type for signature keystore not defined. Cannot sign document");
+		}
+		LOG.info("Reading keystore");
+		HadoopKeyStoreManager hksm = new HadoopKeyStoreManager(conf);
+		try {
+			hksm.openKeyStore(new Path(this.howc.getCryptKeystoreFile()), this.howc.getSigKeystoreType(), this.howc.getSigKeystorePassword());
+			this.howc.setSigKey(hksm.getPrivateKey(this.howc.getSigKeystoreAlias(), this.howc.getSigKeystorePassword()));
+			this.howc.setSigCertificate((X509Certificate) hksm.getCertificate(this.howc.getSigKeystoreAlias()));
+		} catch (NoSuchAlgorithmException | CertificateException | KeyStoreException | IllegalArgumentException | UnrecoverableKeyException e) {
+			LOG.error(e);
+			throw new OfficeWriterException("Cannot read keystore to obtain key and certificate for signing "+e);
+		}
+		
 		
 	}
 }

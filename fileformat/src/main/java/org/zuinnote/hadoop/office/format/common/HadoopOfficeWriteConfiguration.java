@@ -15,6 +15,8 @@
 **/
 package org.zuinnote.hadoop.office.format.common;
 
+import java.security.Key;
+import java.security.cert.X509Certificate;
 import java.util.Locale;
 import java.util.Map;
 
@@ -111,6 +113,8 @@ public class HadoopOfficeWriteConfiguration {
 	private String sigKeystorePassword;
 	private String sigKeystoreAlias;
 	private String sigHash;
+	private X509Certificate sigCertificate;
+	private Key sigKey;
 /*
  * 	Read the configuration for writing office files from a Hadoop configuration
  * 
@@ -354,5 +358,17 @@ public String getSigHash() {
 }
 public void setSigHash(String sigHash) {
 	this.sigHash = sigHash;
+}
+public X509Certificate getSigCertificate() {
+	return sigCertificate;
+}
+public void setSigCertificate(X509Certificate sigCertificate) {
+	this.sigCertificate = sigCertificate;
+}
+public Key getSigKey() {
+	return sigKey;
+}
+public void setSigKey(Key sigKey) {
+	this.sigKey = sigKey;
 }
 }
