@@ -151,7 +151,7 @@ private void readSigningKeyAndCertificate(Configuration conf) throws OfficeWrite
 		LOG.info("Reading keystore");
 		HadoopKeyStoreManager hksm = new HadoopKeyStoreManager(conf);
 		try {
-			hksm.openKeyStore(new Path(this.howc.getCryptKeystoreFile()), this.howc.getSigKeystoreType(), this.howc.getSigKeystorePassword());
+			hksm.openKeyStore(new Path(this.howc.getSigKeystoreFile()), this.howc.getSigKeystoreType(), this.howc.getSigKeystorePassword());
 			this.howc.setSigKey(hksm.getPrivateKey(this.howc.getSigKeystoreAlias(), this.howc.getSigKeystorePassword()));
 			this.howc.setSigCertificate((X509Certificate) hksm.getCertificate(this.howc.getSigKeystoreAlias()));
 		} catch (NoSuchAlgorithmException | CertificateException | KeyStoreException | IllegalArgumentException | UnrecoverableKeyException e) {

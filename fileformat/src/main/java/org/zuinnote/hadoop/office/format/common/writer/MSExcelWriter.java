@@ -17,9 +17,13 @@
 package org.zuinnote.hadoop.office.format.common.writer;
 
 import java.util.ArrayList;
-
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import javax.xml.crypto.MarshalException;
+import javax.xml.crypto.dsig.XMLSignatureException;
+
 import java.util.HashMap;
 import java.util.Date;
 
@@ -32,6 +36,7 @@ import java.io.IOException;
 
 
 import java.security.GeneralSecurityException;
+
 
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -64,6 +69,7 @@ import org.zuinnote.hadoop.office.format.common.HadoopOfficeWriteConfiguration;
 import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 import org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException;
 import org.zuinnote.hadoop.office.format.common.parser.MSExcelParser;
+import org.zuinnote.hadoop.office.format.common.util.MSExcelOOXMLSignUtil;
 
 public class MSExcelWriter implements OfficeSpreadSheetWriterInterface {
 public static final String FORMAT_OOXML = "ooxmlexcel";
@@ -83,6 +89,8 @@ private HashAlgorithm hashAlgorithmCipher;
 private EncryptionMode encryptionModeCipher;
 private ChainingMode chainModeCipher;
 private boolean hasTemplate;
+private MSExcelOOXMLSignUtil signUtil;
+
 
 
 /**
@@ -122,6 +130,7 @@ public MSExcelWriter(String excelFormat, HadoopOfficeWriteConfiguration howc) th
 	this.encryptionModeCipher=getEncryptionModeCipher(this.howc.getEncryptMode());
 	this.chainModeCipher=getChainMode(this.howc.getChainMode());
 	this.hasTemplate=false;
+
 }
 
 
@@ -214,7 +223,14 @@ public void create(OutputStream oStream, Map<String,InputStream> linkedWorkbooks
 	}
 	LOG.debug("Size of linked formula evaluators map: "+linkedFormulaEvaluators.size());
 	currentFormulaEvaluator.setupReferencedWorkbooks(linkedFormulaEvaluators);
-	
+	if (this.howc.getSigKey()!=null) { // use temporary files for signatures
+		try {
+			this.signUtil= new MSExcelOOXMLSignUtil(this.oStream);
+		} catch (IOException e) {
+			LOG.error("Cannot create sign utilities "+e);
+			throw new OfficeWriterException(e.toString());
+		}
+	}
 }
 	
 
@@ -320,6 +336,7 @@ public void close() throws IOException {
 	try {
 		// prepare metadata
 		prepareMetaData();
+		
 		// write
 		if (this.oStream!=null) {
 			if (this.howc.getPassword()==null) { // no encryption
@@ -333,16 +350,20 @@ public void close() throws IOException {
 				 else {
 					LOG.error("Could not write encrypted workbook, because type of workbook is unknown");
 				}
+
 			}
 		} finally {
+
 			// close filesystems
 			if (this.ooxmlDocumentFileSystem!=null)  {
 				 ooxmlDocumentFileSystem.close();
 			}
+
 		// close main workbook
 		if (this.currentWorkbook!=null) {
 			this.currentWorkbook.close();
 		}
+		
 		// close linked workbooks
 		 	for (Workbook currentWorkbookItem: this.listOfWorkbooks) {
 				if (currentWorkbookItem!=null) {
@@ -350,16 +371,46 @@ public void close() throws IOException {
 				}
 			}
 		}
+	try {
+	// do we need to sign => sign
+	if (this.signUtil!=null) {
+		// sign
+		LOG.info("Signing document \""+this.howc.getFileName()+"\"");
+		if (this.howc.getSigCertificate()==null) {
+			LOG.error("Cannot sign document \""+this.howc.getFileName()+"\". No certificate for key provided");
+		} else if (!(this.currentWorkbook instanceof XSSFWorkbook)){
+			LOG.warn("Signing of docuemnts in old Excel format not supported for \""+this.howc.getFileName()+"\"");
+		}else {
+		try {
+				this.signUtil.sign(this.howc.getSigKey(), this.howc.getSigCertificate(), this.howc.getPassword());
+		} catch (XMLSignatureException|MarshalException|IOException|FormatNotUnderstoodException e) {
+			LOG.error("Cannot sign document \""+this.howc.getFileName()+"\" "+e);
+		}
+			
+		}
+		
+	}
+	} finally {
+		if (this.signUtil!=null) {
+			this.signUtil.close();
+		}
+	}
 }
+
 
 
 private void finalizeWriteNotEncrypted() throws IOException {
 	try {
-		this.currentWorkbook.write(this.oStream);
+		if ((this.signUtil!=null) && (this.currentWorkbook instanceof XSSFWorkbook)) {
+			this.currentWorkbook.write(this.signUtil.getTempOutputStream()); // write to temporary file to sign it afterwards
+		} else {
+			this.currentWorkbook.write(this.oStream);
+		}
 	} finally {
-		if (this.oStream!=null) {
+		if ((this.oStream!=null) && (this.signUtil==null)) {
 			this.oStream.close();
 		}
+
 	}
 	
 	
@@ -409,9 +460,17 @@ private void finalizeWriteEncryptedXSSF() throws IOException{
 			} catch (GeneralSecurityException e) {
 				LOG.error(e);
 			} 
-			ooxmlDocumentFileSystem.writeFilesystem(this.oStream);
+
+			OutputStream theOS=this.oStream;
+			if (this.signUtil!=null) {
+				theOS= this.signUtil.getTempOutputStream();
+				
+			} 
+			ooxmlDocumentFileSystem.writeFilesystem(theOS);
+			
 		} finally {
-		 if (this.oStream!=null) {
+			
+		 if ((this.oStream!=null) && (this.signUtil==null)) { // if we need to sign it we close it later after signing
 			 this.oStream.close();
 		 }
 		}

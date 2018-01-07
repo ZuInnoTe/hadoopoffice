@@ -24,7 +24,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.GeneralSecurityException;
+import java.security.PrivateKey;
 import java.security.SecureRandom;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,10 +40,14 @@ import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
 import javax.crypto.CipherOutputStream;
 import javax.crypto.spec.SecretKeySpec;
+import javax.xml.crypto.MarshalException;
+import javax.xml.crypto.dsig.XMLSignatureException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.util.ZipEntrySource;
 import org.apache.poi.poifs.crypt.ChainingMode;
 import org.apache.poi.poifs.crypt.CipherAlgorithm;
@@ -50,6 +56,8 @@ import org.apache.poi.poifs.crypt.EncryptionInfo;
 import org.apache.poi.poifs.crypt.EncryptionMode;
 import org.apache.poi.poifs.crypt.Encryptor;
 import org.apache.poi.poifs.crypt.HashAlgorithm;
+import org.apache.poi.poifs.crypt.dsig.SignatureConfig;
+import org.apache.poi.poifs.crypt.dsig.SignatureInfo;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.ClientAnchor;
 import org.apache.poi.ss.usermodel.Comment;
@@ -61,8 +69,11 @@ import org.apache.poi.xssf.streaming.SXSSFCell;
 import org.apache.poi.xssf.streaming.SXSSFRow;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.zuinnote.hadoop.office.format.common.HadoopOfficeWriteConfiguration;
 import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
+import org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException;
+import org.zuinnote.hadoop.office.format.common.util.MSExcelOOXMLSignUtil;
 
 /**
  * @author Jörn Franke (zuinnote@gmail.com)
@@ -80,6 +91,8 @@ public class MSExcelLowFootprintWriter implements OfficeSpreadSheetWriterInterfa
 	private OutputStream osStream;
 	
 	private Map<String,Drawing> mappedDrawings;
+
+	private MSExcelOOXMLSignUtil signUtil;
 
 public MSExcelLowFootprintWriter(String excelFormat, HadoopOfficeWriteConfiguration howc) throws InvalidWriterConfigurationException {
 	boolean formatFound=MSExcelWriter.isSupportedFormat(excelFormat);
@@ -110,6 +123,16 @@ public MSExcelLowFootprintWriter(String excelFormat, HadoopOfficeWriteConfigurat
 		this.osStream=osStream;
 		this.currentWorkbook=new SecureSXSSFWorkbook(this.howc.getLowFootprintCacheRows(),this.encryptAlgorithmCipher,this.chainModeCipher);
 		this.mappedDrawings=new HashMap<>();	
+		if (this.howc.getSigKey()!=null) { // create temp file
+			LOG.info("Creating tempfile for signing");
+			// 
+			try {
+				this.signUtil= new MSExcelOOXMLSignUtil(this.osStream);
+			} catch (IOException e) {
+				LOG.error("Cannot create sign utilities "+e);
+				throw new OfficeWriterException(e.toString());
+			}
+		}
 	}
 
 	@Override
@@ -165,9 +188,14 @@ public MSExcelLowFootprintWriter(String excelFormat, HadoopOfficeWriteConfigurat
 
 	@Override
 	public void close() throws IOException {
+		
 		// store unencrypted
 		if (this.howc.getPassword()==null) {
-			this.currentWorkbook.write(this.osStream);
+			if (this.signUtil!=null) {
+				this.currentWorkbook.write(this.signUtil.getTempOutputStream());
+			} else {
+				this.currentWorkbook.write(this.osStream);
+			}
 		} else {
 			// encrypt if needed
 	
@@ -183,15 +211,49 @@ public MSExcelLowFootprintWriter(String excelFormat, HadoopOfficeWriteConfigurat
 				LOG.error(e);
 				throw new IOException(e);
 			}
-			fs.writeFilesystem(this.osStream);
-			if (this.osStream!=null) {
-				this.osStream.close();
+			if (this.signUtil!=null) {
+				fs.writeFilesystem(this.signUtil.getTempOutputStream());
+			} else {
+				fs.writeFilesystem(this.osStream);
+				if (this.osStream!=null) {
+					this.osStream.close();
+				}
+			}
+			
+
+			if (fs!=null) {
+				fs.close();
 			}
 		}
 		
 		this.currentWorkbook.dispose(); // this is needed to remove tempfiles
 		
+			try {
+				// do we need to sign => sign
+				if (this.signUtil!=null) {
+					// sign
+					LOG.info("Signing document \""+this.howc.getFileName()+"\"");
+					if (this.howc.getSigCertificate()==null) {
+						LOG.error("Cannot sign document \""+this.howc.getFileName()+"\". No certificate for key provided");
+					} else {
+					try {
+							this.signUtil.sign(this.howc.getSigKey(), this.howc.getSigCertificate(), this.howc.getPassword());
+					} catch (XMLSignatureException|MarshalException|IOException|FormatNotUnderstoodException e) {
+						LOG.error("Cannot sign document \""+this.howc.getFileName()+"\" "+e);
+					}
+						
+					}
+					
+				}
+				} finally {
+					if (this.signUtil!=null) {
+						this.signUtil.close();
+					}
+				}
+		
 	}
+	
+
 	/**
 	 * 
 	 * This class is inspired by https://bz.apache.org/bugzilla/show_bug.cgi?id=60321 to create - in case of encrypted excel - also use encrypted and compressed temporary files
@@ -278,7 +340,7 @@ public MSExcelLowFootprintWriter(String excelFormat, HadoopOfficeWriteConfigurat
 		
 		public void dispose() {
 			if (!this.tempFile.delete()) {
-				LOG.error("Could not delete temporary files");
+				LOG.warn("Could not delete temporary files");
 			}
 		}
 	}

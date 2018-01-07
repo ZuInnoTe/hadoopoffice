@@ -170,7 +170,7 @@ private HadoopOfficeReadConfiguration hocr;
 					SignatureInfo si = new SignatureInfo();
 					si.setSignatureConfig(sic);
 					if (!si.verifySignature()) {
-						throw new FormatNotUnderstoodException("Cannot verify signature of OOXML (.xlsx) file: "+this.hocr.getFileName());
+						throw new FormatNotUnderstoodException("Invalid signature of OOXML (.xlsx) file: "+this.hocr.getFileName());
 					} else {
 						LOG.info("Successfully verifed signature of OXXML (.xlsx) file: "+this.hocr.getFileName());
 					}
