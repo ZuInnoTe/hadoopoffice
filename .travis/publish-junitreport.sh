@@ -5,7 +5,7 @@ echo -e "Publishing test results...\n"
 
 # copy to home
 mkdir -p $HOME/fileformat/tests-latest
-cp -R fileformat/build/reports/tests $HOME/fileformat/tests-latest
+cp -R fileformat/build/test-results/junit-platform $HOME/fileformat/tests-latest
 
 # Get to the Travis build directory, configure git and clone the repo
 cd $HOME
