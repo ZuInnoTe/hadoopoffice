@@ -2785,7 +2785,7 @@ assertEquals("test3", ((SpreadSheetCellDAO)spreadSheetValue.get()[2]).getFormatt
 	job.set("hadoopoffice.write.security.sign.keystore.type", "PKCS12");
 	job.set("hadoopoffice.write.security.sign.keystore.password", "changeit");
 	job.set("hadoopoffice.write.security.sign.keystore.alias", "testalias");
-
+	job.set("hadoopoffice.write.security.sign.hash.algorithm", "sha512");
 	// write
 	ExcelFileOutputFormat outputFormat = new ExcelFileOutputFormat();
     	RecordWriter<NullWritable,SpreadSheetCellDAO> writer = outputFormat.getRecordWriter(null, job, fileName, null);
@@ -2924,6 +2924,7 @@ assertEquals("test3", ((SpreadSheetCellDAO)spreadSheetValue.get()[2]).getFormatt
 	job.set("hadoopoffice.write.security.sign.keystore.type", "PKCS12");
 	job.set("hadoopoffice.write.security.sign.keystore.password", "changeit");
 	job.set("hadoopoffice.write.security.sign.keystore.alias", "testalias");
+	job.set("hadoopoffice.write.security.sign.hash.algorithm", "sha512");
    	ExcelFileOutputFormat outputFormat = new ExcelFileOutputFormat();
     	RecordWriter<NullWritable,SpreadSheetCellDAO> writer = outputFormat.getRecordWriter(null, job, fileName, null);
 	assertNotNull(writer,"Format returned  null RecordWriter");
@@ -3069,6 +3070,7 @@ assertEquals("test3", ((SpreadSheetCellDAO)spreadSheetValue.get()[2]).getFormatt
 	job.set("hadoopoffice.write.security.sign.keystore.type", "PKCS12");
 	job.set("hadoopoffice.write.security.sign.keystore.password", "changeit");
 	job.set("hadoopoffice.write.security.sign.keystore.alias", "testalias");
+	job.set("hadoopoffice.write.security.sign.hash.algorithm", "sha512");
 	ExcelFileOutputFormat outputFormat = new ExcelFileOutputFormat();
     	RecordWriter<NullWritable,SpreadSheetCellDAO> writer = outputFormat.getRecordWriter(null, job, fileName, null);
 	assertNotNull(writer,"Format returned  null RecordWriter");
@@ -3201,6 +3203,7 @@ assertEquals("test3", ((SpreadSheetCellDAO)spreadSheetValue.get()[2]).getFormatt
 	job.set("hadoopoffice.write.security.sign.keystore.type", "PKCS12");
 	job.set("hadoopoffice.write.security.sign.keystore.password", "changeit");
 	job.set("hadoopoffice.write.security.sign.keystore.alias", "testalias");
+	job.set("hadoopoffice.write.security.sign.hash.algorithm", "sha512");
 	ExcelFileOutputFormat outputFormat = new ExcelFileOutputFormat();
     	RecordWriter<NullWritable,SpreadSheetCellDAO> writer = outputFormat.getRecordWriter(null, job, fileName, null);
 	assertNotNull(writer,"Format returned  null RecordWriter");
@@ -3330,6 +3333,7 @@ assertEquals("test3", ((SpreadSheetCellDAO)spreadSheetValue.get()[2]).getFormatt
 	job.set("hadoopoffice.write.security.sign.keystore.type", "PKCS12");
 	job.set("hadoopoffice.write.security.sign.keystore.password", "changeit");
 	job.set("hadoopoffice.write.security.sign.keystore.alias", "testalias");
+	job.set("hadoopoffice.write.security.sign.hash.algorithm", "sha512");
    	ExcelFileOutputFormat outputFormat = new ExcelFileOutputFormat();
     	RecordWriter<NullWritable,SpreadSheetCellDAO> writer = outputFormat.getRecordWriter(null, job, fileName, null);
 	assertNotNull(writer,"Format returned  null RecordWriter");

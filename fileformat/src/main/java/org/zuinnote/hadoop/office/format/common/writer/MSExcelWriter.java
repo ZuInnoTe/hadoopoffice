@@ -382,7 +382,7 @@ public void close() throws IOException {
 			LOG.warn("Signing of docuemnts in old Excel format not supported for \""+this.howc.getFileName()+"\"");
 		}else {
 		try {
-				this.signUtil.sign(this.howc.getSigKey(), this.howc.getSigCertificate(), this.howc.getPassword());
+				this.signUtil.sign(this.howc.getSigKey(), this.howc.getSigCertificate(), this.howc.getPassword(), MSExcelWriter.getHashAlgorithm(this.howc.getSigHash()));
 		} catch (XMLSignatureException|MarshalException|IOException|FormatNotUnderstoodException e) {
 			LOG.error("Cannot sign document \""+this.howc.getFileName()+"\" "+e);
 		}

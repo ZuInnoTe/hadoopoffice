@@ -4395,6 +4395,7 @@ assertEquals( "test3", ((SpreadSheetCellDAO)spreadSheetValue.get()[2]).getFormat
 	conf.set("hadoopoffice.write.security.sign.keystore.type", "PKCS12");
 	conf.set("hadoopoffice.write.security.sign.keystore.password", "changeit");
 	conf.set("hadoopoffice.write.security.sign.keystore.alias", "testalias");
+	conf.set("hadoopoffice.write.security.sign.hash.algorithm", "sha512");
 	conf.set(MRJobConfig.TASK_ATTEMPT_ID,attempt);
 	conf.setInt(MRJobConfig.APPLICATION_ATTEMPT_ID, 0);
  	conf.setInt(FileOutputCommitter.FILEOUTPUTCOMMITTER_ALGORITHM_VERSION,1);
@@ -4577,6 +4578,7 @@ assertEquals( "test3", ((SpreadSheetCellDAO)spreadSheetValue.get()[2]).getFormat
 	conf.set("hadoopoffice.write.security.sign.keystore.type", "PKCS12");
 	conf.set("hadoopoffice.write.security.sign.keystore.password", "changeit");
 	conf.set("hadoopoffice.write.security.sign.keystore.alias", "testalias");
+	conf.set("hadoopoffice.write.security.sign.hash.algorithm", "sha512");
 	conf.set(MRJobConfig.TASK_ATTEMPT_ID,attempt);
 	conf.setInt(MRJobConfig.APPLICATION_ATTEMPT_ID, 0);
  	conf.setInt(FileOutputCommitter.FILEOUTPUTCOMMITTER_ALGORITHM_VERSION,1);
@@ -4762,6 +4764,7 @@ assertEquals( "test3", ((SpreadSheetCellDAO)spreadSheetValue.get()[2]).getFormat
 	conf.set("hadoopoffice.write.security.sign.keystore.type", "PKCS12");
 	conf.set("hadoopoffice.write.security.sign.keystore.password", "changeit");
 	conf.set("hadoopoffice.write.security.sign.keystore.alias", "testalias");
+	conf.set("hadoopoffice.write.security.sign.hash.algorithm", "sha512");
 	conf.set(MRJobConfig.TASK_ATTEMPT_ID,attempt);
 	conf.setInt(MRJobConfig.APPLICATION_ATTEMPT_ID, 0);
  	conf.setInt(FileOutputCommitter.FILEOUTPUTCOMMITTER_ALGORITHM_VERSION,1);
@@ -4949,6 +4952,7 @@ assertEquals( "test3", ((SpreadSheetCellDAO)spreadSheetValue.get()[2]).getFormat
 	conf.set("hadoopoffice.write.security.sign.keystore.type", "PKCS12");
 	conf.set("hadoopoffice.write.security.sign.keystore.password", "changeit");
 	conf.set("hadoopoffice.write.security.sign.keystore.alias", "testalias");
+	conf.set("hadoopoffice.write.security.sign.hash.algorithm", "sha512");
 	conf.set(MRJobConfig.TASK_ATTEMPT_ID,attempt);
 	conf.setInt(MRJobConfig.APPLICATION_ATTEMPT_ID, 0);
  	conf.setInt(FileOutputCommitter.FILEOUTPUTCOMMITTER_ALGORITHM_VERSION,1);
@@ -5131,6 +5135,7 @@ assertEquals( "test3", ((SpreadSheetCellDAO)spreadSheetValue.get()[2]).getFormat
 	conf.set("hadoopoffice.write.security.sign.keystore.type", "PKCS12");
 	conf.set("hadoopoffice.write.security.sign.keystore.password", "changeit");
 	conf.set("hadoopoffice.write.security.sign.keystore.alias", "testalias");
+	conf.set("hadoopoffice.write.security.sign.hash.algorithm", "sha512");
 	conf.set(MRJobConfig.TASK_ATTEMPT_ID,attempt);
 	conf.setInt(MRJobConfig.APPLICATION_ATTEMPT_ID, 0);
  	conf.setInt(FileOutputCommitter.FILEOUTPUTCOMMITTER_ALGORITHM_VERSION,1);

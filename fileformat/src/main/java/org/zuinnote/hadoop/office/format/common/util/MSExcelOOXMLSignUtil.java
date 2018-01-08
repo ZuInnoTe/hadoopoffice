@@ -37,6 +37,7 @@ import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.poifs.crypt.Decryptor;
 import org.apache.poi.poifs.crypt.EncryptionInfo;
 import org.apache.poi.poifs.crypt.Encryptor;
+import org.apache.poi.poifs.crypt.HashAlgorithm;
 import org.apache.poi.poifs.crypt.dsig.SignatureConfig;
 import org.apache.poi.poifs.crypt.dsig.SignatureInfo;
 import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
@@ -78,19 +79,21 @@ public class MSExcelOOXMLSignUtil {
 	 * @param privateKey private Key for signing
 	 * @param x509 Certificate for private Key for signing
 	 * @param password optional password for encryption, if used
+	 * @param hashAlgorithm hash algorithm to be used
 	 * 
 	 * @throws MarshalException 
 	 * @throws XMLSignatureException 
 	 * @throws IOException 
 	 * @throws FormatNotUnderstoodException 
 	 */
-	public void sign(Key privateKey, X509Certificate x509, String password) throws XMLSignatureException, MarshalException, IOException, FormatNotUnderstoodException {
+	public void sign(Key privateKey, X509Certificate x509, String password, HashAlgorithm hashAlgorithm) throws XMLSignatureException, MarshalException, IOException, FormatNotUnderstoodException {
 		if (this.tempSignFileOS!=null) { // close it we sign only a closed temporary file
 			this.tempSignFileOS.close();
 		}
 		SignatureConfig sc = new SignatureConfig();
 		sc.setKey((PrivateKey)privateKey);
 		sc.setSigningCertificateChain(Collections.singletonList(x509));
+		sc.setDigestAlgo(hashAlgorithm);
 		FileInputStream tempSignFileIS = null;
 		try {
 			

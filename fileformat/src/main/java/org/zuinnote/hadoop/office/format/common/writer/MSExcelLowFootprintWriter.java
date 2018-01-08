@@ -237,7 +237,7 @@ public MSExcelLowFootprintWriter(String excelFormat, HadoopOfficeWriteConfigurat
 						LOG.error("Cannot sign document \""+this.howc.getFileName()+"\". No certificate for key provided");
 					} else {
 					try {
-							this.signUtil.sign(this.howc.getSigKey(), this.howc.getSigCertificate(), this.howc.getPassword());
+							this.signUtil.sign(this.howc.getSigKey(), this.howc.getSigCertificate(), this.howc.getPassword(), MSExcelWriter.getHashAlgorithm(this.howc.getSigHash()));
 					} catch (XMLSignatureException|MarshalException|IOException|FormatNotUnderstoodException e) {
 						LOG.error("Cannot sign document \""+this.howc.getFileName()+"\" "+e);
 					}
