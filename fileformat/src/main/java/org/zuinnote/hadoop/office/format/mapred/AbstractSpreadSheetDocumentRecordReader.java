@@ -168,13 +168,13 @@ private void readKeyStore(Configuration conf) throws IOException, FormatNotUnder
 		HadoopKeyStoreManager hksm = new HadoopKeyStoreManager(conf);
 		try {
 			hksm.openKeyStore(new Path(this.hocr.getCryptKeystoreFile()), this.hocr.getCryptKeystoreType(), this.hocr.getCryptKeystorePassword());
-			String password="";
+			String pw="";
 			if ((this.hocr.getCryptKeystoreAlias()!=null) && (!"".equals(this.hocr.getCryptKeystoreAlias()))) {
-				password=hksm.getPassword(this.hocr.getCryptKeystoreAlias(), this.hocr.getCryptKeystorePassword());
+				pw=hksm.getPassword(this.hocr.getCryptKeystoreAlias(), this.hocr.getCryptKeystorePassword());
 			} else {
-				password=hksm.getPassword(this.hocr.getFileName(), this.hocr.getCryptKeystorePassword());
+				pw=hksm.getPassword(this.hocr.getFileName(), this.hocr.getCryptKeystorePassword());
 			}
-			this.hocr.setPassword(password);
+			this.hocr.setPassword(pw);
 		} catch (NoSuchAlgorithmException | CertificateException | KeyStoreException | IllegalArgumentException | UnrecoverableEntryException | InvalidKeySpecException e) {
 			LOG.error(e);
 			throw new FormatNotUnderstoodException("Cannot read keystore to obtain credentials to access encrypted documents "+e);
