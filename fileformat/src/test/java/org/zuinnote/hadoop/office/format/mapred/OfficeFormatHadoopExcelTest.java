@@ -3170,6 +3170,122 @@ assertEquals("test3", ((SpreadSheetCellDAO)spreadSheetValue.get()[2]).getFormatt
 	assertNull(reader,"Format returned  null RecordReader, because no signature present");
 	    }
 
+    
+    @Test
+    public void writeExcelOutputFormatExcel2013SingleSheetLowFootPrintSignedPositiveReadLowFootprint() throws IOException {
+	// one row string and three columns ("test1","test2","test3")
+	// (String formattedValue, String comment, String formula, String address,String sheetName)
+	SpreadSheetCellDAO a1 = new SpreadSheetCellDAO("test1","","","A1","Sheet1");
+	SpreadSheetCellDAO b1 = new SpreadSheetCellDAO("test2","","","B1","Sheet1");
+	SpreadSheetCellDAO c1 = new SpreadSheetCellDAO("test3","","","C1","Sheet1");
+
+	// write
+	JobConf job = new JobConf(defaultConf);
+    	String fileName="excel2013singlesheettestoutlowfootprintsignedpositivereadlowfootprint";
+    	String tmpDir=tmpPath.toString();	
+    	Path outputPath = new Path(tmpDir);
+    	FileOutputFormat.setOutputPath(job, outputPath);
+	// set generic outputformat settings
+	job.set(JobContext.TASK_ATTEMPT_ID, attempt);
+	// set locale to the one of the test data
+	job.set("hadoopoffice.read.locale.bcp47","de");
+	// low footprint
+	job.set("hadoopoffice.write.lowFootprint", "true");
+	job.set("hadoopoffice.write.mimeType","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new Excel format, anyway default, but here for illustrative purposes
+   	/// signature
+	String pkFileName="testsigning.pfx"; // private key
+	ClassLoader classLoader = getClass().getClassLoader();
+	String fileNameKeyStore=classLoader.getResource(pkFileName).getFile();	
+
+	job.set("hadoopoffice.write.security.sign.keystore.file", fileNameKeyStore);
+	job.set("hadoopoffice.write.security.sign.keystore.type", "PKCS12");
+	job.set("hadoopoffice.write.security.sign.keystore.password", "changeit");
+	job.set("hadoopoffice.write.security.sign.keystore.alias", "testalias");
+	ExcelFileOutputFormat outputFormat = new ExcelFileOutputFormat();
+    	RecordWriter<NullWritable,SpreadSheetCellDAO> writer = outputFormat.getRecordWriter(null, job, fileName, null);
+	assertNotNull(writer,"Format returned  null RecordWriter");
+	writer.write(null,a1);
+	writer.write(null,b1);
+	writer.write(null,c1);
+	writer.close(reporter);
+	// try to read it again
+	job = new JobConf(defaultConf);
+	Path inputFile = new Path(tmpDir+File.separator+"_temporary"+File.separator+"0"+File.separator+"_temporary"+File.separator+attempt+File.separator+fileName+".xlsx");
+    	FileInputFormat.setInputPaths(job, inputFile);
+	// set locale to the one of the test data
+	job.set("hadoopoffice.read.locale.bcp47","de");
+
+	// low footprint
+
+	job.set("hadoopoffice.read.lowFootprint", "true");
+	job.set("hadoopoffice.read.security.sign.verifysignature", "true");
+   	ExcelFileInputFormat inputFormat = new ExcelFileInputFormat();
+    	inputFormat.configure(job);
+    	InputSplit[] inputSplits = inputFormat.getSplits(job,1);
+    	assertEquals(1,inputSplits.length,"Only one split generated for Excel file");
+    	RecordReader<Text, ArrayWritable> reader = inputFormat.getRecordReader(inputSplits[0], job, reporter);
+	assertNotNull(reader,"Format returned  null RecordReader");
+	Text spreadSheetKey = new Text();	
+	ArrayWritable spreadSheetValue = new ArrayWritable(SpreadSheetCellDAO.class);
+	assertTrue(reader.next(spreadSheetKey,spreadSheetValue),"Input Split for Excel file contains row 1");	
+	assertEquals("["+fileName+".xlsx]Sheet1!A1",spreadSheetKey.toString(),"Input Split for Excel file has keyname == \"["+fileName+".xlsx]Sheet1!A1\"");
+	assertEquals(3,spreadSheetValue.get().length,"Input Split for Excel file contains row 1 with 3 columns");
+	assertEquals("test1",((SpreadSheetCellDAO)spreadSheetValue.get()[0]).getFormattedValue(),"Input Split for Excel file contains row 1 with cell 1 == \"test1\"");
+	assertEquals("test2",((SpreadSheetCellDAO)spreadSheetValue.get()[1]).getFormattedValue(),"Input Split for Excel file contains row 1 with cell 2 == \"test2\"");
+	assertEquals("test3",((SpreadSheetCellDAO)spreadSheetValue.get()[2]).getFormattedValue(),"Input Split for Excel file contains row 1 with cell 3 == \"test3\"");
+
+
+    }
+    
+    @Test
+    public void writeExcelOutputFormatExcel2013SingleSheetLowFootPrintSignedNegativeReadLowFootprint() throws IOException {
+	// one row string and three columns ("test1","test2","test3")
+	// (String formattedValue, String comment, String formula, String address,String sheetName)
+	SpreadSheetCellDAO a1 = new SpreadSheetCellDAO("test1","","","A1","Sheet1");
+	SpreadSheetCellDAO b1 = new SpreadSheetCellDAO("test2","","","B1","Sheet1");
+	SpreadSheetCellDAO c1 = new SpreadSheetCellDAO("test3","","","C1","Sheet1");
+
+	// write
+	JobConf job = new JobConf(defaultConf);
+    	String fileName="excel2013singlesheettestoutlowfootprintsignednegativereadlowfootprint";
+    	String tmpDir=tmpPath.toString();	
+    	Path outputPath = new Path(tmpDir);
+    	FileOutputFormat.setOutputPath(job, outputPath);
+	// set generic outputformat settings
+	job.set(JobContext.TASK_ATTEMPT_ID, attempt);
+	// set locale to the one of the test data
+	job.set("hadoopoffice.read.locale.bcp47","de");
+	// low footprint
+	job.set("hadoopoffice.write.lowFootprint", "true");
+	job.set("hadoopoffice.write.mimeType","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new Excel format, anyway default, but here for illustrative purposes
+	ExcelFileOutputFormat outputFormat = new ExcelFileOutputFormat();
+    	RecordWriter<NullWritable,SpreadSheetCellDAO> writer = outputFormat.getRecordWriter(null, job, fileName, null);
+	assertNotNull(writer,"Format returned  null RecordWriter");
+	writer.write(null,a1);
+	writer.write(null,b1);
+	writer.write(null,c1);
+	writer.close(reporter);
+	// try to read it again
+	job = new JobConf(defaultConf);
+	Path inputFile = new Path(tmpDir+File.separator+"_temporary"+File.separator+"0"+File.separator+"_temporary"+File.separator+attempt+File.separator+fileName+".xlsx");
+    	FileInputFormat.setInputPaths(job, inputFile);
+	// set locale to the one of the test data
+	job.set("hadoopoffice.read.locale.bcp47","de");
+
+	// low footprint
+
+	job.set("hadoopoffice.read.lowFootprint", "true");
+	job.set("hadoopoffice.read.security.sign.verifysignature", "true"); // will fail no signature provided
+   	ExcelFileInputFormat inputFormat = new ExcelFileInputFormat();
+    	inputFormat.configure(job);
+    	InputSplit[] inputSplits = inputFormat.getSplits(job,1);
+    	assertEquals(1,inputSplits.length,"Only one split generated for Excel file");
+    	RecordReader<Text, ArrayWritable> reader = inputFormat.getRecordReader(inputSplits[0], job, reporter);
+    	assertNull(reader,"Format returned  null RecordReader, because no signature present");
+
+
+    }
+    
     @Test
     public void writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveLowFootprintSignedPositive() throws IOException {
 	// one row string and three columns ("test1","test2","test3")
