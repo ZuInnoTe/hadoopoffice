@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<testsuite name="JUnit Jupiter" tests="180" skipped="4" failures="0" errors="0" time="19.553" hostname="travis-job-b97846b4-17dc-4788-b0f7-f09446787c85" timestamp="2018-01-08T22:55:38">
+<testsuite name="JUnit Jupiter" tests="180" skipped="4" failures="0" errors="0" time="18.49" hostname="travis-job-zuinnote-hadoopoffice-327447315.travisci.net" timestamp="2018-01-10T22:39:22">
 <properties>
 <property name="awt.toolkit" value="sun.awt.X11.XToolkit"/>
 <property name="file.encoding" value="UTF-8"/>
@@ -33,7 +33,7 @@
 <property name="line.separator" value="&#xa;"/>
 <property name="os.arch" value="amd64"/>
 <property name="os.name" value="Linux"/>
-<property name="os.version" value="4.4.0-101-generic"/>
+<property name="os.version" value="4.14.12-041412-generic"/>
 <property name="path.separator" value=":"/>
 <property name="sun.arch.data.model" value="64"/>
 <property name="sun.boot.class.path" value="/usr/lib/jvm/java-8-oracle/jre/lib/resources.jar:/usr/lib/jvm/java-8-oracle/jre/lib/rt.jar:/usr/lib/jvm/java-8-oracle/jre/lib/sunrsasign.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jsse.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jce.jar:/usr/lib/jvm/java-8-oracle/jre/lib/charsets.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jfr.jar:/usr/lib/jvm/java-8-oracle/jre/classes"/>
@@ -55,585 +55,55 @@
 <property name="user.timezone" value="UTC"/>
 <property name="user.variant" value=""/>
 </properties>
-<testcase name="readExcelInputFormat()" classname="org.zuinnote.hadoop.office.format.common.OfficeReaderTest" time="0.016">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.common.OfficeReaderTest]/[method:readExcelInputFormat()]
-display-name: readExcelInputFormat()
-]]></system-out>
-</testcase>
-<testcase name="createKeyStoreforPasswords()" classname="org.zuinnote.hadoop.office.format.common.HadoopKeyStoreManagerTest" time="0.871">
+<testcase name="createKeyStoreforPasswords()" classname="org.zuinnote.hadoop.office.format.common.HadoopKeyStoreManagerTest" time="0.985">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.common.HadoopKeyStoreManagerTest]/[method:createKeyStoreforPasswords()]
 display-name: createKeyStoreforPasswords()
 ]]></system-out>
 </testcase>
-<testcase name="getPrivateKeyAndCertificate()" classname="org.zuinnote.hadoop.office.format.common.HadoopKeyStoreManagerTest" time="0.027">
+<testcase name="getPrivateKeyAndCertificate()" classname="org.zuinnote.hadoop.office.format.common.HadoopKeyStoreManagerTest" time="0.033">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.common.HadoopKeyStoreManagerTest]/[method:getPrivateKeyAndCertificate()]
 display-name: getPrivateKeyAndCertificate()
 ]]></system-out>
 </testcase>
-<testcase name="loadExistingKeyStore()" classname="org.zuinnote.hadoop.office.format.common.HadoopKeyStoreManagerTest" time="0.006">
+<testcase name="loadExistingKeyStore()" classname="org.zuinnote.hadoop.office.format.common.HadoopKeyStoreManagerTest" time="0.012">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.common.HadoopKeyStoreManagerTest]/[method:loadExistingKeyStore()]
 display-name: loadExistingKeyStore()
 ]]></system-out>
 </testcase>
-<testcase name="checkKeystoreAvailable()" classname="org.zuinnote.hadoop.office.format.common.HadoopKeyStoreManagerTest" time="0.004">
+<testcase name="checkKeystoreAvailable()" classname="org.zuinnote.hadoop.office.format.common.HadoopKeyStoreManagerTest" time="0.006">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.common.HadoopKeyStoreManagerTest]/[method:checkKeystoreAvailable()]
 display-name: checkKeystoreAvailable()
 ]]></system-out>
 </testcase>
-<testcase name="checkTestExcel2013MultiSheetAvailable()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.001">
+<testcase name="readExcelInputFormat()" classname="org.zuinnote.hadoop.office.format.common.OfficeReaderTest" time="0">
 <system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2013MultiSheetAvailable()]
-display-name: checkTestExcel2013MultiSheetAvailable()
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.common.OfficeReaderTest]/[method:readExcelInputFormat()]
+display-name: readExcelInputFormat()
 ]]></system-out>
 </testcase>
-<testcase name="readExcelInputFormatExcel2013SingleSheet()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="1.413">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013SingleSheet()]
-display-name: readExcelInputFormatExcel2013SingleSheet()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveSignedPositive()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="2.865">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveSignedPositive()]
-display-name: writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveSignedPositive()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchAllPositive()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.236">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchAllPositive()]
-display-name: writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchAllPositive()
-]]></system-out>
-</testcase>
-<testcase name="checkTestExcel2003LinkedWorkbook1()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.001">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2003LinkedWorkbook1()]
-display-name: checkTestExcel2003LinkedWorkbook1()
-]]></system-out>
-</testcase>
-<testcase name="checkTestExcel2003LinkedWorkbook2()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2003LinkedWorkbook2()]
-display-name: checkTestExcel2003LinkedWorkbook2()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveSignedNegative()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.404">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveSignedNegative()]
-display-name: writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveSignedNegative()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetTwoLinkedWorkbooks()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0">
-<skipped><![CDATA[This does not work yet due to a bug in Apache POI that prevents writing correct workbooks containing external references: https://bz.apache.org/bugzilla/show_bug.cgi?id=57184]]></skipped>
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetTwoLinkedWorkbooks()]
-display-name: writeExcelOutputFormatExcel2013SingleSheetTwoLinkedWorkbooks()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchAllNegative()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.125">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchAllNegative()]
-display-name: writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchAllNegative()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetEncryptedKeyStorePositive()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.371">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetEncryptedKeyStorePositive()]
-display-name: writeExcelOutputFormatExcel2013SingleSheetEncryptedKeyStorePositive()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetComment()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.554">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetComment()]
-display-name: writeExcelOutputFormatExcel2013SingleSheetComment()
-]]></system-out>
-</testcase>
-<testcase name="readExcelInputFormatExcel2003MultiSheetAllLowFootPrint()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.215">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2003MultiSheetAllLowFootPrint()]
-display-name: readExcelInputFormatExcel2003MultiSheetAllLowFootPrint()
-]]></system-out>
-</testcase>
-<testcase name="readExcelInputFormatExcel2003SingleSheet()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.101">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2003SingleSheet()]
-display-name: readExcelInputFormatExcel2003SingleSheet()
-]]></system-out>
-</testcase>
-<testcase name="checkTestExcel2003MainWorkbook()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2003MainWorkbook()]
-display-name: checkTestExcel2003MainWorkbook()
-]]></system-out>
-</testcase>
-<testcase name="checkTestExcel2013MultiSheetGzipAvailable()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.001">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2013MultiSheetGzipAvailable()]
-display-name: checkTestExcel2013MultiSheetGzipAvailable()
-]]></system-out>
-</testcase>
-<testcase name="readExcelInputFormatExcel2013LinkedWorkbook()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.092">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013LinkedWorkbook()]
-display-name: readExcelInputFormatExcel2013LinkedWorkbook()
-]]></system-out>
-</testcase>
-<testcase name="readExcelInputFormatExcel2003SingleSheetEncryptedNegativeLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.016">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2003SingleSheetEncryptedNegativeLowFootprint()]
-display-name: readExcelInputFormatExcel2003SingleSheetEncryptedNegativeLowFootprint()
-]]></system-out>
-</testcase>
-<testcase name="readExcelInputFormatExcel2013SingleSheetEncryptedNegativeLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.045">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013SingleSheetEncryptedNegativeLowFootprint()]
-display-name: readExcelInputFormatExcel2013SingleSheetEncryptedNegativeLowFootprint()
-]]></system-out>
-</testcase>
-<testcase name="readExcelInputFormatExcel2013SingleSheetEncryptedKeyStoreAliasPositive()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.055">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013SingleSheetEncryptedKeyStoreAliasPositive()]
-display-name: readExcelInputFormatExcel2013SingleSheetEncryptedKeyStoreAliasPositive()
-]]></system-out>
-</testcase>
-<testcase name="readExcelInputFormatExcel2003LinkedWorkbook()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.029">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2003LinkedWorkbook()]
-display-name: readExcelInputFormatExcel2003LinkedWorkbook()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchOncePositive()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.138">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchOncePositive()]
-display-name: writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchOncePositive()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetLowFootprintSignedNegativeReadLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.59">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetLowFootprintSignedNegativeReadLowFootprint()]
-display-name: writeExcelOutputFormatExcel2013SingleSheetLowFootprintSignedNegativeReadLowFootprint()
-]]></system-out>
-</testcase>
-<testcase name="checkTestExcel2003EmptySheetAvailable()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.004">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2003EmptySheetAvailable()]
-display-name: checkTestExcel2003EmptySheetAvailable()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetGZipCompressed()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.1">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetGZipCompressed()]
-display-name: writeExcelOutputFormatExcel2013SingleSheetGZipCompressed()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchOnceNegative()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.035">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchOnceNegative()]
-display-name: writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchOnceNegative()
-]]></system-out>
-</testcase>
-<testcase name="readExcelInputFormatExcel2013MultiSheetAllLowFootPrint()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.038">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013MultiSheetAllLowFootPrint()]
-display-name: readExcelInputFormatExcel2013MultiSheetAllLowFootPrint()
-]]></system-out>
-</testcase>
-<testcase name="checkTestExcel2013EmptySheetAvailable()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.002">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2013EmptySheetAvailable()]
-display-name: checkTestExcel2013EmptySheetAvailable()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2003SingleSheetEncryptedPositiveLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.081">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2003SingleSheetEncryptedPositiveLowFootprint()]
-display-name: writeExcelOutputFormatExcel2003SingleSheetEncryptedPositiveLowFootprint()
-]]></system-out>
-</testcase>
-<testcase name="readExcelInputFormatExcel2013MultiSheetSelectedSheet()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.035">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013MultiSheetSelectedSheet()]
-display-name: readExcelInputFormatExcel2013MultiSheetSelectedSheet()
-]]></system-out>
-</testcase>
-<testcase name="checkTestExcel2013LinkedWorkbook1()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2013LinkedWorkbook1()]
-display-name: checkTestExcel2013LinkedWorkbook1()
-]]></system-out>
-</testcase>
-<testcase name="checkTestExcel2013LinkedWorkbook2()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2013LinkedWorkbook2()]
-display-name: checkTestExcel2013LinkedWorkbook2()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.327">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveLowFootprint()]
-display-name: writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveLowFootprint()
-]]></system-out>
-</testcase>
-<testcase name="readExcelInputFormatBzip2CompressedExcel2013MultiSheetAll()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.041">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatBzip2CompressedExcel2013MultiSheetAll()]
-display-name: readExcelInputFormatBzip2CompressedExcel2013MultiSheetAll()
-]]></system-out>
-</testcase>
-<testcase name="readExcelInputFormatExcel2003EmptyRowsLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.007">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2003EmptyRowsLowFootprint()]
-display-name: readExcelInputFormatExcel2003EmptyRowsLowFootprint()
-]]></system-out>
-</testcase>
-<testcase name="checkTestExcel2013TemplateAvailable()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2013TemplateAvailable()]
-display-name: checkTestExcel2013TemplateAvailable()
-]]></system-out>
-</testcase>
-<testcase name="readExcelInputFormatExcel2013SingleSheetLowFootPrint()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.012">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013SingleSheetLowFootPrint()]
-display-name: readExcelInputFormatExcel2013SingleSheetLowFootPrint()
-]]></system-out>
-</testcase>
-<testcase name="checkTestExcel2003SingleSheetAvailable()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2003SingleSheetAvailable()]
-display-name: checkTestExcel2003SingleSheetAvailable()
-]]></system-out>
-</testcase>
-<testcase name="readExcelInputFormatGzipCompressedExcel2013MultiSheetAll()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.021">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatGzipCompressedExcel2013MultiSheetAll()]
-display-name: readExcelInputFormatGzipCompressedExcel2013MultiSheetAll()
-]]></system-out>
-</testcase>
-<testcase name="checkTestExcel2013EmptyRows()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2013EmptyRows()]
-display-name: checkTestExcel2013EmptyRows()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2003SingleSheetOneLinkedWorkbook()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.106">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2003SingleSheetOneLinkedWorkbook()]
-display-name: writeExcelOutputFormatExcel2003SingleSheetOneLinkedWorkbook()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetOneLinkedWorkbook()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0">
-<skipped><![CDATA[This does not work yet due to a bug in Apache POI that prevents writing correct workbooks containing external references: https://bz.apache.org/bugzilla/show_bug.cgi?id=57184]]></skipped>
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetOneLinkedWorkbook()]
-display-name: writeExcelOutputFormatExcel2013SingleSheetOneLinkedWorkbook()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2013TemplateEncryptedSingleSheetPositive()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.222">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013TemplateEncryptedSingleSheetPositive()]
-display-name: writeExcelOutputFormatExcel2013TemplateEncryptedSingleSheetPositive()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveLowFootprintSignedPositive()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.626">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveLowFootprintSignedPositive()]
-display-name: writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveLowFootprintSignedPositive()
-]]></system-out>
-</testcase>
-<testcase name="readExcelInputFormatExcel2003SingleSheetEncryptedPositive()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.007">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2003SingleSheetEncryptedPositive()]
-display-name: readExcelInputFormatExcel2003SingleSheetEncryptedPositive()
-]]></system-out>
-</testcase>
-<testcase name="readExcelInputFormatExcel2013SingleSheetEncryptedPositive()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.043">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013SingleSheetEncryptedPositive()]
-display-name: readExcelInputFormatExcel2013SingleSheetEncryptedPositive()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2003SingleSheetEncryptedPositive()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.062">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2003SingleSheetEncryptedPositive()]
-display-name: writeExcelOutputFormatExcel2003SingleSheetEncryptedPositive()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetEncryptedPositive()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.322">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetEncryptedPositive()]
-display-name: writeExcelOutputFormatExcel2013SingleSheetEncryptedPositive()
-]]></system-out>
-</testcase>
-<testcase name="readExcelInputFormatExcel2013SingleSheetEncryptedKeyStorePositive()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.044">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013SingleSheetEncryptedKeyStorePositive()]
-display-name: readExcelInputFormatExcel2013SingleSheetEncryptedKeyStorePositive()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2013TemplateEncryptedSingleSheetNegative()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.209">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013TemplateEncryptedSingleSheetNegative()]
-display-name: writeExcelOutputFormatExcel2013TemplateEncryptedSingleSheetNegative()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2013TemplateSingleSheet()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.082">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013TemplateSingleSheet()]
-display-name: writeExcelOutputFormatExcel2013TemplateSingleSheet()
-]]></system-out>
-</testcase>
-<testcase name="readExcelInputFormatExcel2013MultiSheetAll()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.029">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013MultiSheetAll()]
-display-name: readExcelInputFormatExcel2013MultiSheetAll()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveLowFootprintSignedNegative()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.277">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveLowFootprintSignedNegative()]
-display-name: writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveLowFootprintSignedNegative()
-]]></system-out>
-</testcase>
-<testcase name="checkTestExcel2013CommentAvailable()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2013CommentAvailable()]
-display-name: checkTestExcel2013CommentAvailable()
-]]></system-out>
-</testcase>
-<testcase name="readExcelInputFormatExcel2003SingleSheetEncryptedNegative()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.004">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2003SingleSheetEncryptedNegative()]
-display-name: readExcelInputFormatExcel2003SingleSheetEncryptedNegative()
-]]></system-out>
-</testcase>
-<testcase name="readExcelInputFormatExcel2013SingleSheetEncryptedNegative()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.043">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013SingleSheetEncryptedNegative()]
-display-name: readExcelInputFormatExcel2013SingleSheetEncryptedNegative()
-]]></system-out>
-</testcase>
-<testcase name="readExcelInputFormatExcel2003Empty()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.011">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2003Empty()]
-display-name: readExcelInputFormatExcel2003Empty()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2003SingleSheetEncryptedNegative()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.037">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2003SingleSheetEncryptedNegative()]
-display-name: writeExcelOutputFormatExcel2003SingleSheetEncryptedNegative()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetEncryptedNegative()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.304">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetEncryptedNegative()]
-display-name: writeExcelOutputFormatExcel2013SingleSheetEncryptedNegative()
-]]></system-out>
-</testcase>
-<testcase name="checkTestExcel2013LinkedWorkbooksLink2Available()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.001">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2013LinkedWorkbooksLink2Available()]
-display-name: checkTestExcel2013LinkedWorkbooksLink2Available()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchOncePositive()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.047">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchOncePositive()]
-display-name: writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchOncePositive()
-]]></system-out>
-</testcase>
-<testcase name="checkTestExcel2013TemplateEncryptedAvailable()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.001">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2013TemplateEncryptedAvailable()]
-display-name: checkTestExcel2013TemplateEncryptedAvailable()
-]]></system-out>
-</testcase>
-<testcase name="readExcelInputFormatExcel2013EmptyRowsLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.018">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013EmptyRowsLowFootprint()]
-display-name: readExcelInputFormatExcel2013EmptyRowsLowFootprint()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.077">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetLowFootprint()]
-display-name: writeExcelOutputFormatExcel2013SingleSheetLowFootprint()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchOnceNegative()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.075">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchOnceNegative()]
-display-name: writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchOnceNegative()
-]]></system-out>
-</testcase>
-<testcase name="checkTestExcel2013LinkedWorkbooksLink1Available()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2013LinkedWorkbooksLink1Available()]
-display-name: checkTestExcel2013LinkedWorkbooksLink1Available()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetSignedPositive()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.192">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetSignedPositive()]
-display-name: writeExcelOutputFormatExcel2013SingleSheetSignedPositive()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheet()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.052">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheet()]
-display-name: writeExcelOutputFormatExcel2013SingleSheet()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetEncryptedKeyStoreAliasPositive()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.327">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetEncryptedKeyStoreAliasPositive()]
-display-name: writeExcelOutputFormatExcel2013SingleSheetEncryptedKeyStoreAliasPositive()
-]]></system-out>
-</testcase>
-<testcase name="readExcelInputFormatExcel2013Comment()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.022">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013Comment()]
-display-name: readExcelInputFormatExcel2013Comment()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetSignedNegative()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.038">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetSignedNegative()]
-display-name: writeExcelOutputFormatExcel2013SingleSheetSignedNegative()
-]]></system-out>
-</testcase>
-<testcase name="readExcelInputFormatExcel2003SingleSheetEncryptedPositiveLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.009">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2003SingleSheetEncryptedPositiveLowFootprint()]
-display-name: readExcelInputFormatExcel2003SingleSheetEncryptedPositiveLowFootprint()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetEncryptedNegativeLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.433">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetEncryptedNegativeLowFootprint()]
-display-name: writeExcelOutputFormatExcel2013SingleSheetEncryptedNegativeLowFootprint()
-]]></system-out>
-</testcase>
-<testcase name="readExcelInputFormatExcel2013Empty()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.008">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013Empty()]
-display-name: readExcelInputFormatExcel2013Empty()
-]]></system-out>
-</testcase>
-<testcase name="checkTestExcel2013LinkedWorkbooksAvailable()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.001">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2013LinkedWorkbooksAvailable()]
-display-name: checkTestExcel2013LinkedWorkbooksAvailable()
-]]></system-out>
-</testcase>
-<testcase name="readExcelInputFormatExcel2013SingleSheetEncryptedPositiveLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.035">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013SingleSheetEncryptedPositiveLowFootprint()]
-display-name: readExcelInputFormatExcel2013SingleSheetEncryptedPositiveLowFootprint()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetLowFootprintSignedPositiveReadLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.167">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetLowFootprintSignedPositiveReadLowFootprint()]
-display-name: writeExcelOutputFormatExcel2013SingleSheetLowFootprintSignedPositiveReadLowFootprint()
-]]></system-out>
-</testcase>
-<testcase name="readExcelInputFormatExcel2003SingleSheetLowFootPrint()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.016">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2003SingleSheetLowFootPrint()]
-display-name: readExcelInputFormatExcel2003SingleSheetLowFootPrint()
-]]></system-out>
-</testcase>
-<testcase name="checkTestExcel2003EmptyRows()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.001">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2003EmptyRows()]
-display-name: checkTestExcel2003EmptyRows()
-]]></system-out>
-</testcase>
-<testcase name="checkTestExcel2013MultiSheetBzip2Available()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2013MultiSheetBzip2Available()]
-display-name: checkTestExcel2013MultiSheetBzip2Available()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetLowFootprintSignedPositive()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.15">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetLowFootprintSignedPositive()]
-display-name: writeExcelOutputFormatExcel2013SingleSheetLowFootprintSignedPositive()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchAllPositive()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.025">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchAllPositive()]
-display-name: writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchAllPositive()
-]]></system-out>
-</testcase>
-<testcase name="readExcelInputFormatExcel2013EmptyRows()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.02">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013EmptyRows()]
-display-name: readExcelInputFormatExcel2013EmptyRows()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2013MultiSheet()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.063">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013MultiSheet()]
-display-name: writeExcelOutputFormatExcel2013MultiSheet()
-]]></system-out>
-</testcase>
-<testcase name="checkTestExcel2013SingleSheetAvailable()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.001">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2013SingleSheetAvailable()]
-display-name: checkTestExcel2013SingleSheetAvailable()
-]]></system-out>
-</testcase>
-<testcase name="checkTestExcel2013MainWorkbook()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2013MainWorkbook()]
-display-name: checkTestExcel2013MainWorkbook()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2003SingleSheetTwoLinkedWorkbooks()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.106">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2003SingleSheetTwoLinkedWorkbooks()]
-display-name: writeExcelOutputFormatExcel2003SingleSheetTwoLinkedWorkbooks()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetLowFootprintSignedNegative()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.043">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetLowFootprintSignedNegative()]
-display-name: writeExcelOutputFormatExcel2013SingleSheetLowFootprintSignedNegative()
-]]></system-out>
-</testcase>
-<testcase name="writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchAllNegative()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.023">
-<system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchAllNegative()]
-display-name: writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchAllNegative()
-]]></system-out>
-</testcase>
-<testcase name="checkTestExcel2013MultiSheetAvailable()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0">
+<testcase name="checkTestExcel2013MultiSheetAvailable()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.001">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2013MultiSheetAvailable()]
 display-name: checkTestExcel2013MultiSheetAvailable()
 ]]></system-out>
 </testcase>
-<testcase name="readExcelInputFormatExcel2013SingleSheet()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.031">
+<testcase name="readExcelInputFormatExcel2013SingleSheet()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="1.57">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013SingleSheet()]
 display-name: readExcelInputFormatExcel2013SingleSheet()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveSignedPositive()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.593">
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveSignedPositive()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="2.323">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveSignedPositive()]
 display-name: writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveSignedPositive()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchAllPositive()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.034">
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchAllPositive()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.171">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchAllPositive()]
 display-name: writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchAllPositive()
@@ -651,7 +121,7 @@ unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapre
 display-name: checkTestExcel2003LinkedWorkbook2()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveSignedNegative()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.264">
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveSignedNegative()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.242">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveSignedNegative()]
 display-name: writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveSignedNegative()
@@ -664,37 +134,37 @@ unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapre
 display-name: writeExcelOutputFormatExcel2013SingleSheetTwoLinkedWorkbooks()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchAllNegative()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.038">
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchAllNegative()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.06">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchAllNegative()]
 display-name: writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchAllNegative()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetEncryptedKeyStorePositive()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.277">
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetEncryptedKeyStorePositive()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.339">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetEncryptedKeyStorePositive()]
 display-name: writeExcelOutputFormatExcel2013SingleSheetEncryptedKeyStorePositive()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetComment()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.046">
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetComment()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.536">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetComment()]
 display-name: writeExcelOutputFormatExcel2013SingleSheetComment()
 ]]></system-out>
 </testcase>
-<testcase name="readExcelInputFormatExcel2003MultiSheetAllLowFootPrint()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.009">
+<testcase name="readExcelInputFormatExcel2003MultiSheetAllLowFootPrint()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.328">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2003MultiSheetAllLowFootPrint()]
 display-name: readExcelInputFormatExcel2003MultiSheetAllLowFootPrint()
 ]]></system-out>
 </testcase>
-<testcase name="readExcelInputFormatExcel2003SingleSheet()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.013">
+<testcase name="readExcelInputFormatExcel2003SingleSheet()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.151">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2003SingleSheet()]
 display-name: readExcelInputFormatExcel2003SingleSheet()
 ]]></system-out>
 </testcase>
-<testcase name="checkTestExcel2003MainWorkbook()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.003">
+<testcase name="checkTestExcel2003MainWorkbook()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.002">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2003MainWorkbook()]
 display-name: checkTestExcel2003MainWorkbook()
@@ -706,97 +176,97 @@ unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapre
 display-name: checkTestExcel2013MultiSheetGzipAvailable()
 ]]></system-out>
 </testcase>
-<testcase name="readExcelInputFormatExcel2013LinkedWorkbook()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.034">
+<testcase name="readExcelInputFormatExcel2013LinkedWorkbook()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.151">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013LinkedWorkbook()]
 display-name: readExcelInputFormatExcel2013LinkedWorkbook()
 ]]></system-out>
 </testcase>
-<testcase name="readExcelInputFormatExcel2003SingleSheetEncryptedNegativeLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.004">
+<testcase name="readExcelInputFormatExcel2003SingleSheetEncryptedNegativeLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.012">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2003SingleSheetEncryptedNegativeLowFootprint()]
 display-name: readExcelInputFormatExcel2003SingleSheetEncryptedNegativeLowFootprint()
 ]]></system-out>
 </testcase>
-<testcase name="readExcelInputFormatExcel2013SingleSheetEncryptedNegativeLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.031">
+<testcase name="readExcelInputFormatExcel2013SingleSheetEncryptedNegativeLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.065">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013SingleSheetEncryptedNegativeLowFootprint()]
 display-name: readExcelInputFormatExcel2013SingleSheetEncryptedNegativeLowFootprint()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetLowFootPrintSignedPositive()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.131">
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetLowFootPrintSignedPositive()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.539">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetLowFootPrintSignedPositive()]
 display-name: writeExcelOutputFormatExcel2013SingleSheetLowFootPrintSignedPositive()
 ]]></system-out>
 </testcase>
-<testcase name="readExcelInputFormatExcel2013SingleSheetEncryptedKeyStoreAliasPositive()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.042">
+<testcase name="readExcelInputFormatExcel2013SingleSheetEncryptedKeyStoreAliasPositive()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.057">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013SingleSheetEncryptedKeyStoreAliasPositive()]
 display-name: readExcelInputFormatExcel2013SingleSheetEncryptedKeyStoreAliasPositive()
 ]]></system-out>
 </testcase>
-<testcase name="readExcelInputFormatExcel2003LinkedWorkbook()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.024">
+<testcase name="readExcelInputFormatExcel2003LinkedWorkbook()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.029">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2003LinkedWorkbook()]
 display-name: readExcelInputFormatExcel2003LinkedWorkbook()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchOncePositive()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.028">
+<testcase name="writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchOncePositive()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.134">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchOncePositive()]
 display-name: writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchOncePositive()
 ]]></system-out>
 </testcase>
-<testcase name="checkTestExcel2003EmptySheetAvailable()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0">
+<testcase name="checkTestExcel2003EmptySheetAvailable()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.001">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2003EmptySheetAvailable()]
 display-name: checkTestExcel2003EmptySheetAvailable()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetGZipCompressed()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.043">
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetGZipCompressed()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.117">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetGZipCompressed()]
 display-name: writeExcelOutputFormatExcel2013SingleSheetGZipCompressed()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetLowFootPrintSignedNegative()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.038">
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetLowFootPrintSignedNegative()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.086">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetLowFootPrintSignedNegative()]
 display-name: writeExcelOutputFormatExcel2013SingleSheetLowFootPrintSignedNegative()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchOnceNegative()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.023">
+<testcase name="writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchOnceNegative()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.018">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchOnceNegative()]
 display-name: writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchOnceNegative()
 ]]></system-out>
 </testcase>
-<testcase name="readExcelInputFormatExcel2013MultiSheetAllLowFootPrint()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.016">
+<testcase name="readExcelInputFormatExcel2013MultiSheetAllLowFootPrint()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.039">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013MultiSheetAllLowFootPrint()]
 display-name: readExcelInputFormatExcel2013MultiSheetAllLowFootPrint()
 ]]></system-out>
 </testcase>
-<testcase name="checkTestExcel2013EmptySheetAvailable()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0">
+<testcase name="checkTestExcel2013EmptySheetAvailable()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.001">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2013EmptySheetAvailable()]
 display-name: checkTestExcel2013EmptySheetAvailable()
 ]]></system-out>
 </testcase>
-<testcase name="readExcelInputFormatExcel2013MultiSheetSelectedSheet()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.017">
+<testcase name="readExcelInputFormatExcel2013MultiSheetSelectedSheet()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.038">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013MultiSheetSelectedSheet()]
 display-name: readExcelInputFormatExcel2013MultiSheetSelectedSheet()
 ]]></system-out>
 </testcase>
-<testcase name="checkTestExcel2013LinkedWorkbook1()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.001">
+<testcase name="checkTestExcel2013LinkedWorkbook1()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2013LinkedWorkbook1()]
 display-name: checkTestExcel2013LinkedWorkbook1()
 ]]></system-out>
 </testcase>
-<testcase name="checkTestExcel2013LinkedWorkbook2()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0">
+<testcase name="checkTestExcel2013LinkedWorkbook2()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.001">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2013LinkedWorkbook2()]
 display-name: checkTestExcel2013LinkedWorkbook2()
@@ -808,13 +278,13 @@ unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapre
 display-name: writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveLowFootprint()
 ]]></system-out>
 </testcase>
-<testcase name="readExcelInputFormatBzip2CompressedExcel2013MultiSheetAll()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.027">
+<testcase name="readExcelInputFormatBzip2CompressedExcel2013MultiSheetAll()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.056">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatBzip2CompressedExcel2013MultiSheetAll()]
 display-name: readExcelInputFormatBzip2CompressedExcel2013MultiSheetAll()
 ]]></system-out>
 </testcase>
-<testcase name="readExcelInputFormatExcel2003EmptyRowsLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.007">
+<testcase name="readExcelInputFormatExcel2003EmptyRowsLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.026">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2003EmptyRowsLowFootprint()]
 display-name: readExcelInputFormatExcel2003EmptyRowsLowFootprint()
@@ -826,25 +296,25 @@ unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapre
 display-name: checkTestExcel2013TemplateAvailable()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetLowFootPrintSignedNegativeReadLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.033">
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetLowFootPrintSignedNegativeReadLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.096">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetLowFootPrintSignedNegativeReadLowFootprint()]
 display-name: writeExcelOutputFormatExcel2013SingleSheetLowFootPrintSignedNegativeReadLowFootprint()
 ]]></system-out>
 </testcase>
-<testcase name="readExcelInputFormatExcel2013SingleSheetLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.013">
+<testcase name="readExcelInputFormatExcel2013SingleSheetLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.023">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013SingleSheetLowFootprint()]
 display-name: readExcelInputFormatExcel2013SingleSheetLowFootprint()
 ]]></system-out>
 </testcase>
-<testcase name="checkTestExcel2003SingleSheetAvailable()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.001">
+<testcase name="checkTestExcel2003SingleSheetAvailable()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2003SingleSheetAvailable()]
 display-name: checkTestExcel2003SingleSheetAvailable()
 ]]></system-out>
 </testcase>
-<testcase name="readExcelInputFormatGzipCompressedExcel2013MultiSheetAll()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.012">
+<testcase name="readExcelInputFormatGzipCompressedExcel2013MultiSheetAll()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.021">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatGzipCompressedExcel2013MultiSheetAll()]
 display-name: readExcelInputFormatGzipCompressedExcel2013MultiSheetAll()
@@ -856,7 +326,7 @@ unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapre
 display-name: checkTestExcel2013EmptyRows()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcelOutputFormatExcel2003SingleSheetOneLinkedWorkbook()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.028">
+<testcase name="writeExcelOutputFormatExcel2003SingleSheetOneLinkedWorkbook()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.04">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2003SingleSheetOneLinkedWorkbook()]
 display-name: writeExcelOutputFormatExcel2003SingleSheetOneLinkedWorkbook()
@@ -869,67 +339,67 @@ unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapre
 display-name: writeExcelOutputFormatExcel2013SingleSheetOneLinkedWorkbook()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcelOutputFormatExcel2013TemplateEncryptedSingleSheetPositive()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.166">
+<testcase name="writeExcelOutputFormatExcel2013TemplateEncryptedSingleSheetPositive()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.194">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013TemplateEncryptedSingleSheetPositive()]
 display-name: writeExcelOutputFormatExcel2013TemplateEncryptedSingleSheetPositive()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveLowFootprintSignedPositive()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.508">
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveLowFootprintSignedPositive()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.464">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveLowFootprintSignedPositive()]
 display-name: writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveLowFootprintSignedPositive()
 ]]></system-out>
 </testcase>
-<testcase name="readExcelInputFormatExcel2003SingleSheetEncryptedPositive()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.004">
+<testcase name="readExcelInputFormatExcel2003SingleSheetEncryptedPositive()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.021">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2003SingleSheetEncryptedPositive()]
 display-name: readExcelInputFormatExcel2003SingleSheetEncryptedPositive()
 ]]></system-out>
 </testcase>
-<testcase name="readExcelInputFormatExcel2013SingleSheetEncryptedPositive()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.036">
+<testcase name="readExcelInputFormatExcel2013SingleSheetEncryptedPositive()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.05">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013SingleSheetEncryptedPositive()]
 display-name: readExcelInputFormatExcel2013SingleSheetEncryptedPositive()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcelOutputFormatExcel2003SingleSheetEncryptedPositive()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.031">
+<testcase name="writeExcelOutputFormatExcel2003SingleSheetEncryptedPositive()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.065">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2003SingleSheetEncryptedPositive()]
 display-name: writeExcelOutputFormatExcel2003SingleSheetEncryptedPositive()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetEncryptedPositive()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.247">
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetEncryptedPositive()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.211">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetEncryptedPositive()]
 display-name: writeExcelOutputFormatExcel2013SingleSheetEncryptedPositive()
 ]]></system-out>
 </testcase>
-<testcase name="readExcelInputFormatExcel2013SingleSheetEncryptedKeyStorePositive()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.032">
+<testcase name="readExcelInputFormatExcel2013SingleSheetEncryptedKeyStorePositive()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.042">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013SingleSheetEncryptedKeyStorePositive()]
 display-name: readExcelInputFormatExcel2013SingleSheetEncryptedKeyStorePositive()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcelOutputFormatExcel2013TemplateEncryptedSingleSheetNegative()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.191">
+<testcase name="writeExcelOutputFormatExcel2013TemplateEncryptedSingleSheetNegative()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.171">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013TemplateEncryptedSingleSheetNegative()]
 display-name: writeExcelOutputFormatExcel2013TemplateEncryptedSingleSheetNegative()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcelOutputFormatExcel2013TemplateSingleSheet()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.043">
+<testcase name="writeExcelOutputFormatExcel2013TemplateSingleSheet()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.051">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013TemplateSingleSheet()]
 display-name: writeExcelOutputFormatExcel2013TemplateSingleSheet()
 ]]></system-out>
 </testcase>
-<testcase name="readExcelInputFormatExcel2013MultiSheetAll()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.011">
+<testcase name="readExcelInputFormatExcel2013MultiSheetAll()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.015">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013MultiSheetAll()]
 display-name: readExcelInputFormatExcel2013MultiSheetAll()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveLowFootprintSignedNegative()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.296">
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveLowFootprintSignedNegative()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.264">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveLowFootprintSignedNegative()]
 display-name: writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveLowFootprintSignedNegative()
@@ -941,13 +411,13 @@ unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapre
 display-name: checkTestExcel2013CommentAvailable()
 ]]></system-out>
 </testcase>
-<testcase name="readExcelInputFormatExcel2003SingleSheetEncryptedNegative()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.002">
+<testcase name="readExcelInputFormatExcel2003SingleSheetEncryptedNegative()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.003">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2003SingleSheetEncryptedNegative()]
 display-name: readExcelInputFormatExcel2003SingleSheetEncryptedNegative()
 ]]></system-out>
 </testcase>
-<testcase name="readExcelInputFormatExcel2013SingleSheetEncryptedNegative()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.056">
+<testcase name="readExcelInputFormatExcel2013SingleSheetEncryptedNegative()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.04">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013SingleSheetEncryptedNegative()]
 display-name: readExcelInputFormatExcel2013SingleSheetEncryptedNegative()
@@ -959,13 +429,13 @@ unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapre
 display-name: readExcelInputFormatExcel2003Empty()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcelOutputFormatExcel2003SingleSheetEncryptedNegative()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.012">
+<testcase name="writeExcelOutputFormatExcel2003SingleSheetEncryptedNegative()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.013">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2003SingleSheetEncryptedNegative()]
 display-name: writeExcelOutputFormatExcel2003SingleSheetEncryptedNegative()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetEncryptedNegative()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.259">
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetEncryptedNegative()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.289">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetEncryptedNegative()]
 display-name: writeExcelOutputFormatExcel2013SingleSheetEncryptedNegative()
@@ -977,7 +447,7 @@ unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapre
 display-name: checkTestExcel2013LinkedWorkbooksLink2Available()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchOncePositive()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.022">
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchOncePositive()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.032">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchOncePositive()]
 display-name: writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchOncePositive()
@@ -989,91 +459,91 @@ unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapre
 display-name: checkTestExcel2013TemplateEncryptedAvailable()
 ]]></system-out>
 </testcase>
-<testcase name="readExcelInputFormatExcel2013EmptyRowsLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.007">
+<testcase name="readExcelInputFormatExcel2013EmptyRowsLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.011">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013EmptyRowsLowFootprint()]
 display-name: readExcelInputFormatExcel2013EmptyRowsLowFootprint()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetLowFootPrint()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.031">
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetLowFootPrint()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.033">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetLowFootPrint()]
 display-name: writeExcelOutputFormatExcel2013SingleSheetLowFootPrint()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchOnceNegative()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.021">
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchOnceNegative()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.027">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchOnceNegative()]
 display-name: writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchOnceNegative()
 ]]></system-out>
 </testcase>
-<testcase name="checkTestExcel2013LinkedWorkbooksLink1Available()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.001">
+<testcase name="checkTestExcel2013LinkedWorkbooksLink1Available()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2013LinkedWorkbooksLink1Available()]
 display-name: checkTestExcel2013LinkedWorkbooksLink1Available()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetSignedPositive()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.103">
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetSignedPositive()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.089">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetSignedPositive()]
 display-name: writeExcelOutputFormatExcel2013SingleSheetSignedPositive()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheet()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.021">
+<testcase name="writeExcelOutputFormatExcel2013SingleSheet()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.035">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheet()]
 display-name: writeExcelOutputFormatExcel2013SingleSheet()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetEncryptedKeyStoreAliasPositive()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.282">
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetEncryptedKeyStoreAliasPositive()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.242">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetEncryptedKeyStoreAliasPositive()]
 display-name: writeExcelOutputFormatExcel2013SingleSheetEncryptedKeyStoreAliasPositive()
 ]]></system-out>
 </testcase>
-<testcase name="readExcelInputFormatExcel2013Comment()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.013">
+<testcase name="readExcelInputFormatExcel2013Comment()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.031">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013Comment()]
 display-name: readExcelInputFormatExcel2013Comment()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetSignedNegative()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.019">
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetSignedNegative()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.027">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetSignedNegative()]
 display-name: writeExcelOutputFormatExcel2013SingleSheetSignedNegative()
 ]]></system-out>
 </testcase>
-<testcase name="readExcelInputFormatExcel2003SingleSheetEncryptedPositiveLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.004">
+<testcase name="readExcelInputFormatExcel2003SingleSheetEncryptedPositiveLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.009">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2003SingleSheetEncryptedPositiveLowFootprint()]
 display-name: readExcelInputFormatExcel2003SingleSheetEncryptedPositiveLowFootprint()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetEncryptedNegativeLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.334">
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetEncryptedNegativeLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.261">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetEncryptedNegativeLowFootprint()]
 display-name: writeExcelOutputFormatExcel2013SingleSheetEncryptedNegativeLowFootprint()
 ]]></system-out>
 </testcase>
-<testcase name="readExcelInputFormatExcel2013Empty()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.007">
+<testcase name="readExcelInputFormatExcel2013Empty()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.01">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013Empty()]
 display-name: readExcelInputFormatExcel2013Empty()
 ]]></system-out>
 </testcase>
-<testcase name="checkTestExcel2013LinkedWorkbooksAvailable()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.001">
+<testcase name="checkTestExcel2013LinkedWorkbooksAvailable()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2013LinkedWorkbooksAvailable()]
 display-name: checkTestExcel2013LinkedWorkbooksAvailable()
 ]]></system-out>
 </testcase>
-<testcase name="readExcelInputFormatExcel2013SingleSheetEncryptedPositiveLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.04">
+<testcase name="readExcelInputFormatExcel2013SingleSheetEncryptedPositiveLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.029">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013SingleSheetEncryptedPositiveLowFootprint()]
 display-name: readExcelInputFormatExcel2013SingleSheetEncryptedPositiveLowFootprint()
 ]]></system-out>
 </testcase>
-<testcase name="readExcelInputFormatExcel2003SingleSheetLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.009">
+<testcase name="readExcelInputFormatExcel2003SingleSheetLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.01">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2003SingleSheetLowFootprint()]
 display-name: readExcelInputFormatExcel2003SingleSheetLowFootprint()
@@ -1091,19 +561,19 @@ unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapre
 display-name: checkTestExcel2013MultiSheetBzip2Available()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchAllPositive()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.02">
+<testcase name="writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchAllPositive()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.013">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchAllPositive()]
 display-name: writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchAllPositive()
 ]]></system-out>
 </testcase>
-<testcase name="readExcelInputFormatExcel2013EmptyRows()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.017">
+<testcase name="readExcelInputFormatExcel2013EmptyRows()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.011">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013EmptyRows()]
 display-name: readExcelInputFormatExcel2013EmptyRows()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcelOutputFormatExcel2013MultiSheet()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.039">
+<testcase name="writeExcelOutputFormatExcel2013MultiSheet()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.027">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013MultiSheet()]
 display-name: writeExcelOutputFormatExcel2013MultiSheet()
@@ -1121,21 +591,551 @@ unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapre
 display-name: checkTestExcel2013MainWorkbook()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcelOutputFormatExcel2013SingleSheetLowFootPrintSignedPositiveReadLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.088">
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetLowFootPrintSignedPositiveReadLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.103">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetLowFootPrintSignedPositiveReadLowFootprint()]
 display-name: writeExcelOutputFormatExcel2013SingleSheetLowFootPrintSignedPositiveReadLowFootprint()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcelOutputFormatExcel2003SingleSheetTwoLinkedWorkbooks()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.032">
+<testcase name="writeExcelOutputFormatExcel2003SingleSheetTwoLinkedWorkbooks()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.088">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2003SingleSheetTwoLinkedWorkbooks()]
 display-name: writeExcelOutputFormatExcel2003SingleSheetTwoLinkedWorkbooks()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchAllNegative()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.017">
+<testcase name="writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchAllNegative()" classname="org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest" time="0.022">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapred.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchAllNegative()]
+display-name: writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchAllNegative()
+]]></system-out>
+</testcase>
+<testcase name="checkTestExcel2013MultiSheetAvailable()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2013MultiSheetAvailable()]
+display-name: checkTestExcel2013MultiSheetAvailable()
+]]></system-out>
+</testcase>
+<testcase name="readExcelInputFormatExcel2013SingleSheet()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.04">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013SingleSheet()]
+display-name: readExcelInputFormatExcel2013SingleSheet()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveSignedPositive()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.538">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveSignedPositive()]
+display-name: writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveSignedPositive()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchAllPositive()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.075">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchAllPositive()]
+display-name: writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchAllPositive()
+]]></system-out>
+</testcase>
+<testcase name="checkTestExcel2003LinkedWorkbook1()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2003LinkedWorkbook1()]
+display-name: checkTestExcel2003LinkedWorkbook1()
+]]></system-out>
+</testcase>
+<testcase name="checkTestExcel2003LinkedWorkbook2()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2003LinkedWorkbook2()]
+display-name: checkTestExcel2003LinkedWorkbook2()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveSignedNegative()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.23">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveSignedNegative()]
+display-name: writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveSignedNegative()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetTwoLinkedWorkbooks()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0">
+<skipped><![CDATA[This does not work yet due to a bug in Apache POI that prevents writing correct workbooks containing external references: https://bz.apache.org/bugzilla/show_bug.cgi?id=57184]]></skipped>
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetTwoLinkedWorkbooks()]
+display-name: writeExcelOutputFormatExcel2013SingleSheetTwoLinkedWorkbooks()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchAllNegative()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.039">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchAllNegative()]
+display-name: writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchAllNegative()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetEncryptedKeyStorePositive()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.297">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetEncryptedKeyStorePositive()]
+display-name: writeExcelOutputFormatExcel2013SingleSheetEncryptedKeyStorePositive()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetComment()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.062">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetComment()]
+display-name: writeExcelOutputFormatExcel2013SingleSheetComment()
+]]></system-out>
+</testcase>
+<testcase name="readExcelInputFormatExcel2003MultiSheetAllLowFootPrint()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.015">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2003MultiSheetAllLowFootPrint()]
+display-name: readExcelInputFormatExcel2003MultiSheetAllLowFootPrint()
+]]></system-out>
+</testcase>
+<testcase name="readExcelInputFormatExcel2003SingleSheet()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.015">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2003SingleSheet()]
+display-name: readExcelInputFormatExcel2003SingleSheet()
+]]></system-out>
+</testcase>
+<testcase name="checkTestExcel2003MainWorkbook()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2003MainWorkbook()]
+display-name: checkTestExcel2003MainWorkbook()
+]]></system-out>
+</testcase>
+<testcase name="checkTestExcel2013MultiSheetGzipAvailable()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2013MultiSheetGzipAvailable()]
+display-name: checkTestExcel2013MultiSheetGzipAvailable()
+]]></system-out>
+</testcase>
+<testcase name="readExcelInputFormatExcel2013LinkedWorkbook()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.043">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013LinkedWorkbook()]
+display-name: readExcelInputFormatExcel2013LinkedWorkbook()
+]]></system-out>
+</testcase>
+<testcase name="readExcelInputFormatExcel2003SingleSheetEncryptedNegativeLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.006">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2003SingleSheetEncryptedNegativeLowFootprint()]
+display-name: readExcelInputFormatExcel2003SingleSheetEncryptedNegativeLowFootprint()
+]]></system-out>
+</testcase>
+<testcase name="readExcelInputFormatExcel2013SingleSheetEncryptedNegativeLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.024">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013SingleSheetEncryptedNegativeLowFootprint()]
+display-name: readExcelInputFormatExcel2013SingleSheetEncryptedNegativeLowFootprint()
+]]></system-out>
+</testcase>
+<testcase name="readExcelInputFormatExcel2013SingleSheetEncryptedKeyStoreAliasPositive()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.037">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013SingleSheetEncryptedKeyStoreAliasPositive()]
+display-name: readExcelInputFormatExcel2013SingleSheetEncryptedKeyStoreAliasPositive()
+]]></system-out>
+</testcase>
+<testcase name="readExcelInputFormatExcel2003LinkedWorkbook()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.025">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2003LinkedWorkbook()]
+display-name: readExcelInputFormatExcel2003LinkedWorkbook()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchOncePositive()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.081">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchOncePositive()]
+display-name: writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchOncePositive()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetLowFootprintSignedNegativeReadLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.081">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetLowFootprintSignedNegativeReadLowFootprint()]
+display-name: writeExcelOutputFormatExcel2013SingleSheetLowFootprintSignedNegativeReadLowFootprint()
+]]></system-out>
+</testcase>
+<testcase name="checkTestExcel2003EmptySheetAvailable()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2003EmptySheetAvailable()]
+display-name: checkTestExcel2003EmptySheetAvailable()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetGZipCompressed()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.045">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetGZipCompressed()]
+display-name: writeExcelOutputFormatExcel2013SingleSheetGZipCompressed()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchOnceNegative()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.031">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchOnceNegative()]
+display-name: writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchOnceNegative()
+]]></system-out>
+</testcase>
+<testcase name="readExcelInputFormatExcel2013MultiSheetAllLowFootPrint()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.028">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013MultiSheetAllLowFootPrint()]
+display-name: readExcelInputFormatExcel2013MultiSheetAllLowFootPrint()
+]]></system-out>
+</testcase>
+<testcase name="checkTestExcel2013EmptySheetAvailable()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2013EmptySheetAvailable()]
+display-name: checkTestExcel2013EmptySheetAvailable()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2003SingleSheetEncryptedPositiveLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.054">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2003SingleSheetEncryptedPositiveLowFootprint()]
+display-name: writeExcelOutputFormatExcel2003SingleSheetEncryptedPositiveLowFootprint()
+]]></system-out>
+</testcase>
+<testcase name="readExcelInputFormatExcel2013MultiSheetSelectedSheet()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.015">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013MultiSheetSelectedSheet()]
+display-name: readExcelInputFormatExcel2013MultiSheetSelectedSheet()
+]]></system-out>
+</testcase>
+<testcase name="checkTestExcel2013LinkedWorkbook1()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2013LinkedWorkbook1()]
+display-name: checkTestExcel2013LinkedWorkbook1()
+]]></system-out>
+</testcase>
+<testcase name="checkTestExcel2013LinkedWorkbook2()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2013LinkedWorkbook2()]
+display-name: checkTestExcel2013LinkedWorkbook2()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.215">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveLowFootprint()]
+display-name: writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveLowFootprint()
+]]></system-out>
+</testcase>
+<testcase name="readExcelInputFormatBzip2CompressedExcel2013MultiSheetAll()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.021">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatBzip2CompressedExcel2013MultiSheetAll()]
+display-name: readExcelInputFormatBzip2CompressedExcel2013MultiSheetAll()
+]]></system-out>
+</testcase>
+<testcase name="readExcelInputFormatExcel2003EmptyRowsLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.006">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2003EmptyRowsLowFootprint()]
+display-name: readExcelInputFormatExcel2003EmptyRowsLowFootprint()
+]]></system-out>
+</testcase>
+<testcase name="checkTestExcel2013TemplateAvailable()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2013TemplateAvailable()]
+display-name: checkTestExcel2013TemplateAvailable()
+]]></system-out>
+</testcase>
+<testcase name="readExcelInputFormatExcel2013SingleSheetLowFootPrint()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.045">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013SingleSheetLowFootPrint()]
+display-name: readExcelInputFormatExcel2013SingleSheetLowFootPrint()
+]]></system-out>
+</testcase>
+<testcase name="checkTestExcel2003SingleSheetAvailable()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2003SingleSheetAvailable()]
+display-name: checkTestExcel2003SingleSheetAvailable()
+]]></system-out>
+</testcase>
+<testcase name="readExcelInputFormatGzipCompressedExcel2013MultiSheetAll()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.021">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatGzipCompressedExcel2013MultiSheetAll()]
+display-name: readExcelInputFormatGzipCompressedExcel2013MultiSheetAll()
+]]></system-out>
+</testcase>
+<testcase name="checkTestExcel2013EmptyRows()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2013EmptyRows()]
+display-name: checkTestExcel2013EmptyRows()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2003SingleSheetOneLinkedWorkbook()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.111">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2003SingleSheetOneLinkedWorkbook()]
+display-name: writeExcelOutputFormatExcel2003SingleSheetOneLinkedWorkbook()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetOneLinkedWorkbook()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0">
+<skipped><![CDATA[This does not work yet due to a bug in Apache POI that prevents writing correct workbooks containing external references: https://bz.apache.org/bugzilla/show_bug.cgi?id=57184]]></skipped>
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetOneLinkedWorkbook()]
+display-name: writeExcelOutputFormatExcel2013SingleSheetOneLinkedWorkbook()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2013TemplateEncryptedSingleSheetPositive()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.155">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013TemplateEncryptedSingleSheetPositive()]
+display-name: writeExcelOutputFormatExcel2013TemplateEncryptedSingleSheetPositive()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveLowFootprintSignedPositive()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.451">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveLowFootprintSignedPositive()]
+display-name: writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveLowFootprintSignedPositive()
+]]></system-out>
+</testcase>
+<testcase name="readExcelInputFormatExcel2003SingleSheetEncryptedPositive()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.005">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2003SingleSheetEncryptedPositive()]
+display-name: readExcelInputFormatExcel2003SingleSheetEncryptedPositive()
+]]></system-out>
+</testcase>
+<testcase name="readExcelInputFormatExcel2013SingleSheetEncryptedPositive()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.031">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013SingleSheetEncryptedPositive()]
+display-name: readExcelInputFormatExcel2013SingleSheetEncryptedPositive()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2003SingleSheetEncryptedPositive()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.057">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2003SingleSheetEncryptedPositive()]
+display-name: writeExcelOutputFormatExcel2003SingleSheetEncryptedPositive()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetEncryptedPositive()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.217">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetEncryptedPositive()]
+display-name: writeExcelOutputFormatExcel2013SingleSheetEncryptedPositive()
+]]></system-out>
+</testcase>
+<testcase name="readExcelInputFormatExcel2013SingleSheetEncryptedKeyStorePositive()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.029">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013SingleSheetEncryptedKeyStorePositive()]
+display-name: readExcelInputFormatExcel2013SingleSheetEncryptedKeyStorePositive()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2013TemplateEncryptedSingleSheetNegative()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.215">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013TemplateEncryptedSingleSheetNegative()]
+display-name: writeExcelOutputFormatExcel2013TemplateEncryptedSingleSheetNegative()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2013TemplateSingleSheet()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.045">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013TemplateSingleSheet()]
+display-name: writeExcelOutputFormatExcel2013TemplateSingleSheet()
+]]></system-out>
+</testcase>
+<testcase name="readExcelInputFormatExcel2013MultiSheetAll()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.012">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013MultiSheetAll()]
+display-name: readExcelInputFormatExcel2013MultiSheetAll()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveLowFootprintSignedNegative()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.201">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveLowFootprintSignedNegative()]
+display-name: writeExcelOutputFormatExcel2013SingleSheetEncryptedPositiveLowFootprintSignedNegative()
+]]></system-out>
+</testcase>
+<testcase name="checkTestExcel2013CommentAvailable()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2013CommentAvailable()]
+display-name: checkTestExcel2013CommentAvailable()
+]]></system-out>
+</testcase>
+<testcase name="readExcelInputFormatExcel2003SingleSheetEncryptedNegative()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.004">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2003SingleSheetEncryptedNegative()]
+display-name: readExcelInputFormatExcel2003SingleSheetEncryptedNegative()
+]]></system-out>
+</testcase>
+<testcase name="readExcelInputFormatExcel2013SingleSheetEncryptedNegative()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.047">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013SingleSheetEncryptedNegative()]
+display-name: readExcelInputFormatExcel2013SingleSheetEncryptedNegative()
+]]></system-out>
+</testcase>
+<testcase name="readExcelInputFormatExcel2003Empty()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.008">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2003Empty()]
+display-name: readExcelInputFormatExcel2003Empty()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2003SingleSheetEncryptedNegative()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.049">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2003SingleSheetEncryptedNegative()]
+display-name: writeExcelOutputFormatExcel2003SingleSheetEncryptedNegative()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetEncryptedNegative()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.295">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetEncryptedNegative()]
+display-name: writeExcelOutputFormatExcel2013SingleSheetEncryptedNegative()
+]]></system-out>
+</testcase>
+<testcase name="checkTestExcel2013LinkedWorkbooksLink2Available()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2013LinkedWorkbooksLink2Available()]
+display-name: checkTestExcel2013LinkedWorkbooksLink2Available()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchOncePositive()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.033">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchOncePositive()]
+display-name: writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchOncePositive()
+]]></system-out>
+</testcase>
+<testcase name="checkTestExcel2013TemplateEncryptedAvailable()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2013TemplateEncryptedAvailable()]
+display-name: checkTestExcel2013TemplateEncryptedAvailable()
+]]></system-out>
+</testcase>
+<testcase name="readExcelInputFormatExcel2013EmptyRowsLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.015">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013EmptyRowsLowFootprint()]
+display-name: readExcelInputFormatExcel2013EmptyRowsLowFootprint()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.06">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetLowFootprint()]
+display-name: writeExcelOutputFormatExcel2013SingleSheetLowFootprint()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchOnceNegative()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.039">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchOnceNegative()]
+display-name: writeExcelOutputFormatExcel2013SingleSheetMetaDataMatchOnceNegative()
+]]></system-out>
+</testcase>
+<testcase name="checkTestExcel2013LinkedWorkbooksLink1Available()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2013LinkedWorkbooksLink1Available()]
+display-name: checkTestExcel2013LinkedWorkbooksLink1Available()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetSignedPositive()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.081">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetSignedPositive()]
+display-name: writeExcelOutputFormatExcel2013SingleSheetSignedPositive()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2013SingleSheet()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.05">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheet()]
+display-name: writeExcelOutputFormatExcel2013SingleSheet()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetEncryptedKeyStoreAliasPositive()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.337">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetEncryptedKeyStoreAliasPositive()]
+display-name: writeExcelOutputFormatExcel2013SingleSheetEncryptedKeyStoreAliasPositive()
+]]></system-out>
+</testcase>
+<testcase name="readExcelInputFormatExcel2013Comment()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.028">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013Comment()]
+display-name: readExcelInputFormatExcel2013Comment()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetSignedNegative()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.099">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetSignedNegative()]
+display-name: writeExcelOutputFormatExcel2013SingleSheetSignedNegative()
+]]></system-out>
+</testcase>
+<testcase name="readExcelInputFormatExcel2003SingleSheetEncryptedPositiveLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.014">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2003SingleSheetEncryptedPositiveLowFootprint()]
+display-name: readExcelInputFormatExcel2003SingleSheetEncryptedPositiveLowFootprint()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetEncryptedNegativeLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.393">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetEncryptedNegativeLowFootprint()]
+display-name: writeExcelOutputFormatExcel2013SingleSheetEncryptedNegativeLowFootprint()
+]]></system-out>
+</testcase>
+<testcase name="readExcelInputFormatExcel2013Empty()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.007">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013Empty()]
+display-name: readExcelInputFormatExcel2013Empty()
+]]></system-out>
+</testcase>
+<testcase name="checkTestExcel2013LinkedWorkbooksAvailable()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2013LinkedWorkbooksAvailable()]
+display-name: checkTestExcel2013LinkedWorkbooksAvailable()
+]]></system-out>
+</testcase>
+<testcase name="readExcelInputFormatExcel2013SingleSheetEncryptedPositiveLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.036">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013SingleSheetEncryptedPositiveLowFootprint()]
+display-name: readExcelInputFormatExcel2013SingleSheetEncryptedPositiveLowFootprint()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetLowFootprintSignedPositiveReadLowFootprint()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.115">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetLowFootprintSignedPositiveReadLowFootprint()]
+display-name: writeExcelOutputFormatExcel2013SingleSheetLowFootprintSignedPositiveReadLowFootprint()
+]]></system-out>
+</testcase>
+<testcase name="readExcelInputFormatExcel2003SingleSheetLowFootPrint()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.005">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2003SingleSheetLowFootPrint()]
+display-name: readExcelInputFormatExcel2003SingleSheetLowFootPrint()
+]]></system-out>
+</testcase>
+<testcase name="checkTestExcel2003EmptyRows()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2003EmptyRows()]
+display-name: checkTestExcel2003EmptyRows()
+]]></system-out>
+</testcase>
+<testcase name="checkTestExcel2013MultiSheetBzip2Available()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2013MultiSheetBzip2Available()]
+display-name: checkTestExcel2013MultiSheetBzip2Available()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetLowFootprintSignedPositive()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.111">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetLowFootprintSignedPositive()]
+display-name: writeExcelOutputFormatExcel2013SingleSheetLowFootprintSignedPositive()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchAllPositive()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.048">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchAllPositive()]
+display-name: writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchAllPositive()
+]]></system-out>
+</testcase>
+<testcase name="readExcelInputFormatExcel2013EmptyRows()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.009">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:readExcelInputFormatExcel2013EmptyRows()]
+display-name: readExcelInputFormatExcel2013EmptyRows()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2013MultiSheet()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.031">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013MultiSheet()]
+display-name: writeExcelOutputFormatExcel2013MultiSheet()
+]]></system-out>
+</testcase>
+<testcase name="checkTestExcel2013SingleSheetAvailable()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2013SingleSheetAvailable()]
+display-name: checkTestExcel2013SingleSheetAvailable()
+]]></system-out>
+</testcase>
+<testcase name="checkTestExcel2013MainWorkbook()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:checkTestExcel2013MainWorkbook()]
+display-name: checkTestExcel2013MainWorkbook()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2003SingleSheetTwoLinkedWorkbooks()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.12">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2003SingleSheetTwoLinkedWorkbooks()]
+display-name: writeExcelOutputFormatExcel2003SingleSheetTwoLinkedWorkbooks()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2013SingleSheetLowFootprintSignedNegative()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.04">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2013SingleSheetLowFootprintSignedNegative()]
+display-name: writeExcelOutputFormatExcel2013SingleSheetLowFootprintSignedNegative()
+]]></system-out>
+</testcase>
+<testcase name="writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchAllNegative()" classname="org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest" time="0.044">
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.office.format.mapreduce.OfficeFormatHadoopExcelTest]/[method:writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchAllNegative()]
 display-name: writeExcelOutputFormatExcel2003SingleSheetMetaDataMatchAllNegative()
 ]]></system-out>
 </testcase>
