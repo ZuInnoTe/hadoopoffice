@@ -40,6 +40,10 @@ import org.apache.poi.poifs.crypt.Encryptor;
 import org.apache.poi.poifs.crypt.HashAlgorithm;
 import org.apache.poi.poifs.crypt.dsig.SignatureConfig;
 import org.apache.poi.poifs.crypt.dsig.SignatureInfo;
+import org.apache.poi.poifs.crypt.dsig.facets.KeyInfoSignatureFacet;
+import org.apache.poi.poifs.crypt.dsig.facets.OOXMLSignatureFacet;
+import org.apache.poi.poifs.crypt.dsig.facets.Office2010SignatureFacet;
+import org.apache.poi.poifs.crypt.dsig.facets.XAdESSignatureFacet;
 import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
 import org.apache.poi.util.TempFile;
 import org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException;
@@ -91,6 +95,10 @@ public class MSExcelOOXMLSignUtil {
 			this.tempSignFileOS.close();
 		}
 		SignatureConfig sc = new SignatureConfig();
+        sc.addSignatureFacet(new OOXMLSignatureFacet());
+        sc.addSignatureFacet(new KeyInfoSignatureFacet());
+        sc.addSignatureFacet(new XAdESSignatureFacet());
+        sc.addSignatureFacet(new Office2010SignatureFacet());
 		sc.setKey((PrivateKey)privateKey);
 		sc.setSigningCertificateChain(Collections.singletonList(x509));
 		sc.setDigestAlgo(hashAlgorithm);
