@@ -124,6 +124,17 @@ private static java.nio.file.Path tmpPath;
     }
     
     @Test
+    public void checkCertificateAvailable() {
+		ClassLoader classLoader = getClass().getClassLoader();
+		String fileName="testsigning.pfx";
+		String fileNameKeyStore=classLoader.getResource(fileName).getFile();	
+		assertNotNull(fileNameKeyStore,"Test Data File \""+fileName+"\" is not null in resource path");
+		File file = new File(fileNameKeyStore);
+		assertTrue( file.exists(),"Test Data File \""+fileName+"\" exists");
+		assertFalse( file.isDirectory(),"Test Data File \""+fileName+"\" is not a directory");
+    }
+    
+    @Test
     public void loadExistingKeyStore() throws IOException, NoSuchAlgorithmException, CertificateException, KeyStoreException, UnrecoverableEntryException, InvalidKeySpecException {
 	    	Configuration conf = new Configuration(HadoopKeyStoreManagerTest.defaultConf);
 	    	ClassLoader classLoader = getClass().getClassLoader();
