@@ -1,0 +1,137 @@
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+apply plugin: 'maven'
+apply plugin: 'signing'
+apply plugin: 'jacoco'
+apply plugin: 'org.junit.platform.gradle.plugin'
+
+sourceCompatibility = 1.7
+compileJava.options.encoding = 'UTF-8'
+
+group = "com.github.zuinnote"
+archivesBaseName = "hadoopoffice-flinkds"
+version = "1.1.0"
+
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'ZuInnoTe - Hadoop Office Analytics Library -  Flink DS (Data Source/Data Sink)', 'Implementation-Version': version
+    }
+
+    baseName = 'hadoopoffice-flinkds'
+   // note this builds one fat jar and it is not recommended for production use - just for illustration purpose
+   from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+}
+
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+
+
+}
+
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        csv.enabled true
+    }
+}
+
+
+// Integrate JaCoCo for jUnit5
+project.afterEvaluate {
+    def junitPlatformTestTask = project.tasks.getByName('junitPlatformTest')
+
+    // configure jacoco to analyze the junitPlatformTest task
+    jacoco {
+        applyTo junitPlatformTestTask
+    }
+
+    // create junit platform jacoco task
+    project.task(type: JacocoReport, "junitPlatformJacocoReport",
+            {
+                sourceDirectories = files("./src/main")
+                classDirectories = files("$buildDir/classes/main")
+                executionData junitPlatformTestTask
+            })
+}
+
+
+configurations {
+	provided
+	integrationTestCompile.extendsFrom testCompile
+    	integrationTestRuntime.extendsFrom testRuntime
+}
+
+eclipse {
+
+  classpath {
+    plusConfigurations += [ configurations.provided ]
+  }
+}
+
+sourceSets {
+    main.compileClasspath += configurations.provided
+    test.compileClasspath += configurations.provided
+    test.runtimeClasspath += configurations.provided
+    integrationTest {
+        java {
+            compileClasspath += main.output + test.output + configurations.provided
+            runtimeClasspath += main.output + test.output + configurations.provided
+            srcDir file('src/integration-test/java')
+        }
+        resources.srcDir file('src/integration-test/resources')
+    }
+}
+
+dependencies {
+   // hadoop lib for driver
+     provided("org.apache.hadoop:hadoop-client:2.7.0")
+       // hadoopoffice library
+   provided("com.github.zuinnote:hadoopoffice-fileformat:1.0.4")
+    // flink api
+   provided("org.apache.flink:flink-java:1.2.0")
+   // log4j2
+   provided("org.apache.logging.log4j:log4j-api:2.4.1")
+   // testing
+     testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.0.2'
+ 	 testRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.0.2'
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId 'com.github.zuinnote'
+            artifactId 'hadoopoffice-flinkds'
+            version '1.1.0'
+
+            from components.java
+        }
+    }
+}
+
+
+
+
+test {
+    testLogging.showStandardStreams = true
+}
+
+javadoc.classpath += configurations.provided
+
+task hadoopOfficeJavaDocs(type: Jar) {
+  classifier = 'javadoc'
+  from javadoc
+}
+
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives hadoopOfficeJavaDocs, sourcesJar
+}
