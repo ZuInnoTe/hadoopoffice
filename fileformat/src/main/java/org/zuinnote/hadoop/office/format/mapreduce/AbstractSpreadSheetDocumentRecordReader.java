@@ -201,7 +201,7 @@ private void readKeyStore(Configuration conf) throws IOException, FormatNotUnder
  * @throws FormatNotUnderstoodException
  */
 private void readTrustStore(Configuration conf) throws IOException, FormatNotUnderstoodException {
-	if (((this.hocr.getCryptKeystoreFile()!=null) && (!"".equals(this.hocr.getCryptKeystoreFile())))) {
+	if (((this.hocr.getSigTruststoreFile()!=null) && (!"".equals(this.hocr.getSigTruststoreFile())))) {
 		LOG.info("Reading truststore to validate certificate chain for signatures");
 		HadoopKeyStoreManager hksm = new HadoopKeyStoreManager(conf);
 		try {
