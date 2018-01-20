@@ -167,6 +167,7 @@ private HadoopOfficeReadConfiguration hocr;
 					OPCPackage pgk = ((XSSFWorkbook)this.currentWorkbook).getPackage();
 					SignatureConfig sic = new SignatureConfig();
 					sic.setOpcPackage(pgk);
+					sic.setSigningCertificateChain(this.hocr.getCertificateChain());
 					SignatureInfo si = new SignatureInfo();
 					si.setSignatureConfig(sic);
 					if (!si.verifySignature()) {

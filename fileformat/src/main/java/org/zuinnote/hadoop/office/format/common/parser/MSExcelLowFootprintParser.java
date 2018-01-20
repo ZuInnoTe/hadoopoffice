@@ -267,6 +267,7 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 				LOG.info("Verifying signature of document");
 				SignatureConfig sic = new SignatureConfig();
 				sic.setOpcPackage(pkg);
+				sic.setSigningCertificateChain(this.hocr.getCertificateChain());
 				SignatureInfo si = new SignatureInfo();
 				si.setSignatureConfig(sic);
 				if (!si.verifySignature()) {

@@ -21,6 +21,7 @@ import java.io.InputStream;
 
 
 import java.security.GeneralSecurityException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableEntryException;
@@ -110,6 +111,7 @@ try {
     codec = new CompressionCodecFactory(context.getConfiguration()).getCodec(file);
     this.hocr.setFileName(file.getName());
     this.readKeyStore(context.getConfiguration());
+    this.readTrustStore(context.getConfiguration());
     FSDataInputStream fileIn = file.getFileSystem(conf).open(file);
     // open stream
       if (isCompressedInput()) { // decompress
@@ -184,6 +186,30 @@ private void readKeyStore(Configuration conf) throws IOException, FormatNotUnder
 		} catch (NoSuchAlgorithmException | CertificateException | KeyStoreException | IllegalArgumentException | UnrecoverableEntryException | InvalidKeySpecException e) {
 			LOG.error(e);
 			throw new FormatNotUnderstoodException("Cannot read keystore to obtain credentials to access encrypted documents "+e);
+		}
+		
+	}
+}
+
+
+
+/***
+ * Read truststore for establishing certificate chain for signature validation
+ * 
+ * @param conf
+ * @throws IOException
+ * @throws FormatNotUnderstoodException
+ */
+private void readTrustStore(Configuration conf) throws IOException, FormatNotUnderstoodException {
+	if (((this.hocr.getCryptKeystoreFile()!=null) && (!"".equals(this.hocr.getCryptKeystoreFile())))) {
+		LOG.info("Reading truststore to validate certificate chain for signatures");
+		HadoopKeyStoreManager hksm = new HadoopKeyStoreManager(conf);
+		try {
+			hksm.openKeyStore(new Path(this.hocr.getSigTruststoreFile()), this.hocr.getSigTruststoreType(), this.hocr.getSigTruststorePassword());
+			this.hocr.setCertificateChain(hksm.getMostTrustedCertificates());
+		} catch (NoSuchAlgorithmException | CertificateException | KeyStoreException | IllegalArgumentException | InvalidAlgorithmParameterException e) {
+			LOG.error(e);
+			throw new FormatNotUnderstoodException("Cannot read truststore to establish certificate chain for signature validation "+e);
 		}
 		
 	}

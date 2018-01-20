@@ -15,6 +15,9 @@
 **/
 package org.zuinnote.hadoop.office.format.common;
 
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -82,6 +85,7 @@ private boolean verifySignature;
 private String sigTruststoreFile;
 private String sigTruststoreType;
 private String sigTruststorePassword;
+private List<X509Certificate> certificateChain;
 
 /*
  * Create an empty configuration
@@ -89,6 +93,7 @@ private String sigTruststorePassword;
  */
 public HadoopOfficeReadConfiguration() {
 	// create an empty configuration
+	this.setCertificateChain(new ArrayList<>());
 }
 
 /**
@@ -135,6 +140,7 @@ public HadoopOfficeReadConfiguration(Configuration conf) {
      this.setSigTruststoreFile(conf.get(HadoopOfficeReadConfiguration.CONF_SIGTRUSTFILE,HadoopOfficeReadConfiguration.DEFAULT_SIGTRUSTFILE));
      this.setSigTruststoreType(conf.get(HadoopOfficeReadConfiguration.CONF_SIGTRUSTTYPE,HadoopOfficeReadConfiguration.DEFAULT_SIGTRUSTTYPE));
      this.setSigTruststorePassword(conf.get(HadoopOfficeReadConfiguration.CONF_SIGTRUSTPW,HadoopOfficeReadConfiguration.DEFAULT_SIGTRUSTPW));
+     this.setCertificateChain(new ArrayList<>());
 }
 
 /*
@@ -404,6 +410,14 @@ public String getSigTruststorePassword() {
 
 public void setSigTruststorePassword(String sigTruststorePassword) {
 	this.sigTruststorePassword = sigTruststorePassword;
+}
+
+public List<X509Certificate> getCertificateChain() {
+	return certificateChain;
+}
+
+public void setCertificateChain(List<X509Certificate> certificateChain) {
+	this.certificateChain = certificateChain;
 }
 
 
