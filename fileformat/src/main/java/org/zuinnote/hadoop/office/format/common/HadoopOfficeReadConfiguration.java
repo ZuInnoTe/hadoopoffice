@@ -41,6 +41,9 @@ public static final String CONF_CRYKEYSTORETYPE = "hadoopoffice.read.security.cr
 public static final String CONF_CRYKEYSTOREPW = "hadoopoffice.read.security.crypt.credential.keystore.password";
 public static final String CONF_CRYKEYSTOREALIAS = "hadoopoffice.read.security.crypt.credential.keystore.alias";
 public static final String CONF_VERIFYSIGNATURE = "hadoopoffice.read.security.sign.verifysignature";
+public static final String CONF_SIGTRUSTFILE = "hadoopoffice.read.security.sign.truststore.file";
+public static final String CONF_SIGTRUSTTYPE= "hadoopoffice.read.security.sign.truststore.type";
+public static final String CONF_SIGTRUSTPW= "hadoopoffice.read.security.sign.truststore.password";
 
 public static final String DEFAULT_MIMETYPE="";
 public static final String DEFAULT_LOCALE="";
@@ -55,6 +58,10 @@ public static final String DEFAULT_CRYKEYSTOREPW="";
 public static final String DEFAULT_CRYKEYSTOREALIAS="";
 
 public static final boolean DEFAULT_VERIFYSIGNATURE=false;
+
+public static final String DEFAULT_SIGTRUSTFILE="";
+public static final String DEFAULT_SIGTRUSTTYPE="JKS";
+public static final String DEFAULT_SIGTRUSTPW="";
 
 private String fileName;
 private String mimeType=null;
@@ -72,6 +79,9 @@ private String cryptKeystoreType;
 private String cryptKeystorePassword;
 private String cryptKeystoreAlias;
 private boolean verifySignature;
+private String sigTruststoreFile;
+private String sigTruststoreType;
+private String sigTruststorePassword;
 
 /*
  * Create an empty configuration
@@ -120,6 +130,11 @@ public HadoopOfficeReadConfiguration(Configuration conf) {
      this.setCryptKeystoreAlias(conf.get(HadoopOfficeReadConfiguration.CONF_CRYKEYSTOREALIAS,HadoopOfficeReadConfiguration.DEFAULT_CRYKEYSTOREALIAS));
 
      this.setVerifySignature(conf.getBoolean(HadoopOfficeReadConfiguration.CONF_VERIFYSIGNATURE,HadoopOfficeReadConfiguration.DEFAULT_VERIFYSIGNATURE));
+     
+
+     this.setSigTruststoreFile(conf.get(HadoopOfficeReadConfiguration.CONF_SIGTRUSTFILE,HadoopOfficeReadConfiguration.DEFAULT_SIGTRUSTFILE));
+     this.setSigTruststoreType(conf.get(HadoopOfficeReadConfiguration.CONF_SIGTRUSTTYPE,HadoopOfficeReadConfiguration.DEFAULT_SIGTRUSTTYPE));
+     this.setSigTruststorePassword(conf.get(HadoopOfficeReadConfiguration.CONF_SIGTRUSTPW,HadoopOfficeReadConfiguration.DEFAULT_SIGTRUSTPW));
 }
 
 /*
@@ -365,6 +380,30 @@ public String getCryptKeystoreAlias() {
 
 public void setCryptKeystoreAlias(String cryptKeystoreAlias) {
 	this.cryptKeystoreAlias = cryptKeystoreAlias;
+}
+
+public String getSigTruststoreFile() {
+	return sigTruststoreFile;
+}
+
+public void setSigTruststoreFile(String sigTruststoreFile) {
+	this.sigTruststoreFile = sigTruststoreFile;
+}
+
+public String getSigTruststoreType() {
+	return sigTruststoreType;
+}
+
+public void setSigTruststoreType(String sigTruststoreType) {
+	this.sigTruststoreType = sigTruststoreType;
+}
+
+public String getSigTruststorePassword() {
+	return sigTruststorePassword;
+}
+
+public void setSigTruststorePassword(String sigTruststorePassword) {
+	this.sigTruststorePassword = sigTruststorePassword;
 }
 
 
