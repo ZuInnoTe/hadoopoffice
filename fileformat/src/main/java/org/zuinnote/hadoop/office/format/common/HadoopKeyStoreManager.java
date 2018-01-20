@@ -18,6 +18,7 @@ package org.zuinnote.hadoop.office.format.common;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -26,7 +27,13 @@ import java.security.UnrecoverableEntryException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.security.cert.PKIXParameters;
+import java.security.cert.TrustAnchor;
+import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
@@ -162,6 +169,24 @@ public class HadoopKeyStoreManager {
 		if (os!=null) {
 			os.close();
 		}
+	}
+	
+	/**
+	 * Reads from keystore (truststore) the most trusted CA. You can use this for verification of a certification chain
+	 * 
+	 * @return
+	 * @throws InvalidAlgorithmParameterException 
+	 * @throws KeyStoreException 
+	 */
+	
+	public List<X509Certificate> getMostTrustedCertificates() throws KeyStoreException, InvalidAlgorithmParameterException {
+		PKIXParameters parameters = new PKIXParameters(this.keystore);
+		Iterator<TrustAnchor> iterator = parameters.getTrustAnchors().iterator();
+		ArrayList<X509Certificate> result = new ArrayList<>();
+		while (iterator.hasNext()) {
+			result.add(iterator.next().getTrustedCert());
+		}
+		return result;
 	}
 
 }

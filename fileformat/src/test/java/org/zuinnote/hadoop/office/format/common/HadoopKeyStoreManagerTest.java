@@ -26,13 +26,17 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.Key;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableEntryException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
+import java.util.List;
+
 
 import java.security.cert.Certificate;
 
@@ -184,6 +188,19 @@ private static java.nio.file.Path tmpPath;
        	// load certificate
        	Certificate certificate = hksm.getCertificate("testalias");
        	assertNotNull(certificate,"Certificate for private key could be loaded");
-       	
+    }
+    
+    @Test
+    public void getMostTrustedCertificatesFromTrustStore() throws IOException, NoSuchAlgorithmException, CertificateException, KeyStoreException, InvalidAlgorithmParameterException {
+    	Configuration conf = new Configuration(HadoopKeyStoreManagerTest.defaultConf);
+		ClassLoader classLoader = getClass().getClassLoader();
+		String fileName="cacerts";
+		String fileNameKeyStore=classLoader.getResource(fileName).getFile();	
+		Path file = new Path(fileNameKeyStore);
+		HadoopKeyStoreManager hksm = new HadoopKeyStoreManager(conf);
+		hksm.openKeyStore(file, "JKS", "changeit");
+		// get most trusted certificates
+		List<X509Certificate> mostTrustedCAList=hksm.getMostTrustedCertificates();
+		assertEquals(104,mostTrustedCAList.size(),"Most trusted CA list has length 104");
     }
 }
