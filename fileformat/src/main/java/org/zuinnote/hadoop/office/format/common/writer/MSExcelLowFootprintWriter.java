@@ -26,6 +26,8 @@ import java.io.OutputStream;
 import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
 import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -237,8 +239,10 @@ public MSExcelLowFootprintWriter(String excelFormat, HadoopOfficeWriteConfigurat
 						LOG.error("Cannot sign document \""+this.howc.getFileName()+"\". No certificate for key provided");
 					} else {
 					try {
-							this.signUtil.sign(this.howc.getSigKey(), this.howc.getSigCertificate(), this.howc.getPassword(), MSExcelWriter.getHashAlgorithm(this.howc.getSigHash()));
-					} catch (XMLSignatureException|MarshalException|IOException|FormatNotUnderstoodException e) {
+						ArrayList<X509Certificate> certList = new ArrayList<>();
+						certList.add(this.howc.getSigCertificate());
+						this.signUtil.sign(this.howc.getSigKey(), certList, this.howc.getPassword(), MSExcelWriter.getHashAlgorithm(this.howc.getSigHash()));
+						} catch (XMLSignatureException|MarshalException|IOException|FormatNotUnderstoodException e) {
 						LOG.error("Cannot sign document \""+this.howc.getFileName()+"\" "+e);
 					}
 						

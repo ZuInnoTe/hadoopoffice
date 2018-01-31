@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import org.apache.poi.hssf.model.InternalWorkbook;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -48,14 +49,21 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.poifs.crypt.dsig.SignatureConfig;
 import org.apache.poi.poifs.crypt.dsig.SignatureInfo;
+import org.apache.poi.poifs.crypt.dsig.SignatureInfo.SignaturePart;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 
 import java.lang.reflect.Method;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.lang.reflect.InvocationTargetException;
 
 import org.zuinnote.hadoop.office.format.common.HadoopOfficeReadConfiguration;
 import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
+import org.zuinnote.hadoop.office.format.common.util.CertificateChainVerificationUtil;
 
 /*
 *
@@ -164,17 +172,37 @@ private HadoopOfficeReadConfiguration hocr;
 				if (!(this.currentWorkbook instanceof XSSFWorkbook)) {
 					throw new FormatNotUnderstoodException("Can only verify signatures for files using the OOXML (.xlsx) format");
 				} else {
+					//
 					OPCPackage pgk = ((XSSFWorkbook)this.currentWorkbook).getPackage();
 					SignatureConfig sic = new SignatureConfig();
 					sic.setOpcPackage(pgk);
-					sic.setSigningCertificateChain(this.hocr.getCertificateChain());
 					SignatureInfo si = new SignatureInfo();
 					si.setSignatureConfig(sic);
 					if (!si.verifySignature()) {
-						throw new FormatNotUnderstoodException("Invalid signature of OOXML (.xlsx) file: "+this.hocr.getFileName());
+						throw new FormatNotUnderstoodException("Cannot verify signature of OOXML (.xlsx) file: "+this.hocr.getFileName());
 					} else {
-						LOG.info("Successfully verifed signature of OXXML (.xlsx) file: "+this.hocr.getFileName());
+						LOG.info("Successfully verifed first part signature of OXXML (.xlsx) file: "+this.hocr.getFileName());
 					}
+					 Iterator<SignaturePart> spIter = si.getSignatureParts().iterator();
+					 while (spIter.hasNext()) {
+						 SignaturePart currentSP = spIter.next();
+						 if (!(currentSP.validate())) {
+							 throw new FormatNotUnderstoodException("Could not validate all signature parts for file: "+this.hocr.getFileName());
+						 } else {
+							 X509Certificate currentCertificate = currentSP.getSigner();
+							 try {
+								if ((this.hocr.getX509CertificateChain().size()>0) && (!CertificateChainVerificationUtil.verifyCertificateChain(currentCertificate, this.hocr.getX509CertificateChain()))) {
+									 throw new FormatNotUnderstoodException("Could not validate signature part for principal \""+currentCertificate.getSubjectX500Principal().getName()+"\" : "+this.hocr.getFileName());
+								 }
+							} catch (CertificateException | NoSuchAlgorithmException | NoSuchProviderException
+									| InvalidAlgorithmParameterException e) {
+								LOG.error("Could not validate signature part for principal \""+currentCertificate.getSubjectX500Principal().getName()+"\" : "+this.hocr.getFileName(), e);
+								 throw new FormatNotUnderstoodException("Could not validate signature part for principal \""+currentCertificate.getSubjectX500Principal().getName()+"\" : "+this.hocr.getFileName());
+									
+							}
+						 }
+					 }
+					 LOG.info("Successfully verifed all signatures of OXXML (.xlsx) file: "+this.hocr.getFileName());
 				}
 			}
 		// formulaEvaluator

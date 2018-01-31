@@ -28,12 +28,11 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.PKIXParameters;
-import java.security.cert.TrustAnchor;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
@@ -46,7 +45,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
 /**
- * Load/Store passwords from/to keystore files accessible through Hadoop APIs
+ * Load/Store passwords/keys/certificates from/to keystore files accessible through Hadoop APIs
  *
  */
 public class HadoopKeyStoreManager {
@@ -171,20 +170,25 @@ public class HadoopKeyStoreManager {
 		}
 	}
 	
+
+	
 	/**
-	 * Reads from keystore (truststore) the most trusted CA. You can use this for verification of a certification chain
 	 * 
-	 * @return
-	 * @throws InvalidAlgorithmParameterException 
-	 * @throws KeyStoreException 
+	 * Reads all X509Certificatres from the keystore
+	 * 
+	 * @return Set of X509 Certificates in the keystore
+	 * @throws KeyStoreException
 	 */
 	
-	public List<X509Certificate> getMostTrustedCertificates() throws KeyStoreException, InvalidAlgorithmParameterException {
-		PKIXParameters parameters = new PKIXParameters(this.keystore);
-		Iterator<TrustAnchor> iterator = parameters.getTrustAnchors().iterator();
-		ArrayList<X509Certificate> result = new ArrayList<>();
-		while (iterator.hasNext()) {
-			result.add(iterator.next().getTrustedCert());
+	public Set<X509Certificate> getAllX509Certificates() throws KeyStoreException {
+		HashSet<X509Certificate> result = new HashSet<>();
+		Enumeration<String> enumAlias = this.keystore.aliases();
+		while (enumAlias.hasMoreElements()) {
+			Certificate currentCert = this.keystore.getCertificate(enumAlias.nextElement());
+			if (currentCert instanceof X509Certificate) {
+				LOG.debug(((X509Certificate) currentCert).getSubjectDN().getName());
+				result.add((X509Certificate)currentCert);
+			}
 		}
 		return result;
 	}

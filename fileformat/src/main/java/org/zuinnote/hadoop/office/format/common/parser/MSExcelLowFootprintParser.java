@@ -18,8 +18,14 @@ package org.zuinnote.hadoop.office.format.common.parser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -56,6 +62,7 @@ import org.apache.poi.poifs.crypt.Decryptor;
 import org.apache.poi.poifs.crypt.EncryptionInfo;
 import org.apache.poi.poifs.crypt.dsig.SignatureConfig;
 import org.apache.poi.poifs.crypt.dsig.SignatureInfo;
+import org.apache.poi.poifs.crypt.dsig.SignatureInfo.SignaturePart;
 import org.apache.poi.poifs.filesystem.FileMagic;
 import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
 import org.apache.poi.ss.usermodel.DataFormatter;
@@ -75,6 +82,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.zuinnote.hadoop.office.format.common.HadoopOfficeReadConfiguration;
 import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
+import org.zuinnote.hadoop.office.format.common.util.CertificateChainVerificationUtil;
 import org.zuinnote.hadoop.office.format.common.util.MSExcelUtil;
 
 /*
@@ -267,14 +275,33 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 				LOG.info("Verifying signature of document");
 				SignatureConfig sic = new SignatureConfig();
 				sic.setOpcPackage(pkg);
-				sic.setSigningCertificateChain(this.hocr.getCertificateChain());
 				SignatureInfo si = new SignatureInfo();
 				si.setSignatureConfig(sic);
 				if (!si.verifySignature()) {
 						throw new FormatNotUnderstoodException("Cannot verify signature of OOXML (.xlsx) file: "+this.hocr.getFileName());
 				} else {
-						LOG.info("Successfully verifed signature of OXXML (.xlsx) file: "+this.hocr.getFileName());
+					LOG.info("Successfully verifed first part signature of OXXML (.xlsx) file: "+this.hocr.getFileName());
 				}
+				Iterator<SignaturePart> spIter = si.getSignatureParts().iterator();
+				 while (spIter.hasNext()) {
+					 SignaturePart currentSP = spIter.next();
+					 if (!(currentSP.validate())) {
+						 throw new FormatNotUnderstoodException("Could not validate all signature parts for file: "+this.hocr.getFileName());
+					 } else {
+						 X509Certificate currentCertificate = currentSP.getSigner();
+						 try {
+							if ((this.hocr.getX509CertificateChain().size()>0) && (!CertificateChainVerificationUtil.verifyCertificateChain(currentCertificate, this.hocr.getX509CertificateChain()))) {
+								 throw new FormatNotUnderstoodException("Could not validate signature part for principal \""+currentCertificate.getSubjectX500Principal().getName()+"\" : "+this.hocr.getFileName());
+							 }
+						} catch (CertificateException | NoSuchAlgorithmException | NoSuchProviderException
+								| InvalidAlgorithmParameterException e) {
+							LOG.error("Could not validate signature part for principal \""+currentCertificate.getSubjectX500Principal().getName()+"\" : "+this.hocr.getFileName(), e);
+							 throw new FormatNotUnderstoodException("Could not validate signature part for principal \""+currentCertificate.getSubjectX500Principal().getName()+"\" : "+this.hocr.getFileName());
+								
+						}
+					 }
+				 }
+				 LOG.info("Successfully verifed all signatures of OXXML (.xlsx) file: "+this.hocr.getFileName());
 		}
 		// continue in lowfootprint mode
 		XSSFReader r;

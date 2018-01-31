@@ -19,6 +19,7 @@ package org.zuinnote.hadoop.office.format.mapred;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableEntryException;
@@ -154,7 +155,7 @@ private void readSigningKeyAndCertificate(Configuration conf) throws OfficeWrite
 			hksm.openKeyStore(new Path(this.howc.getSigKeystoreFile()), this.howc.getSigKeystoreType(), this.howc.getSigKeystorePassword());
 			this.howc.setSigKey(hksm.getPrivateKey(this.howc.getSigKeystoreAlias(), this.howc.getSigKeystorePassword()));
 			this.howc.setSigCertificate((X509Certificate) hksm.getCertificate(this.howc.getSigKeystoreAlias()));
-		} catch (NoSuchAlgorithmException | CertificateException | KeyStoreException | IllegalArgumentException | UnrecoverableKeyException e) {
+		} catch (NoSuchAlgorithmException | CertificateException | KeyStoreException | IllegalArgumentException | UnrecoverableKeyException  e) {
 			LOG.error(e);
 			throw new OfficeWriterException("Cannot read keystore to obtain key and certificate for signing "+e);
 		}

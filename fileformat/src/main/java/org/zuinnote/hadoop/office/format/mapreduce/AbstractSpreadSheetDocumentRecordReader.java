@@ -206,8 +206,8 @@ private void readTrustStore(Configuration conf) throws IOException, FormatNotUnd
 		HadoopKeyStoreManager hksm = new HadoopKeyStoreManager(conf);
 		try {
 			hksm.openKeyStore(new Path(this.hocr.getSigTruststoreFile()), this.hocr.getSigTruststoreType(), this.hocr.getSigTruststorePassword());
-			this.hocr.setCertificateChain(hksm.getMostTrustedCertificates());
-		} catch (NoSuchAlgorithmException | CertificateException | KeyStoreException | IllegalArgumentException | InvalidAlgorithmParameterException e) {
+			this.hocr.setX509CertificateChain(hksm.getAllX509Certificates());
+		} catch (NoSuchAlgorithmException | CertificateException | KeyStoreException | IllegalArgumentException  e) {
 			LOG.error(e);
 			throw new FormatNotUnderstoodException("Cannot read truststore to establish certificate chain for signature validation "+e);
 		}

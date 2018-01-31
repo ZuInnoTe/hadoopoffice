@@ -15,11 +15,14 @@
 **/
 package org.zuinnote.hadoop.office.format.common;
 
+import java.security.cert.PKIXParameters;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.hadoop.conf.Configuration;
 
@@ -85,7 +88,7 @@ private boolean verifySignature;
 private String sigTruststoreFile;
 private String sigTruststoreType;
 private String sigTruststorePassword;
-private List<X509Certificate> certificateChain;
+private Set<X509Certificate> x509CertificateChain;
 
 /*
  * Create an empty configuration
@@ -93,7 +96,7 @@ private List<X509Certificate> certificateChain;
  */
 public HadoopOfficeReadConfiguration() {
 	// create an empty configuration
-	this.setCertificateChain(new ArrayList<>());
+	this.setX509CertificateChain(new HashSet<>());
 }
 
 /**
@@ -140,7 +143,8 @@ public HadoopOfficeReadConfiguration(Configuration conf) {
      this.setSigTruststoreFile(conf.get(HadoopOfficeReadConfiguration.CONF_SIGTRUSTFILE,HadoopOfficeReadConfiguration.DEFAULT_SIGTRUSTFILE));
      this.setSigTruststoreType(conf.get(HadoopOfficeReadConfiguration.CONF_SIGTRUSTTYPE,HadoopOfficeReadConfiguration.DEFAULT_SIGTRUSTTYPE));
      this.setSigTruststorePassword(conf.get(HadoopOfficeReadConfiguration.CONF_SIGTRUSTPW,HadoopOfficeReadConfiguration.DEFAULT_SIGTRUSTPW));
-     this.setCertificateChain(new ArrayList<>());
+
+ 	this.setX509CertificateChain(new HashSet<>());
 }
 
 /*
@@ -412,13 +416,15 @@ public void setSigTruststorePassword(String sigTruststorePassword) {
 	this.sigTruststorePassword = sigTruststorePassword;
 }
 
-public List<X509Certificate> getCertificateChain() {
-	return certificateChain;
+public Set<X509Certificate> getX509CertificateChain() {
+	return x509CertificateChain;
 }
 
-public void setCertificateChain(List<X509Certificate> certificateChain) {
-	this.certificateChain = certificateChain;
+public void setX509CertificateChain(Set<X509Certificate> x509CertificateChain) {
+	this.x509CertificateChain = x509CertificateChain;
 }
+
+
 
 
 

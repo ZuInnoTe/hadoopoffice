@@ -25,7 +25,7 @@ import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
-import java.util.Collections;
+import java.util.List;
 
 import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.dsig.XMLSignatureException;
@@ -81,7 +81,7 @@ public class MSExcelOOXMLSignUtil {
 	 * Signs the Excel OOXML file and writes it to the final outputstream
 	 * 
 	 * @param privateKey private Key for signing
-	 * @param x509 Certificate for private Key for signing
+	 * @param x509List List of certificates for signing. First item must be the private key for signing.
 	 * @param password optional password for encryption, if used
 	 * @param hashAlgorithm hash algorithm to be used
 	 * 
@@ -90,7 +90,7 @@ public class MSExcelOOXMLSignUtil {
 	 * @throws IOException 
 	 * @throws FormatNotUnderstoodException 
 	 */
-	public void sign(Key privateKey, X509Certificate x509, String password, HashAlgorithm hashAlgorithm) throws XMLSignatureException, MarshalException, IOException, FormatNotUnderstoodException {
+	public void sign(Key privateKey, List<X509Certificate> x509List, String password, HashAlgorithm hashAlgorithm) throws XMLSignatureException, MarshalException, IOException, FormatNotUnderstoodException {
 		if (this.tempSignFileOS!=null) { // close it we sign only a closed temporary file
 			this.tempSignFileOS.close();
 		}
@@ -100,7 +100,7 @@ public class MSExcelOOXMLSignUtil {
         sc.addSignatureFacet(new XAdESSignatureFacet());
         sc.addSignatureFacet(new Office2010SignatureFacet());
 		sc.setKey((PrivateKey)privateKey);
-		sc.setSigningCertificateChain(Collections.singletonList(x509));
+		sc.setSigningCertificateChain(x509List);
 		sc.setDigestAlgo(hashAlgorithm);
 		FileInputStream tempSignFileIS = null;
 		try {

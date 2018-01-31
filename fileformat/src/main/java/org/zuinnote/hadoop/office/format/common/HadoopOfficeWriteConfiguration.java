@@ -17,6 +17,8 @@ package org.zuinnote.hadoop.office.format.common;
 
 import java.security.Key;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -115,6 +117,11 @@ public class HadoopOfficeWriteConfiguration {
 	private String sigHash;
 	private X509Certificate sigCertificate;
 	private Key sigKey;
+	
+	public HadoopOfficeWriteConfiguration(String fileName) {
+		this.fileName=fileName;
+	}
+	
 /*
  * 	Read the configuration for writing office files from a Hadoop configuration
  * 
@@ -185,6 +192,7 @@ public HadoopOfficeWriteConfiguration(Configuration conf, String fileName) {
      this.setSigKeystorePassword(conf.get(HadoopOfficeWriteConfiguration.CONF_SIGKEYSTOREPW,HadoopOfficeWriteConfiguration.DEFAULT_SIGKEYSTOREPW));
      this.setSigKeystoreAlias(conf.get(HadoopOfficeWriteConfiguration.CONF_SIGKEYSTOREALIAS,HadoopOfficeWriteConfiguration.DEFAULT_SIGKEYSTOREALIAS));
      this.setSigHash(conf.get(HadoopOfficeWriteConfiguration.CONF_SIGHASH,HadoopOfficeWriteConfiguration.DEFAULT_SIGHASH));
+  
 }
 public String[] getLinkedWorkbooksName() {
 	return linkedWorkbooksName;
@@ -371,4 +379,5 @@ public Key getSigKey() {
 public void setSigKey(Key sigKey) {
 	this.sigKey = sigKey;
 }
+
 }

@@ -36,7 +36,7 @@ import java.io.IOException;
 
 
 import java.security.GeneralSecurityException;
-
+import java.security.cert.X509Certificate;
 
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -382,7 +382,9 @@ public void close() throws IOException {
 			LOG.warn("Signing of docuemnts in old Excel format not supported for \""+this.howc.getFileName()+"\"");
 		}else {
 		try {
-				this.signUtil.sign(this.howc.getSigKey(), this.howc.getSigCertificate(), this.howc.getPassword(), MSExcelWriter.getHashAlgorithm(this.howc.getSigHash()));
+				ArrayList<X509Certificate> certList = new ArrayList<>();
+				certList.add(this.howc.getSigCertificate());
+				this.signUtil.sign(this.howc.getSigKey(), certList, this.howc.getPassword(), MSExcelWriter.getHashAlgorithm(this.howc.getSigHash()));
 		} catch (XMLSignatureException|MarshalException|IOException|FormatNotUnderstoodException e) {
 			LOG.error("Cannot sign document \""+this.howc.getFileName()+"\" "+e);
 		}

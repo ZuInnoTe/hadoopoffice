@@ -33,11 +33,11 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableEntryException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.security.cert.PKIXParameters;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.util.List;
-
-
+import java.util.Set;
 import java.security.cert.Certificate;
 
 import org.apache.hadoop.conf.Configuration;
@@ -191,7 +191,7 @@ private static java.nio.file.Path tmpPath;
     }
     
     @Test
-    public void getMostTrustedCertificatesFromTrustStore() throws IOException, NoSuchAlgorithmException, CertificateException, KeyStoreException, InvalidAlgorithmParameterException {
+    public void getAllX509CertificatesFromTrustStore() throws IOException, NoSuchAlgorithmException, CertificateException, KeyStoreException, InvalidAlgorithmParameterException {
     	Configuration conf = new Configuration(HadoopKeyStoreManagerTest.defaultConf);
 		ClassLoader classLoader = getClass().getClassLoader();
 		String fileName="cacerts";
@@ -200,7 +200,7 @@ private static java.nio.file.Path tmpPath;
 		HadoopKeyStoreManager hksm = new HadoopKeyStoreManager(conf);
 		hksm.openKeyStore(file, "JKS", "changeit");
 		// get most trusted certificates
-		List<X509Certificate> mostTrustedCAList=hksm.getMostTrustedCertificates();
-		assertEquals(104,mostTrustedCAList.size(),"Most trusted CA list has length 104");
+		Set<X509Certificate> allX509Certificates=hksm.getAllX509Certificates();
+		assertEquals(104,allX509Certificates.size(),"All X509 Certificate list has length 104");
     }
 }
