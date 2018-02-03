@@ -54,11 +54,11 @@ public class ExcelConverterSimpleSpreadSheetCellDAO {
 	private DecimalFormat decimalFormat;
 
 
-/**
+/***
+ * Create a new converter
  * 
- * @param dateFormat
- * @param decimalLocale
- * @param dformat
+ * @param dateFormat format of the dates in the Excel
+ * @param decimalFormat format of the decimals in the Excel
  */
 	public ExcelConverterSimpleSpreadSheetCellDAO(SimpleDateFormat dateFormat, DecimalFormat decimalFormat) {
 		this.schemaRow=new ArrayList<>();
@@ -244,7 +244,9 @@ public class ExcelConverterSimpleSpreadSheetCellDAO {
 	 * @return
 	 */
 	public GenericDataType[] getSchemaRow() {
-		return this.getSchemaRow();
+		GenericDataType[] result = new GenericDataType[this.schemaRow.size()];
+		this.schemaRow.toArray(result);
+		return result;
 	}
 	
 	/**
@@ -252,9 +254,9 @@ public class ExcelConverterSimpleSpreadSheetCellDAO {
 	 * 
 	 * @param dataRow cells containing data
 	 * @return an array of objects of primitive datatypes (boolean, int, byte, etc.) containing the data of datarow, null if dataRow does not fit into schema. Note: single elements can be null depending on the original Excel
-	 * @throws ParseException 
+	 * 
 	 */
-	public Object[] getDataAccordingToSchema(SpreadSheetCellDAO[] dataRow) throws ParseException {
+	public Object[] getDataAccordingToSchema(SpreadSheetCellDAO[] dataRow)  {
 		if (dataRow.length!=this.schemaRow.size()) {
 			LOG.error("Data row does not fit into schema. Cannot convert spreadsheet cell to simple datatypes");
 			return null;
@@ -282,7 +284,14 @@ public class ExcelConverterSimpleSpreadSheetCellDAO {
 			            result[i]=null;
 			        } 
 				}	else if (applyDataType instanceof GenericNumericDataType) {
-			        		BigDecimal bd = (BigDecimal) this.decimalFormat.parse(currentCell.getFormattedValue());
+					    BigDecimal bd = null;
+					    try {
+					    		if (!"".equals(currentCell.getFormattedValue())) {
+					    			bd = (BigDecimal) this.decimalFormat.parse(currentCell.getFormattedValue());
+					    		}
+					    } catch (ParseException p) {
+					    		LOG.warn("Could not parse decimal in spreadsheet cell, although type was detected as decimal");
+					    }
 			        		if (bd!=null) {
 			        				BigDecimal bdv = bd.stripTrailingZeros();
 			        				if (applyDataType instanceof GenericByteDataType) {
@@ -294,7 +303,7 @@ public class ExcelConverterSimpleSpreadSheetCellDAO {
 			        				} else if (applyDataType instanceof GenericLongDataType) {
 			        					result[i] = bdv.longValueExact();
 			        				} else if (applyDataType instanceof GenericBigDecimalDataType) {
-			        					result[i] = bdv;
+			        					result[i] = bd;
 			        				} else {
 			        					result[i] = null;
 			        				}

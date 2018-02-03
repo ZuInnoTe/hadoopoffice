@@ -13,20 +13,45 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 **/
-package org.zuinnote.hadoop.office.format.common.converter.datatypes;
+package org.zuinnote.hadoop.office.format.common.converter;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Locale;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mortbay.log.Log;
+import org.zuinnote.hadoop.office.format.common.HadoopOfficeReadConfiguration;
+import org.zuinnote.hadoop.office.format.common.OfficeReader;
+import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericBigDecimalDataType;
+import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericBooleanDataType;
+import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericByteDataType;
+import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericDataType;
+import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericDateDataType;
+import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericIntegerDataType;
+import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericLongDataType;
+import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericShortDataType;
+import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericStringDataType;
+import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
+import org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException;
 
 /**
  * @author jornfranke
@@ -66,7 +91,114 @@ public class ExcelConverterSimpleSpreadSheetCellDAOTest {
 	    
 
 	    @Test
-	    public void convertCaseTestSimple() {
+	    public void convertCaseTestSimple() throws FileNotFoundException, ParseException, FormatNotUnderstoodException {
+			ClassLoader classLoader = getClass().getClassLoader();
+			String fileName="testsimple.xlsx";
+			String fileNameSpreadSheet=classLoader.getResource(fileName).getFile();	
+    			File file = new File(fileNameSpreadSheet);
+	    		HadoopOfficeReadConfiguration hocr = new HadoopOfficeReadConfiguration();
+	    		hocr.setFileName(fileName);
+	    		hocr.setMimeType("ms-excel");
+	    		hocr.setLocale(Locale.GERMAN);
+	    		OfficeReader officeReader = new OfficeReader(new FileInputStream(file), hocr);  
+	    		officeReader.parse();
+	    		// read excel file
+	    		ArrayList<SpreadSheetCellDAO[]> excelContent = new ArrayList<>();
+	    		SpreadSheetCellDAO[] currentRow =(SpreadSheetCellDAO[]) officeReader.getNext();
+	   
+	    		while (currentRow!=null) {
+	    			excelContent.add(currentRow);
+	    			currentRow = (SpreadSheetCellDAO[]) officeReader.getNext();
+	    		
+	    		}
+	    		
+	    		assertEquals(7,excelContent.size(),"7 rows (including header) read");
+	    		// configure converter
+	    		SimpleDateFormat dateFormat = (SimpleDateFormat)DateFormat.getDateInstance(DateFormat.SHORT, Locale.US);
+	    		DecimalFormat decimalFormat = (DecimalFormat) DecimalFormat.getInstance(Locale.GERMAN);
+	    		ExcelConverterSimpleSpreadSheetCellDAO converter = new ExcelConverterSimpleSpreadSheetCellDAO(dateFormat,decimalFormat);
+	    		///// auto detect schema (skip header)
+	    		for (int i=1;i<excelContent.size();i++) {
+	    			converter.updateSpreadSheetCellRowToInferSchemaInformation(excelContent.get(i));
+	    		}
+	    		GenericDataType[] schema = converter.getSchemaRow();
+	    		// check schema
+	    		assertTrue(schema[0] instanceof GenericBigDecimalDataType, "First column is a decimal");
+	    		assertEquals(2,((GenericBigDecimalDataType)schema[0]).getPrecision(), "First column decimal has precision 2");
+	    		assertEquals(1,((GenericBigDecimalDataType)schema[0]).getScale(), "First column decimal has scale 1");
+	    		assertTrue(schema[1] instanceof GenericBooleanDataType, "Second column is a boolean");
+	    		assertTrue(schema[2] instanceof GenericDateDataType, "Third column is a date");
+	    		assertTrue(schema[3] instanceof GenericStringDataType, "Fourth column is a String");
+	    		assertTrue(schema[4] instanceof GenericBigDecimalDataType, "Fifth column is a decimal");
+	    		assertEquals(8,((GenericBigDecimalDataType)schema[4]).getPrecision(), "Fifth column decimal has precision 8");
+	    		assertEquals(3,((GenericBigDecimalDataType)schema[4]).getScale(), "Fifth column decimal has scale 3");
+	    		assertTrue(schema[5] instanceof GenericByteDataType, "Sixth column is a byte");
+	    		assertTrue(schema[6] instanceof GenericShortDataType, "Seventh column is a short");
+	    		assertTrue(schema[7] instanceof GenericIntegerDataType, "Eighth column is an integer");
+	    		assertTrue(schema[8] instanceof GenericLongDataType, "Ninth column is a log");
+	    		///// check conversion
+	    		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+	    		// check data (skip row 0, because it contains header)
+	    		Object[] simpleRow1 = converter.getDataAccordingToSchema(excelContent.get(1));
+	    		assertEquals(new BigDecimal("1.00"),simpleRow1[0], "A2 = 1.00");
+	    		assertTrue((Boolean)simpleRow1[1],"B2 = TRUE");
+	    		assertEquals(sdf.parse("2017-01-01"),simpleRow1[2],"C2 = 2017-01-01");
+	    		assertEquals("This is a text",simpleRow1[3], "D2 = This is a text");
+	    		assertEquals(new BigDecimal("10.000"),simpleRow1[4], "E2 = 10.000");
+	    		assertEquals((byte)3,simpleRow1[5], "F2 = 3");
+	    		assertEquals((short)3,simpleRow1[6], "G2 = 3");
+	    		assertEquals((int)100,simpleRow1[7], "H2 = 100");
+	    		assertEquals(65335L,simpleRow1[8], "I2 = 65335");
+	    		Object[] simpleRow2 = converter.getDataAccordingToSchema(excelContent.get(2));
+	    		assertEquals(new BigDecimal("1.50"),simpleRow2[0], "A3 = 1.50");
+	    		assertFalse((Boolean)simpleRow2[1],"B3 = FALSE");
+	    		assertEquals(sdf.parse("2017-02-28"),simpleRow2[2],"C3 = 2017-02-28");
+	    		assertEquals("Another String",simpleRow2[3], "D3 = Another String");
+	    		assertEquals(new BigDecimal("2.334"),simpleRow2[4], "E3 = 2.334");
+	    		assertEquals((byte)5,simpleRow2[5], "F3 = 5");
+	    		assertEquals((short)4,simpleRow2[6], "G3 = 4");
+	    		assertEquals((int)65335,simpleRow2[7], "H3 = 65335");
+	    		assertEquals(1L,simpleRow2[8], "I3 = 1");
+	    		Object[] simpleRow3 = converter.getDataAccordingToSchema(excelContent.get(3));
+	    		assertEquals(new BigDecimal("3.40"),simpleRow3[0], "A4 = 3.40");
+	    		assertFalse((Boolean)simpleRow3[1],"B4 = FALSE");
+	    		assertEquals(sdf.parse("2000-02-29"),simpleRow3[2],"C4 = 2000-02-29");
+	    		assertEquals("10",simpleRow3[3], "D4 = 10");
+	    		assertEquals(new BigDecimal("4.500"),simpleRow3[4], "E4 = 4.500");
+	    		assertEquals((byte)-100,simpleRow3[5], "F4 = -100");
+	    		assertEquals((short)5,simpleRow3[6], "G4 = 5");
+	    		assertEquals((int)1,simpleRow3[7], "H4 = 1");
+	    		assertEquals(250L,simpleRow3[8], "I4 = 250");
+	    		Object[] simpleRow4 = converter.getDataAccordingToSchema(excelContent.get(4));
+	    		assertEquals(new BigDecimal("5.50"),simpleRow4[0], "A5 = 5.50");
+	    		assertFalse((Boolean)simpleRow4[1],"B5 = FALSE");
+	    		assertEquals(sdf.parse("2017-03-01"),simpleRow4[2],"C5 = 2017-03-01");
+	    		assertEquals("test3",simpleRow4[3], "D5 = test3");
+	    		assertEquals(new BigDecimal("11.000"),simpleRow4[4], "E5 = 11.000");
+	    		assertEquals((byte)2,simpleRow4[5], "F5 = 2");
+	    		assertEquals((short)250,simpleRow4[6], "G5 = 250");
+	    		assertEquals((int)250,simpleRow4[7], "H5 = 250");
+	    		assertEquals(10L,simpleRow4[8], "I5 = 10");
+	    		Object[] simpleRow5 = converter.getDataAccordingToSchema(excelContent.get(5));
+	    		assertNull(simpleRow5[0], "A6 = null");
+	    		assertNull(simpleRow5[1], "B6 = null");
+	    		assertNull(simpleRow5[2], "C6 = null");
+	    		assertEquals("test4",simpleRow5[3], "D6 = test4");
+	    		assertEquals(new BigDecimal("100.000"),simpleRow5[4], "E6 = 100.000");
+	    		assertEquals((byte)3,simpleRow5[5], "F6 = 3");
+	    		assertEquals((short)3,simpleRow5[6], "G6 = 3");
+	    		assertEquals((int)5,simpleRow5[7], "H6 = 5");
+	    		assertEquals(3147483647L,simpleRow5[8], "I6 = 3147483647");
+	    		Object[] simpleRow6 = converter.getDataAccordingToSchema(excelContent.get(6));
+	    		assertEquals(new BigDecimal("3.40"),simpleRow6[0], "A7 = 3.40");
+	    		assertTrue((Boolean)simpleRow6[1],"B7 = TRUE");
+	    		assertEquals(sdf.parse("2017-03-01"),simpleRow6[2],"C7 = 2017-03-01");
+	    		assertEquals("test5",simpleRow6[3], "D7 = test5");
+	    		assertEquals(new BigDecimal("10000.500"),simpleRow6[4], "E6 = 10000.500");
+	    		assertEquals((byte)120,simpleRow6[5], "F7 = 120");
+	    		assertEquals((short)100,simpleRow6[6], "G7 = 100");
+	    		assertEquals((int)10000,simpleRow6[7], "H7 = 10000");
+	    		assertEquals(10L,simpleRow6[8], "I6 = 10");
 	    }
 
 }
