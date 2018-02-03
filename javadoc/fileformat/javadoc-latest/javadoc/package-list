@@ -1,4 +1,6 @@
 org.zuinnote.hadoop.office.format.common
+org.zuinnote.hadoop.office.format.common.converter
+org.zuinnote.hadoop.office.format.common.converter.datatypes
 org.zuinnote.hadoop.office.format.common.dao
 org.zuinnote.hadoop.office.format.common.parser
 org.zuinnote.hadoop.office.format.common.util
