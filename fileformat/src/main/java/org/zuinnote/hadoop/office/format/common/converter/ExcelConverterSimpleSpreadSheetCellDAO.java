@@ -23,6 +23,7 @@ import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -249,6 +250,15 @@ public class ExcelConverterSimpleSpreadSheetCellDAO {
 		return result;
 	}
 	
+	/***
+	 * Allows to set a custom schema. Note: the schema must have the the size of the largest (expected) row in the Excel. In case you do not need a conversion set the schema for the corresponding column to null
+	 * 
+	 * @param schemaRow
+	 */
+	public void setSchemaRow(GenericDataType[] schemaRow) {
+		this.schemaRow=new ArrayList<>(Arrays.asList(schemaRow));
+	}
+	
 	/**
 	 * Translate a data row according to the currently defined schema. 
 	 * 
@@ -265,7 +275,12 @@ public class ExcelConverterSimpleSpreadSheetCellDAO {
 		for (int i=0;i<dataRow.length;i++) {
 			SpreadSheetCellDAO currentCell = dataRow[i];
 			if (currentCell!=null) {
-				GenericDataType applyDataType = this.schemaRow.get(i);
+				GenericDataType applyDataType=null;
+				if (i>=this.schemaRow.size()) {
+					LOG.warn("No further schema row for column defined: "+String.valueOf(i));
+				} else {
+					applyDataType = this.schemaRow.get(i);
+				}
 				if (applyDataType==null) {
 					result[i]=currentCell.getFormattedValue();
 				} else
@@ -316,5 +331,7 @@ public class ExcelConverterSimpleSpreadSheetCellDAO {
 		}
 		return result;
 	}
+	
+	
 	
 }
