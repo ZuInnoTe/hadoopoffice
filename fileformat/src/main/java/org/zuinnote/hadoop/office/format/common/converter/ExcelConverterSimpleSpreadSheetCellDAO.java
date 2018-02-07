@@ -298,17 +298,22 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 					result[i]=currentCell.getFormattedValue();
 				} else 
 				if (applyDataType instanceof GenericBooleanDataType) {
-					result[i]=Boolean.valueOf(currentCell.getFormattedValue());
+					if (!"".equals(currentCell.getFormattedValue())) {
+						result[i]=Boolean.valueOf(currentCell.getFormattedValue());
+					}
 				} else 
 				if (applyDataType instanceof GenericDateDataType) {
-					Date theDate = this.dateFormat.parse(currentCell.getFormattedValue(), new ParsePosition(0));
-			        if (theDate != null) {
-			        			result[i]=theDate;
-			 
-			        } else {
-			            result[i]=null;
-			        } 
+					if (!"".equals(currentCell.getFormattedValue())) {
+						Date theDate = this.dateFormat.parse(currentCell.getFormattedValue(), new ParsePosition(0));
+				        if (theDate != null) {
+				        			result[i]=theDate;
+				 
+				        } else {
+				            result[i]=null;
+				        } 
+					}
 				}	else if (applyDataType instanceof GenericNumericDataType) {
+					if (!"".equals(currentCell.getFormattedValue())) {
 					    BigDecimal bd = null;
 					    try {
 					    		if (!"".equals(currentCell.getFormattedValue())) {
@@ -333,7 +338,7 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 			        					result[i] = null;
 			        				}
 			        }
-			        } else {
+			        }} else {
 			        		result[i] = null;
 			        		LOG.warn("Could not convert object in spreadsheet cellrow. Did you add a new datatype?");
 			        }
