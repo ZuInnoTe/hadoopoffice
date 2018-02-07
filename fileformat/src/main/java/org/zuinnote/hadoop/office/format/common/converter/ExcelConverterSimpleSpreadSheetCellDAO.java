@@ -274,6 +274,9 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 	 * 
 	 */
 	public Object[] getDataAccordingToSchema(SpreadSheetCellDAO[] dataRow)  {
+		if (dataRow==null) {
+			return new Object[this.schemaRow.size()];
+		}
 		if (dataRow.length!=this.schemaRow.size()) {
 			LOG.error("Data row does not fit into schema. Cannot convert spreadsheet cell to simple datatypes");
 			return null;

@@ -135,7 +135,7 @@ public class ExcelConverterSimpleSpreadSheetCellDAOTest {
 	    		assertTrue(schema[5] instanceof GenericByteDataType, "Sixth column is a byte");
 	    		assertTrue(schema[6] instanceof GenericShortDataType, "Seventh column is a short");
 	    		assertTrue(schema[7] instanceof GenericIntegerDataType, "Eighth column is an integer");
-	    		assertTrue(schema[8] instanceof GenericLongDataType, "Ninth column is a log");
+	    		assertTrue(schema[8] instanceof GenericLongDataType, "Ninth column is a long");
 	    		///// check conversion
 	    		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 	    		// check data (skip row 0, because it contains header)
