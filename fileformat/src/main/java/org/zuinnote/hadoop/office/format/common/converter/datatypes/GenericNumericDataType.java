@@ -15,10 +15,17 @@
 **/
 package org.zuinnote.hadoop.office.format.common.converter.datatypes;
 
+import java.io.Serializable;
+
 /**
  * @author jornfranke
  *
  */
-public class GenericNumericDataType extends GenericDataType {
+public class GenericNumericDataType extends GenericDataType implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7155900569691186912L;
 
 }

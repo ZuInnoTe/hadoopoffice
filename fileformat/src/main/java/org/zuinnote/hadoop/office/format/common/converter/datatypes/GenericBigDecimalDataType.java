@@ -15,13 +15,19 @@
 **/
 package org.zuinnote.hadoop.office.format.common.converter.datatypes;
 
+import java.io.Serializable;
+
 /**
  * @author jornfranke
  *
  */
-public class GenericBigDecimalDataType extends GenericNumericDataType {
+public class GenericBigDecimalDataType extends GenericNumericDataType implements Serializable{
 	
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1166910232067725516L;
 	private int scale;
 	private int precision;
 	

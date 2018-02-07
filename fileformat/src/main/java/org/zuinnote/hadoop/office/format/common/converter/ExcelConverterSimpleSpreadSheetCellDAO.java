@@ -17,6 +17,7 @@
 package org.zuinnote.hadoop.office.format.common.converter;
 
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -46,7 +47,13 @@ import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
  * This class allows to infer the Java datatypes underlying a SpreadSheet and the corresponding data as Java objects
  *
  */
-public class ExcelConverterSimpleSpreadSheetCellDAO {
+public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3281344931609307423L;
+
+
 	private static final Log LOG = LogFactory.getLog(ExcelConverterSimpleSpreadSheetCellDAO.class.getName());
 	
 	

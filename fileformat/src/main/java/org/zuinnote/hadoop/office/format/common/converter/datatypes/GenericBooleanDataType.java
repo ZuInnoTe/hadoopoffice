@@ -15,10 +15,12 @@
 **/
 package org.zuinnote.hadoop.office.format.common.converter.datatypes;
 
+import java.io.Serializable;
+
 /**
  * @author jornfranke
  *
  */
-public class GenericBooleanDataType extends GenericDataType {
+public class GenericBooleanDataType extends GenericDataType implements Serializable {
 
 }
