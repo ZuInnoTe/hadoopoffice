@@ -37,6 +37,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.flink.core.fs.Path;
 import org.apache.hadoop.conf.Configuration;
@@ -189,7 +190,7 @@ private static java.nio.file.Path tmpPath;
     }
     
     @Test
-    public void getMostTrustedCertificatesFromTrustStore() throws IOException, NoSuchAlgorithmException, CertificateException, KeyStoreException, InvalidAlgorithmParameterException {
+    public void getAllX509Certificates() throws IOException, NoSuchAlgorithmException, CertificateException, KeyStoreException, InvalidAlgorithmParameterException {
     	
 		ClassLoader classLoader = getClass().getClassLoader();
 		String fileName="cacerts";
@@ -198,7 +199,7 @@ private static java.nio.file.Path tmpPath;
 		FlinkKeyStoreManager fksm = new FlinkKeyStoreManager();
 		fksm.openKeyStore(file, "JKS", "changeit");
 		// get most trusted certificates
-		List<X509Certificate> mostTrustedCAList=fksm.getMostTrustedCertificates();
+		Set<X509Certificate> mostTrustedCAList=fksm.getAllX509Certificates();
 		assertEquals(104,mostTrustedCAList.size(),"Most trusted CA list has length 104");
     }
 }
