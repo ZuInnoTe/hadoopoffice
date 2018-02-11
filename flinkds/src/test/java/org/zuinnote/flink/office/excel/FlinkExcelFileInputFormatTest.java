@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Locale;
 
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.core.fs.FileInputSplit;
@@ -105,7 +106,9 @@ public class FlinkExcelFileInputFormatTest {
 			    Path file = new Path(fileNameSpreadSheet); 
 			    FileInputSplit spreadSheetInputSplit = new FileInputSplit(0,file,0, -1, null);
 			    HadoopOfficeReadConfiguration hocr = new HadoopOfficeReadConfiguration();
-			    ExcelFlinkFileInputFormat inputFormat = new ExcelFlinkFileInputFormat(hocr);
+			    hocr.setLocale(Locale.US);
+			    boolean useHeader=false;
+			    ExcelFlinkFileInputFormat inputFormat = new ExcelFlinkFileInputFormat(hocr,useHeader);
 			    inputFormat.open(spreadSheetInputSplit);
 			    assertFalse(inputFormat.reachedEnd(),"End not reached");
 			    SpreadSheetCellDAO[] reuse = new  SpreadSheetCellDAO[0];
@@ -176,7 +179,9 @@ public class FlinkExcelFileInputFormatTest {
 			    Path file = new Path(fileNameSpreadSheet); 
 			    FileInputSplit spreadSheetInputSplit = new FileInputSplit(0,file,0, -1, null);
 			    HadoopOfficeReadConfiguration hocr = new HadoopOfficeReadConfiguration();
-			    ExcelFlinkFileInputFormat inputFormat = new ExcelFlinkFileInputFormat(hocr);
+			    hocr.setLocale(Locale.US);
+			    boolean useHeader=false;
+			    ExcelFlinkFileInputFormat inputFormat = new ExcelFlinkFileInputFormat(hocr,useHeader);
 			    inputFormat.open(spreadSheetInputSplit);
 			    assertFalse(inputFormat.reachedEnd(),"End not reached");
 			    SpreadSheetCellDAO[] reuse = new  SpreadSheetCellDAO[0];
@@ -247,7 +252,9 @@ public class FlinkExcelFileInputFormatTest {
 			    Path file = new Path(fileNameSpreadSheet); 
 			    FileInputSplit spreadSheetInputSplit = new FileInputSplit(0,file,0, -1, null);
 			    HadoopOfficeReadConfiguration hocr = new HadoopOfficeReadConfiguration();
-			    ExcelFlinkFileInputFormat inputFormat = new ExcelFlinkFileInputFormat(hocr);
+			    hocr.setLocale(Locale.US);
+			    boolean useHeader=false;
+			    ExcelFlinkFileInputFormat inputFormat = new ExcelFlinkFileInputFormat(hocr,useHeader);
 			    inputFormat.open(spreadSheetInputSplit);
 			    assertFalse(inputFormat.reachedEnd(),"End not reached");
 			    SpreadSheetCellDAO[] reuse = new  SpreadSheetCellDAO[0];

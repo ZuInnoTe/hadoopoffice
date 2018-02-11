@@ -32,8 +32,8 @@ public class ExcelFlinkFileInputFormat extends AbstractSpreadSheetFlinkFileInput
 	private static final Log LOG = LogFactory.getLog(ExcelFlinkFileInputFormat.class.getName());
 	
 	
-	public ExcelFlinkFileInputFormat(HadoopOfficeReadConfiguration hocr) {
-		super(hocr);
+	public ExcelFlinkFileInputFormat(HadoopOfficeReadConfiguration hocr, boolean useHeader) {
+		super(hocr,useHeader);
 		hocr.setMimeType(AbstractSpreadSheetFlinkFileInputFormat.MIMETYPE_EXCEL);
 	}
 

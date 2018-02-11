@@ -35,6 +35,7 @@ import org.zuinnote.flink.office.common.FlinkFileReader;
 import org.zuinnote.flink.office.common.FlinkKeyStoreManager;
 import org.zuinnote.hadoop.office.format.common.HadoopOfficeReadConfiguration;
 import org.zuinnote.hadoop.office.format.common.OfficeReader;
+import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 import org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException;
 
 /**
@@ -54,6 +55,8 @@ implements CheckpointableInputFormat<FileInputSplit, Tuple2<Long, Long>> {
 	private FlinkFileReader currentFFR;
 	private long sheetNum;
 	private long rowNum;
+	private boolean useHeader;
+	private String[] header;
 	private boolean reachedEnd;
 
 	
@@ -67,12 +70,14 @@ implements CheckpointableInputFormat<FileInputSplit, Tuple2<Long, Long>> {
 	 * Initialize the ExcelFlinkInputFormat with a given configuration for the
 	 * HadoopOffice library
 	 * 
-	 * @param hocr
-	 *            HadoopOffice read configuration
+	 * @param hocr HadoopOffice read configuration
+	 * @param useHeader read the first row of the Excel as header
 	 */
 
-	public AbstractSpreadSheetFlinkFileInputFormat(HadoopOfficeReadConfiguration hocr) {
+	public AbstractSpreadSheetFlinkFileInputFormat(HadoopOfficeReadConfiguration hocr, boolean useHeader) {
 		this.hocr = hocr;
+		this.useHeader=useHeader;
+		this.header = new String[0];
 		this.unsplittable=true;
 	}
 
@@ -127,7 +132,18 @@ implements CheckpointableInputFormat<FileInputSplit, Tuple2<Long, Long>> {
 			}
 		}
 	    }
+	    if (this.useHeader) {
+	    	 	SpreadSheetCellDAO[] headerRow = (SpreadSheetCellDAO[]) this.readNextRow();
+	    	 	this.header=new String[headerRow.length];
+	    	 	for (int i=0;i<headerRow.length;i++) {
+	    	 		this.header[i]=headerRow[i].getFormattedValue();
+	    	 	}
+	    }
 		
+	}
+	
+	public String[] getHeader() {
+		return this.header;
 	}
 
 

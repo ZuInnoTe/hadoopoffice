@@ -29,11 +29,11 @@ import org.zuinnote.hadoop.office.format.common.writer.OfficeWriterException;
  * @author jornfranke
  *
  */
-public class SimpleExcelFlinkOutputFormat extends AbstractSpreadSheetFlinkFileOutputFormat<Object[]> {
+public class SimpleExcelFlinkFileOutputFormat extends AbstractSpreadSheetFlinkFileOutputFormat<Object[]> {
 	
 	
 
-	private static final Log LOG = LogFactory.getLog(SimpleExcelFlinkOutputFormat.class.getName());
+	private static final Log LOG = LogFactory.getLog(SimpleExcelFlinkFileOutputFormat.class.getName());
 	/**
 	 * 
 	 */
@@ -42,7 +42,7 @@ public class SimpleExcelFlinkOutputFormat extends AbstractSpreadSheetFlinkFileOu
 	private String sheetName;
 	private int rowNum;
 	
-	public SimpleExcelFlinkOutputFormat(HadoopOfficeWriteConfiguration howc, String sheetName, ExcelConverterSimpleSpreadSheetCellDAO converter) {
+	public SimpleExcelFlinkFileOutputFormat(HadoopOfficeWriteConfiguration howc, String sheetName, ExcelConverterSimpleSpreadSheetCellDAO converter) {
 		super(howc);
 		this.converter=converter;
 		this.sheetName=sheetName;
