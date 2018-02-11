@@ -26,6 +26,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -199,6 +200,80 @@ public class ExcelConverterSimpleSpreadSheetCellDAOTest {
 	    		assertEquals((short)100,simpleRow6[6], "G7 = 100");
 	    		assertEquals((int)10000,simpleRow6[7], "H7 = 10000");
 	    		assertEquals(10L,simpleRow6[8], "I6 = 10");
+	    }
+	    
+	    
+	    @Test
+	    public void getSpreadSheetCellDAOfromSimpleDataType() throws ParseException {
+		    	// configure converter
+	    		SimpleDateFormat dateFormat = (SimpleDateFormat)DateFormat.getDateInstance(DateFormat.SHORT, Locale.US);
+	    		DecimalFormat decimalFormat = (DecimalFormat) DecimalFormat.getInstance(Locale.GERMAN);
+	    		ExcelConverterSimpleSpreadSheetCellDAO converter = new ExcelConverterSimpleSpreadSheetCellDAO(dateFormat,decimalFormat);
+	    		// test some rows
+	    		Object[] rowA = new Object[13];
+	    		rowA[0] = new Boolean(true);
+	    		rowA[1] = new Byte((byte) 100);
+	    		rowA[2] = new Short((short) 1000);
+	    		rowA[3] = new Integer(32000);
+	    		rowA[4] = new Long(65536L);
+	    		rowA[5] = new Double(2.5);
+	    		rowA[6] = new Float(3.5f);
+	    		rowA[7] = new BigDecimal(1.5);
+	    		rowA[8] = dateFormat.parse("1/13/2018");
+	    		rowA[9] = new java.sql.Date(dateFormat.parse("1/13/2018").getTime());
+	    		rowA[10] = new Timestamp(dateFormat.parse("1/13/2018").getTime());
+	    		rowA[11] = "This is a test";
+	    		rowA[12] = null;
+	    		SpreadSheetCellDAO[] actual = converter.getSpreadSheetCellDAOfromSimpleDataType(rowA, "testsheet", 0);
+	    		assertEquals("",actual[0].getFormattedValue(),"Formatted Value is empty");
+	    		assertEquals("",actual[0].getComment(),"Comment is empty");
+	    		assertEquals("true",actual[0].getFormula(),"Formula contains data type");
+	    		assertEquals("A1",actual[0].getAddress(),"Address is correct");
+	    		assertEquals("",actual[1].getFormattedValue(),"Formatted Value is empty");
+	    		assertEquals("",actual[1].getComment(),"Comment is empty");
+	    		assertEquals("100",actual[1].getFormula(),"Formula contains data type");
+	    		assertEquals("B1",actual[1].getAddress(),"Address is correct");
+	    		assertEquals("",actual[2].getFormattedValue(),"Formatted Value is empty");
+	    		assertEquals("",actual[2].getComment(),"Comment is empty");
+	    		assertEquals("1000",actual[2].getFormula(),"Formula contains data type");
+	    		assertEquals("C1",actual[2].getAddress(),"Address is correct");
+	    		assertEquals("",actual[3].getFormattedValue(),"Formatted Value is empty");
+	    		assertEquals("",actual[3].getComment(),"Comment is empty");
+	    		assertEquals("32000",actual[3].getFormula(),"Formula contains data type");
+	    		assertEquals("D1",actual[3].getAddress(),"Address is correct");
+	    		assertEquals("",actual[4].getFormattedValue(),"Formatted Value is empty");
+	    		assertEquals("",actual[4].getComment(),"Comment is empty");
+	    		assertEquals("65536",actual[4].getFormula(),"Formula contains data type");
+	    		assertEquals("E1",actual[4].getAddress(),"Address is correct");
+	    		assertEquals("",actual[5].getFormattedValue(),"Formatted Value is empty");
+	    		assertEquals("",actual[5].getComment(),"Comment is empty");
+	    		assertEquals("2.5",actual[5].getFormula(),"Formula contains data type");
+	    		assertEquals("F1",actual[5].getAddress(),"Address is correct");
+	    		assertEquals("",actual[6].getFormattedValue(),"Formatted Value is empty");
+	    		assertEquals("",actual[6].getComment(),"Comment is empty");
+	    		assertEquals("3.5",actual[6].getFormula(),"Formula contains data type");
+	    		assertEquals("G1",actual[6].getAddress(),"Address is correct");
+	    		assertEquals("",actual[7].getFormattedValue(),"Formatted Value is empty");
+	    		assertEquals("",actual[7].getComment(),"Comment is empty");
+	    		assertEquals("1.5",actual[7].getFormula(),"Formula contains data type");
+	    		assertEquals("H1",actual[7].getAddress(),"Address is correct");
+	    		assertEquals("1/13/18",actual[8].getFormattedValue(),"Formatted Value contains data type");
+	    		assertEquals("",actual[8].getComment(),"Comment is empty");
+	    		assertEquals("",actual[8].getFormula(),"Formula is empty");
+	    		assertEquals("I1",actual[8].getAddress(),"Address is correct");
+	    		assertEquals("1/13/18",actual[9].getFormattedValue(),"Formatted Value contains data type");
+	    		assertEquals("",actual[9].getComment(),"Comment is empty");
+	    		assertEquals("",actual[9].getFormula(),"Formula is empty");
+	    		assertEquals("J1",actual[9].getAddress(),"Address is correct");
+	    		assertEquals("2018-01-13 00:00:00.0",actual[10].getFormattedValue(),"Formatted Value contains data type");
+	    		assertEquals("",actual[10].getComment(),"Comment is empty");
+	    		assertEquals("",actual[10].getFormula(),"Formula is empty");
+	    		assertEquals("K1",actual[10].getAddress(),"Address is correct");
+	    		assertEquals("This is a test",actual[11].getFormattedValue(),"Formatted Value contains data");
+	    		assertEquals("",actual[11].getComment(),"Comment is empty");
+	    		assertEquals("",actual[11].getFormula(),"Formula is empty");
+	    		assertEquals("L1",actual[11].getAddress(),"Address is correct");
+	    		assertNull(actual[12],"Null values stay null");
 	    }
 
 }

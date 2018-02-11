@@ -139,52 +139,54 @@ public MSExcelLowFootprintWriter(String excelFormat, HadoopOfficeWriteConfigurat
 
 	@Override
 	public void write(Object newDAO) throws OfficeWriterException {
-		SpreadSheetCellDAO sscd = MSExcelWriter.checkSpreadSheetCellDAO(newDAO);
-		String safeSheetName=WorkbookUtil.createSafeSheetName(sscd.getSheetName());
-		SXSSFSheet currentSheet=this.currentWorkbook.getSheet(safeSheetName);
-		if (currentSheet==null) {// create sheet if it does not exist yet
-			currentSheet=this.currentWorkbook.createSheet(safeSheetName);
-			if (!(safeSheetName.equals(sscd.getSheetName()))) {
-				LOG.warn("Sheetname modified from \""+sscd.getSheetName()+"\" to \""+safeSheetName+"\" to correspond to Excel conventions.");
+		if (newDAO!=null) {
+			SpreadSheetCellDAO sscd = MSExcelWriter.checkSpreadSheetCellDAO(newDAO);
+			String safeSheetName=WorkbookUtil.createSafeSheetName(sscd.getSheetName());
+			SXSSFSheet currentSheet=this.currentWorkbook.getSheet(safeSheetName);
+			if (currentSheet==null) {// create sheet if it does not exist yet
+				currentSheet=this.currentWorkbook.createSheet(safeSheetName);
+				if (!(safeSheetName.equals(sscd.getSheetName()))) {
+					LOG.warn("Sheetname modified from \""+sscd.getSheetName()+"\" to \""+safeSheetName+"\" to correspond to Excel conventions.");
+				}
+				// create drawing anchor (needed for comments...)
+				this.mappedDrawings.put(safeSheetName,currentSheet.createDrawingPatriarch());
 			}
-			// create drawing anchor (needed for comments...)
-			this.mappedDrawings.put(safeSheetName,currentSheet.createDrawingPatriarch());
-		}
-		// check if cell exist
-		CellAddress currentCA = new CellAddress(sscd.getAddress());
-		SXSSFRow currentRow = currentSheet.getRow(currentCA.getRow());
-		if (currentRow==null) { // row does not exist? => create it
-			currentRow=currentSheet.createRow(currentCA.getRow());
-		}
-		SXSSFCell currentCell = currentRow.getCell(currentCA.getColumn());
-		if ((currentCell!=null)) { // cell already exists and no template loaded ? => throw exception
-			throw new OfficeWriterException("Invalid cell specification: cell already exists at "+currentCA);
-		}
-		// create cell if no template is loaded or cell not available in template
-			currentCell=currentRow.createCell(currentCA.getColumn());		
-		// set the values accordingly
-		if (!("".equals(sscd.getFormula()))) { // if formula exists then use formula
-			currentCell.setCellFormula(sscd.getFormula());
-			
-		} else {	
-		// else use formattedValue
-			currentCell.setCellValue(sscd.getFormattedValue());
-		}
-		// set comment
-		if ((sscd.getComment()!=null) && (!("".equals(sscd.getComment())))) {
-			/** the following operations are necessary to create comments **/
-			/** Define size of the comment window **/
-			    ClientAnchor anchor = this.currentWorkbook.getCreationHelper().createClientAnchor();
-	    		    anchor.setCol1(currentCell.getColumnIndex());
-	    		    anchor.setCol2(currentCell.getColumnIndex()+this.howc.getCommentWidth());
-	    		    anchor.setRow1(currentRow.getRowNum());
-	    		    anchor.setRow2(currentRow.getRowNum()+this.howc.getCommentHeight());
-			/** create comment **/
-			   Comment currentComment = mappedDrawings.get(safeSheetName).createCellComment(anchor);
-	    		    currentComment.setString(this.currentWorkbook.getCreationHelper().createRichTextString(sscd.getComment()));
-	    		    currentComment.setAuthor(this.howc.getCommentAuthor());
-			    currentCell.setCellComment(currentComment);
-
+			// check if cell exist
+			CellAddress currentCA = new CellAddress(sscd.getAddress());
+			SXSSFRow currentRow = currentSheet.getRow(currentCA.getRow());
+			if (currentRow==null) { // row does not exist? => create it
+				currentRow=currentSheet.createRow(currentCA.getRow());
+			}
+			SXSSFCell currentCell = currentRow.getCell(currentCA.getColumn());
+			if ((currentCell!=null)) { // cell already exists and no template loaded ? => throw exception
+				throw new OfficeWriterException("Invalid cell specification: cell already exists at "+currentCA);
+			}
+			// create cell if no template is loaded or cell not available in template
+				currentCell=currentRow.createCell(currentCA.getColumn());		
+			// set the values accordingly
+			if (!("".equals(sscd.getFormula()))) { // if formula exists then use formula
+				currentCell.setCellFormula(sscd.getFormula());
+				
+			} else {	
+			// else use formattedValue
+				currentCell.setCellValue(sscd.getFormattedValue());
+			}
+			// set comment
+			if ((sscd.getComment()!=null) && (!("".equals(sscd.getComment())))) {
+				/** the following operations are necessary to create comments **/
+				/** Define size of the comment window **/
+				    ClientAnchor anchor = this.currentWorkbook.getCreationHelper().createClientAnchor();
+		    		    anchor.setCol1(currentCell.getColumnIndex());
+		    		    anchor.setCol2(currentCell.getColumnIndex()+this.howc.getCommentWidth());
+		    		    anchor.setRow1(currentRow.getRowNum());
+		    		    anchor.setRow2(currentRow.getRowNum()+this.howc.getCommentHeight());
+				/** create comment **/
+				   Comment currentComment = mappedDrawings.get(safeSheetName).createCellComment(anchor);
+		    		    currentComment.setString(this.currentWorkbook.getCreationHelper().createRichTextString(sscd.getComment()));
+		    		    currentComment.setAuthor(this.howc.getCommentAuthor());
+				    currentCell.setCellComment(currentComment);
+	
+			}
 		}
 		}
 

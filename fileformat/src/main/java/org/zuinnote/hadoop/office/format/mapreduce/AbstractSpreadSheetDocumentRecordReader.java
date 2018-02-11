@@ -184,7 +184,7 @@ private void readKeyStore(Configuration conf) throws IOException, FormatNotUnder
 			}
 			this.hocr.setPassword(pw);
 		} catch (NoSuchAlgorithmException | CertificateException | KeyStoreException | IllegalArgumentException | UnrecoverableEntryException | InvalidKeySpecException e) {
-			LOG.error(e);
+			LOG.error("Cannopt read keystore. Exception: ",e);
 			throw new FormatNotUnderstoodException("Cannot read keystore to obtain credentials to access encrypted documents "+e);
 		}
 		
@@ -208,7 +208,7 @@ private void readTrustStore(Configuration conf) throws IOException, FormatNotUnd
 			hksm.openKeyStore(new Path(this.hocr.getSigTruststoreFile()), this.hocr.getSigTruststoreType(), this.hocr.getSigTruststorePassword());
 			this.hocr.setX509CertificateChain(hksm.getAllX509Certificates());
 		} catch (NoSuchAlgorithmException | CertificateException | KeyStoreException | IllegalArgumentException  e) {
-			LOG.error(e);
+			LOG.error("Cannopt read truststore. Exception: ",e);
 			throw new FormatNotUnderstoodException("Cannot read truststore to establish certificate chain for signature validation "+e);
 		}
 		

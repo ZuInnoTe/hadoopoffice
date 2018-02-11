@@ -124,7 +124,7 @@ private void readKeyStore(Configuration conf) throws IOException, OfficeWriterEx
 			}
 			this.howc.setPassword(password);
 		} catch (NoSuchAlgorithmException | CertificateException | KeyStoreException | IllegalArgumentException | UnrecoverableEntryException | InvalidKeySpecException e) {
-			LOG.error(e);
+			LOG.error("Cannopt read keystore. Exception: ",e);
 			throw new OfficeWriterException("Cannot read keystore to obtain credentials used to encrypt office documents "+e);
 		}
 		
@@ -156,7 +156,7 @@ private void readSigningKeyAndCertificate(Configuration conf) throws OfficeWrite
 			this.howc.setSigKey(hksm.getPrivateKey(this.howc.getSigKeystoreAlias(), this.howc.getSigKeystorePassword()));
 			this.howc.setSigCertificate((X509Certificate) hksm.getCertificate(this.howc.getSigKeystoreAlias()));
 		} catch (NoSuchAlgorithmException | CertificateException | KeyStoreException | IllegalArgumentException | UnrecoverableKeyException  e) {
-			LOG.error(e);
+			LOG.error("Cannopt read signing certificate. Exception: ",e);
 			throw new OfficeWriterException("Cannot read keystore to obtain key and certificate for signing "+e);
 		}
 		

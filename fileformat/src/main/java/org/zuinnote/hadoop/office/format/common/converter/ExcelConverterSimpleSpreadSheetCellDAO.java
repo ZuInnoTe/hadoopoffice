@@ -19,6 +19,7 @@ package org.zuinnote.hadoop.office.format.common.converter;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.ParsePosition;
@@ -42,6 +43,7 @@ import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericNumer
 import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericShortDataType;
 import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericStringDataType;
 import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
+import org.zuinnote.hadoop.office.format.common.util.MSExcelUtil;
 
 /**
  * This class allows to infer the Java datatypes underlying a SpreadSheet and the corresponding data as Java objects
@@ -60,6 +62,7 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 	private List<GenericDataType> schemaRow;
 	private SimpleDateFormat dateFormat;
 	private DecimalFormat decimalFormat;
+	
 
 
 /***
@@ -347,6 +350,93 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 		return result;
 	}
 	
+	/***
+	 * Converts a row consisting of objects of simple data types (String, byte, short, int, long, etc.) to a row of SpreadSheetCellDAO
+	 * 
+	 * @param row
+	 * @param sheetName
+	 * @param rowNum
+	 * @return
+	 */
+	public SpreadSheetCellDAO[] getSpreadSheetCellDAOfromSimpleDataType(Object[] row, String sheetName, int rowNum) {
+		  // for each value in the row
+
+	    SpreadSheetCellDAO[] result = new SpreadSheetCellDAO[row.length];
+	    for (int currentColumnNum=0; currentColumnNum< row.length;currentColumnNum++) { // for each element of the row
+	      Object x = row[currentColumnNum];
+	      String formattedValue = "";
+	      String comment = "";
+	      String formula = "";
+	      String address = "";
+	      if (x!=null) {
+		      if (x instanceof Boolean) {
+		    	  		formattedValue = "";
+		    	          comment = "";
+		    	          formula = String.valueOf(x);
+		    	          address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
+		      } else if (x instanceof Byte) {
+				    	  formattedValue = "";
+		    	          comment = "";
+		    	          formula = String.valueOf(x);
+		    	          address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
+		      } else if (x instanceof Short) {
+				    	  formattedValue = "";
+		    	          comment = "";
+		    	          formula = "";
+		    	          formula = String.valueOf(x);
+		    	          address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
+		      } else if (x instanceof Integer) {
+				    	  formattedValue = "";
+		    	          comment = "";
+		    	          formula = String.valueOf(x);
+		    	          address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
+		      } else if (x instanceof Long) {
+				    	  formattedValue = "";
+		    	          comment = "";
+		    	          formula = String.valueOf(x);
+		    	          address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
+		      } else if (x instanceof Double) {
+				    	  formattedValue = "";
+		    	          comment = "";
+		    	          formula = String.valueOf(x);
+		    	          address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
+		      } else if (x instanceof Float) {
+				    	  formattedValue = "";
+		    	          comment = "";
+		    	          formula = String.valueOf(x);
+		    	          address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
+		      } else if (x instanceof BigDecimal) {
+				    	  formattedValue = "";
+		    	          comment = "";
+		    	          formula = String.valueOf(x);
+		    	          address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
+		      } else if (x instanceof Timestamp) {
+				    	  formattedValue = String.valueOf(x);
+		    	          comment = "";
+		    	          formula = "";
+		    	          address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
+		      }	else if (x instanceof Date) {
+				    	  formattedValue =  this.dateFormat.format((Date)x);
+		    	          comment = "";
+		    	          formula = "";
+		    	          address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
+		      }  else if (x instanceof String) {
+				    	  formattedValue =  x.toString();
+		    	          comment = "";
+		    	          formula = "";
+		    	          address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
+		      } else {
+			    	  LOG.warn("Unknown datatype in column number: "+currentColumnNum+". Trying to use .toString");
+			    	  formattedValue =  (String)x;
+	    	          comment = "";
+	    	          formula = "";
+	    	          address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
+		      }
+	       result[currentColumnNum]=new SpreadSheetCellDAO(formattedValue, comment, formula, address, sheetName);
+	      }
+	      }
+		return result;
+	}
 	
 	
 }

@@ -118,7 +118,7 @@ public AbstractSpreadSheetDocumentRecordReader(FileSplit split, JobConf job, Rep
       	if (codec instanceof SplittableCompressionCodec) {
 		LOG.debug("Reading from a compressed file \""+file+"\" with splittable compression codec");
         	final SplitCompressionInputStream cIn =((SplittableCompressionCodec)codec).createInputStream(fileIn, decompressor, start, end,SplittableCompressionCodec.READ_MODE.CONTINUOUS);
-		officeReader = new OfficeReader(cIn, this.hocr);  
+				officeReader = new OfficeReader(cIn, this.hocr);
 		start = cIn.getAdjustedStart();
        		end = cIn.getAdjustedEnd();
         	filePosition = cIn; // take pos from compressed stream
@@ -178,7 +178,7 @@ private void readKeyStore(Configuration conf) throws IOException, FormatNotUnder
 			}
 			this.hocr.setPassword(pw);
 		} catch (NoSuchAlgorithmException | CertificateException | KeyStoreException | IllegalArgumentException | UnrecoverableEntryException | InvalidKeySpecException e) {
-			LOG.error(e);
+			LOG.error("Cannopt read keystore. Exception: ",e);
 			throw new FormatNotUnderstoodException("Cannot read keystore to obtain credentials to access encrypted documents "+e);
 		}
 		
@@ -201,7 +201,7 @@ private void readTrustStore(Configuration conf) throws IOException, FormatNotUnd
 			hksm.openKeyStore(new Path(this.hocr.getSigTruststoreFile()), this.hocr.getSigTruststoreType(), this.hocr.getSigTruststorePassword());
 			this.hocr.setX509CertificateChain(hksm.getAllX509Certificates());
 		} catch (NoSuchAlgorithmException | CertificateException | KeyStoreException | IllegalArgumentException e) {
-			LOG.error(e);
+			LOG.error("Cannopt read truststore. Exception: ",e);
 			throw new FormatNotUnderstoodException("Cannot read truststore to establish certificate chain for signature validation "+e);
 		}
 		
