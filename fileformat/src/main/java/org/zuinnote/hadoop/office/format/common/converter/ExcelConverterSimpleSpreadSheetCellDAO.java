@@ -16,7 +16,6 @@
 
 package org.zuinnote.hadoop.office.format.common.converter;
 
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -46,7 +45,8 @@ import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 import org.zuinnote.hadoop.office.format.common.util.MSExcelUtil;
 
 /**
- * This class allows to infer the Java datatypes underlying a SpreadSheet and the corresponding data as Java objects
+ * This class allows to infer the Java datatypes underlying a SpreadSheet and
+ * the corresponding data as Java objects
  *
  */
 public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
@@ -55,202 +55,217 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 	 */
 	private static final long serialVersionUID = 3281344931609307423L;
 
-
 	private static final Log LOG = LogFactory.getLog(ExcelConverterSimpleSpreadSheetCellDAO.class.getName());
-	
-	
+
 	private List<GenericDataType> schemaRow;
 	private SimpleDateFormat dateFormat;
 	private DecimalFormat decimalFormat;
-	
 
-
-/***
- * Create a new converter
- * 
- * @param dateFormat format of the dates in the Excel
- * @param decimalFormat format of the decimals in the Excel
- */
-	public ExcelConverterSimpleSpreadSheetCellDAO(SimpleDateFormat dateFormat, DecimalFormat decimalFormat) {
-		this.schemaRow=new ArrayList<>();
-		this.dateFormat=dateFormat;
-		this.decimalFormat=decimalFormat;
-        this.decimalFormat.setParseBigDecimal(true);
-	}
-	
 	/***
-	 * This provides another sample to infer schema in form of simple datatypes (e.g. boolean, byte etc.). You might add as many sample as necessary to get a precise schema. 
+	 * Create a new converter
+	 * 
+	 * @param dateFormat
+	 *            format of the dates in the Excel
+	 * @param decimalFormat
+	 *            format of the decimals in the Excel
+	 */
+	public ExcelConverterSimpleSpreadSheetCellDAO(SimpleDateFormat dateFormat, DecimalFormat decimalFormat) {
+		this.schemaRow = new ArrayList<>();
+		this.dateFormat = dateFormat;
+		this.decimalFormat = decimalFormat;
+		this.decimalFormat.setParseBigDecimal(true);
+	}
+
+	/***
+	 * This provides another sample to infer schema in form of simple datatypes
+	 * (e.g. boolean, byte etc.). You might add as many sample as necessary to get a
+	 * precise schema.
 	 * 
 	 * @param dataRow
 	 */
 	public void updateSpreadSheetCellRowToInferSchemaInformation(SpreadSheetCellDAO[] dataRow) {
 		// check size of cell based on address
 		// if necessary add more to schemaRow
-	
-		for (SpreadSheetCellDAO currentSpreadSheetCellDAO: dataRow) {
+
+		for (SpreadSheetCellDAO currentSpreadSheetCellDAO : dataRow) {
 			boolean dataTypeFound = false;
-			if (currentSpreadSheetCellDAO!=null) {
+			if (currentSpreadSheetCellDAO != null) {
 				// add potential column to list
 				int j = new CellAddress(currentSpreadSheetCellDAO.getAddress()).getColumn();
-				if (j>=this.schemaRow.size()) {
+				if (j >= this.schemaRow.size()) {
 					// fill up
-					for (int x=this.schemaRow.size();x<=j;x++) {
+					for (int x = this.schemaRow.size(); x <= j; x++) {
 						this.schemaRow.add(null);
 					}
 				}
-				if ((currentSpreadSheetCellDAO.getFormattedValue()!=null) && (!"".equals(currentSpreadSheetCellDAO.getFormattedValue()))) { // skip null value
+				if ((currentSpreadSheetCellDAO.getFormattedValue() != null)
+						&& (!"".equals(currentSpreadSheetCellDAO.getFormattedValue()))) { // skip null value
 					String currentCellValue = currentSpreadSheetCellDAO.getFormattedValue();
 					// check if boolean
-		              if (("TRUE".equals(currentCellValue)) || ("FALSE".equals(currentCellValue))) {
-		                  dataTypeFound = true;
-		                  if (this.schemaRow.get(j) != null) { // check if previous assumption was boolean
-		                
-		                    if (!(this.schemaRow.get(j) instanceof GenericBooleanDataType)) {
-		                      // if not then the type needs to be set to string
-		                      this.schemaRow.set(j, new GenericStringDataType());
-		                    }
-		                    // if yes then nothing todo (already boolean)
-		                  } else { // we face this the first time
-		                	  	this.schemaRow.set(j, new GenericBooleanDataType());
-		                  }
-		                }
-		         
-		              if (!dataTypeFound) {
+					if (("TRUE".equals(currentCellValue)) || ("FALSE".equals(currentCellValue))) {
+						dataTypeFound = true;
+						if (this.schemaRow.get(j) != null) { // check if previous assumption was boolean
 
-		                Date theDate = this.dateFormat.parse(currentCellValue, new ParsePosition(0));
-		                if (theDate != null) { // we have indeed a date
+							if (!(this.schemaRow.get(j) instanceof GenericBooleanDataType)) {
+								// if not then the type needs to be set to string
+								this.schemaRow.set(j, new GenericStringDataType());
+							}
+							// if yes then nothing todo (already boolean)
+						} else { // we face this the first time
+							this.schemaRow.set(j, new GenericBooleanDataType());
+						}
+					}
 
-		                  dataTypeFound = true;
-		                  if (this.schemaRow.get(j) != null) { // check if previous assumption was date
-		                    
-		                    if (!(this.schemaRow.get(j) instanceof GenericDateDataType)) {
-		                      // if not then the type needs to be set to string
-		                     this.schemaRow.set(j, new GenericStringDataType());
-		                    }
-		                  } else { // we face this the first time
-		                	   this.schemaRow.set(j, new GenericDateDataType());
-		                  }
-		                }
-		              }
-		              // check if BigDecimal
-		           
-		              BigDecimal bd = (BigDecimal) this.decimalFormat.parse(currentCellValue, new ParsePosition(0));
-		              if ((!dataTypeFound) && (bd != null)) {
-		                BigDecimal bdv = bd.stripTrailingZeros();
+					if (!dataTypeFound) {
 
-		                dataTypeFound = true;
+						Date theDate = this.dateFormat.parse(currentCellValue, new ParsePosition(0));
+						if (theDate != null) { // we have indeed a date
 
-		                if (this.schemaRow.get(j) != null) { // check if previous assumption was a number
-		                  
-		                  // check if we need to upgrade to decimal
-		                  if ((bdv.scale() > 0) && (this.schemaRow.get(j) instanceof GenericNumericDataType)) {
-		                    // upgrade to decimal, if necessary
-		                    if (!(this.schemaRow.get(j) instanceof GenericBigDecimalDataType)) {
-		                    	  this.schemaRow.set(j, new GenericBigDecimalDataType(bdv.precision(),bdv.scale()));
-		                    } else {
-		                      if ((bdv.scale() > ((GenericBigDecimalDataType)this.schemaRow.get(j)).getScale()) && (bdv.precision() > ((GenericBigDecimalDataType)this.schemaRow.get(j)).getPrecision())) {
-		                       this.schemaRow.set(j, new GenericBigDecimalDataType(bdv.precision(),bdv.scale()));
-		                      } else if (bdv.scale() > ((GenericBigDecimalDataType)this.schemaRow.get(j)).getScale()) {
-		                        // upgrade scale
-		                    	  	GenericBigDecimalDataType gbd = ((GenericBigDecimalDataType)this.schemaRow.get(j));
-		                    	  	gbd.setScale(bdv.scale());
-		                    	  	this.schemaRow.set(j, gbd);
-		                       } else if (bdv.precision() > ((GenericBigDecimalDataType)this.schemaRow.get(j)).getPrecision()) {
-		                        // upgrade precision
-		                        // new precision is needed to extend to max scale
-		                    	  	GenericBigDecimalDataType gbd = ((GenericBigDecimalDataType)this.schemaRow.get(j));
-		                    	  	int newpre = bdv.precision() + (gbd.getScale() - bdv.scale());
-		                    	  	gbd.setPrecision(newpre);
-		                    	  	this.schemaRow.set(j, gbd);
-		                      }
-		                    }
-		                  } else { // check if we need to upgrade one of the integer types
-		                    // if current is byte
-		                    boolean isByte = false;
-		                    boolean isShort = false;
-		                    boolean isInt = false;
-		                    	boolean isLong = true;
-		                    try {
-		                      bdv.longValueExact();
-		                      isLong = true;
-		                      bdv.intValueExact();
-		                      isInt = true;
-		                      bdv.shortValueExact();
-		                      isShort = true;
-		                      bdv.byteValueExact();
-		                      isByte = true;
-		                    } catch (Exception e) {
-		                    		LOG.debug("Possible data types: Long: " + isLong + " Int: " + isInt + " Short: " + isShort + " Byte: " + isByte);
-		                    }
-		                    // if it was Numeric before we can ignore testing the byte case, here just for completeness
-		                    if ((isByte) && ((this.schemaRow.get(j) instanceof GenericByteDataType) || (this.schemaRow.get(j) instanceof GenericShortDataType) || (this.schemaRow.get(j) instanceof GenericIntegerDataType) || (this.schemaRow.get(j) instanceof GenericLongDataType))) {
-		                      // if it was Byte before we can ignore testing the byte case, here just for completeness
-		                    } else if ((isShort) && ((this.schemaRow.get(j) instanceof GenericByteDataType))) {
-		                      // upgrade to short
-		                    	 this.schemaRow.set(j, new GenericShortDataType());
-		                    } else if ((isInt) && ((this.schemaRow.get(j) instanceof GenericShortDataType) || (this.schemaRow.get(j) instanceof GenericByteDataType))) {
-		                      // upgrade to integer
-		                    	 this.schemaRow.set(j, new GenericIntegerDataType());
-		                    } else if ((!isByte) && (!isShort) && (!isInt) && !((this.schemaRow.get(j) instanceof GenericLongDataType))) {
-		                      // upgrade to long
-		                    	 this.schemaRow.set(j, new GenericLongDataType());
-		                    }
+							dataTypeFound = true;
+							if (this.schemaRow.get(j) != null) { // check if previous assumption was date
 
-		                  }
+								if (!(this.schemaRow.get(j) instanceof GenericDateDataType)) {
+									// if not then the type needs to be set to string
+									this.schemaRow.set(j, new GenericStringDataType());
+								}
+							} else { // we face this the first time
+								this.schemaRow.set(j, new GenericDateDataType());
+							}
+						}
+					}
+					// check if BigDecimal
 
-		                } else {
-		                  // we face it for the first time
-		                  // determine value type
-		                  if (bdv.scale() > 0) {
-		                	  	this.schemaRow.set(j, new GenericBigDecimalDataType(bdv.precision(),bdv.scale()));
-		                  } else {
-		                    boolean isByte = false;
-		                    boolean isShort = false;
-		                    boolean isInt = false;
-		                    	boolean isLong = true;
-		                    try {
-		                      bdv.longValueExact();
-		                      isLong = true;
-		                      bdv.intValueExact();
-		                      isInt = true;
-		                      bdv.shortValueExact();
-		                      isShort = true;
-		                      bdv.byteValueExact();
-		                      isByte = true;
-		                    } catch (Exception e){
-		                    		LOG.debug("Possible data types: Long: " + isLong + " Int: " + isInt + " Short: " + isShort + " Byte: " + isByte);
-		                    }
-		                    if (isByte) {
-		                    	 this.schemaRow.set(j, new GenericByteDataType());
-		                    } else if (isShort) {
-		                    	this.schemaRow.set(j, new GenericShortDataType());
-		                    } else if (isInt) {
-		                    	this.schemaRow.set(j, new GenericIntegerDataType());
-		                    } else if (isLong) {
-		                    	this.schemaRow.set(j, new GenericLongDataType());
-		                    }
-		                  }
-		                }
-		              }
-		              if (!dataTypeFound) {
-		                // otherwise string
-		            	  if (!(this.schemaRow.get(j) instanceof GenericStringDataType)) {
-		            		  this.schemaRow.set(j,new GenericStringDataType());
-		            	  }
-		               
-		              }
+					BigDecimal bd = (BigDecimal) this.decimalFormat.parse(currentCellValue, new ParsePosition(0));
+					if ((!dataTypeFound) && (bd != null)) {
+						BigDecimal bdv = bd.stripTrailingZeros();
 
+						dataTypeFound = true;
 
-		            
-			} else {
-				// ignore null values
+						if (this.schemaRow.get(j) != null) { // check if previous assumption was a number
+
+							// check if we need to upgrade to decimal
+							if ((bdv.scale() > 0) && (this.schemaRow.get(j) instanceof GenericNumericDataType)) {
+								// upgrade to decimal, if necessary
+								if (!(this.schemaRow.get(j) instanceof GenericBigDecimalDataType)) {
+									this.schemaRow.set(j, new GenericBigDecimalDataType(bdv.precision(), bdv.scale()));
+								} else {
+									if ((bdv.scale() > ((GenericBigDecimalDataType) this.schemaRow.get(j)).getScale())
+											&& (bdv.precision() > ((GenericBigDecimalDataType) this.schemaRow.get(j))
+													.getPrecision())) {
+										this.schemaRow.set(j,
+												new GenericBigDecimalDataType(bdv.precision(), bdv.scale()));
+									} else if (bdv.scale() > ((GenericBigDecimalDataType) this.schemaRow.get(j))
+											.getScale()) {
+										// upgrade scale
+										GenericBigDecimalDataType gbd = ((GenericBigDecimalDataType) this.schemaRow
+												.get(j));
+										gbd.setScale(bdv.scale());
+										this.schemaRow.set(j, gbd);
+									} else if (bdv.precision() > ((GenericBigDecimalDataType) this.schemaRow.get(j))
+											.getPrecision()) {
+										// upgrade precision
+										// new precision is needed to extend to max scale
+										GenericBigDecimalDataType gbd = ((GenericBigDecimalDataType) this.schemaRow
+												.get(j));
+										int newpre = bdv.precision() + (gbd.getScale() - bdv.scale());
+										gbd.setPrecision(newpre);
+										this.schemaRow.set(j, gbd);
+									}
+								}
+							} else { // check if we need to upgrade one of the integer types
+								// if current is byte
+								boolean isByte = false;
+								boolean isShort = false;
+								boolean isInt = false;
+								boolean isLong = true;
+								try {
+									bdv.longValueExact();
+									isLong = true;
+									bdv.intValueExact();
+									isInt = true;
+									bdv.shortValueExact();
+									isShort = true;
+									bdv.byteValueExact();
+									isByte = true;
+								} catch (Exception e) {
+									LOG.debug("Possible data types: Long: " + isLong + " Int: " + isInt + " Short: "
+											+ isShort + " Byte: " + isByte);
+								}
+								// if it was Numeric before we can ignore testing the byte case, here just for
+								// completeness
+								if ((isByte) && ((this.schemaRow.get(j) instanceof GenericByteDataType)
+										|| (this.schemaRow.get(j) instanceof GenericShortDataType)
+										|| (this.schemaRow.get(j) instanceof GenericIntegerDataType)
+										|| (this.schemaRow.get(j) instanceof GenericLongDataType))) {
+									// if it was Byte before we can ignore testing the byte case, here just for
+									// completeness
+								} else if ((isShort) && ((this.schemaRow.get(j) instanceof GenericByteDataType))) {
+									// upgrade to short
+									this.schemaRow.set(j, new GenericShortDataType());
+								} else if ((isInt) && ((this.schemaRow.get(j) instanceof GenericShortDataType)
+										|| (this.schemaRow.get(j) instanceof GenericByteDataType))) {
+									// upgrade to integer
+									this.schemaRow.set(j, new GenericIntegerDataType());
+								} else if ((!isByte) && (!isShort) && (!isInt)
+										&& !((this.schemaRow.get(j) instanceof GenericLongDataType))) {
+									// upgrade to long
+									this.schemaRow.set(j, new GenericLongDataType());
+								}
+
+							}
+
+						} else {
+							// we face it for the first time
+							// determine value type
+							if (bdv.scale() > 0) {
+								this.schemaRow.set(j, new GenericBigDecimalDataType(bdv.precision(), bdv.scale()));
+							} else {
+								boolean isByte = false;
+								boolean isShort = false;
+								boolean isInt = false;
+								boolean isLong = true;
+								try {
+									bdv.longValueExact();
+									isLong = true;
+									bdv.intValueExact();
+									isInt = true;
+									bdv.shortValueExact();
+									isShort = true;
+									bdv.byteValueExact();
+									isByte = true;
+								} catch (Exception e) {
+									LOG.debug("Possible data types: Long: " + isLong + " Int: " + isInt + " Short: "
+											+ isShort + " Byte: " + isByte);
+								}
+								if (isByte) {
+									this.schemaRow.set(j, new GenericByteDataType());
+								} else if (isShort) {
+									this.schemaRow.set(j, new GenericShortDataType());
+								} else if (isInt) {
+									this.schemaRow.set(j, new GenericIntegerDataType());
+								} else if (isLong) {
+									this.schemaRow.set(j, new GenericLongDataType());
+								}
+							}
+						}
+					}
+					if (!dataTypeFound) {
+						// otherwise string
+						if (!(this.schemaRow.get(j) instanceof GenericStringDataType)) {
+							this.schemaRow.set(j, new GenericStringDataType());
+						}
+
+					}
+
+				} else {
+					// ignore null values
+				}
 			}
 		}
 	}
-	}
-	
+
 	/**
-	 * Returns a list of objects corresponding to the schema. 
+	 * Returns a list of objects corresponding to the schema.
 	 * 
 	 * @return
 	 */
@@ -259,99 +274,105 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 		this.schemaRow.toArray(result);
 		return result;
 	}
-	
+
 	/***
-	 * Allows to set a custom schema. Note: the schema must have the the size of the largest (expected) row in the Excel. In case you do not need a conversion set the schema for the corresponding column to null
+	 * Allows to set a custom schema. Note: the schema must have the the size of the
+	 * largest (expected) row in the Excel. In case you do not need a conversion set
+	 * the schema for the corresponding column to null
 	 * 
 	 * @param schemaRow
 	 */
 	public void setSchemaRow(GenericDataType[] schemaRow) {
-		this.schemaRow=new ArrayList<>(Arrays.asList(schemaRow));
+		this.schemaRow = new ArrayList<>(Arrays.asList(schemaRow));
 	}
-	
+
 	/**
-	 * Translate a data row according to the currently defined schema. 
+	 * Translate a data row according to the currently defined schema.
 	 * 
-	 * @param dataRow cells containing data
-	 * @return an array of objects of primitive datatypes (boolean, int, byte, etc.) containing the data of datarow, null if dataRow does not fit into schema. Note: single elements can be null depending on the original Excel
+	 * @param dataRow
+	 *            cells containing data
+	 * @return an array of objects of primitive datatypes (boolean, int, byte, etc.)
+	 *         containing the data of datarow, null if dataRow does not fit into
+	 *         schema. Note: single elements can be null depending on the original
+	 *         Excel
 	 * 
 	 */
-	public Object[] getDataAccordingToSchema(SpreadSheetCellDAO[] dataRow)  {
-		if (dataRow==null) {
+	public Object[] getDataAccordingToSchema(SpreadSheetCellDAO[] dataRow) {
+		if (dataRow == null) {
 			return new Object[this.schemaRow.size()];
 		}
-		if (dataRow.length!=this.schemaRow.size()) {
+		if (dataRow.length != this.schemaRow.size()) {
 			LOG.error("Data row does not fit into schema. Cannot convert spreadsheet cell to simple datatypes");
 			return null;
 		}
 		Object[] result = new Object[dataRow.length];
-		for (int i=0;i<dataRow.length;i++) {
+		for (int i = 0; i < dataRow.length; i++) {
 			SpreadSheetCellDAO currentCell = dataRow[i];
-			if (currentCell!=null) {
-				GenericDataType applyDataType=null;
-				if (i>=this.schemaRow.size()) {
-					LOG.warn("No further schema row for column defined: "+String.valueOf(i));
+			if (currentCell != null) {
+				GenericDataType applyDataType = null;
+				if (i >= this.schemaRow.size()) {
+					LOG.warn("No further schema row for column defined: " + String.valueOf(i));
 				} else {
 					applyDataType = this.schemaRow.get(i);
 				}
-				if (applyDataType==null) {
-					result[i]=currentCell.getFormattedValue();
-				} else
-				if (applyDataType instanceof GenericStringDataType) {
-					result[i]=currentCell.getFormattedValue();
-				} else 
-				if (applyDataType instanceof GenericBooleanDataType) {
+				if (applyDataType == null) {
+					result[i] = currentCell.getFormattedValue();
+				} else if (applyDataType instanceof GenericStringDataType) {
+					result[i] = currentCell.getFormattedValue();
+				} else if (applyDataType instanceof GenericBooleanDataType) {
 					if (!"".equals(currentCell.getFormattedValue())) {
-						result[i]=Boolean.valueOf(currentCell.getFormattedValue());
+						result[i] = Boolean.valueOf(currentCell.getFormattedValue());
 					}
-				} else 
-				if (applyDataType instanceof GenericDateDataType) {
+				} else if (applyDataType instanceof GenericDateDataType) {
 					if (!"".equals(currentCell.getFormattedValue())) {
 						Date theDate = this.dateFormat.parse(currentCell.getFormattedValue(), new ParsePosition(0));
-				        if (theDate != null) {
-				        			result[i]=theDate;
-				 
-				        } else {
-				            result[i]=null;
-				        } 
+						if (theDate != null) {
+							result[i] = theDate;
+
+						} else {
+							result[i] = null;
+						}
 					}
-				}	else if (applyDataType instanceof GenericNumericDataType) {
+				} else if (applyDataType instanceof GenericNumericDataType) {
 					if (!"".equals(currentCell.getFormattedValue())) {
-					    BigDecimal bd = null;
-					    try {
-					    		if (!"".equals(currentCell.getFormattedValue())) {
-					    			bd = (BigDecimal) this.decimalFormat.parse(currentCell.getFormattedValue());
-					    		}
-					    } catch (ParseException p) {
-					    		LOG.warn("Could not parse decimal in spreadsheet cell, although type was detected as decimal");
-					    }
-			        		if (bd!=null) {
-			        				BigDecimal bdv = bd.stripTrailingZeros();
-			        				if (applyDataType instanceof GenericByteDataType) {
-			        					result[i] = bdv.byteValueExact();
-			        				} else if (applyDataType instanceof GenericShortDataType) {
-			        					result[i] = bdv.shortValueExact();
-			        				} else if (applyDataType instanceof GenericIntegerDataType) {
-			        					result[i] = bdv.intValueExact();
-			        				} else if (applyDataType instanceof GenericLongDataType) {
-			        					result[i] = bdv.longValueExact();
-			        				} else if (applyDataType instanceof GenericBigDecimalDataType) {
-			        					result[i] = bd;
-			        				} else {
-			        					result[i] = null;
-			        				}
-			        }
-			        }} else {
-			        		result[i] = null;
-			        		LOG.warn("Could not convert object in spreadsheet cellrow. Did you add a new datatype?");
-			        }
+						BigDecimal bd = null;
+						try {
+							if (!"".equals(currentCell.getFormattedValue())) {
+								bd = (BigDecimal) this.decimalFormat.parse(currentCell.getFormattedValue());
+							}
+						} catch (ParseException p) {
+							LOG.warn(
+									"Could not parse decimal in spreadsheet cell, although type was detected as decimal");
+						}
+						if (bd != null) {
+							BigDecimal bdv = bd.stripTrailingZeros();
+							if (applyDataType instanceof GenericByteDataType) {
+								result[i] = bdv.byteValueExact();
+							} else if (applyDataType instanceof GenericShortDataType) {
+								result[i] = bdv.shortValueExact();
+							} else if (applyDataType instanceof GenericIntegerDataType) {
+								result[i] = bdv.intValueExact();
+							} else if (applyDataType instanceof GenericLongDataType) {
+								result[i] = bdv.longValueExact();
+							} else if (applyDataType instanceof GenericBigDecimalDataType) {
+								result[i] = bd;
+							} else {
+								result[i] = null;
+							}
+						}
+					}
+				} else {
+					result[i] = null;
+					LOG.warn("Could not convert object in spreadsheet cellrow. Did you add a new datatype?");
+				}
 			}
 		}
 		return result;
 	}
-	
+
 	/***
-	 * Converts a row consisting of objects of simple data types (String, byte, short, int, long, etc.) to a row of SpreadSheetCellDAO
+	 * Converts a row consisting of objects of simple data types (String, byte,
+	 * short, int, long, etc.) to a row of SpreadSheetCellDAO
 	 * 
 	 * @param row
 	 * @param sheetName
@@ -359,84 +380,97 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 	 * @return
 	 */
 	public SpreadSheetCellDAO[] getSpreadSheetCellDAOfromSimpleDataType(Object[] row, String sheetName, int rowNum) {
-		  // for each value in the row
+		// for each value in the row
 
-	    SpreadSheetCellDAO[] result = new SpreadSheetCellDAO[row.length];
-	    for (int currentColumnNum=0; currentColumnNum< row.length;currentColumnNum++) { // for each element of the row
-	      Object x = row[currentColumnNum];
-	      String formattedValue = "";
-	      String comment = "";
-	      String formula = "";
-	      String address = "";
-	      if (x!=null) {
-		      if (x instanceof Boolean) {
-		    	  		formattedValue = "";
-		    	          comment = "";
-		    	          formula = String.valueOf(x);
-		    	          address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
-		      } else if (x instanceof Byte) {
-				    	  formattedValue = "";
-		    	          comment = "";
-		    	          formula = String.valueOf(x);
-		    	          address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
-		      } else if (x instanceof Short) {
-				    	  formattedValue = "";
-		    	          comment = "";
-		    	          formula = "";
-		    	          formula = String.valueOf(x);
-		    	          address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
-		      } else if (x instanceof Integer) {
-				    	  formattedValue = "";
-		    	          comment = "";
-		    	          formula = String.valueOf(x);
-		    	          address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
-		      } else if (x instanceof Long) {
-				    	  formattedValue = "";
-		    	          comment = "";
-		    	          formula = String.valueOf(x);
-		    	          address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
-		      } else if (x instanceof Double) {
-				    	  formattedValue = "";
-		    	          comment = "";
-		    	          formula = String.valueOf(x);
-		    	          address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
-		      } else if (x instanceof Float) {
-				    	  formattedValue = "";
-		    	          comment = "";
-		    	          formula = String.valueOf(x);
-		    	          address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
-		      } else if (x instanceof BigDecimal) {
-				    	  formattedValue = "";
-		    	          comment = "";
-		    	          formula = String.valueOf(x);
-		    	          address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
-		      } else if (x instanceof Timestamp) {
-				    	  formattedValue = String.valueOf(x);
-		    	          comment = "";
-		    	          formula = "";
-		    	          address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
-		      }	else if (x instanceof Date) {
-				    	  formattedValue =  this.dateFormat.format((Date)x);
-		    	          comment = "";
-		    	          formula = "";
-		    	          address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
-		      }  else if (x instanceof String) {
-				    	  formattedValue =  x.toString();
-		    	          comment = "";
-		    	          formula = "";
-		    	          address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
-		      } else {
-			    	  LOG.warn("Unknown datatype in column number: "+currentColumnNum+". Trying to use .toString");
-			    	  formattedValue =  (String)x;
-	    	          comment = "";
-	    	          formula = "";
-	    	          address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
-		      }
-	       result[currentColumnNum]=new SpreadSheetCellDAO(formattedValue, comment, formula, address, sheetName);
-	      }
-	      }
+		SpreadSheetCellDAO[] result = new SpreadSheetCellDAO[row.length];
+		for (int currentColumnNum = 0; currentColumnNum < row.length; currentColumnNum++) { // for each element of the
+																							// row
+			Object x = row[currentColumnNum];
+			String formattedValue = "";
+			String comment = "";
+			String formula = "";
+			String address = "";
+			if (x != null) {
+				if (x instanceof SpreadSheetCellDAO) {
+					result[currentColumnNum] = (SpreadSheetCellDAO) x;
+				} else {
+					if (x instanceof Boolean) {
+						formattedValue = "";
+						comment = "";
+						formula = String.valueOf(x);
+						address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
+					} else if (x instanceof Byte) {
+						formattedValue = "";
+						comment = "";
+						formula = String.valueOf(x);
+						address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
+					} else if (x instanceof Short) {
+						formattedValue = "";
+						comment = "";
+						formula = "";
+						formula = String.valueOf(x);
+						address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
+					} else if (x instanceof Integer) {
+						formattedValue = "";
+						comment = "";
+						formula = String.valueOf(x);
+						address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
+					} else if (x instanceof Long) {
+						formattedValue = "";
+						comment = "";
+						formula = String.valueOf(x);
+						address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
+					} else if (x instanceof Double) {
+						formattedValue = "";
+						comment = "";
+						formula = String.valueOf(x);
+						address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
+					} else if (x instanceof Float) {
+						formattedValue = "";
+						comment = "";
+						formula = String.valueOf(x);
+						address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
+					} else if (x instanceof BigDecimal) {
+						formattedValue = "";
+						comment = "";
+						formula = String.valueOf(x);
+						address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
+					} else if (x instanceof Timestamp) {
+						formattedValue = String.valueOf(x);
+						comment = "";
+						formula = "";
+						address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
+					} else if (x instanceof Date) {
+						formattedValue = this.dateFormat.format((Date) x);
+						comment = "";
+						formula = "";
+						address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
+					} else if (x instanceof String) {
+						formattedValue = x.toString();
+						comment = "";
+						formula = "";
+						address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
+					} else if ((x instanceof String[]) && ((String[]) x).length == 5) {
+						String[] spreadSheetCellDAOAsArray = (String[]) x;
+						formattedValue = spreadSheetCellDAOAsArray[0];
+						comment = spreadSheetCellDAOAsArray[1];
+						formula = spreadSheetCellDAOAsArray[2];
+						address = spreadSheetCellDAOAsArray[3];
+						sheetName = spreadSheetCellDAOAsArray[4];
+					} else {
+						LOG.warn("Unknown datatype in column number: " + currentColumnNum + ". Reported data type"
+								+ x.getClass().getName() + ". Trying to use .toString");
+						formattedValue = x.toString();
+						comment = "";
+						formula = "";
+						address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
+					}
+					result[currentColumnNum] = new SpreadSheetCellDAO(formattedValue, comment, formula, address,
+							sheetName);
+				}
+			}
+		}
 		return result;
 	}
-	
-	
+
 }
