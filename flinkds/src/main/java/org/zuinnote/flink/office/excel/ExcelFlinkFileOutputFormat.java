@@ -32,8 +32,8 @@ import org.zuinnote.hadoop.office.format.common.writer.OfficeWriterException;
 public class ExcelFlinkFileOutputFormat extends AbstractSpreadSheetFlinkFileOutputFormat<SpreadSheetCellDAO[]> {
 	
 	
-	public ExcelFlinkFileOutputFormat(HadoopOfficeWriteConfiguration howc) {
-		super(howc);
+	public ExcelFlinkFileOutputFormat(HadoopOfficeWriteConfiguration howc, String[] header, String defaultSheetName) {
+		super(howc,header,defaultSheetName);
 	}
 
 

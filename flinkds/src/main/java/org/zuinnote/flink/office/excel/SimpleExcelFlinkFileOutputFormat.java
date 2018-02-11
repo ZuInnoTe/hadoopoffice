@@ -39,20 +39,23 @@ public class SimpleExcelFlinkFileOutputFormat extends AbstractSpreadSheetFlinkFi
 	 */
 	private static final long serialVersionUID = 8528766434712667829L;
 	private ExcelConverterSimpleSpreadSheetCellDAO converter;
-	private String sheetName;
+	private String defaultSheetName;
 	private int rowNum;
 	
-	public SimpleExcelFlinkFileOutputFormat(HadoopOfficeWriteConfiguration howc, String sheetName, ExcelConverterSimpleSpreadSheetCellDAO converter) {
-		super(howc);
+	public SimpleExcelFlinkFileOutputFormat(HadoopOfficeWriteConfiguration howc, String[] header, String defaultSheetName, ExcelConverterSimpleSpreadSheetCellDAO converter) {
+		super(howc,header,defaultSheetName);
 		this.converter=converter;
-		this.sheetName=sheetName;
+		this.defaultSheetName=defaultSheetName;
 		this.rowNum=0;
+		if ((header!=null) && (header.length>0)) {
+			this.rowNum++;
+		}
 	}
 
 	@Override
 	public void writeRecord(Object[] record) throws IOException {
 		try {
-			this.getOfficeWriter().write(converter.getSpreadSheetCellDAOfromSimpleDataType(record, this.sheetName, rowNum));
+			this.getOfficeWriter().write(converter.getSpreadSheetCellDAOfromSimpleDataType(record, this.defaultSheetName, rowNum));
 		} catch (OfficeWriterException e) {
 			LOG.error(e);
 		}

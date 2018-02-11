@@ -35,6 +35,8 @@ import org.zuinnote.flink.office.common.FlinkFileReader;
 import org.zuinnote.flink.office.common.FlinkKeyStoreManager;
 import org.zuinnote.hadoop.office.format.common.HadoopOfficeWriteConfiguration;
 import org.zuinnote.hadoop.office.format.common.OfficeWriter;
+import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
+import org.zuinnote.hadoop.office.format.common.util.MSExcelUtil;
 import org.zuinnote.hadoop.office.format.common.writer.InvalidWriterConfigurationException;
 import org.zuinnote.hadoop.office.format.common.writer.OfficeWriterException;
 
@@ -53,9 +55,13 @@ public abstract class AbstractSpreadSheetFlinkFileOutputFormat<E> extends FileOu
 	private OfficeWriter officeWriter;
 	private FlinkFileReader currentReader;
 	private Map<String,InputStream> linkedWorkbooksMap;
+	private String[] header;
+	private String defaultSheetName;
 	
-	public AbstractSpreadSheetFlinkFileOutputFormat(HadoopOfficeWriteConfiguration howc) {
+	public AbstractSpreadSheetFlinkFileOutputFormat(HadoopOfficeWriteConfiguration howc, String[] header, String defaultSheetName) {
 		this.howc=howc;
+		this.header=header;
+		this.defaultSheetName=defaultSheetName;
 	}
 
 	@Override
@@ -89,8 +95,29 @@ public abstract class AbstractSpreadSheetFlinkFileOutputFormat<E> extends FileOu
 			} catch (OfficeWriterException e) {
 				LOG.error("Could not create office file for writing. Exception: ",e);
 			}
+		    if ((this.header!=null) && (this.header.length>0)) {
+		    		SpreadSheetCellDAO[] headerRow = new SpreadSheetCellDAO[this.header.length];
+		    		for (int i=0;i<this.header.length;i++) {
+		    			String formattedValue = this.header[i];
+		    			String comment ="";
+		    			String formula = "";
+		    			String address=MSExcelUtil.getCellAddressA1Format(0,i);
+		    			String sheetName=this.defaultSheetName;
+		    			SpreadSheetCellDAO currentColumn = new SpreadSheetCellDAO(formattedValue, comment, formula, address,sheetName);
+		    			headerRow[i] = currentColumn;
+		    		}
+		    		this.writeRow(headerRow);
+		    }
 	}
-	 
+	
+	public void writeRow(SpreadSheetCellDAO[] row) {
+		try {
+			this.getOfficeWriter().write(row);
+		} catch (OfficeWriterException e) {
+			LOG.error(e);
+		}
+	}
+	
 	@Override
 	public void close() throws IOException {
 		try {
