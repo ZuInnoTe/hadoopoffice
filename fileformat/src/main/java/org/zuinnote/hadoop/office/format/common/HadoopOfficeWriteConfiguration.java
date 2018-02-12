@@ -18,6 +18,7 @@ package org.zuinnote.hadoop.office.format.common;
 import java.security.Key;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -120,6 +121,9 @@ public class HadoopOfficeWriteConfiguration {
 	
 	public HadoopOfficeWriteConfiguration(String fileName) {
 		this.fileName=fileName;
+		this.linkedWorkbooksName=new String[0];
+		this.linkedWBCredentialMap = new HashMap<>();
+		this.metadata = new HashMap<>();
 	}
 	
 /*
