@@ -26,6 +26,7 @@ import org.zuinnote.flink.office.AbstractSpreadSheetFlinkFileInputFormat;
 
 import org.zuinnote.hadoop.office.format.common.HadoopOfficeReadConfiguration;
 import org.zuinnote.hadoop.office.format.common.converter.ExcelConverterSimpleSpreadSheetCellDAO;
+import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericDataType;
 import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 
 /**
@@ -62,6 +63,15 @@ public class SimpleExcelFlinkFileInputFormat extends AbstractSpreadSheetFlinkFil
 	
 	}
 	
+	/***
+	 * get the schema of the underlying data
+	 * 
+	 * @return
+	 */
+	
+	public GenericDataType[] getSchema() {
+		return this.converter.getSchemaRow();
+	}
 
 	/**
 	 * Open an Excel file
