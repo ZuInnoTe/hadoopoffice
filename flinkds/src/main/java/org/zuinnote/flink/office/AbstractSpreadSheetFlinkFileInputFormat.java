@@ -44,7 +44,7 @@ import org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodExcept
  *
  */
 public abstract class AbstractSpreadSheetFlinkFileInputFormat<E> extends FileInputFormat<E>
-implements CheckpointableInputFormat<FileInputSplit, Tuple2<Long, Long>> {
+ {
 	/**
 	 * 
 	 */
@@ -54,8 +54,7 @@ implements CheckpointableInputFormat<FileInputSplit, Tuple2<Long, Long>> {
 	private HadoopOfficeReadConfiguration hocr;
 	private OfficeReader officeReader = null;
 	private FlinkFileReader currentFFR;
-	private long sheetNum;
-	private long rowNum;
+
 	private boolean useHeader;
 	private String[] header;
 	private boolean reachedEnd;
@@ -89,8 +88,6 @@ implements CheckpointableInputFormat<FileInputSplit, Tuple2<Long, Long>> {
 	@Override
 	public void open(FileInputSplit split) throws IOException {
 		super.open(split);
-		this.sheetNum = 0;
-		this.rowNum = 0;
 		this.reachedEnd=false;
 		this.hocr.setFileName(split.getPath().getName());
 		try {
@@ -150,10 +147,7 @@ implements CheckpointableInputFormat<FileInputSplit, Tuple2<Long, Long>> {
 	}
 
 
-	@Override
-	public Tuple2<Long, Long> getCurrentState() throws IOException {
-		return new Tuple2<>(this.sheetNum, this.rowNum);
-	}
+
 
 	@Override
 	public boolean reachedEnd() throws IOException {
@@ -174,31 +168,10 @@ implements CheckpointableInputFormat<FileInputSplit, Tuple2<Long, Long>> {
 		if (nextRow==null) {
 			this.reachedEnd=true;
 		}
-		this.sheetNum=this.officeReader.getCurrentParser().getCurrentSheet();
-		this.rowNum=this.officeReader.getCurrentParser().getCurrentRow();
 		return nextRow;
 	}
 	
 
-	/***
-	 * 
-	 * Reopens the stream. Note that it still needs to parse the full Excel file,
-	 * but it resumes for nextRecord from the current sheet and row number
-	 * 
-	 * @param split
-	 * @param state
-	 * @throws IOException
-	 */
-
-	@Override
-	public void reopen(FileInputSplit split, Tuple2<Long, Long> state) throws IOException {
-		this.open(split);
-		this.sheetNum = state.f0;
-		this.rowNum = state.f1;
-		this.officeReader.getCurrentParser().setCurrentSheet(this.sheetNum);
-		this.officeReader.getCurrentParser().setCurrentRow(this.rowNum);
-
-	}
 
 	
 	/**

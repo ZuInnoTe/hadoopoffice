@@ -30,7 +30,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.core.fs.FileInputSplit;
 import org.apache.flink.core.fs.Path;
 import org.junit.jupiter.api.AfterAll;
@@ -39,7 +39,16 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.zuinnote.hadoop.office.format.common.HadoopOfficeReadConfiguration;
-import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
+import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericBigDecimalDataType;
+import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericBooleanDataType;
+import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericByteDataType;
+import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericDataType;
+import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericDateDataType;
+import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericIntegerDataType;
+import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericLongDataType;
+import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericShortDataType;
+import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericStringDataType;
+
 
 /**
  * @author jornfranke
@@ -196,6 +205,7 @@ public class FlinkSimpleExcelFileInputFormatTest {
 		assertTrue(inputFormat.reachedEnd(), "End reached");
 	}
 
+	@Test
 	public void restoreSimpleExcel2013() throws ParseException, IOException {
 		ClassLoader classLoader = getClass().getClassLoader();
 		String fileName = "testsimple.xlsx";
@@ -209,6 +219,8 @@ public class FlinkSimpleExcelFileInputFormatTest {
 		SimpleExcelFlinkFileInputFormat inputFormat = new SimpleExcelFlinkFileInputFormat(hocr, -1, useHeader,
 				dateFormat, decimalFormat);
 		inputFormat.open(spreadSheetInputSplit);
+
+		
 		assertFalse(inputFormat.reachedEnd(), "End not reached");
 		Object[] reuse = new Object[0];
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -223,7 +235,21 @@ public class FlinkSimpleExcelFileInputFormatTest {
 		assertEquals("shortcolumn", header[6], "Correct Header Column");
 		assertEquals("intcolumn", header[7], "Correct Header Column");
 		assertEquals("longcolumn", header[8], "Correct Header Column");
-
+		GenericDataType[] schema = inputFormat.getInferredSchema();
+		// check schema
+		assertTrue(schema[0] instanceof GenericBigDecimalDataType, "First column is a decimal");
+		assertEquals(2,((GenericBigDecimalDataType)schema[0]).getPrecision(), "First column decimal has precision 2");
+		assertEquals(1,((GenericBigDecimalDataType)schema[0]).getScale(), "First column decimal has scale 1");
+		assertTrue(schema[1] instanceof GenericBooleanDataType, "Second column is a boolean");
+		assertTrue(schema[2] instanceof GenericDateDataType, "Third column is a date");
+		assertTrue(schema[3] instanceof GenericStringDataType, "Fourth column is a String");
+		assertTrue(schema[4] instanceof GenericBigDecimalDataType, "Fifth column is a decimal");
+		assertEquals(8,((GenericBigDecimalDataType)schema[4]).getPrecision(), "Fifth column decimal has precision 8");
+		assertEquals(3,((GenericBigDecimalDataType)schema[4]).getScale(), "Fifth column decimal has scale 3");
+		assertTrue(schema[5] instanceof GenericByteDataType, "Sixth column is a byte");
+		assertTrue(schema[6] instanceof GenericShortDataType, "Seventh column is a short");
+		assertTrue(schema[7] instanceof GenericIntegerDataType, "Eighth column is an integer");
+		assertTrue(schema[8] instanceof GenericLongDataType, "Ninth column is a long");
 		// check data
 		Object[] simpleRow1 = inputFormat.nextRecord(reuse);
 
@@ -248,11 +274,10 @@ public class FlinkSimpleExcelFileInputFormatTest {
 		assertEquals((int) 65335, simpleRow2[7], "H3 = 65335");
 		assertEquals(1L, simpleRow2[8], "I3 = 1");
 		// store state
-		Tuple2<Long, Long> state = inputFormat.getCurrentState();
+		Tuple3<Long, Long,GenericDataType[]> state = inputFormat.getCurrentState();
 		assertEquals(0, (long) state.f0, "sheet num: 0");
-		assertEquals(2, (long) state.f1, "row num: 2");
+		assertEquals(3, (long) state.f1, "row num: 3");
 		Object[] simpleRow3 = inputFormat.nextRecord(reuse);
-		assertEquals(2, (long) state.f1, "row num: 2");
 		assertEquals(new BigDecimal("3.40"), simpleRow3[0], "A4 = 3.40");
 		assertFalse((Boolean) simpleRow3[1], "B4 = FALSE");
 		assertEquals(sdf.parse("2000-02-29"), simpleRow3[2], "C4 = 2000-02-29");

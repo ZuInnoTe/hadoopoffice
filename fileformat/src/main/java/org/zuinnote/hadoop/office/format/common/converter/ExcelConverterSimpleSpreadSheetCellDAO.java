@@ -347,13 +347,13 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 						if (bd != null) {
 							BigDecimal bdv = bd.stripTrailingZeros();
 							if (applyDataType instanceof GenericByteDataType) {
-								result[i] = bdv.byteValueExact();
+								result[i] = (byte)bdv.byteValueExact();
 							} else if (applyDataType instanceof GenericShortDataType) {
-								result[i] = bdv.shortValueExact();
+								result[i] = (short)bdv.shortValueExact();
 							} else if (applyDataType instanceof GenericIntegerDataType) {
-								result[i] = bdv.intValueExact();
+								result[i] = (int) bdv.intValueExact();
 							} else if (applyDataType instanceof GenericLongDataType) {
-								result[i] = bdv.longValueExact();
+								result[i] = (long)bdv.longValueExact();
 							} else if (applyDataType instanceof GenericBigDecimalDataType) {
 								result[i] = bd;
 							} else {
@@ -433,7 +433,7 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 					} else if (x instanceof BigDecimal) {
 						formattedValue = "";
 						comment = "";
-						formula = String.valueOf(x);
+						formula = ((BigDecimal)x).toString();
 						address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
 					} else if (x instanceof Timestamp) {
 						formattedValue = String.valueOf(x);

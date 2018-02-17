@@ -16,6 +16,8 @@
 package org.zuinnote.flink.office.excel;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -40,22 +42,22 @@ public class SimpleExcelFlinkFileOutputFormat extends AbstractSpreadSheetFlinkFi
 	private static final long serialVersionUID = 8528766434712667829L;
 	private ExcelConverterSimpleSpreadSheetCellDAO converter;
 	private String defaultSheetName;
-	private int rowNum;
+	private int rowNumSimple;
 	
-	public SimpleExcelFlinkFileOutputFormat(HadoopOfficeWriteConfiguration howc, String[] header, String defaultSheetName, ExcelConverterSimpleSpreadSheetCellDAO converter) {
+	public SimpleExcelFlinkFileOutputFormat(HadoopOfficeWriteConfiguration howc, String[] header, String defaultSheetName, SimpleDateFormat dateFormat, DecimalFormat decimalFormat) {
 		super(howc,header,defaultSheetName);
-		this.converter=converter;
+		this.converter=new ExcelConverterSimpleSpreadSheetCellDAO(dateFormat,decimalFormat);
 		this.defaultSheetName=defaultSheetName;
-		this.rowNum=0;
+		this.rowNumSimple=0;
 		if ((header!=null) && (header.length>0)) {
-			this.rowNum++;
+			this.rowNumSimple++;
 		}
 	}
 
 	@Override
 	public void writeRecord(Object[] record) throws IOException {
-		this.writeRow(converter.getSpreadSheetCellDAOfromSimpleDataType(record, this.defaultSheetName, rowNum));
-		this.rowNum++;
+		this.writeRow(converter.getSpreadSheetCellDAOfromSimpleDataType(record, this.defaultSheetName, this.rowNumSimple));
+		this.rowNumSimple++;
 		
 	}
 
