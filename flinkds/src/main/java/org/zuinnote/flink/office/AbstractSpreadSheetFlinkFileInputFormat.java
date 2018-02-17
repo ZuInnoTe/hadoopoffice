@@ -35,6 +35,7 @@ import org.zuinnote.flink.office.common.FlinkFileReader;
 import org.zuinnote.flink.office.common.FlinkKeyStoreManager;
 import org.zuinnote.hadoop.office.format.common.HadoopOfficeReadConfiguration;
 import org.zuinnote.hadoop.office.format.common.OfficeReader;
+import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericDataType;
 import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 import org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException;
 
@@ -141,6 +142,8 @@ implements CheckpointableInputFormat<FileInputSplit, Tuple2<Long, Long>> {
 	    }
 		
 	}
+	
+	
 	
 	public String[] getHeader() {
 		return this.header;

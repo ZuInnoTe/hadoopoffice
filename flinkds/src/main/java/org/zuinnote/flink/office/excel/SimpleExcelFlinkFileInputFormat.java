@@ -43,6 +43,7 @@ public class SimpleExcelFlinkFileInputFormat extends AbstractSpreadSheetFlinkFil
 	private boolean useHeader;
 	private ExcelConverterSimpleSpreadSheetCellDAO converter;
 	private HadoopOfficeReadConfiguration shocr;
+	private GenericDataType[] customSchema;
 
 
 	/**
@@ -64,13 +65,32 @@ public class SimpleExcelFlinkFileInputFormat extends AbstractSpreadSheetFlinkFil
 	}
 	
 	/***
-	 * get the schema of the underlying data
+	 * Get the inferred schema of the underlying data
 	 * 
 	 * @return
 	 */
 	
+	public GenericDataType[] getInferredSchema() {
+		return this.converter.getSchemaRow();
+	}
+	
+	/***
+	 * Get custom schema defined for converting data from Excel to primitive datatypes
+	 * 
+	 * @return
+	 */
 	public GenericDataType[] getSchema() {
 		return this.converter.getSchemaRow();
+	}
+	
+	
+	/**
+	 * Set a custom schema used for converting data from Excel to primitive datatypes
+	 * 
+	 * @param customSchema
+	 */
+	public void setSchema(GenericDataType[] customSchema) {
+		this.customSchema=customSchema;
 	}
 
 	/**

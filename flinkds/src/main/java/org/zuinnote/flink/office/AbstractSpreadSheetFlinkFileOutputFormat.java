@@ -112,7 +112,9 @@ public abstract class AbstractSpreadSheetFlinkFileOutputFormat<E> extends FileOu
 	
 	public void writeRow(SpreadSheetCellDAO[] row) {
 		try {
-			this.getOfficeWriter().write(row);
+			for (SpreadSheetCellDAO currentSCD: row) {
+				this.getOfficeWriter().write(currentSCD);
+			}
 		} catch (OfficeWriterException e) {
 			LOG.error(e);
 		}

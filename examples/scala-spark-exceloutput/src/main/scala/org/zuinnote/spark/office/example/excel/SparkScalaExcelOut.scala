@@ -58,7 +58,7 @@ object SparkScalaExcelOut {
    }
    
    
-   def convertToCSV(sc: SparkContext, hadoopConf: Configuration, inputFile: String, outputFile: String): Unit = {
+   def convertToExcel(sc: SparkContext, hadoopConf: Configuration, inputFile: String, outputFile: String): Unit = {
      	// load a text file using standard spark methods
      // split it
      // create a pair rdd (nullwritable, SpreadSheetCellDAO)

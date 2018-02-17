@@ -58,13 +58,7 @@ public class ExcelFlinkFileOutputFormat extends AbstractSpreadSheetFlinkFileOutp
 
 	@Override
 	public void writeRecord(SpreadSheetCellDAO[] record) throws IOException {
-
-		try {
-			this.getOfficeWriter().write(record);
-		} catch (OfficeWriterException e) {
-			LOG.error(e);
-		}
-		
+		this.writeRow(record);
 	}
 	
 
