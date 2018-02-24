@@ -176,6 +176,9 @@ private void readSigningKeyAndCertificate(Configuration conf) throws OfficeWrite
 @Override
 public synchronized void write(NullWritable key, K value) throws IOException {
 		try {
+			if (value==null) {
+				return;
+			}
 			if (value instanceof ArrayWritable) {
 				ArrayWritable row = (ArrayWritable)value;
 				Writable[] rowCellDAO = row.get();
