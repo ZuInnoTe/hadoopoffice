@@ -306,32 +306,44 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 		if (dataRow.length > this.schemaRow.size()) {
 			LOG.warn("Data row is larger than schema. Will return String for everything that is not specified. ");
 		}
-		Object[] result = new Object[dataRow.length];
+		List<Object> returnList = new ArrayList<>();
+		for (int i=0;i<this.schemaRow.size();i++) { // fill up with schema rows
+			returnList.add(null);
+		}
 		for (int i = 0; i < dataRow.length; i++) {
 			SpreadSheetCellDAO currentCell = dataRow[i];
+			
 			if (currentCell != null) {
+				// determine real position
+				int j = new CellAddress(currentCell.getAddress()).getColumn();
+				if (j >= returnList.size()) {
+					// fill up
+					for (int x = returnList.size(); x <= j; x++) {
+						returnList.add(null);
+					}
+				}
 				GenericDataType applyDataType = null;
-				if (i >= this.schemaRow.size()) {
-					LOG.warn("No further schema row for column defined: " + String.valueOf(i));
+				if (j >= this.schemaRow.size()) {
+					LOG.warn("No further schema row for column defined: " + String.valueOf(j)+". Will assume String.");
 				} else {
-					applyDataType = this.schemaRow.get(i);
+					applyDataType = this.schemaRow.get(j);
 				}
 				if (applyDataType == null) {
-					result[i] = currentCell.getFormattedValue();
+					returnList.set(j, currentCell.getFormattedValue());
 				} else if (applyDataType instanceof GenericStringDataType) {
-					result[i] = currentCell.getFormattedValue();
+					returnList.set(j, currentCell.getFormattedValue());
 				} else if (applyDataType instanceof GenericBooleanDataType) {
 					if (!"".equals(currentCell.getFormattedValue())) {
-						result[i] = Boolean.valueOf(currentCell.getFormattedValue());
+						returnList.set(j, Boolean.valueOf(currentCell.getFormattedValue()));
 					}
 				} else if (applyDataType instanceof GenericDateDataType) {
 					if (!"".equals(currentCell.getFormattedValue())) {
 						Date theDate = this.dateFormat.parse(currentCell.getFormattedValue(), new ParsePosition(0));
 						if (theDate != null) {
-							result[i] = theDate;
+							returnList.set(j,theDate);
 
 						} else {
-							result[i] = null;
+							returnList.set(j, null);
 						}
 					}
 				} else if (applyDataType instanceof GenericNumericDataType) {
@@ -348,31 +360,33 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 						if (bd != null) {
 							BigDecimal bdv = bd.stripTrailingZeros();
 							if (applyDataType instanceof GenericByteDataType) {
-								result[i] = (byte)bdv.byteValueExact();
+								returnList.set(j,(byte)bdv.byteValueExact());
 							} else if (applyDataType instanceof GenericShortDataType) {
-								result[i] = (short)bdv.shortValueExact();
+								returnList.set(j,(short)bdv.shortValueExact());
 							} else if (applyDataType instanceof GenericIntegerDataType) {
-								result[i] = (int) bdv.intValueExact();
+								returnList.set(j,(int) bdv.intValueExact());
 							} else if (applyDataType instanceof GenericLongDataType) {
-								result[i] = (long)bdv.longValueExact();
+								returnList.set(j,(long)bdv.longValueExact());
 							}  else if (applyDataType instanceof GenericDoubleDataType) {
-								result[i] = (double)bdv.doubleValue();
+								returnList.set(j,(double)bdv.doubleValue());
 							} else if (applyDataType instanceof GenericFloatDataType) {
-								result[i] = (float)bdv.floatValue();
+								returnList.set(j,(float)bdv.floatValue());
 							} 
 							else if (applyDataType instanceof GenericBigDecimalDataType) {
-								result[i] = bd;
+								returnList.set(j,bd);
 							} else {
-								result[i] = null;
+								returnList.set(j,null);
 							}
 						}
 					}
 				} else {
-					result[i] = null;
+					returnList.set(j,null);
 					LOG.warn("Could not convert object in spreadsheet cellrow. Did you add a new datatype?");
 				}
 			}
 		}
+		Object[] result = new Object[returnList.size()];
+		returnList.toArray(result);
 		return result;
 	}
 
