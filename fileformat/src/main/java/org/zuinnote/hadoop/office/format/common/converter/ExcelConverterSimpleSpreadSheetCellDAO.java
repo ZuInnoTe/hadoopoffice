@@ -36,6 +36,8 @@ import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericBoole
 import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericByteDataType;
 import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericDataType;
 import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericDateDataType;
+import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericDoubleDataType;
+import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericFloatDataType;
 import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericIntegerDataType;
 import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericLongDataType;
 import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericNumericDataType;
@@ -301,9 +303,8 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 		if (dataRow == null) {
 			return new Object[this.schemaRow.size()];
 		}
-		if (dataRow.length != this.schemaRow.size()) {
-			LOG.error("Data row does not fit into schema. Cannot convert spreadsheet cell to simple datatypes");
-			return null;
+		if (dataRow.length > this.schemaRow.size()) {
+			LOG.warn("Data row is larger than schema. Will return String for everything that is not specified. ");
 		}
 		Object[] result = new Object[dataRow.length];
 		for (int i = 0; i < dataRow.length; i++) {
@@ -354,7 +355,12 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 								result[i] = (int) bdv.intValueExact();
 							} else if (applyDataType instanceof GenericLongDataType) {
 								result[i] = (long)bdv.longValueExact();
-							} else if (applyDataType instanceof GenericBigDecimalDataType) {
+							}  else if (applyDataType instanceof GenericDoubleDataType) {
+								result[i] = (double)bdv.doubleValue();
+							} else if (applyDataType instanceof GenericFloatDataType) {
+								result[i] = (float)bdv.floatValue();
+							} 
+							else if (applyDataType instanceof GenericBigDecimalDataType) {
 								result[i] = bd;
 							} else {
 								result[i] = null;
