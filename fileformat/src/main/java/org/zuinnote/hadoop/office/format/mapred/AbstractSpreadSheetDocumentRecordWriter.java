@@ -33,7 +33,9 @@ import java.util.Map;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapred.Reporter;
+import org.apache.hadoop.io.ArrayWritable;
 import org.apache.hadoop.io.NullWritable;
+import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapred.RecordWriter;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
@@ -54,7 +56,7 @@ import org.zuinnote.hadoop.office.format.common.writer.*;
 
 
 
-public abstract class AbstractSpreadSheetDocumentRecordWriter<NullWritable,SpreadSheetCellDAO> implements RecordWriter<NullWritable,SpreadSheetCellDAO> {
+public abstract class AbstractSpreadSheetDocumentRecordWriter<NullWritable,K> implements RecordWriter<NullWritable,K> {
 public static final Log LOG = LogFactory.getLog(AbstractSpreadSheetDocumentRecordWriter.class.getName());
 private OfficeWriter officeWriter;
 private Map<String,InputStream> linkedWorkbooksMap;
@@ -172,9 +174,17 @@ private void readSigningKeyAndCertificate(Configuration conf) throws OfficeWrite
 *
 */
 @Override
-public synchronized void write(NullWritable key, SpreadSheetCellDAO value) throws IOException {
+public synchronized void write(NullWritable key, K value) throws IOException {
 		try {
-			this.officeWriter.write(value);
+			if (value instanceof ArrayWritable) {
+				ArrayWritable row = (ArrayWritable)value;
+				Writable[] rowCellDAO = row.get();
+				for (int i=0;i<rowCellDAO.length;i++) {
+					this.officeWriter.write(rowCellDAO[i]);
+				}
+			} else {
+				this.officeWriter.write(value);
+			}
 		} catch (OfficeWriterException e) {
 			LOG.error(e);
 		}

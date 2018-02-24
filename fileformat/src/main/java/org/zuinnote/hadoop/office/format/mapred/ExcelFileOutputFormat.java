@@ -36,7 +36,7 @@ import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 import org.zuinnote.hadoop.office.format.common.writer.InvalidWriterConfigurationException;
 import org.zuinnote.hadoop.office.format.common.writer.OfficeWriterException;
 
-public class ExcelFileOutputFormat extends AbstractSpreadSheetDocumentFileOutputFormat implements Serializable {
+public class ExcelFileOutputFormat<SpreadSheetCellDAO> extends AbstractSpreadSheetDocumentFileOutputFormat<SpreadSheetCellDAO> implements Serializable {
 /**
 	 * 
 	 */
@@ -86,7 +86,7 @@ public RecordWriter<NullWritable,SpreadSheetCellDAO> getRecordWriter(FileSystem 
 * @return file extension
 *
 */
-private static String getSuffix(String mimeType) {
+public static String getSuffix(String mimeType) {
 	if (mimeType.contains("openxmlformats-officedocument.spreadsheetml")) {
 		return ExcelFileOutputFormat.SUFFIX_OOXML;
 	} else if (mimeType.contains("ms-excel")) {

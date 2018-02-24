@@ -35,10 +35,10 @@ import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 
 /* The input format will return an array of strings that it reads per "row" from the source formats */
 
-public abstract class AbstractSpreadSheetDocumentFileOutputFormat  extends FileOutputFormat<NullWritable,SpreadSheetCellDAO> {
+public abstract class AbstractSpreadSheetDocumentFileOutputFormat<K>  extends FileOutputFormat<NullWritable,K> {
 
 @Override
-public abstract RecordWriter<NullWritable,SpreadSheetCellDAO> getRecordWriter(FileSystem ignored, JobConf conf, String name, Progressable progress) throws IOException;
+public abstract RecordWriter<NullWritable,K> getRecordWriter(FileSystem ignored, JobConf conf, String name, Progressable progress) throws IOException;
 	
 
 

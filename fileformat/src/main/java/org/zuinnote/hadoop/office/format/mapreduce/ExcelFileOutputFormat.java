@@ -17,12 +17,14 @@
 package org.zuinnote.hadoop.office.format.mapreduce;
 
 import org.apache.hadoop.conf.Configuration;
-
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.RecordWriter;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import org.apache.hadoop.util.Progressable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.compress.GzipCodec;
+import org.apache.hadoop.mapred.JobConf;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -39,7 +41,7 @@ import org.zuinnote.hadoop.office.format.common.writer.InvalidWriterConfiguratio
 import org.zuinnote.hadoop.office.format.common.writer.OfficeWriterException;
 import org.zuinnote.hadoop.office.format.common.writer.InvalidCellSpecificationException;
 
-public class ExcelFileOutputFormat extends AbstractSpreadSheetDocumentFileOutputFormat implements Serializable {
+public class ExcelFileOutputFormat<SpreadSheetCellDAO> extends AbstractSpreadSheetDocumentFileOutputFormat<SpreadSheetCellDAO>implements Serializable {
 /**
 	 * 
 	 */
@@ -95,5 +97,7 @@ public static String getSuffix(String mimeType) {
 	} 
 	return ".unknown";
 }
+
+
 
 }
