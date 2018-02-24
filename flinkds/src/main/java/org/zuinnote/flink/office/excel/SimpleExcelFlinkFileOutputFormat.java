@@ -56,7 +56,9 @@ public class SimpleExcelFlinkFileOutputFormat extends AbstractSpreadSheetFlinkFi
 
 	@Override
 	public void writeRecord(Object[] record) throws IOException {
-		this.writeRow(converter.getSpreadSheetCellDAOfromSimpleDataType(record, this.defaultSheetName, this.rowNumSimple));
+		if (record!=null) {
+			this.writeRow(converter.getSpreadSheetCellDAOfromSimpleDataType(record, this.defaultSheetName, this.rowNumSimple));
+		}
 		this.rowNumSimple++;
 		
 	}
