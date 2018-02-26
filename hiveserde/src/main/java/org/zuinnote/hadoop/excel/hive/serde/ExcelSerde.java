@@ -126,35 +126,50 @@ public class ExcelSerde extends AbstractSerDe {
 
 	@Override
 	public void initialize(Configuration conf, Properties prop, Properties partionProperties) throws SerDeException {
+		LOG.debug("Initializing Excel Hive Serde");
+		LOG.debug("Configuring Hive-only options");
 		// configure hadoopoffice specific hive options
-		this.writeHeader=(boolean) prop.getOrDefault(ExcelSerde.CONF_WRITEHEADER, ExcelSerde.DEFAULT_WRITEHEADER);
-		this.defaultSheetName=(String) prop.getOrDefault(ExcelSerde.CONF_DEFAULTSHEETNAME, ExcelSerde.DEFAULT_DEFAULTSHEETNAME);
-		String dateFormatString=(String) prop.getOrDefault(ExcelSerde.CONF_DATEFORMAT, ExcelSerde.DEFAULT_DATEFORMAT);
+		String writeHeaderStr=prop.getProperty(ExcelSerde.CONF_WRITEHEADER);
+		if (writeHeaderStr!=null) {
+			this.writeHeader=Boolean.valueOf(writeHeaderStr);
+		}
+		String defaultSheetNameStr=prop.getProperty(ExcelSerde.CONF_DEFAULTSHEETNAME);
+		if (defaultSheetNameStr!=null) {
+			this.defaultSheetName=defaultSheetNameStr;
+		}
+		String dateFormatStr=prop.getProperty(ExcelSerde.CONF_DATEFORMAT);
+		if (dateFormatStr==null) {
+			dateFormatStr=ExcelSerde.DEFAULT_DATEFORMAT;
+		}
 		Locale datelocale = Locale.getDefault();
-		if (!"".equals(dateFormatString)) {
-			 datelocale = new Locale.Builder().setLanguageTag(dateFormatString).build();
+		if (!"".equals(dateFormatStr)) {
+			 datelocale = new Locale.Builder().setLanguageTag(dateFormatStr).build();
 		}
 		SimpleDateFormat dateFormat = (SimpleDateFormat) DateFormat.getDateInstance(DateFormat.SHORT, datelocale);
-		String decimalFormatString=(String) prop.getOrDefault(ExcelSerde.CONF_DECIMALFORMAT, ExcelSerde.DEFAULT_DECIMALFORMAT);
+		String decimalFormatString=prop.getProperty(ExcelSerde.CONF_DECIMALFORMAT);
+		if (decimalFormatString==null) {
+			decimalFormatString=ExcelSerde.DEFAULT_DECIMALFORMAT;
+		}
 		Locale decimallocale = Locale.getDefault();
 		if (!"".equals(decimalFormatString)) {
 			decimallocale = new Locale.Builder().setLanguageTag(decimalFormatString).build();
 		}
 		DecimalFormat decimalFormat = (DecimalFormat) NumberFormat.getInstance(decimallocale);
 		// copy hadoopoffice options
-		// copy hadoopoffice options
+		LOG.debug("Configuring HadoopOffice Format");
 		Set<Entry<Object, Object>> entries = prop.entrySet();
 		for (Entry<Object, Object> entry : entries) {
 			if ((entry.getKey() instanceof String)
 					&& ((String) entry.getKey()).startsWith(ExcelSerde.HOSUFFIX)) {
-				if (entry.getValue() instanceof Boolean) {
-					conf.setBoolean((String) entry.getKey(), (Boolean) entry.getValue());
+				if (("TRUE".equalsIgnoreCase((String)entry.getValue())) || ("FALSE".equalsIgnoreCase(((String)entry.getValue())))) {
+					conf.setBoolean((String) entry.getKey(), Boolean.valueOf((String)entry.getValue()));
 				} else {
 					conf.set((String) entry.getKey(), (String) entry.getValue());
 				}
 			}
 		}
 		// create object inspector (always a struct = row)
+		LOG.debug("Creating object inspector");
 	    this.columnNames = Arrays.asList(prop.getProperty(serdeConstants.LIST_COLUMNS).split(","));
 	    this.columnTypes = TypeInfoUtils.getTypeInfosFromTypeString(prop.getProperty(serdeConstants.LIST_COLUMN_TYPES));
 	    final List<ObjectInspector> columnOIs = new ArrayList<ObjectInspector>(columnNames.size());
@@ -163,6 +178,7 @@ public class ExcelSerde extends AbstractSerDe {
 		}
 		this.oi=ObjectInspectorFactory.getStandardStructObjectInspector(columnNames, columnOIs);
 		// create converter
+		LOG.debug("Creating converter");
 		this.converter = new ExcelConverterSimpleSpreadSheetCellDAO(dateFormat,decimalFormat);
 		GenericDataType[] columnsGD = new GenericDataType[columnNames.size()];
 		for (int i=0;i<columnOIs.size();i++) {
@@ -206,6 +222,7 @@ public class ExcelSerde extends AbstractSerDe {
 		this.currentWriteRow=0;
 		// set outputrow
 		this.outputRow=new Object[this.columnNames.size()];
+		LOG.debug("Finished Initialization");
 	}
 
 	@Override
