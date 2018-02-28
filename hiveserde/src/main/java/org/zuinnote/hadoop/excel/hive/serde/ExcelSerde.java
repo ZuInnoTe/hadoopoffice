@@ -81,9 +81,10 @@ import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAOArrayWrita
 import org.zuinnote.hadoop.office.format.common.util.MSExcelUtil;
 
 /**
- * SerDe for Excel files (.xls,.xlsx) to retrieve them as rows. Note:
+ * SerDe for Excel files (.xls,.xlsx) to retrieve them as rows and store them in Excel.  Note: you need to specify a schema according to which the data in the Excel should be converted.
  *
  */
+
 public class ExcelSerde extends AbstractSerDe {
 	public static final String CONF_DATEFORMAT = "office.hive.dateFormat";
 	public static final String CONF_DECIMALFORMAT = "office.hive.decimalFormat";
@@ -105,94 +106,36 @@ public class ExcelSerde extends AbstractSerDe {
 	private int currentWriteRow;
 	private ExcelConverterSimpleSpreadSheetCellDAO converter;
 
-	@Override
-	public Object deserialize(Writable arg0) throws SerDeException {
-		if ((arg0 == null) || (arg0 instanceof NullWritable)) {
-			return this.nullRow;
-		}
-		Object[] primitiveRow = this.converter
-				.getDataAccordingToSchema((SpreadSheetCellDAO[]) ((ArrayWritable) arg0).get());
-		// check if supported type and convert to hive type, if necessary
-		for (int i = 0; i < primitiveRow.length; i++) {
-			PrimitiveTypeInfo ti = (PrimitiveTypeInfo) this.columnTypes.get(i);
-			switch (ti.getPrimitiveCategory()) {
-			case STRING:
-				primitiveRow[i] = primitiveRow[i];
-				break;
-			case BYTE:
-				primitiveRow[i] = primitiveRow[i];
-				break;
-			case SHORT:
-				primitiveRow[i] = primitiveRow[i];
-				break;
-			case INT:
-				primitiveRow[i] = primitiveRow[i];
-				break;
-			case LONG:
-				primitiveRow[i] = primitiveRow[i];
-				break;
-			case FLOAT:
-				primitiveRow[i] = primitiveRow[i];
-				break;
-			case DOUBLE:
-				primitiveRow[i] = primitiveRow[i];
-				break;
-			case BOOLEAN:
-				primitiveRow[i] = primitiveRow[i];
-				break;
-			case TIMESTAMP:
-				primitiveRow[i] = Timestamp.valueOf((String) primitiveRow[i]);
-				break;
-			case DATE:
-				if (primitiveRow[i] != null) {
-					primitiveRow[i] = new java.sql.Date(((Date) primitiveRow[i]).getTime());
-				}
-				break;
-			case DECIMAL:
-				if (primitiveRow[i] != null) {
-					primitiveRow[i] = HiveDecimal.create((BigDecimal) primitiveRow[i]);
-				}
-				break;
-			case CHAR:
-				if (primitiveRow[i] != null) {
-					primitiveRow[i] = new HiveChar((String) primitiveRow[i], ((CharTypeInfo) ti).getLength());
-				}
-				break;
-			case VARCHAR:
-				if (primitiveRow[i] != null) {
-					primitiveRow[i] = new HiveVarchar((String) primitiveRow[i], ((VarcharTypeInfo) ti).getLength());
-				}
-				break;
-			default:
-				throw new SerDeException("Unsupported type " + ti);
-			}
-		}
-		return primitiveRow;
-	}
-
-	@Override
-	public ObjectInspector getObjectInspector() throws SerDeException {
-		return this.oi;
-	}
-
-	@Override
-	public SerDeStats getSerDeStats() {
-		// no statistics supported
-		return null;
-	}
-
-	@Override
-	public Class<? extends Writable> getSerializedClass() {
-		return ArrayWritable.class;
-	}
-
+	/**
+	 * Initializes the Serde
+	 *  
+	 * @see #initialize(Configuration, Properties, Properties)
+	 * 
+	 * @param conf Hadoop Configuration
+	 * @param prop table properties
+	 * 
+	 * 
+	 */
 	@Override
 	public void initialize(Configuration conf, Properties prop) throws SerDeException {
 		this.initialize(conf, prop, null);
 	}
-
+	
+	/**
+	 * Initializes the SerDe \n
+	 * You can define in the table properties (additionally to the standard Hive properties) the following options \n
+	 * office.hive.dateFormat: formats of dates in BCP47 (@see <a href="https://tools.ietf.org/html/bcp47">https://tools.ietf.org/html/bcp47</a>) notation. The default is: US. Usually even for other countries the US format should be used as default because Excel stores internally the dates in US formats and converts them only in the Excel GUI to the right locale.  \n
+	 * office.hive.decimalFormat: decimal format in BCP47 notation. The default is empty string, which means the systems locale is used. Important if you have decimal numbers to detect the separator \n
+	 * office.hive.write.header: true if the column names should be written in the first line of the Excel, false if not. Default: false\n
+	 * office.hive.write.defaultSheetName: The sheetname to which data should be written (note: as an input any sheets can be read or selected sheets according to HadoopOffice configuration values) \n
+	 * Any of the HadoopOffice options (hadoopoffice.*), such as encryption, signing, low footprint mode, linked workbooks, can be defined in the table properties @see <a href="https://github.com/ZuInnoTe/hadoopoffice/wiki/Hadoop-File-Format">HadoopOffice configuration</a>\n
+	 * @param conf Hadoop Configuration
+	 * @param prop table properties. 
+	 * @param partitionProperties ignored. Partitions are not supported.
+	 */
+	
 	@Override
-	public void initialize(Configuration conf, Properties prop, Properties partionProperties) throws SerDeException {
+	public void initialize(Configuration conf, Properties prop, Properties partitionProperties) throws SerDeException {
 		LOG.debug("Initializing Excel Hive Serde");
 		LOG.debug("Configuring Hive-only options");
 		// configure hadoopoffice specific hive options
@@ -288,6 +231,124 @@ public class ExcelSerde extends AbstractSerDe {
 		LOG.debug("Finished Initialization");
 	}
 
+	/**
+	 * The object inspector returned is always of type StructObjectInspector
+	 * 
+	 * @return StructObjectInspector
+	 */
+	@Override
+	public ObjectInspector getObjectInspector() throws SerDeException {
+		return this.oi;
+	}
+	
+	/**
+	 * Returns null because SerdeStata are not supported
+	 * 
+	 * @return null
+	 */
+	@Override
+	public SerDeStats getSerDeStats() {
+		// no statistics supported
+		return null;
+	}
+	
+	/**
+	 * Returns the class in which information is serialized.
+	 * It is an ArrayWritable (@see org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAOArrayWritable) containing objects of type SpreadSheetCellDAO (@see org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO)
+	 * 
+	 * @return SpreadSheetCellDAOArrayWritable.class
+	 */
+	@Override
+	public Class<? extends Writable> getSerializedClass() {
+		return SpreadSheetCellDAOArrayWritable.class;
+	}
+
+	/**
+	 * Deserializes an object of type @see #getSerializedClass()
+	 * Note: Some Java types, such as Decimal, are converted to Hive specific datatypes. 
+	 * 
+	 * @param arg0 object of type @see #getSerializedClass()
+	 * @return Array containing objects of type primitive Java (e.g. string, byte, integer)/Hive (e.g HiveDecimal, HiveVarChar)
+	 * 
+	 */
+	@Override
+	public Object deserialize(Writable arg0) throws SerDeException {
+		if ((arg0 == null) || (arg0 instanceof NullWritable)) {
+			return this.nullRow;
+		}
+		Object[] primitiveRow = this.converter
+				.getDataAccordingToSchema((SpreadSheetCellDAO[]) ((ArrayWritable) arg0).get());
+		// check if supported type and convert to hive type, if necessary
+		for (int i = 0; i < primitiveRow.length; i++) {
+			PrimitiveTypeInfo ti = (PrimitiveTypeInfo) this.columnTypes.get(i);
+			switch (ti.getPrimitiveCategory()) {
+			case STRING:
+				primitiveRow[i] = primitiveRow[i];
+				break;
+			case BYTE:
+				primitiveRow[i] = primitiveRow[i];
+				break;
+			case SHORT:
+				primitiveRow[i] = primitiveRow[i];
+				break;
+			case INT:
+				primitiveRow[i] = primitiveRow[i];
+				break;
+			case LONG:
+				primitiveRow[i] = primitiveRow[i];
+				break;
+			case FLOAT:
+				primitiveRow[i] = primitiveRow[i];
+				break;
+			case DOUBLE:
+				primitiveRow[i] = primitiveRow[i];
+				break;
+			case BOOLEAN:
+				primitiveRow[i] = primitiveRow[i];
+				break;
+			case TIMESTAMP:
+				if (primitiveRow[i] != null) {
+					primitiveRow[i] = Timestamp.valueOf((String) primitiveRow[i]);
+				}
+				break;
+			case DATE:
+				if (primitiveRow[i] != null) {
+					primitiveRow[i] = new java.sql.Date(((Date) primitiveRow[i]).getTime());
+				}
+				break;
+			case DECIMAL:
+				if (primitiveRow[i] != null) {
+					primitiveRow[i] = HiveDecimal.create((BigDecimal) primitiveRow[i]);
+				}
+				break;
+			case CHAR:
+				if (primitiveRow[i] != null) {
+					primitiveRow[i] = new HiveChar((String) primitiveRow[i], ((CharTypeInfo) ti).getLength());
+				}
+				break;
+			case VARCHAR:
+				if (primitiveRow[i] != null) {
+					primitiveRow[i] = new HiveVarchar((String) primitiveRow[i], ((VarcharTypeInfo) ti).getLength());
+				}
+				break;
+			default:
+				throw new SerDeException("Unsupported type " + ti);
+			}
+		}
+		return primitiveRow;
+	}
+
+	
+/***
+ *  Serializes an array of primitive (Hive) data types to a objects of type @see #getSerializedClass()
+ *  Note: For HiveDecimals we add trailing zeros
+ *  
+ *  @param arg0 Array of objects of primitive (Hive) data types. 
+ *  @param arg1 ObjectInspector to be able to parse the object given in arg0
+ *  
+ *  @return object of type @see #getSerializedClass()
+ *  
+ */
 	@Override
 	public Writable serialize(Object arg0, ObjectInspector arg1) throws SerDeException {
 		SpreadSheetCellDAO[] resultHeader = new SpreadSheetCellDAO[0];
@@ -364,7 +425,7 @@ public class ExcelSerde extends AbstractSerDe {
 				break;
 			case DECIMAL:
 				if (outputRow[i] != null) {
-					// add trailing zeros, if necessary
+					// add trailing zeros, if necessary, Hive removes them by default, but for certain scenarios we might still need them in Excel
 					outputRow[i] = ((HiveDecimal) outputRow[i]).bigDecimalValue().setScale(((DecimalTypeInfo)ti).scale());
 				}
 				break;
