@@ -97,7 +97,7 @@ sourceSets {
 dependencies {
    // hadoop lib for driver
      provided("org.apache.hadoop:hadoop-client:2.7.0")
-       // hadoop crypto ledger library
+       // hadoopoffice library
    provided("com.github.zuinnote:hadoopoffice-fileformat:1.1.0")
     // hive serde API
    provided("org.apache.hive:hive-serde:1.2.1")
