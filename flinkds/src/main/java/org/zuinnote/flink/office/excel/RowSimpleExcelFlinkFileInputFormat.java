@@ -22,7 +22,10 @@ import java.text.SimpleDateFormat;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.flink.api.common.io.CheckpointableInputFormat;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
+import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.core.fs.FileInputSplit;
 import org.apache.flink.types.Row;
 import org.zuinnote.flink.office.AbstractSpreadSheetFlinkFileInputFormat;
@@ -36,7 +39,7 @@ import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
  *
  */
 public class RowSimpleExcelFlinkFileInputFormat extends AbstractSpreadSheetFlinkFileInputFormat<Row>
-implements CheckpointableInputFormat<FileInputSplit, Tuple3<Long, Long, GenericDataType[]>> {
+implements CheckpointableInputFormat<FileInputSplit, Tuple3<Long, Long, GenericDataType[]>>,ResultTypeQueryable<Row> {
 	/**
 	 * 
 	 */
@@ -47,15 +50,17 @@ implements CheckpointableInputFormat<FileInputSplit, Tuple3<Long, Long, GenericD
 	private ExcelConverterSimpleSpreadSheetCellDAO converter;
 	private HadoopOfficeReadConfiguration shocr;
 	private GenericDataType[] customSchema;
+	private TypeInformation[] fieldTypeInfos;
 	
 	public RowSimpleExcelFlinkFileInputFormat(HadoopOfficeReadConfiguration hocr, long maxInferRows, boolean useHeader,
-			SimpleDateFormat dateFormat, DecimalFormat decimalFormat) {
+			SimpleDateFormat dateFormat, DecimalFormat decimalFormat, TypeInformation[] fieldTypeInfos) {
 		super(hocr,useHeader);
 		this.maxInferRows = maxInferRows;
 		this.useHeader = useHeader;
 		this.converter = new ExcelConverterSimpleSpreadSheetCellDAO(dateFormat, decimalFormat);
 		this.shocr = hocr;
 		hocr.setMimeType(AbstractSpreadSheetFlinkFileInputFormat.MIMETYPE_EXCEL);
+		this.fieldTypeInfos=fieldTypeInfos;
 	}
 	
 	/***
@@ -160,6 +165,11 @@ implements CheckpointableInputFormat<FileInputSplit, Tuple3<Long, Long, GenericD
 	public Tuple3<Long, Long, GenericDataType[]> getCurrentState() throws IOException {
 		return new Tuple3<>(this.getOfficeReader().getCurrentParser().getCurrentSheet(),
 				this.getOfficeReader().getCurrentParser().getCurrentRow(), this.converter.getSchemaRow());
+	}
+
+	@Override
+	public TypeInformation<Row> getProducedType() {
+		return new RowTypeInfo(this.fieldTypeInfos);
 	}
 
 }
