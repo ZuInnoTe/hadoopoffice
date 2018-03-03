@@ -21,7 +21,7 @@ publishTo := Some(Resolver.file("file",  new File(Path.userHome.absolutePath+"/.
 
 fork  := true
 
-crossScalaVersions := Seq("2.10.7","2.11.12")
+crossScalaVersions := Seq("2.10.7","2.11.10")
 
 scalacOptions += "-target:jvm-1.7"
 
@@ -32,6 +32,8 @@ libraryDependencies += "com.github.zuinnote" % "hadoopoffice-flinkds" % "1.1.0" 
 libraryDependencies += "org.apache.flink" %% "flink-scala" % "1.3.2" % "provided" 
 
 libraryDependencies += "org.apache.flink" %% "flink-table" % "1.3.2" % "provided" 
+// needed for table environment 
+libraryDependencies += "org.apache.flink" %% "flink-streaming-scala" % "1.3.2" % "provided" 
 
 libraryDependencies += "org.apache.flink" % "flink-shaded-hadoop2" % "1.3.2" % "provided"  
 
