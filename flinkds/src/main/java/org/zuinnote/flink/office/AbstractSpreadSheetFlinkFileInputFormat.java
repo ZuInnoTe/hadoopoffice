@@ -80,10 +80,6 @@ public abstract class AbstractSpreadSheetFlinkFileInputFormat<E> extends FileInp
 		this.header = new String[0];
 		this.unsplittable=true;
 	}
-
-
-	
-
 	
 	@Override
 	public void open(FileInputSplit split) throws IOException {

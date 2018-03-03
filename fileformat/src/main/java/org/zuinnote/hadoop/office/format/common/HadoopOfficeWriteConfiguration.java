@@ -15,6 +15,7 @@
 **/
 package org.zuinnote.hadoop.office.format.common;
 
+import java.io.Serializable;
 import java.security.Key;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -31,7 +32,11 @@ import org.apache.hadoop.conf.Configuration;
  * @author Jörn Franke (zuinnote@gmail.com)
  *
  */
-public class HadoopOfficeWriteConfiguration {
+public class HadoopOfficeWriteConfiguration implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4125629762320597440L;
 	public static final String CONF_MIMETYPE="hadoopoffice.write.mimeType";
 	public static final String CONF_LOCALE="hadoopoffice.write.locale.bcp47";
 	public static final String CONF_LINKEDWB="hadoopoffice.write.linkedworkbooks";

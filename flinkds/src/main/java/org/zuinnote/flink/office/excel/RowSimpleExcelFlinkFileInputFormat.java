@@ -28,6 +28,7 @@ import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.core.fs.FileInputSplit;
+import org.apache.flink.core.fs.Path;
 import org.apache.flink.types.Row;
 import org.zuinnote.flink.office.AbstractSpreadSheetFlinkFileInputFormat;
 import org.zuinnote.hadoop.office.format.common.HadoopOfficeReadConfiguration;

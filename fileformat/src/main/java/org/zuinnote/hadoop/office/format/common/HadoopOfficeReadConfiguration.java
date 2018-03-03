@@ -15,6 +15,7 @@
 **/
 package org.zuinnote.hadoop.office.format.common;
 
+import java.io.Serializable;
 import java.security.cert.PKIXParameters;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -32,7 +33,11 @@ import org.apache.hadoop.conf.Configuration;
  * @author Jörn Franke (zuinnote@gmail.com)
  *
  */
-public class HadoopOfficeReadConfiguration {
+public class HadoopOfficeReadConfiguration implements Serializable {
+/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8028549445862365699L;
 public static final String CONF_MIMETYPE="hadoopoffice.read.mimeType";
 public static final String CONF_SHEETS="hadoopoffice.read.sheets";
 public static final String CONF_LOCALE="hadoopoffice.read.locale.bcp47";
