@@ -40,8 +40,7 @@ class ExcelFlinkTableSink(
   decimalFormat:    DecimalFormat                  = NumberFormat.getInstance().asInstanceOf[DecimalFormat],
   writeMode:        Option[WriteMode]              = Some(WriteMode.NO_OVERWRITE)) extends TableSinkBase[Row] with BatchTableSink[Row] {
 
-  
-  /***
+/***
    * Writes a dataset in Excel format. If useHeader is activated then it adds the field names of the dataset as the first row
    * 
    * @param dataSet dataset to write
@@ -61,12 +60,10 @@ class ExcelFlinkTableSink(
     dataSet.write(outputFormat, path).name(this.getClass + getFieldNames.mkString(","))
   }
 
-  
   override protected def copy: TableSinkBase[Row] = {
-    new ExcelFlinkTableSink(path, useHeader, howc, defaultSheetName, dateFormat,decimalFormat,writeMode)
+    new ExcelFlinkTableSink(path, useHeader, howc, defaultSheetName, dateFormat, decimalFormat, writeMode)
   }
 
-  
   override def getOutputType: TypeInformation[Row] = {
     new RowTypeInfo(getFieldTypes: _*)
   }

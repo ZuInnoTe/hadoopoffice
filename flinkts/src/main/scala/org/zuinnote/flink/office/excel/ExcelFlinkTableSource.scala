@@ -1,18 +1,18 @@
 /**
-* Copyright 2018 ZuInnoTe (Jörn Franke) <zuinnote@gmail.com>
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-**/
+ * Copyright 2018 ZuInnoTe (Jörn Franke) <zuinnote@gmail.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package org.zuinnote.flink.office.excel
 
@@ -46,11 +46,10 @@ import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericStrin
 import org.zuinnote.flink.office.excel.RowSimpleExcelFlinkFileInputFormat
 import org.apache.flink.table.api.Types
 
-
 import scala.collection.mutable
 import java.util.Locale
 
-class ExcelFlinkTableSource   (
+class ExcelFlinkTableSource(
   val path:          String,
   val fieldNames:    Array[String],
   val fieldTypes:    Array[TypeInformation[_]],
@@ -60,12 +59,9 @@ class ExcelFlinkTableSource   (
   val decimalFormat: DecimalFormat)
   extends BatchTableSource[Row] {
 
-  
   private val returnType: RowTypeInfo = new RowTypeInfo(fieldTypes, fieldNames)
 
-  
-
-  /***
+/***
    * Returns the dataSet from the Excel file. Note: Currently only the types string, date, timestamp, decimal, byte,short,integer,long,double,float are supported
    * 
    * @param execEnv executionEnvironment 
@@ -84,9 +80,9 @@ class ExcelFlinkTableSource   (
         customSchema(i) = new GenericStringDataType()
       } else if (ct.equals(Types.SQL_DATE)) {
         customSchema(i) = new GenericDateDataType()
-      }else if (ct.equals(Types.SQL_TIMESTAMP)) {
+      } else if (ct.equals(Types.SQL_TIMESTAMP)) {
         customSchema(i) = new GenericTimestampDataType()
-      }else if (ct.equals(Types.DECIMAL)) {
+      } else if (ct.equals(Types.DECIMAL)) {
         customSchema(i) = new GenericBigDecimalDataType(10, 0)
       } else if (ct.equals(Types.BYTE)) {
         customSchema(i) = new GenericByteDataType()
@@ -101,7 +97,7 @@ class ExcelFlinkTableSource   (
       } else if (ct.equals(Types.FLOAT)) {
         customSchema(i) = new GenericFloatDataType()
       } else {
-        throw new RuntimeException ("Type not supported "+ct.toString())
+        throw new RuntimeException("Type not supported " + ct.toString())
       }
       i += 1
     }
@@ -114,7 +110,7 @@ class ExcelFlinkTableSource   (
   /** Returns the [[RowTypeInfo]] for the return type of the [[ExcelTableSource]]. */
   override def getReturnType: RowTypeInfo = returnType
 
-  /***
+/***
    * Explains the table source
    * 
    */
@@ -124,56 +120,52 @@ class ExcelFlinkTableSource   (
   }
 }
 
-
-
 object ExcelFlinkTableSource {
 
   /**
-    * A builder for creating [[ExcelFlinkTableSource]] instances.
-    *
-    * Example:
-    *
-    * {{{
-    *   val source: ExcelFlinkTableSource = new ExcelFlinkTableSource.builder()
-    *     .path("/path/to/your/file.xlsx")
-    *     .field("column1", Types.STRING)
-    *     .field("column2", Types.SQL_DATE)
-    *     .hocr(new HadoopOfficeReadConfiguration())
-    *     .decimalFormat(NumberFormat.getInstance(Locale.US))
-    *     .build()
-    * }}}
-    *
-    */
+   * A builder for creating [[ExcelFlinkTableSource]] instances.
+   *
+   * Example:
+   *
+   * {{{
+   *   val source: ExcelFlinkTableSource = new ExcelFlinkTableSource.builder()
+   *     .path("/path/to/your/file.xlsx")
+   *     .field("column1", Types.STRING)
+   *     .field("column2", Types.SQL_DATE)
+   *     .hocr(new HadoopOfficeReadConfiguration())
+   *     .decimalFormat(NumberFormat.getInstance(Locale.US))
+   *     .build()
+   * }}}
+   *
+   */
   class Builder {
 
     private val schema: mutable.LinkedHashMap[String, TypeInformation[_]] =
       mutable.LinkedHashMap[String, TypeInformation[_]]()
     private var path: String = _
     private var useHeader: Boolean = false
-    private var hocr:          HadoopOfficeReadConfiguration = _
-   private var dateFormat:    SimpleDateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.US).asInstanceOf[SimpleDateFormat]
-   private var decimalFormat: DecimalFormat = NumberFormat.getInstance().asInstanceOf[DecimalFormat]
+    private var hocr: HadoopOfficeReadConfiguration = _
+    private var dateFormat: SimpleDateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.US).asInstanceOf[SimpleDateFormat]
+    private var decimalFormat: DecimalFormat = NumberFormat.getInstance().asInstanceOf[DecimalFormat]
 
     /**
-      * Sets the path to the CSV file. Required.
-      *
-      * @param path the path to the CSV file
-      */
+     * Sets the path to the CSV file. Required.
+     *
+     * @param path the path to the CSV file
+     */
     def path(path: String): Builder = {
       this.path = path
       this
     }
 
-   
-
     /**
-      * Adds a field with the field name and the type information. Required.
-      * This method can be called multiple times. The call order of this method defines
-      * also the order of the fields in a row.
-      *
-      * @param fieldName the field name
-      * @param fieldType the type information of the field
-      */
+     * Adds a field with the field name and the type information. Required.
+     * This method can be called multiple times. The call order of this method defines
+     * also the order of the fields in a row.
+     *
+     * @param fieldName the field name
+     * @param fieldType the type information of the field
+     */
     def field(fieldName: String, fieldType: TypeInformation[_]): Builder = {
       if (schema.contains(fieldName)) {
         throw new IllegalArgumentException(s"Duplicate field name $fieldName.")
@@ -181,14 +173,13 @@ object ExcelFlinkTableSource {
       schema += (fieldName -> fieldType)
       this
     }
-    
-        /**
+
+    /**
      * Defines if the first line ("header") shoudl be skipped
-     * 
+     *
      * @param useHeader true, if it should be skipped, false if not
      */
-    
-    
+
     def useHeader(useHeader: Boolean): Builder = {
       this.useHeader = useHeader
       this
@@ -196,43 +187,40 @@ object ExcelFlinkTableSource {
 
     /**
      * Defines the configuration for reading office files (e.g. decryption, linked documents, signature verification etc.)
-     * 
+     *
      * @param conf the configuration
      */
-    
-    
+
     def conf(conf: HadoopOfficeReadConfiguration): Builder = {
       this.hocr = conf
       this
     }
-    
+
     /**
      * Defines the dateFormat to use when reading office files. Note: for some office files, such as Excel the default "US" makes sense, because even for other regions they store it internally as US
-     * 
+     *
      * @param dateFormat DateFormat
      */
-     def dateFormat(dateFormat: SimpleDateFormat): Builder = {
+    def dateFormat(dateFormat: SimpleDateFormat): Builder = {
       this.dateFormat = dateFormat
       this
     }
-     
-      /***
+
+/***
      * Defines the decimalFormat when reading office files. 
      * 
      * @param decimalFormat decimal format to use
      */
-     def decimalFormat(decimalFormat: DecimalFormat): Builder = {
+    def decimalFormat(decimalFormat: DecimalFormat): Builder = {
       this.decimalFormat = decimalFormat
       this
     }
 
-   
-
     /**
-      * Apply the current values and constructs a newly-created [[CsvTableSource]].
-      *
-      * @return a newly-created [[CsvTableSource]].
-      */
+     * Apply the current values and constructs a newly-created [[CsvTableSource]].
+     *
+     * @return a newly-created [[CsvTableSource]].
+     */
     def build(): ExcelFlinkTableSource = {
       if (path == null) {
         throw new IllegalArgumentException("Path must be defined.")
@@ -250,29 +238,25 @@ object ExcelFlinkTableSource {
         useHeader,
         hocr,
         dateFormat,
-        decimalFormat
-        )
+        decimalFormat)
     }
 
-  
-
- 
-}
-   /**
-    * Return a new builder that builds a [[ExcelFlinkTableSource]].
-    *
-    * For example:
-    *
-    * {{{
-    *   val source: ExcelFlinkTableSource = new ExcelFlinkTableSource.builder()
-    *     .path("/path/to/your/file.xlsx")
-    *     .field("column1", Types.STRING)
-    *     .field("column2", Types.SQL_DATE)
-    *     .hocr(new HadoopOfficeReadConfiguration())
-    *     .decimalFormat(NumberFormat.getInstance(Locale.US))
-    *     .build()
-    * }}}
-    * @return a new builder to build a [[ExcelFLinkTableSource]]
-    */
+  }
+  /**
+   * Return a new builder that builds a [[ExcelFlinkTableSource]].
+   *
+   * For example:
+   *
+   * {{{
+   *   val source: ExcelFlinkTableSource = new ExcelFlinkTableSource.builder()
+   *     .path("/path/to/your/file.xlsx")
+   *     .field("column1", Types.STRING)
+   *     .field("column2", Types.SQL_DATE)
+   *     .hocr(new HadoopOfficeReadConfiguration())
+   *     .decimalFormat(NumberFormat.getInstance(Locale.US))
+   *     .build()
+   * }}}
+   * @return a new builder to build a [[ExcelFLinkTableSource]]
+   */
   def builder(): Builder = new Builder
 }
