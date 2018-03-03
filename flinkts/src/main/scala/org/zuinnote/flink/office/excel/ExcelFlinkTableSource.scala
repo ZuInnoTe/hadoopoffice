@@ -65,7 +65,12 @@ class ExcelFlinkTableSource   (
 
   
 
-  
+  /***
+   * Returns the dataSet from the Excel file. Note: Currently only the types string, date, timestamp, decimal, byte,short,integer,long,double,float are supported
+   * 
+   * @param execEnv executionEnvironment 
+   * 
+   */
   override def getDataSet(execEnv: ExecutionEnvironment): DataSet[Row] = {
     // we do not infer any data, because fieldnames and types are given
     val inputFormat = new RowSimpleExcelFlinkFileInputFormat(hocr, 0, useHeader, dateFormat, decimalFormat, fieldTypes)
@@ -109,6 +114,10 @@ class ExcelFlinkTableSource   (
   /** Returns the [[RowTypeInfo]] for the return type of the [[ExcelTableSource]]. */
   override def getReturnType: RowTypeInfo = returnType
 
+  /***
+   * Explains the table source
+   * 
+   */
   override def explainSource(): String = {
     s"ExcelTableSource(" +
       s"read fields: ${getReturnType.getFieldNames.mkString(", ")})"

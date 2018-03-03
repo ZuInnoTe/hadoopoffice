@@ -59,8 +59,8 @@ import org.zuinnote.hadoop.office.format.common.HadoopOfficeReadConfiguration
 import scala.collection.mutable.ArrayBuffer
 import org.scalatest.{FlatSpec, BeforeAndAfterAll, GivenWhenThen, Matchers}
 
-class FlinkScalaExcelTSIntegrationSpec  extends FlatSpec with BeforeAndAfterAll with GivenWhenThen with Matchers  {
-  private val appName: String = "example-scalaflinkbitcoinblockcounter-integrationtest"
+class FlinkScalaExcelTableSourceIntegrationSpec  extends FlatSpec with BeforeAndAfterAll with GivenWhenThen with Matchers  {
+  private val appName: String = "example-scalaflinkexceltablesource-integrationtest"
 private val tmpPrefix: String = "hcl-integrationtest"
 private var tmpPath: java.nio.file.Path = _
 private val CLUSTERNAME: String ="hcl-minicluster"
