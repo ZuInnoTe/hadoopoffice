@@ -91,7 +91,7 @@ public class ExcelSerde extends AbstractSerDe {
 	public static final String CONF_WRITEHEADER = "office.hive.write.header";
 	public static final String CONF_DEFAULTSHEETNAME = "office.hive.write.defaultSheetName";
 	public static final Boolean DEFAULT_WRITEHEADER = false;
-	public static final String DEFAULT_DATEFORMAT = "";
+	public static final String DEFAULT_DATEFORMAT = "US";
 	public static final String DEFAULT_DECIMALFORMAT = "";
 	public static final String DEFAULT_DEFAULTSHEETNAME = "Sheet1";
 	public static final String HOSUFFIX = "hadoopoffice.";
