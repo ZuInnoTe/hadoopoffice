@@ -43,6 +43,7 @@ import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericLongD
 import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericNumericDataType;
 import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericShortDataType;
 import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericStringDataType;
+import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericTimestampDataType;
 import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 import org.zuinnote.hadoop.office.format.common.util.MSExcelUtil;
 
@@ -346,7 +347,19 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 							returnList.set(j, null);
 						}
 					}
-				} else if (applyDataType instanceof GenericNumericDataType) {
+				} else if (applyDataType instanceof GenericTimestampDataType) {
+					if (!"".equals(currentCell.getFormattedValue())) {
+						Date theDate = this.dateFormat.parse(currentCell.getFormattedValue(), new ParsePosition(0));
+						if (theDate != null) {
+							returnList.set(j,new java.sql.Timestamp(theDate.getTime()));
+
+						} else {
+							returnList.set(j, null);
+						}
+					}
+				} 
+				
+				else if (applyDataType instanceof GenericNumericDataType) {
 					if (!"".equals(currentCell.getFormattedValue())) {
 						BigDecimal bd = null;
 						try {
