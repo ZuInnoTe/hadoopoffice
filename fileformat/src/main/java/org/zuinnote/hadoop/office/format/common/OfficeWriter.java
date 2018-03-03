@@ -153,7 +153,10 @@ if (this.currentOfficeSpreadSheetWriter!=null) {
 */
 private static String getInternalWriterFormatFromMimeType(String mimeType) throws InvalidWriterConfigurationException {
  // for MS Office it is based on https://blogs.msdn.microsoft.com/vsofficedeveloper/2008/05/08/office-2007-file-format-mime-types-for-http-content-streaming-2/
- if (mimeType.contains("ms-excel")) { 
+if (mimeType==null) {
+	throw new InvalidWriterConfigurationException("Please specify a mimetype for writing");
+}
+if (mimeType.contains("ms-excel")) { 
 	return MSExcelWriter.FORMAT_OLD;
 } else if (mimeType.contains("openxmlformats-officedocument.spreadsheetml")) {
 	return MSExcelWriter.FORMAT_OOXML;
