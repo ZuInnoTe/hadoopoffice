@@ -18,6 +18,7 @@ package org.zuinnote.flink.office.excel;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -135,6 +136,9 @@ implements CheckpointableInputFormat<FileInputSplit, Tuple3<Long, Long, GenericD
 			reuseRow=reuse;
 		}
 		for (int i=0;i<convertedRow.length;i++) {
+			if (convertedRow[i] instanceof Date) {
+				convertedRow[i]=new java.sql.Date(((Date)convertedRow[i]).getTime());
+			}
 			reuseRow.setField(i, convertedRow[i]);
 		}
 		return reuseRow;
