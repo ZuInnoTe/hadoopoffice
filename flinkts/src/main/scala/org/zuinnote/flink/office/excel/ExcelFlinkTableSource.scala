@@ -119,7 +119,7 @@ class ExcelFlinkTableSource   (
    * 
    */
   override def explainSource(): String = {
-    s"ExcelTableSource(" +
+    s"ExcelFlinkTableSource(" +
       s"read fields: ${getReturnType.getFieldNames.mkString(", ")})"
   }
 }
