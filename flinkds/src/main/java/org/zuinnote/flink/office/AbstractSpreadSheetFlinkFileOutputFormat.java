@@ -123,7 +123,9 @@ public abstract class AbstractSpreadSheetFlinkFileOutputFormat<E> extends FileOu
 	@Override
 	public void close() throws IOException {
 		try {
-			this.officeWriter.close();
+			if (this.officeWriter!=null) {
+				this.officeWriter.close();
+			}
 		}  finally {
 			if (this.stream!=null) {
 				this.stream.close();
