@@ -335,7 +335,9 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 					returnList.set(j, currentCell.getFormattedValue());
 				} else if (applyDataType instanceof GenericBooleanDataType) {
 					if (!"".equals(currentCell.getFormattedValue())) {
-						returnList.set(j, Boolean.valueOf(currentCell.getFormattedValue()));
+						if (currentCell.getFormattedValue().equalsIgnoreCase("true") ||currentCell.getFormattedValue().equalsIgnoreCase("false")) {
+							returnList.set(j, Boolean.valueOf(currentCell.getFormattedValue()));
+						} 
 					}
 				} else if (applyDataType instanceof GenericDateDataType) {
 					if (!"".equals(currentCell.getFormattedValue())) {
