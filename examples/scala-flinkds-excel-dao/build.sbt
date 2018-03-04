@@ -5,13 +5,17 @@ import scala._
 
 lazy val root = (project in file("."))
 .settings(
-    name := "example-ho-flink-scala-excelin",
+    name := "example-ho-flink-scala-excel-dao",
     version := "0.1"
 )
  .configs( IntegrationTest )
   .settings( Defaults.itSettings : _*)
   .enablePlugins(JacocoItPlugin)
 
+assemblyMergeStrategy in assembly := {
+ case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+ case x => MergeStrategy.first
+}
 
 crossScalaVersions := Seq("2.10.5", "2.11.7")
 
@@ -19,7 +23,7 @@ scalacOptions += "-target:jvm-1.7"
 
 resolvers += Resolver.mavenLocal
 
-assemblyJarName in assembly := "example-ho-flink-scala-excelin.jar"
+assemblyJarName in assembly := "example-ho-flink-scala-excel-dao.jar"
 
 fork  := true
 
