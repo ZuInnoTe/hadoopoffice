@@ -28,9 +28,12 @@ import org.apache.hadoop.conf._
 import org.apache.hadoop.mapreduce._
 import org.apache.hadoop.io._
 
+import org.zuinnote.hadoop.office.format.common.util._
+import org.zuinnote.hadoop.office.format.common.converter._
 import org.zuinnote.hadoop.office.format.common.dao._
 import org.zuinnote.hadoop.office.format.mapreduce._
    
+import collection.JavaConverters._
 /**
 * Author: Jörn Franke <zuinnote@gmail.com>
 *
@@ -59,9 +62,26 @@ object SparkScalaExcelOut {
    
    
    def convertToExcel(sc: SparkContext, hadoopConf: Configuration, inputFile: String, outputFile: String): Unit = {
-     	// load a text file using standard spark methods
-     // split it
+    	// load a text file using standard spark methods
+     val textFile = sc.textFile(inputFile)
      // create a pair rdd (nullwritable, SpreadSheetCellDAO)
-     // use new hadoop api (mapreduce.*) 
+     val excelRdd = textFile
+     .zipWithIndex() // create an index for each line  (to create the corresponding cells in Excel)
+     .map{case (line, idx) => {
+     	// read the cells and create an array for all cells
+     	val cells = line.split(",")
+     	var columnNum=0
+     	var outputRow = new Array[Writable](cells.length)
+     	for (cell <- cells) {
+     	       //SpreadSheetCellDAO(String formattedValue, String comment, String formula, String address,String sheetName)
+     		outputRow(columnNum)=new SpreadSheetCellDAO(cell, "",MSExcelUtil.getCellAddressA1Format(idx.intValue,columnNum), "", "Sheet1")
+     		columnNum+=1
+     	}
+     	val outputRowWritable = new SpreadSheetCellDAOArrayWritable()
+     	outputRowWritable.set(outputRow)
+     	outputRowWritable
+     }}.map(spreadSheetCellArrayWritable => (NullWritable.get(),spreadSheetCellArrayWritable)) // create key/value pair for outputformat
+     .saveAsNewAPIHadoopFile(outputFile,classOf[NullWritable], classOf[SpreadSheetCellDAOArrayWritable], classOf[ExcelRowFileOutputFormat], hadoopConf) // use new hadoopp api (mapreduce.*)
+}
 }
 
