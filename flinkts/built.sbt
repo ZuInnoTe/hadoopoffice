@@ -12,7 +12,7 @@ version := "1.1.0"
 )
  .configs( IntegrationTest )
   .settings( Defaults.itSettings : _*)
-
+  .enablePlugins(JacocoItPlugin)
 
 
 resolvers += Resolver.mavenLocal
