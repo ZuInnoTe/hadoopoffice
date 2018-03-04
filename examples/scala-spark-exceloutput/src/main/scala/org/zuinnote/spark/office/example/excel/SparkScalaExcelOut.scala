@@ -74,7 +74,7 @@ object SparkScalaExcelOut {
      	var outputRow = new Array[Writable](cells.length)
      	for (cell <- cells) {
      	       //SpreadSheetCellDAO(String formattedValue, String comment, String formula, String address,String sheetName)
-     		outputRow(columnNum)=new SpreadSheetCellDAO(cell, "",MSExcelUtil.getCellAddressA1Format(idx.intValue,columnNum), "", "Sheet1")
+     		outputRow(columnNum)=new SpreadSheetCellDAO(cell, "","",MSExcelUtil.getCellAddressA1Format(idx.intValue,columnNum), "Sheet1")
      		columnNum+=1
      	}
      	val outputRowWritable = new SpreadSheetCellDAOArrayWritable()

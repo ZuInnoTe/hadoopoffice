@@ -48,6 +48,11 @@ import org.apache.hadoop.io.compress.Decompressor
 import org.apache.hadoop.io.compress.SplittableCompressionCodec
 import org.apache.hadoop.io.compress.SplitCompressionInputStream
 
+import org.zuinnote.hadoop.office.format.common.util._
+import org.zuinnote.hadoop.office.format.common.converter._
+import org.zuinnote.hadoop.office.format.common.dao._
+import org.zuinnote.hadoop.office.format.common.parser._
+import org.zuinnote.hadoop.office.format.common._
 
 import org.apache.spark.{SparkConf, SparkContext}
 import scala.collection.mutable.ArrayBuffer
@@ -64,6 +69,7 @@ private val CLUSTERNAME: String ="hcl-minicluster"
 private val DFS_INPUT_DIR_NAME: String = "/input"
 private val DFS_OUTPUT_DIR_NAME: String = "/output"
 private val DEFAULT_OUTPUT_FILENAME: String = "part-00000"
+private val DEFAULT_OUTPUT_EXCEL_FILENAME: String = "part-r-00000.xlsx";
 private val DFS_INPUT_DIR : Path = new Path(DFS_INPUT_DIR_NAME)
 private val DFS_OUTPUT_DIR : Path = new Path(DFS_OUTPUT_DIR_NAME)
 private val NOOFDATANODES: Int =4
@@ -131,7 +137,7 @@ override def beforeAll(): Unit = {
 }
 
 
-"The test excel file" should "be converted into a 6 lines CSV" in {
+"The test csv file" should "be converted into a 2 lines Excel" in {
 	Given("Excel 2013 test file on DFS")
 	// create input directory
 	dfsCluster.getFileSystem().mkdirs(DFS_INPUT_DIR)
@@ -145,14 +151,85 @@ override def beforeAll(): Unit = {
 	Given("Configuration")
 	conf.set("hadoopoffice.write.locale.bcp47","us");
 	When("convert to CSV")
+	SparkScalaExcelOut.convertToExcel(sc,conf,dfsCluster.getFileSystem().getUri().toString()+DFS_INPUT_DIR_NAME,dfsCluster.getFileSystem().getUri().toString()+DFS_OUTPUT_DIR_NAME)
 	Then("Excel correspond to CSV")
-
+	val listExcel = readDefaultExcelResults(2)
+	assert(2==listExcel.size)
+	val firstRow = listExcel.get(0)
+	assert(4==firstRow.length) 
+	assert("1"==firstRow(0).getFormattedValue())
+	assert(""==firstRow(0).getComment())
+	assert(""==firstRow(0).getFormula())
+	assert("A1"==firstRow(0).getAddress())
+	assert("Sheet1"==firstRow(0).getSheetName())
+	assert("2"==firstRow(1).getFormattedValue())
+	assert(""==firstRow(1).getComment())
+	assert(""==firstRow(1).getFormula())
+	assert("B1"==firstRow(1).getAddress())
+	assert("Sheet1"==firstRow(1).getSheetName())
+	assert("3"==firstRow(2).getFormattedValue())
+	assert(""==firstRow(2).getComment())
+	assert(""==firstRow(2).getFormula())
+	assert("C1"==firstRow(2).getAddress())
+	assert("Sheet1"==firstRow(2).getSheetName())
+	assert("4"==firstRow(3).getFormattedValue())
+	assert(""==firstRow(3).getComment())
+	assert(""==firstRow(3).getFormula())
+	assert("D1"==firstRow(3).getAddress())
+	assert("Sheet1"==firstRow(3).getSheetName())
+	val secondRow = listExcel.get(1)
+	assert(4==secondRow.length) 
+	assert("test1"==secondRow(0).getFormattedValue())
+	assert(""==secondRow(0).getComment())
+	assert(""==secondRow(0).getFormula())
+	assert("A2"==secondRow(0).getAddress())
+	assert("Sheet1"==secondRow(0).getSheetName())
+	assert("test2"==secondRow(1).getFormattedValue())
+	assert(""==secondRow(1).getComment())
+	assert(""==secondRow(1).getFormula())
+	assert("B2"==secondRow(1).getAddress())
+	assert("Sheet1"==secondRow(1).getSheetName())
+	assert("test3"==secondRow(2).getFormattedValue())
+	assert(""==secondRow(2).getComment())
+	assert(""==secondRow(2).getFormula())
+	assert("C2"==secondRow(2).getAddress())
+	assert("Sheet1"==secondRow(2).getSheetName())
+	assert("test4"==secondRow(3).getFormattedValue())
+	assert(""==secondRow(3).getComment())
+	assert(""==secondRow(3).getFormula())
+	assert("D2"==secondRow(3).getAddress())
+	assert("Sheet1"==secondRow(3).getSheetName())
 }
 
 
 
 	  
+		    
+	    /**
+	     * Read excel files from the default output directory and default excel outputfile 
+	     * @throws FormatNotUnderstoodException 
+	     * 
+	     * 
+	     */
 	    
+	    def readDefaultExcelResults(numOfRows: Int): List[Array[SpreadSheetCellDAO]] = {
+	    val result = new ArrayList[Array[SpreadSheetCellDAO]]()
+		val defaultOutputfile = new Path(DFS_OUTPUT_DIR_NAME+"/"+DEFAULT_OUTPUT_EXCEL_FILENAME)
+		val defaultInputStream = openFile(defaultOutputfile);
+		// Create a new MS Excel Parser
+		val hocr = new HadoopOfficeReadConfiguration()
+		val excelParser = new MSExcelParser(hocr,null)
+		excelParser.parse(defaultInputStream)
+		for (i <- 0 to numOfRows-1){
+		   val currentRow = excelParser.getNext().asInstanceOf[Array[SpreadSheetCellDAO]]
+			if (currentRow!=null) {
+				result.add(currentRow)
+			}
+		}
+		excelParser.close()
+	    return result
+	    }
+	        
 
 
       /**
