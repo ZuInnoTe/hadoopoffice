@@ -36,7 +36,7 @@ import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 import org.zuinnote.hadoop.office.format.common.writer.InvalidWriterConfigurationException;
 import org.zuinnote.hadoop.office.format.common.writer.OfficeWriterException;
 
-public class ExcelFileOutputFormat<SpreadSheetCellDAO> extends AbstractSpreadSheetDocumentFileOutputFormat<SpreadSheetCellDAO> implements Serializable {
+public class ExcelFileOutputFormat extends AbstractSpreadSheetDocumentFileOutputFormat<SpreadSheetCellDAO> implements Serializable {
 /**
 	 * 
 	 */

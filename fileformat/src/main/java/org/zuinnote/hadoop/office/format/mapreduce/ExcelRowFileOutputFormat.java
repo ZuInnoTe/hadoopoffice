@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.ArrayWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.RecordWriter;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
@@ -38,7 +39,7 @@ import org.zuinnote.hadoop.office.format.common.writer.OfficeWriterException;
  * @author jornfranke
  *
  */
-public class ExcelRowFileOutputFormat<ArrayWritable> extends AbstractSpreadSheetDocumentFileOutputFormat<ArrayWritable> implements Serializable {
+public class ExcelRowFileOutputFormat extends AbstractSpreadSheetDocumentFileOutputFormat<ArrayWritable> implements Serializable {
 	/**
 	 * 
 	 */
