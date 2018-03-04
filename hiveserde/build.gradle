@@ -98,7 +98,7 @@ dependencies {
    // hadoop lib for driver
      provided("org.apache.hadoop:hadoop-client:2.7.0")
        // hadoopoffice library
-   provided("com.github.zuinnote:hadoopoffice-fileformat:1.1.0")
+   compile("com.github.zuinnote:hadoopoffice-fileformat:1.1.0")
     // hive serde API
    provided("org.apache.hive:hive-serde:1.2.1")
    provided("org.apache.hive:hive-exec:1.2.1")

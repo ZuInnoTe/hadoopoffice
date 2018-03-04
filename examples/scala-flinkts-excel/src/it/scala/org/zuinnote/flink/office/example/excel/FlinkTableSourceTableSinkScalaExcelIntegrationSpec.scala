@@ -73,7 +73,6 @@ import scala.collection.mutable.ArrayBuffer
 import org.scalatest.{FlatSpec, BeforeAndAfterAll, GivenWhenThen, Matchers}
 
 class FlinkTableSourceTableSinkScalaExcelIntegrationSpec extends FlatSpec with BeforeAndAfterAll with GivenWhenThen with Matchers {
-private val master: String = "local[2]"
 private val appName: String = "example-flinktablesourcetablesink-integrationtest"
 private val tmpPrefix: String = "ho-integrationtest"
 private var tmpPath: java.nio.file.Path = _
