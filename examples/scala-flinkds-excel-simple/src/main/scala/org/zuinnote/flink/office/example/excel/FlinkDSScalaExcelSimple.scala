@@ -77,12 +77,20 @@ object FlinkDSScalaExcelSimple {
 	  val inputFormat = new SimpleExcelFlinkFileInputFormat(hocr, maxInferRows, useHeader, dateFormat, decimalFormat)
       val excelInData = env.readFile(inputFormat, inputFile)
       // create dataset
-	  val excelData = excelInData.map(row => row) // note that each row is just an Array of Objects (Array[AnyRef]) of simple datatypes, e.g. int, long, string etc.
+	  val excelData = excelInData.map{ // note that each row is just an Array of Objects (Array[AnyRef]) of simple datatypes, e.g. int, long, string etc.
+	  row => { // note the following step can be skipped, but it is just to illustrate what is returned by the inputformat
+	  	val destArray = new Array[AnyRef](row.length) 
+	  		for (i <- 0 to destArray.length-1) {
+	  			destArray(i)=row(i)
+	  		}
+	  	destArray
+	    }
+	  } 
 	  // write Excel file
 	  val howc = new HadoopOfficeWriteConfiguration(new Path(outputFile).getName())
 	  howc.setMimeType(MIMETYPE_XLSX)
 	  val defaultSheetName = "Sheet2"
-	  val header = null
+	  val header = null // is an Array of Strings, if null then no header line is written
 	  val outputFormat = new SimpleExcelFlinkFileOutputFormat(howc, header,defaultSheetName, dateFormat, decimalFormat)
 	  excelData.write(outputFormat, outputFile)
     }
