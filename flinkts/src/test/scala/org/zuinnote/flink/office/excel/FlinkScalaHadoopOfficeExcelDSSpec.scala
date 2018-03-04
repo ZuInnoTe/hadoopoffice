@@ -18,7 +18,7 @@
  * This test "unit tests" the application with a local Spark master
  *
  */
-package org.zuinnote.spark.office.excel
+package org.zuinnote.flink.office.excel
 
 import org.scalatest.{ FlatSpec, BeforeAndAfterAll, GivenWhenThen, Matchers }
 
