@@ -137,7 +137,12 @@ public abstract class AbstractSpreadSheetFlinkFileInputFormat<E> extends FileInp
 	}
 	
 	
-	
+	/***
+	 * Internal only for testing. You cannot use it within a Flink application
+	 * 
+	 * 
+	 * @return
+	 */
 	public String[] getHeader() {
 		return this.header;
 	}
