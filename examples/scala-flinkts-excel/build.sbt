@@ -5,7 +5,7 @@ import scala._
 
 lazy val root = (project in file("."))
 .settings(
-    name := "example-ho-flink-scala-excelin",
+    name := "example-ho-flink-tablesourcetablesink-scala-excel",
     version := "0.1"
 )
  .configs( IntegrationTest )
@@ -19,7 +19,7 @@ scalacOptions += "-target:jvm-1.7"
 
 resolvers += Resolver.mavenLocal
 
-assemblyJarName in assembly := "example-ho-flink-scala-excelin.jar"
+assemblyJarName in assembly := "example-ho-flink-tablesourcetablesink-scala-excel.jar"
 
 fork  := true
 
