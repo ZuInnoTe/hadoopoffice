@@ -135,7 +135,7 @@ override def beforeAll(): Unit = {
 	Given("Excel 2013 test file on DFS")
 	// create input directory
 	dfsCluster.getFileSystem().mkdirs(DFS_INPUT_DIR)
-	// copy bitcoin blocks
+	// copy Excel input file blocks
 	val classLoader = getClass().getClassLoader()
     	// put testdata on DFS
     	val fileName: String="excel2013test.xlsx"
