@@ -27,6 +27,11 @@ fork  := true
 
 libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.0.4" % "compile"
 
+// following three libraries are only needed for digital signatures
+libraryDependencies += "org.bouncycastle" % "bcprov-ext-jdk15on" % "1.58" % "compile"
+libraryDependencies += "org.bouncycastle" % "bcpkix-jdk15on" % "1.58" % "compile"
+libraryDependencies += "org.apache.santuario" % "xmlsec" % "2.1.0" % "compile"
+
 libraryDependencies += "org.apache.spark" %% "spark-core" % "1.5.0" % "provided"
 
 libraryDependencies += "org.apache.spark" %% "spark-sql" % "1.5.0" % "provided"
