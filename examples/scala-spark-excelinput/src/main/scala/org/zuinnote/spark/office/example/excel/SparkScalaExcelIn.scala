@@ -63,6 +63,7 @@ object SparkScalaExcelIn {
 	val excelRDD = sc.newAPIHadoopFile(inputFile, classOf[ExcelFileInputFormat], classOf[Text], classOf[ArrayWritable], hadoopConf);
 	// print the cell address and the formatted cell content
 	excelRDD.map(hadoopKeyValueTuple => {
+		// note see also org.zuinnote.hadoop.office.format.common.converter.ExcelConverterSimpleSpreadSheetCellDAO to convert from and to SpreadSheetCellDAO
 		val rowStrBuffer = new StringBuilder
 		var i=0;
 		for (x <-hadoopKeyValueTuple._2.get) { // parse through the SpreadSheetCellDAO
