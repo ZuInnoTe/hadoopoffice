@@ -10,7 +10,7 @@ lazy val root = (project in file("."))
 )
  .configs( IntegrationTest )
   .settings( Defaults.itSettings : _*)
-
+  .enablePlugins(JacocoItPlugin)
 
 
 crossScalaVersions := Seq("2.10.5", "2.11.7")
@@ -24,9 +24,6 @@ assemblyJarName in assembly := "example-ho-spark-scala-ds-excelout.jar"
 
 fork  := true
 
-jacoco.settings
-
-itJacoco.settings
 
 
 libraryDependencies += "com.github.zuinnote" %% "spark-hadoopoffice-ds" % "1.0.4" % "compile"

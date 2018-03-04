@@ -10,6 +10,7 @@ lazy val root = (project in file("."))
 )
  .configs( IntegrationTest )
   .settings( Defaults.itSettings : _*)
+  .enablePlugins(JacocoItPlugin)
 
 
 
@@ -23,16 +24,20 @@ assemblyJarName in assembly := "example-ho-spark-scala-excelout.jar"
 
 fork  := true
 
-jacoco.settings
-
-itJacoco.settings
 
 
-libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.0.4" % "compile"
+libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.1.0" % "compile"
 
-libraryDependencies += "org.apache.spark" %% "spark-core" % "1.5.0" % "provided"
+// following three libraries are only needed for digital signatures
+libraryDependencies += "org.bouncycastle" % "bcprov-ext-jdk15on" % "1.58" % "compile"
+libraryDependencies += "org.bouncycastle" % "bcpkix-jdk15on" % "1.58" % "compile"
+libraryDependencies += "org.apache.santuario" % "xmlsec" % "2.1.0" % "compile"
 
-libraryDependencies += "org.apache.spark" %% "spark-sql" % "1.5.0" % "provided"
+
+// Spark dependencies
+libraryDependencies += "org.apache.spark" %% "spark-core" % "1.6.0" % "provided"
+
+libraryDependencies += "org.apache.spark" %% "spark-sql" % "1.6.0" % "provided"
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.1" % "test,it"
 
