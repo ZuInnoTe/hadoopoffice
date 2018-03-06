@@ -38,5 +38,6 @@ public List<String> getLinkedWorkbooks();
 public Object[] getNext();
 public boolean getFiltered();
 public void close() throws IOException;
+public String[] getHeader();
 
 }

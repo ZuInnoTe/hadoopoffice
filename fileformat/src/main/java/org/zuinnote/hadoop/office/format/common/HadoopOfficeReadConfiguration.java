@@ -60,7 +60,12 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 	public static final String CONF_SIGTRUSTFILE = "hadoopoffice.read.security.sign.truststore.file";
 	public static final String CONF_SIGTRUSTTYPE = "hadoopoffice.read.security.sign.truststore.type";
 	public static final String CONF_SIGTRUSTPW = "hadoopoffice.read.security.sign.truststore.password";
+	public static final String CONF_READHEADER = "hadoopoffice.read.header.read";
+	public static final String CONF_HEADERIGNOREHEADERALLSHEETS = "hadoopoffice.read.header.skipheaderinallsheets";
+	public static final String CONF_SKIPLINES = "hadoopoffice.read.sheet.skiplines.num";
+	public static final String CONF_SKIPLINESALLSHEETS = "hadoopoffice.read.sheet.skiplines.allsheets";
 
+	
 	public static final String DEFAULT_MIMETYPE = "";
 	public static final String DEFAULT_LOCALE = "";
 	public static final String DEFAULT_SHEETS = "";
@@ -78,7 +83,14 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 	public static final String DEFAULT_SIGTRUSTFILE = "";
 	public static final String DEFAULT_SIGTRUSTTYPE = "JKS";
 	public static final String DEFAULT_SIGTRUSTPW = "";
-
+	
+	
+	
+	public static final boolean DEFAULT_READHEADER = false;
+	public static final boolean DEFAULT_HEADERIGNOREHEADERALLSHEETS = false;
+	public static final Integer DEFAULT_SKIPLINES = 0;
+	public static final boolean DEFAULT_SKIPLINESALLSHEETS = false;
+	
 	private String fileName;
 	private String mimeType = null;
 	private String localeStrBCP47 = null;
@@ -99,6 +111,11 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 	private String sigTruststoreType;
 	private String sigTruststorePassword;
 	private Set<X509Certificate> x509CertificateChain;
+	private boolean readHeader;
+	private boolean ignoreHeaderInAllSheets;
+    private int skipLines;
+    private boolean skipLinesAllSheets;
+	
 
 	/*
 	 * Create an empty configuration
@@ -127,7 +144,10 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 		this.setSigTruststoreFile(HadoopOfficeReadConfiguration.DEFAULT_SIGTRUSTFILE);
 		this.setSigTruststoreType(HadoopOfficeReadConfiguration.DEFAULT_SIGTRUSTTYPE);
 		this.setSigTruststorePassword(HadoopOfficeReadConfiguration.DEFAULT_SIGTRUSTPW);
-
+		this.setReadHeader(HadoopOfficeReadConfiguration.DEFAULT_READHEADER);
+		this.setIgnoreHeaderInAllSheets(HadoopOfficeReadConfiguration.DEFAULT_HEADERIGNOREHEADERALLSHEETS);
+		this.setSkipLines(HadoopOfficeReadConfiguration.DEFAULT_SKIPLINES);
+	    this.setSkipLinesAllSheets(HadoopOfficeReadConfiguration.DEFAULT_SKIPLINESALLSHEETS);
 		// create an empty configuration
 		this.setX509CertificateChain(new HashSet<>());
 	}
@@ -229,7 +249,11 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 				HadoopOfficeReadConfiguration.DEFAULT_SIGTRUSTTYPE));
 		this.setSigTruststorePassword(conf.get(HadoopOfficeReadConfiguration.CONF_SIGTRUSTPW,
 				HadoopOfficeReadConfiguration.DEFAULT_SIGTRUSTPW));
-
+		
+		this.setReadHeader(conf.getBoolean(HadoopOfficeReadConfiguration.CONF_READHEADER, HadoopOfficeReadConfiguration.DEFAULT_READHEADER));
+		this.setIgnoreHeaderInAllSheets(conf.getBoolean(HadoopOfficeReadConfiguration.CONF_HEADERIGNOREHEADERALLSHEETS, HadoopOfficeReadConfiguration.DEFAULT_HEADERIGNOREHEADERALLSHEETS));
+		this.setSkipLines(conf.getInt(HadoopOfficeReadConfiguration.CONF_SKIPLINES, HadoopOfficeReadConfiguration.DEFAULT_SKIPLINES));
+	    this.setSkipLinesAllSheets(conf.getBoolean(HadoopOfficeReadConfiguration.CONF_SKIPLINESALLSHEETS, HadoopOfficeReadConfiguration.DEFAULT_SKIPLINESALLSHEETS));
 		this.setX509CertificateChain(new HashSet<>());
 	}
 
@@ -508,6 +532,38 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 
 	public void setX509CertificateChain(Set<X509Certificate> x509CertificateChain) {
 		this.x509CertificateChain = x509CertificateChain;
+	}
+
+	public boolean getReadHeader() {
+		return readHeader;
+	}
+
+	public void setReadHeader(boolean readHeader) {
+		this.readHeader = readHeader;
+	}
+
+	public boolean getIgnoreHeaderInAllSheets() {
+		return ignoreHeaderInAllSheets;
+	}
+
+	public void setIgnoreHeaderInAllSheets(boolean ignoreHeaderInAllSheets) {
+		this.ignoreHeaderInAllSheets = ignoreHeaderInAllSheets;
+	}
+
+	public int getSkipLines() {
+		return skipLines;
+	}
+
+	public void setSkipLines(int skipLines) {
+		this.skipLines = skipLines;
+	}
+
+	public boolean getSkipLinesAllSheets() {
+		return skipLinesAllSheets;
+	}
+
+	public void setSkipLinesAllSheets(boolean skipLinesAllSheets) {
+		this.skipLinesAllSheets = skipLinesAllSheets;
 	}
 
 }

@@ -112,6 +112,9 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 	private HadoopOfficeReadConfiguration hocr;
 	private int currentSheet;
 	private int currentRow;
+	private String[] header;
+	private int currentSkipLine=0;
+	private boolean firstSheetSkipped=false;
 	
 	public MSExcelLowFootprintParser(HadoopOfficeReadConfiguration hocr) {
 		this(hocr, null);
@@ -359,9 +362,21 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 			LOG.error(e);
 			throw new FormatNotUnderstoodException("Parsing Excel sheet in .xlsx format failed. Cannot read XML content");
 		}
-		
-		
-	
+		 // check header
+		 if (this.hocr.getReadHeader()) {
+			 LOG.debug("Reading header...");
+			 Object[] firstRow = this.getNext();
+			 if (firstRow!=null) {
+				 this.header=new String[firstRow.length];
+				 for (int i=0;i<firstRow.length;i++) {
+					 this.header[i]=((SpreadSheetCellDAO)firstRow[i]).getFormattedValue();
+				 }
+			 } else {
+				 this.header=new String[0];
+			 }
+		 }
+		 // check skipping of additional lines
+		 this.currentRow+=this.hocr.getSkipLines();
 	}
 	
 	@Override
@@ -394,14 +409,27 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 	@Override
 	public Object[] getNext() {
 		SpreadSheetCellDAO[] result = null;
+		if (this.spreadSheetCellDAOCache.size()==0) {
+			return result;
+		}
 		if (this.currentRow<this.spreadSheetCellDAOCache.get(this.currentSheet).size()) {
 			result=this.spreadSheetCellDAOCache.get(this.currentSheet).get(this.currentRow++);
 		} 
-		if (this.currentRow==this.spreadSheetCellDAOCache.get(this.currentSheet).size()) { // next sheet
+		while (this.currentRow>=this.spreadSheetCellDAOCache.get(this.currentSheet).size()) { // next sheet
 			this.spreadSheetCellDAOCache.remove(this.currentSheet);
+			if (this.spreadSheetCellDAOCache.size()==0) {
+				return result;
+			}
 			this.currentSheet++;
 			this.currentRow=0;
-			
+			// check if we need to skip header
+			if (this.hocr.getIgnoreHeaderInAllSheets()) {
+				this.currentRow++;
+			}
+			// check if we need to skip lines
+			if (this.hocr.getSkipLinesAllSheets()) {
+				this.currentRow+=this.hocr.getSkipLines();
+			}
 		}
 		
 		return result;
@@ -759,6 +787,11 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 	@Override
 	public long getCurrentSheet() {
 		return this.currentSheet;
+	}
+
+	@Override
+	public String[] getHeader() {
+		return this.header;
 	}
 	
 }

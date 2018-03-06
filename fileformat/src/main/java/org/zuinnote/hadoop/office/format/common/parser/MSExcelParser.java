@@ -93,6 +93,9 @@ private ArrayList<Workbook> addedWorkbooks;
 
 private boolean filtered=false;
 private HadoopOfficeReadConfiguration hocr;
+private String[] header;
+private int currentSkipLine=0;
+private boolean currentSheetSkipped=false;
 	/*
 	* In the default case all sheets are parsed one after the other.
 	* @param hocr HadoopOffice configuration for reading files:
@@ -219,6 +222,22 @@ private HadoopOfficeReadConfiguration hocr;
 		 } else  {
 			this.currentSheetName=sheets[0];
 		 }
+		 // check header
+		 if (this.hocr.getReadHeader()) {
+			 LOG.debug("Reading header...");
+			 Object[] firstRow = this.getNext();
+			 if (firstRow!=null) {
+				 this.header=new String[firstRow.length];
+				 for (int i=0;i<firstRow.length;i++) {
+					 this.header[i]=((SpreadSheetCellDAO)firstRow[i]).getFormattedValue();
+				 }
+			 } else {
+				 this.header=new String[0];
+			 }
+		 }
+		 // check skipping of additional lines
+		 this.currentRow+=this.hocr.getSkipLines();
+		 this.currentSheetSkipped=true;
 	}
 
 	/**
@@ -391,6 +410,7 @@ private HadoopOfficeReadConfiguration hocr;
 	*/
 	@Override
 	public Object[] getNext() {
+	
 		SpreadSheetCellDAO[] result=null;
 		// all sheets?
 		if (this.sheets==null) { //  go on with all sheets
@@ -439,9 +459,17 @@ private HadoopOfficeReadConfiguration hocr;
 	}
 	
 	private boolean nextAllSheets() {
-		if (this.currentRow>this.currentWorkbook.getSheetAt(this.currentSheet).getLastRowNum()) { // end of row reached? => next sheet
+		while (this.currentRow>this.currentWorkbook.getSheetAt(this.currentSheet).getLastRowNum()) { // end of row reached? => next sheet
 			this.currentSheet++;
 			this.currentRow=0;
+			// check if we need to skip header
+			if (this.hocr.getIgnoreHeaderInAllSheets()) {
+				this.currentRow++;
+			}
+			// check if we need to skip lines
+			if (this.hocr.getSkipLinesAllSheets()) {
+				this.currentRow+=this.hocr.getSkipLines();
+			}
 			if (this.currentSheet>=this.currentWorkbook.getNumberOfSheets()) {
 				return false; // no more sheets available?
 			}
@@ -456,18 +484,27 @@ private HadoopOfficeReadConfiguration hocr;
 						if (this.currentWorkbook.getSheet(this.sheets[this.sheetsIndex])==null) { // log only if sheet not found
 							LOG.warn("Sheet \""+this.sheets[this.sheetsIndex]+"\" not found");
 						} else { // sheet found, check number of rows
-						   if (this.currentRow>this.currentWorkbook.getSheet(this.sheets[this.sheetsIndex]).getLastRowNum()) {
-							// reset rows
-							this.currentRow=0;
-						   } else { // we have a sheet where we still need to process rows
+						   if (this.currentRow<=this.currentWorkbook.getSheet(this.sheets[this.sheetsIndex]).getLastRowNum()) {
+						 // we have a sheet where we still need to process rows
 							this.currentSheet=this.currentWorkbook.getSheetIndex(this.currentWorkbook.getSheet(this.sheets[this.sheetsIndex]));
 							this.currentSheetName=this.currentWorkbook.getSheetAt(this.currentSheet).getSheetName();
 							break;
 						   }
 						}
-						this.sheetsIndex++;
+						while (this.currentRow>this.currentWorkbook.getSheet(this.sheets[this.sheetsIndex]).getLastRowNum()) {
+							this.sheetsIndex++;
+							this.currentRow=0;
+							// check if we need to skip header
+							if (this.hocr.getIgnoreHeaderInAllSheets()) {
+								this.currentRow++;
+							}
+							// check if we need to skip lines
+							if (this.hocr.getSkipLinesAllSheets()) {
+								this.currentRow+=this.hocr.getSkipLines();
+							}
+						}
 					}
-					if (this.sheetsIndex==this.sheets.length) {
+					if (this.sheetsIndex>=this.sheets.length) {
 						return false; // all sheets processed
 					}
 					return true;
@@ -913,6 +950,11 @@ private HadoopOfficeReadConfiguration hocr;
 	@Override
 	public long getCurrentSheet() {
 		return this.currentSheet;
+	}
+
+	@Override
+	public String[] getHeader() {
+		return this.header;
 	}
 
 }
