@@ -53,7 +53,6 @@ class ExcelFlinkTableSource(
   val path:          String,
   val fieldNames:    Array[String],
   val fieldTypes:    Array[TypeInformation[_]],
-  val useHeader:     Boolean,
   val hocr:          HadoopOfficeReadConfiguration,
   val dateFormat:    SimpleDateFormat,
   val decimalFormat: DecimalFormat)
@@ -69,7 +68,7 @@ class ExcelFlinkTableSource(
    */
   override def getDataSet(execEnv: ExecutionEnvironment): DataSet[Row] = {
     // we do not infer any data, because fieldnames and types are given
-    val inputFormat = new RowSimpleExcelFlinkFileInputFormat(hocr, 0, useHeader, dateFormat, decimalFormat, fieldTypes)
+    val inputFormat = new RowSimpleExcelFlinkFileInputFormat(hocr, 0, dateFormat, decimalFormat, fieldTypes)
     // set custom schma
     val customSchema: Array[GenericDataType] = new Array[GenericDataType](fieldTypes.length)
     var i = 0
@@ -143,7 +142,6 @@ object ExcelFlinkTableSource {
     private val schema: mutable.LinkedHashMap[String, TypeInformation[_]] =
       mutable.LinkedHashMap[String, TypeInformation[_]]()
     private var path: String = _
-    private var useHeader: Boolean = false
     private var hocr: HadoopOfficeReadConfiguration = _
     private var dateFormat: SimpleDateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.US).asInstanceOf[SimpleDateFormat]
     private var decimalFormat: DecimalFormat = NumberFormat.getInstance().asInstanceOf[DecimalFormat]
@@ -174,16 +172,7 @@ object ExcelFlinkTableSource {
       this
     }
 
-    /**
-     * Defines if the first line ("header") shoudl be skipped
-     *
-     * @param useHeader true, if it should be skipped, false if not
-     */
 
-    def useHeader(useHeader: Boolean): Builder = {
-      this.useHeader = useHeader
-      this
-    }
 
     /**
      * Defines the configuration for reading office files (e.g. decryption, linked documents, signature verification etc.)
@@ -235,7 +224,6 @@ object ExcelFlinkTableSource {
         path,
         schema.keys.toArray,
         schema.values.toArray,
-        useHeader,
         hocr,
         dateFormat,
         decimalFormat)

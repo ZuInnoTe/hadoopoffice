@@ -142,10 +142,9 @@ class FlinkScalaExcelTableSourceIntegrationSpec extends FlatSpec with BeforeAndA
     val hocr: HadoopOfficeReadConfiguration = new HadoopOfficeReadConfiguration()
     val dateFormat: SimpleDateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.US).asInstanceOf[SimpleDateFormat]
     val decimalFormat: DecimalFormat = NumberFormat.getInstance(Locale.GERMANY).asInstanceOf[DecimalFormat]
-
+    hocr.setReadHeader(true)
     val source: ExcelFlinkTableSource = ExcelFlinkTableSource.builder()
       .path(dfsCluster.getFileSystem().getUri().toString() + DFS_INPUT_DIR_NAME)
-      .useHeader(true)
       .field("decimalsc1", Types.DECIMAL)
       .field("booleancolumn", Types.BOOLEAN)
       .field("datecolumn", Types.SQL_DATE)

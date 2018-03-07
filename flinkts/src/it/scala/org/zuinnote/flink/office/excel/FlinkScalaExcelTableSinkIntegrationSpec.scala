@@ -145,10 +145,9 @@ class FlinkScalaExcelTableSinkIntegrationSpec extends FlatSpec with BeforeAndAft
     val hocr: HadoopOfficeReadConfiguration = new HadoopOfficeReadConfiguration()
     val dateFormat: SimpleDateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.US).asInstanceOf[SimpleDateFormat]
     val decimalFormat: DecimalFormat = NumberFormat.getInstance(Locale.GERMANY).asInstanceOf[DecimalFormat]
-
+    hocr.setReadHeader(true)
     val source: ExcelFlinkTableSource = ExcelFlinkTableSource.builder()
       .path(dfsCluster.getFileSystem().getUri().toString() + DFS_INPUT_DIR_NAME)
-      .useHeader(true)
       .field("decimalsc1", Types.DECIMAL)
       .field("booleancolumn", Types.BOOLEAN)
       .field("datecolumn", Types.SQL_DATE)
@@ -172,9 +171,9 @@ class FlinkScalaExcelTableSinkIntegrationSpec extends FlatSpec with BeforeAndAft
     testSimpleResult.writeToSink(sink)
     flinkEnvironment.execute() // trigger writing of the file on HSDFS
     // reread written table
+    hocr.setReadHeader(true)
     val sourceReWritten: ExcelFlinkTableSource = ExcelFlinkTableSource.builder()
       .path(dfsCluster.getFileSystem().getUri().toString() + DFS_OUTPUT_DIR_NAME)
-      .useHeader(true)
       .field("decimalsc1", Types.DECIMAL)
       .field("booleancolumn", Types.BOOLEAN)
       .field("datecolumn", Types.SQL_DATE)
