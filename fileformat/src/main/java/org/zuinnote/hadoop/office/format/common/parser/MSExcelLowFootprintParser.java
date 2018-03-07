@@ -362,6 +362,8 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 			LOG.error(e);
 			throw new FormatNotUnderstoodException("Parsing Excel sheet in .xlsx format failed. Cannot read XML content");
 		}
+		 // check skipping of additional lines
+		 this.currentRow+=this.hocr.getSkipLines();
 		 // check header
 		 if (this.hocr.getReadHeader()) {
 			 LOG.debug("Reading header...");
@@ -375,8 +377,7 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 				 this.header=new String[0];
 			 }
 		 }
-		 // check skipping of additional lines
-		 this.currentRow+=this.hocr.getSkipLines();
+		
 	}
 	
 	@Override
@@ -422,14 +423,15 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 			}
 			this.currentSheet++;
 			this.currentRow=0;
-			// check if we need to skip header
-			if (this.hocr.getIgnoreHeaderInAllSheets()) {
-				this.currentRow++;
-			}
 			// check if we need to skip lines
 			if (this.hocr.getSkipLinesAllSheets()) {
 				this.currentRow+=this.hocr.getSkipLines();
 			}
+			// check if we need to skip header
+			if (this.hocr.getIgnoreHeaderInAllSheets()) {
+				this.currentRow++;
+			}
+			
 		}
 		
 		return result;

@@ -95,7 +95,7 @@ private boolean filtered=false;
 private HadoopOfficeReadConfiguration hocr;
 private String[] header;
 private int currentSkipLine=0;
-private boolean currentSheetSkipped=false;
+
 	/*
 	* In the default case all sheets are parsed one after the other.
 	* @param hocr HadoopOffice configuration for reading files:
@@ -222,6 +222,8 @@ private boolean currentSheetSkipped=false;
 		 } else  {
 			this.currentSheetName=sheets[0];
 		 }
+		 // check skipping of additional lines
+		 this.currentRow+=this.hocr.getSkipLines();
 		 // check header
 		 if (this.hocr.getReadHeader()) {
 			 LOG.debug("Reading header...");
@@ -235,9 +237,8 @@ private boolean currentSheetSkipped=false;
 				 this.header=new String[0];
 			 }
 		 }
-		 // check skipping of additional lines
-		 this.currentRow+=this.hocr.getSkipLines();
-		 this.currentSheetSkipped=true;
+
+	
 	}
 
 	/**
@@ -462,14 +463,15 @@ private boolean currentSheetSkipped=false;
 		while (this.currentRow>this.currentWorkbook.getSheetAt(this.currentSheet).getLastRowNum()) { // end of row reached? => next sheet
 			this.currentSheet++;
 			this.currentRow=0;
-			// check if we need to skip header
-			if (this.hocr.getIgnoreHeaderInAllSheets()) {
-				this.currentRow++;
-			}
 			// check if we need to skip lines
 			if (this.hocr.getSkipLinesAllSheets()) {
 				this.currentRow+=this.hocr.getSkipLines();
 			}
+			// check if we need to skip header
+			if (this.hocr.getIgnoreHeaderInAllSheets()) {
+				this.currentRow++;
+			}
+
 			if (this.currentSheet>=this.currentWorkbook.getNumberOfSheets()) {
 				return false; // no more sheets available?
 			}
@@ -494,14 +496,15 @@ private boolean currentSheetSkipped=false;
 						while (this.currentRow>this.currentWorkbook.getSheet(this.sheets[this.sheetsIndex]).getLastRowNum()) {
 							this.sheetsIndex++;
 							this.currentRow=0;
-							// check if we need to skip header
-							if (this.hocr.getIgnoreHeaderInAllSheets()) {
-								this.currentRow++;
-							}
 							// check if we need to skip lines
 							if (this.hocr.getSkipLinesAllSheets()) {
 								this.currentRow+=this.hocr.getSkipLines();
 							}
+							// check if we need to skip header
+							if (this.hocr.getIgnoreHeaderInAllSheets()) {
+								this.currentRow++;
+							}
+
 						}
 					}
 					if (this.sheetsIndex>=this.sheets.length) {
