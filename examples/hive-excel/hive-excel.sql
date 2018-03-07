@@ -5,7 +5,7 @@ use excel;
 -- note: as in the HadoopOffice library .xls and .xlsx files are supported. You can also use all its options (encryption, signing, linked workbooks, templates, low footprint mode...)
 
 -- create external table representing an Excel data stored in /user/office/files
--- we do skip the header line (assuming header is only in one sheet, for more fine-granular configuration, see 
+-- we do skip the header line (assuming header is only in one sheet, for more fine-granular configuration, see https://github.com/ZuInnoTe/hadoopoffice/wiki/Hadoop-File-Format#header)
 -- specify a HadoopOffice option as an example (see here for all options: https://github.com/ZuInnoTe/hadoopoffice/wiki/Hadoop-File-Format)
 -- based on example file: https://github.com/ZuInnoTe/hadoopoffice/blob/master/fileformat/src/test/resources/testsimple.xlsx?raw=true
 -- all options: https://github.com/ZuInnoTe/hadoopoffice/wiki/Hive-Serde
