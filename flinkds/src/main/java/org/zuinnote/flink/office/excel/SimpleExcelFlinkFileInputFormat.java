@@ -44,7 +44,7 @@ public class SimpleExcelFlinkFileInputFormat extends AbstractSpreadSheetFlinkFil
 	 */
 	private static final long serialVersionUID = -1185152489329461987L;
 	private long maxInferRows;
-	private boolean useHeader;
+
 	private ExcelConverterSimpleSpreadSheetCellDAO converter;
 	private HadoopOfficeReadConfiguration shocr;
 	private GenericDataType[] customSchema;
@@ -53,15 +53,14 @@ public class SimpleExcelFlinkFileInputFormat extends AbstractSpreadSheetFlinkFil
 	 * 
 	 * @param hocr
 	 * @param maxInferRows
-	 * @param useHeader
 	 * @param dateFormat
 	 * @param decimalFormat
 	 */
-	public SimpleExcelFlinkFileInputFormat(HadoopOfficeReadConfiguration hocr, long maxInferRows, boolean useHeader,
+	public SimpleExcelFlinkFileInputFormat(HadoopOfficeReadConfiguration hocr, long maxInferRows, 
 			SimpleDateFormat dateFormat, DecimalFormat decimalFormat) {
-		super(hocr, useHeader);
+		super(hocr);
 		this.maxInferRows = maxInferRows;
-		this.useHeader = useHeader;
+	
 		this.converter = new ExcelConverterSimpleSpreadSheetCellDAO(dateFormat, decimalFormat);
 		this.shocr = hocr;
 		hocr.setMimeType(AbstractSpreadSheetFlinkFileInputFormat.MIMETYPE_EXCEL);
@@ -110,7 +109,7 @@ public class SimpleExcelFlinkFileInputFormat extends AbstractSpreadSheetFlinkFil
 		super.open(split);
 		// infer schema (requires to read file again)
 		if (this.customSchema == null) {
-			ExcelFlinkFileInputFormat effif = new ExcelFlinkFileInputFormat(this.shocr, this.useHeader);
+			ExcelFlinkFileInputFormat effif = new ExcelFlinkFileInputFormat(this.shocr);
 			effif.open(split);
 			SpreadSheetCellDAO[] currentRow = effif.nextRecord(null);
 			int i = 0;

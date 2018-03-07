@@ -55,7 +55,6 @@ public abstract class AbstractSpreadSheetFlinkFileInputFormat<E> extends FileInp
 	private OfficeReader officeReader = null;
 	private FlinkFileReader currentFFR;
 
-	private boolean useHeader;
 	private String[] header;
 	private boolean reachedEnd;
 
@@ -71,12 +70,10 @@ public abstract class AbstractSpreadSheetFlinkFileInputFormat<E> extends FileInp
 	 * HadoopOffice library
 	 * 
 	 * @param hocr HadoopOffice read configuration
-	 * @param useHeader read the first row of the Excel as header
 	 */
 
-	public AbstractSpreadSheetFlinkFileInputFormat(HadoopOfficeReadConfiguration hocr, boolean useHeader) {
+	public AbstractSpreadSheetFlinkFileInputFormat(HadoopOfficeReadConfiguration hocr) {
 		this.hocr = hocr;
-		this.useHeader=useHeader;
 		this.header = new String[0];
 		this.unsplittable=true;
 	}
@@ -126,13 +123,10 @@ public abstract class AbstractSpreadSheetFlinkFileInputFormat<E> extends FileInp
 			}
 		}
 	    }
-	    if (this.useHeader) {
-	    	 	SpreadSheetCellDAO[] headerRow = (SpreadSheetCellDAO[]) this.readNextRow();
-	    	 	this.header=new String[headerRow.length];
-	    	 	for (int i=0;i<headerRow.length;i++) {
-	    	 		this.header[i]=headerRow[i].getFormattedValue();
-	    	 	}
+	    if (this.hocr.getReadHeader()) {
+	    		this.header = this.officeReader.getCurrentParser().getHeader();
 	    }
+	  
 		
 	}
 	

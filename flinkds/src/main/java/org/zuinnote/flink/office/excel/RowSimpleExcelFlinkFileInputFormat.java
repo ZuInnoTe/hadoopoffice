@@ -48,17 +48,15 @@ implements CheckpointableInputFormat<FileInputSplit, Tuple3<Long, Long, GenericD
 	private static final long serialVersionUID = -9124263750507448247L;
 	private static final Log LOG = LogFactory.getLog(RowSimpleExcelFlinkFileInputFormat.class.getName());
 	private long maxInferRows;
-	private boolean useHeader;
 	private ExcelConverterSimpleSpreadSheetCellDAO converter;
 	private HadoopOfficeReadConfiguration shocr;
 	private GenericDataType[] customSchema;
 	private TypeInformation[] fieldTypeInfos;
 	
-	public RowSimpleExcelFlinkFileInputFormat(HadoopOfficeReadConfiguration hocr, long maxInferRows, boolean useHeader,
+	public RowSimpleExcelFlinkFileInputFormat(HadoopOfficeReadConfiguration hocr, long maxInferRows,
 			SimpleDateFormat dateFormat, DecimalFormat decimalFormat, TypeInformation[] fieldTypeInfos) {
-		super(hocr,useHeader);
+		super(hocr);
 		this.maxInferRows = maxInferRows;
-		this.useHeader = useHeader;
 		this.converter = new ExcelConverterSimpleSpreadSheetCellDAO(dateFormat, decimalFormat);
 		this.shocr = hocr;
 		hocr.setMimeType(AbstractSpreadSheetFlinkFileInputFormat.MIMETYPE_EXCEL);
@@ -107,7 +105,7 @@ implements CheckpointableInputFormat<FileInputSplit, Tuple3<Long, Long, GenericD
 		super.open(split);
 		// infer schema (requires to read file again)
 		if (this.customSchema == null) {
-			ExcelFlinkFileInputFormat effif = new ExcelFlinkFileInputFormat(this.shocr, this.useHeader);
+			ExcelFlinkFileInputFormat effif = new ExcelFlinkFileInputFormat(this.shocr);
 			effif.open(split);
 			SpreadSheetCellDAO[] currentRow = effif.nextRecord(null);
 			int i = 0;

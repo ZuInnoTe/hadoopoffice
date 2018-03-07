@@ -118,8 +118,8 @@ public class FlinkSimpleExcelFileOutputFormatTest {
 		FileInputSplit spreadSheetInputSplit = new FileInputSplit(0, file, 0, -1, null);
 		HadoopOfficeReadConfiguration hocr = new HadoopOfficeReadConfiguration();
 
-		boolean useHeader = true;
-		SimpleExcelFlinkFileInputFormat inputFormat = new SimpleExcelFlinkFileInputFormat(hocr, -1, useHeader,
+		hocr.setReadHeader(true);
+		SimpleExcelFlinkFileInputFormat inputFormat = new SimpleExcelFlinkFileInputFormat(hocr, -1,
 				dateFormat, decimalFormat);
 		inputFormat.open(spreadSheetInputSplit);
 		// write
@@ -151,8 +151,8 @@ public class FlinkSimpleExcelFileOutputFormatTest {
 		HadoopOfficeReadConfiguration hocrOut = new HadoopOfficeReadConfiguration();
 		SimpleDateFormat dateFormatOut = (SimpleDateFormat) DateFormat.getDateInstance(DateFormat.SHORT, Locale.US);
 		DecimalFormat decimalFormatOut = (DecimalFormat) DecimalFormat.getInstance(Locale.GERMAN);
-		boolean useHeaderOut = true;
-		SimpleExcelFlinkFileInputFormat inputFormatOut = new SimpleExcelFlinkFileInputFormat(hocrOut, -1, useHeaderOut,
+		hocrOut.setReadHeader(true);
+		SimpleExcelFlinkFileInputFormat inputFormatOut = new SimpleExcelFlinkFileInputFormat(hocrOut, -1,
 				dateFormatOut, decimalFormatOut);
 		inputFormatOut.open(spreadSheetInputSplitOut);
 		assertFalse(inputFormatOut.reachedEnd(), "End not reached");
@@ -268,8 +268,8 @@ public class FlinkSimpleExcelFileOutputFormatTest {
 		FileInputSplit spreadSheetInputSplit = new FileInputSplit(0, file, 0, -1, null);
 		HadoopOfficeReadConfiguration hocr = new HadoopOfficeReadConfiguration();
 
-		boolean useHeader = true;
-		SimpleExcelFlinkFileInputFormat inputFormat = new SimpleExcelFlinkFileInputFormat(hocr, -1, useHeader,
+		hocr.setReadHeader(true);
+		SimpleExcelFlinkFileInputFormat inputFormat = new SimpleExcelFlinkFileInputFormat(hocr, -1,
 				dateFormat, decimalFormat);
 		inputFormat.open(spreadSheetInputSplit);
 		// write
@@ -301,8 +301,8 @@ public class FlinkSimpleExcelFileOutputFormatTest {
 		HadoopOfficeReadConfiguration hocrOut = new HadoopOfficeReadConfiguration();
 		SimpleDateFormat dateFormatOut = (SimpleDateFormat) DateFormat.getDateInstance(DateFormat.SHORT, Locale.US);
 		DecimalFormat decimalFormatOut = (DecimalFormat) DecimalFormat.getInstance(Locale.GERMAN);
-		boolean useHeaderOut = true;
-		SimpleExcelFlinkFileInputFormat inputFormatOut = new SimpleExcelFlinkFileInputFormat(hocrOut, -1, useHeaderOut,
+		hocrOut.setReadHeader(true);
+		SimpleExcelFlinkFileInputFormat inputFormatOut = new SimpleExcelFlinkFileInputFormat(hocrOut, -1,
 				dateFormatOut, decimalFormatOut);
 		inputFormatOut.open(spreadSheetInputSplitOut);
 		assertFalse(inputFormatOut.reachedEnd(), "End not reached");
