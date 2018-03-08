@@ -52,7 +52,6 @@ import org.apache.hadoop.io.compress.CompressionCodec;
 
 import org.apache.hadoop.util.ReflectionUtils;
 
-import org.apache.poi.EncryptedDocumentException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -60,8 +59,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.zuinnote.hadoop.office.format.common.dao.*;
-import org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException;
-import org.zuinnote.hadoop.office.format.common.writer.OfficeWriterException;
 
 public class OfficeFormatHadoopExcelTest {
 
@@ -355,6 +352,28 @@ public class OfficeFormatHadoopExcelTest {
 	public void checkTestExcel2013TemplateEncryptedAvailable() {
 		ClassLoader classLoader = getClass().getClassLoader();
 		String fileName = "templatetest1encrypt.xlsx";
+		String fileNameSpreadSheet = classLoader.getResource(fileName).getFile();
+		assertNotNull(fileNameSpreadSheet, "Test Data File \"" + fileName + "\" is not null in resource path");
+		File file = new File(fileNameSpreadSheet);
+		assertTrue(file.exists(), "Test Data File \"" + fileName + "\" exists");
+		assertFalse(file.isDirectory(), "Test Data File \"" + fileName + "\" is not a directory");
+	}
+
+	@Test
+	public void checkTestExcel2013MultiSheetHeaderAvailable() {
+		ClassLoader classLoader = getClass().getClassLoader();
+		String fileName = "multisheetheader.xlsx";
+		String fileNameSpreadSheet = classLoader.getResource(fileName).getFile();
+		assertNotNull(fileNameSpreadSheet, "Test Data File \"" + fileName + "\" is not null in resource path");
+		File file = new File(fileNameSpreadSheet);
+		assertTrue(file.exists(), "Test Data File \"" + fileName + "\" exists");
+		assertFalse(file.isDirectory(), "Test Data File \"" + fileName + "\" is not a directory");
+	}
+
+	@Test
+	public void checkTestExcel2013SkipSheetvailable() {
+		ClassLoader classLoader = getClass().getClassLoader();
+		String fileName = "skipsheet.xlsx";
 		String fileNameSpreadSheet = classLoader.getResource(fileName).getFile();
 		assertNotNull(fileNameSpreadSheet, "Test Data File \"" + fileName + "\" is not null in resource path");
 		File file = new File(fileNameSpreadSheet);
@@ -1320,6 +1339,322 @@ public class OfficeFormatHadoopExcelTest {
 		assertNull(spreadSheetValue.get()[1], "Input Split for Excel file contains row 9 with cell 2 == null");
 		assertEquals("seven", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormattedValue(),
 				"Input Split for Excel file contains row 9 with cell 3 == \"seven\"");
+	}
+
+	@Test
+	public void readExcelInputFormatExcel2013MultiSheetHeader() throws IOException, InterruptedException {
+		Configuration conf = new Configuration(defaultConf);
+		ClassLoader classLoader = getClass().getClassLoader();
+		String fileName = "multisheetheader.xlsx";
+		String fileNameSpreadSheet = classLoader.getResource(fileName).getFile();
+		Path file = new Path(fileNameSpreadSheet);
+		// set locale to the one of the test data
+		conf.set("hadoopoffice.locale.bcp47", "us");
+		conf.set("hadoopoffice.read.header.read", "true");
+		conf.set("hadoopoffice.read.header.skipheaderinallsheets", "true");
+		Job job = Job.getInstance(conf);
+		FileInputFormat.setInputPaths(job, file);
+		TaskAttemptContext context = new TaskAttemptContextImpl(conf, new TaskAttemptID());
+		ExcelFileInputFormat format = new ExcelFileInputFormat();
+		List<InputSplit> splits = format.getSplits(job);
+		assertEquals(1, splits.size(), "Only one split generated for Excel file");
+		RecordReader<Text, ArrayWritable> reader = format.createRecordReader(splits.get(0), context);
+		assertNotNull(reader, "Format returned  null RecordReader");
+		reader.initialize(splits.get(0), context);
+		assertEquals("column1", ((ExcelRecordReader) reader).getOfficeReader().getCurrentParser().getHeader()[0],
+				" header column 1 correctly read");
+		assertEquals("column2", ((ExcelRecordReader) reader).getOfficeReader().getCurrentParser().getHeader()[1],
+				" header column 2 correctly read");
+		assertEquals("column3", ((ExcelRecordReader) reader).getOfficeReader().getCurrentParser().getHeader()[2],
+				" header column 3 correctly read");
+		Text spreadSheetKey = new Text();
+		ArrayWritable spreadSheetValue = new ArrayWritable(SpreadSheetCellDAO.class);
+		assertTrue(reader.nextKeyValue(), "Input Split for Excel file contains row 1");
+		spreadSheetKey = reader.getCurrentKey();
+		spreadSheetValue = reader.getCurrentValue();
+
+		// First Sheet
+		assertEquals("1", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getFormattedValue(), "A2 = \"1\"");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getComment(), "Empty Comment");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getFormula(), "Empty formula");
+		assertEquals("A2", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getAddress(), "Correct address");
+		assertEquals("Sheet1", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getSheetName(), "Correct sheet");
+
+		assertEquals("test1", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getFormattedValue(), "B2 = \"test1\"");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getComment(), "Empty Comment");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getFormula(), "Empty formula");
+		assertEquals("B2", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getAddress(), "Correct address");
+		assertEquals("Sheet1", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getSheetName(), "Correct sheet");
+
+		assertEquals("10", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormattedValue(), "C2 = \"10\"");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getComment(), "Empty Comment");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormula(), "Empty formula");
+		assertEquals("C2", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getAddress(), "Correct address");
+		assertEquals("Sheet1", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getSheetName(), "Correct sheet");
+		assertTrue(reader.nextKeyValue(), "Input Split for Excel file contains row 2");
+		spreadSheetKey = reader.getCurrentKey();
+		spreadSheetValue = reader.getCurrentValue();
+		assertEquals("2", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getFormattedValue(), "A3 = \"2\"");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getComment(), "Empty Comment");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getFormula(), "Empty formula");
+		assertEquals("A3", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getAddress(), "Correct address");
+		assertEquals("Sheet1", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getSheetName(), "Correct sheet");
+
+		assertEquals("test3", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getFormattedValue(), "B3 = \"test3\"");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getComment(), "Empty Comment");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getFormula(), "Empty formula");
+		assertEquals("B3", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getAddress(), "Correct address");
+		assertEquals("Sheet1", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getSheetName(), "Correct sheet");
+
+		assertEquals("15", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormattedValue(), "C3 = \"15\"");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getComment(), "Empty Comment");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormula(), "Empty formula");
+		assertEquals("C3", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getAddress(), "Correct address");
+		assertEquals("Sheet1", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getSheetName(), "Correct sheet");
+
+		assertTrue(reader.nextKeyValue(), "Input Split for Excel file contains row 3");
+		spreadSheetKey = reader.getCurrentKey();
+		spreadSheetValue = reader.getCurrentValue();
+		assertEquals("10", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getFormattedValue(), "A4 = \"10\"");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getComment(), "Empty Comment");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getFormula(), "Empty formula");
+		assertEquals("A4", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getAddress(), "Correct address");
+		assertEquals("Sheet1", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getSheetName(), "Correct sheet");
+
+		assertEquals("test2", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getFormattedValue(), "B4 = \"test2\"");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getComment(), "Empty Comment");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getFormula(), "Empty formula");
+		assertEquals("B4", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getAddress(), "Correct address");
+		assertEquals("Sheet1", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getSheetName(), "Correct sheet");
+
+		assertEquals("20", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormattedValue(), "C4 = \"20\"");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getComment(), "Empty Comment");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormula(), "Empty formula");
+		assertEquals("C4", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getAddress(), "Correct address");
+		assertEquals("Sheet1", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getSheetName(), "Correct sheet");
+
+		assertTrue(reader.nextKeyValue(), "Input Split for Excel file contains row 1 (Second Sheet)");
+		spreadSheetKey = reader.getCurrentKey();
+		spreadSheetValue = reader.getCurrentValue();
+		assertEquals("50", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getFormattedValue(), "A2 = \"50\"");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getComment(), "Empty Comment");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getFormula(), "Empty formula");
+		assertEquals("A2", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getAddress(), "Correct address");
+		assertEquals("Sheet2", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getSheetName(), "Correct sheet");
+
+		assertEquals("test1", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getFormattedValue(), "B2 = \"test1\"");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getComment(), "Empty Comment");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getFormula(), "Empty formula");
+		assertEquals("B2", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getAddress(), "Correct address");
+		assertEquals("Sheet2", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getSheetName(), "Correct sheet");
+
+		assertEquals("80", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormattedValue(), "C2 = \"80\"");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getComment(), "Empty Comment");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormula(), "Empty formula");
+		assertEquals("C2", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getAddress(), "Correct address");
+		assertEquals("Sheet2", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getSheetName(), "Correct sheet");
+
+		assertTrue(reader.nextKeyValue(), "Input Split for Excel file contains row 2 (Second Sheet)");
+		spreadSheetKey = reader.getCurrentKey();
+		spreadSheetValue = reader.getCurrentValue();
+		assertEquals("60", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getFormattedValue(), "A3 = \"60\"");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getComment(), "Empty Comment");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getFormula(), "Empty formula");
+		assertEquals("A3", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getAddress(), "Correct address");
+		assertEquals("Sheet2", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getSheetName(), "Correct sheet");
+
+		assertEquals("test3", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getFormattedValue(), "B3 = \"test3\"");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getComment(), "Empty Comment");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getFormula(), "Empty formula");
+		assertEquals("B3", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getAddress(), "Correct address");
+		assertEquals("Sheet2", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getSheetName(), "Correct sheet");
+
+		assertEquals("90", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormattedValue(), "C3 = \"90\"");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getComment(), "Empty Comment");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormula(), "Empty formula");
+		assertEquals("C3", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getAddress(), "Correct address");
+		assertEquals("Sheet2", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getSheetName(), "Correct sheet");
+
+		assertTrue(reader.nextKeyValue(), "Input Split for Excel file contains row 3 (Second Sheet)");
+		spreadSheetKey = reader.getCurrentKey();
+		spreadSheetValue = reader.getCurrentValue();
+		assertEquals("70", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getFormattedValue(), "A4 = \"70\"");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getComment(), "Empty Comment");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getFormula(), "Empty formula");
+		assertEquals("A4", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getAddress(), "Correct address");
+		assertEquals("Sheet2", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getSheetName(), "Correct sheet");
+
+		assertEquals("test2", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getFormattedValue(), "B4 = \"test2\"");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getComment(), "Empty Comment");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getFormula(), "Empty formula");
+		assertEquals("B4", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getAddress(), "Correct address");
+		assertEquals("Sheet2", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getSheetName(), "Correct sheet");
+
+		assertEquals("10000", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormattedValue(), "C4 = \"10000\"");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getComment(), "Empty Comment");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormula(), "Empty formula");
+		assertEquals("C4", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getAddress(), "Correct address");
+		assertEquals("Sheet2", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getSheetName(), "Correct sheet");
+		assertFalse(reader.nextKeyValue(), "Input Split for Excel file contains no further row");
+	}
+	
+	
+	@Test
+	public void readExcelInputFormatExcel2013MultiSheetHeaderLowFootPrint() throws IOException, InterruptedException {
+		Configuration conf = new Configuration(defaultConf);
+		ClassLoader classLoader = getClass().getClassLoader();
+		String fileName = "multisheetheader.xlsx";
+		String fileNameSpreadSheet = classLoader.getResource(fileName).getFile();
+		Path file = new Path(fileNameSpreadSheet);
+		// set locale to the one of the test data
+		conf.set("hadoopoffice.locale.bcp47", "us");
+		conf.set("hadoopoffice.read.header.read", "true");
+		conf.set("hadoopoffice.read.header.skipheaderinallsheets", "true");
+		conf.set("hadoopoffice.read.lowFootprint", "true");
+		Job job = Job.getInstance(conf);
+		FileInputFormat.setInputPaths(job, file);
+		TaskAttemptContext context = new TaskAttemptContextImpl(conf, new TaskAttemptID());
+		ExcelFileInputFormat format = new ExcelFileInputFormat();
+		List<InputSplit> splits = format.getSplits(job);
+		assertEquals(1, splits.size(), "Only one split generated for Excel file");
+		RecordReader<Text, ArrayWritable> reader = format.createRecordReader(splits.get(0), context);
+		assertNotNull(reader, "Format returned  null RecordReader");
+		reader.initialize(splits.get(0), context);
+		assertEquals("column1", ((ExcelRecordReader) reader).getOfficeReader().getCurrentParser().getHeader()[0],
+				" header column 1 correctly read");
+		assertEquals("column2", ((ExcelRecordReader) reader).getOfficeReader().getCurrentParser().getHeader()[1],
+				" header column 2 correctly read");
+		assertEquals("column3", ((ExcelRecordReader) reader).getOfficeReader().getCurrentParser().getHeader()[2],
+				" header column 3 correctly read");
+		Text spreadSheetKey = new Text();
+		ArrayWritable spreadSheetValue = new ArrayWritable(SpreadSheetCellDAO.class);
+		assertTrue(reader.nextKeyValue(), "Input Split for Excel file contains row 1");
+		spreadSheetKey = reader.getCurrentKey();
+		spreadSheetValue = reader.getCurrentValue();
+
+		// First Sheet
+		assertEquals("1", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getFormattedValue(), "A2 = \"1\"");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getComment(), "Empty Comment");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getFormula(), "Empty formula");
+		assertEquals("A2", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getAddress(), "Correct address");
+		assertEquals("Sheet1", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getSheetName(), "Correct sheet");
+
+		assertEquals("test1", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getFormattedValue(), "B2 = \"test1\"");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getComment(), "Empty Comment");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getFormula(), "Empty formula");
+		assertEquals("B2", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getAddress(), "Correct address");
+		assertEquals("Sheet1", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getSheetName(), "Correct sheet");
+
+		assertEquals("10", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormattedValue(), "C2 = \"10\"");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getComment(), "Empty Comment");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormula(), "Empty formula");
+		assertEquals("C2", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getAddress(), "Correct address");
+		assertEquals("Sheet1", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getSheetName(), "Correct sheet");
+		assertTrue(reader.nextKeyValue(), "Input Split for Excel file contains row 2");
+		spreadSheetKey = reader.getCurrentKey();
+		spreadSheetValue = reader.getCurrentValue();
+		assertEquals("2", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getFormattedValue(), "A3 = \"2\"");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getComment(), "Empty Comment");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getFormula(), "Empty formula");
+		assertEquals("A3", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getAddress(), "Correct address");
+		assertEquals("Sheet1", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getSheetName(), "Correct sheet");
+
+		assertEquals("test3", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getFormattedValue(), "B3 = \"test3\"");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getComment(), "Empty Comment");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getFormula(), "Empty formula");
+		assertEquals("B3", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getAddress(), "Correct address");
+		assertEquals("Sheet1", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getSheetName(), "Correct sheet");
+
+		assertEquals("15", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormattedValue(), "C3 = \"15\"");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getComment(), "Empty Comment");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormula(), "Empty formula");
+		assertEquals("C3", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getAddress(), "Correct address");
+		assertEquals("Sheet1", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getSheetName(), "Correct sheet");
+
+		assertTrue(reader.nextKeyValue(), "Input Split for Excel file contains row 3");
+		spreadSheetKey = reader.getCurrentKey();
+		spreadSheetValue = reader.getCurrentValue();
+		assertEquals("10", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getFormattedValue(), "A4 = \"10\"");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getComment(), "Empty Comment");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getFormula(), "Empty formula");
+		assertEquals("A4", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getAddress(), "Correct address");
+		assertEquals("Sheet1", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getSheetName(), "Correct sheet");
+
+		assertEquals("test2", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getFormattedValue(), "B4 = \"test2\"");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getComment(), "Empty Comment");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getFormula(), "Empty formula");
+		assertEquals("B4", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getAddress(), "Correct address");
+		assertEquals("Sheet1", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getSheetName(), "Correct sheet");
+
+		assertEquals("20", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormattedValue(), "C4 = \"20\"");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getComment(), "Empty Comment");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormula(), "Empty formula");
+		assertEquals("C4", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getAddress(), "Correct address");
+		assertEquals("Sheet1", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getSheetName(), "Correct sheet");
+
+		assertTrue(reader.nextKeyValue(), "Input Split for Excel file contains row 1 (Second Sheet)");
+		spreadSheetKey = reader.getCurrentKey();
+		spreadSheetValue = reader.getCurrentValue();
+		assertEquals("50", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getFormattedValue(), "A2 = \"50\"");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getComment(), "Empty Comment");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getFormula(), "Empty formula");
+		assertEquals("A2", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getAddress(), "Correct address");
+		assertEquals("Sheet2", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getSheetName(), "Correct sheet");
+
+		assertEquals("test1", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getFormattedValue(), "B2 = \"test1\"");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getComment(), "Empty Comment");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getFormula(), "Empty formula");
+		assertEquals("B2", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getAddress(), "Correct address");
+		assertEquals("Sheet2", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getSheetName(), "Correct sheet");
+
+		assertEquals("80", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormattedValue(), "C2 = \"80\"");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getComment(), "Empty Comment");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormula(), "Empty formula");
+		assertEquals("C2", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getAddress(), "Correct address");
+		assertEquals("Sheet2", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getSheetName(), "Correct sheet");
+
+		assertTrue(reader.nextKeyValue(), "Input Split for Excel file contains row 2 (Second Sheet)");
+		spreadSheetKey = reader.getCurrentKey();
+		spreadSheetValue = reader.getCurrentValue();
+		assertEquals("60", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getFormattedValue(), "A3 = \"60\"");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getComment(), "Empty Comment");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getFormula(), "Empty formula");
+		assertEquals("A3", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getAddress(), "Correct address");
+		assertEquals("Sheet2", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getSheetName(), "Correct sheet");
+
+		assertEquals("test3", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getFormattedValue(), "B3 = \"test3\"");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getComment(), "Empty Comment");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getFormula(), "Empty formula");
+		assertEquals("B3", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getAddress(), "Correct address");
+		assertEquals("Sheet2", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getSheetName(), "Correct sheet");
+
+		assertEquals("90", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormattedValue(), "C3 = \"90\"");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getComment(), "Empty Comment");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormula(), "Empty formula");
+		assertEquals("C3", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getAddress(), "Correct address");
+		assertEquals("Sheet2", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getSheetName(), "Correct sheet");
+
+		assertTrue(reader.nextKeyValue(), "Input Split for Excel file contains row 3 (Second Sheet)");
+		spreadSheetKey = reader.getCurrentKey();
+		spreadSheetValue = reader.getCurrentValue();
+		assertEquals("70", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getFormattedValue(), "A4 = \"70\"");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getComment(), "Empty Comment");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getFormula(), "Empty formula");
+		assertEquals("A4", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getAddress(), "Correct address");
+		assertEquals("Sheet2", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getSheetName(), "Correct sheet");
+
+		assertEquals("test2", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getFormattedValue(), "B4 = \"test2\"");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getComment(), "Empty Comment");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getFormula(), "Empty formula");
+		assertEquals("B4", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getAddress(), "Correct address");
+		assertEquals("Sheet2", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getSheetName(), "Correct sheet");
+
+		assertEquals("10000", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormattedValue(), "C4 = \"10000\"");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getComment(), "Empty Comment");
+		assertEquals("", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormula(), "Empty formula");
+		assertEquals("C4", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getAddress(), "Correct address");
+		assertEquals("Sheet2", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getSheetName(), "Correct sheet");
+		assertFalse(reader.nextKeyValue(), "Input Split for Excel file contains no further row");
 	}
 
 	@Test
