@@ -363,7 +363,9 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 			throw new FormatNotUnderstoodException("Parsing Excel sheet in .xlsx format failed. Cannot read XML content");
 		}
 		 // check skipping of additional lines
-		 this.currentRow+=this.hocr.getSkipLines();
+		for (int i=0;i<this.hocr.getSkipLines();i++) {
+			this.getNext();
+		}
 		 // check header
 		 if (this.hocr.getReadHeader()) {
 			 LOG.debug("Reading header...");
@@ -413,10 +415,11 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 		if (this.spreadSheetCellDAOCache.size()==0) {
 			return result;
 		}
-		if (this.currentRow<this.spreadSheetCellDAOCache.get(this.currentSheet).size()) {
-			result=this.spreadSheetCellDAOCache.get(this.currentSheet).get(this.currentRow++);
+		if (this.spreadSheetCellDAOCache.get(this.currentSheet).size()>0) {
+			result=this.spreadSheetCellDAOCache.get(this.currentSheet).remove(0);
+			this.currentRow++;
 		} 
-		while (this.currentRow>=this.spreadSheetCellDAOCache.get(this.currentSheet).size()) { // next sheet
+		while (this.spreadSheetCellDAOCache.get(this.currentSheet).size()<=0) { // next sheet
 			this.spreadSheetCellDAOCache.remove(this.currentSheet);
 			if (this.spreadSheetCellDAOCache.size()==0) {
 				return result;
@@ -425,10 +428,18 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 			this.currentRow=0;
 			// check if we need to skip lines
 			if (this.hocr.getSkipLinesAllSheets()) {
-				this.currentRow+=this.hocr.getSkipLines();
+				for (int i=0;i<this.hocr.getSkipLines();i++) {
+					if (this.spreadSheetCellDAOCache.get(this.currentSheet).size()>0) {
+						this.spreadSheetCellDAOCache.get(this.currentSheet).remove(0);
+					}
+					this.currentRow++;
+				}
 			}
 			// check if we need to skip header
 			if (this.hocr.getIgnoreHeaderInAllSheets()) {
+				if (this.spreadSheetCellDAOCache.get(this.currentSheet).size()>0) {
+					this.spreadSheetCellDAOCache.get(this.currentSheet).remove(0);
+				}
 				this.currentRow++;
 			}
 			
@@ -542,10 +553,8 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 		private int currentSheet;
 		private String[] sheets;
 		private long currentCellNum;
-		private boolean readCachedFormulaResult;
 		private int cachedRowNum;
 		private short cachedColumnNum;
-		private boolean currentSheetIgnore;
 		private SSTRecord currentSSTrecord;
 		private SheetRecordCollectingListener workbookBuildingListener;
 		private HSSFWorkbook stubWorkbook;
@@ -554,8 +563,6 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 			this.spreadSheetCellDAOCache=spreadSheetCellDAOCache;
 			this.sheets=sheets;
 			this.currentCellNum=0L;
-			this.currentSheetIgnore=false;
-			this.readCachedFormulaResult=false;
 			this.cachedRowNum=0;
 			this.cachedColumnNum=0;
 			this.sheetList=new ArrayList<>();
@@ -653,7 +660,7 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 	            		formulaString=HSSFFormulaParser.toFormulaString(stubWorkbook, formRec.getParsedExpression());
 	            	}
 	            	if (formRec.hasCachedResultString()) {
-	            		this.readCachedFormulaResult=true;
+	           
 	            		this.cachedColumnNum=formRec.getColumn();
 	            		this.cachedRowNum=formRec.getRow();
 	            	} else {
@@ -678,7 +685,7 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 	            	}
 	            	/** **/
 	              this.spreadSheetCellDAOCache.get(this.currentSheet-1).get(this.cachedRowNum)[this.cachedColumnNum]=new SpreadSheetCellDAO(strRec.getString(),"","",MSExcelUtil.getCellAddressA1Format(this.cachedRowNum,this.cachedColumnNum),this.sheetList.get(this.currentSheet-1));          			
-	    	         this.readCachedFormulaResult=false;	
+	    	        
 	            	
 	            	break;
 	            case NumberRecord.sid: // read number result
