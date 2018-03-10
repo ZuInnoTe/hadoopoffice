@@ -24,7 +24,10 @@ assemblyJarName in assembly := "example-ho-spark-scala-excelout.jar"
 
 fork  := true
 
-
+assemblyMergeStrategy in assembly := {
+ case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+ case x => MergeStrategy.first
+}
 
 libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.1.0" % "compile"
 
