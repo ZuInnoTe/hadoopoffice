@@ -26,7 +26,7 @@ fork  := true
 
 
 
-libraryDependencies += "com.github.zuinnote" %% "spark-hadoopoffice-ds" % "1.0.4" % "compile"
+libraryDependencies += "com.github.zuinnote" %% "spark-hadoopoffice-ds" % "1.1.0" % "compile"
 
 libraryDependencies += "org.apache.spark" %% "spark-core" % "2.0.0" % "provided"
 
