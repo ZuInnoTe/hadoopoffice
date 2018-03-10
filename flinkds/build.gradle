@@ -19,8 +19,6 @@ jar {
     }
 
     baseName = 'hadoopoffice-flinkds'
-   // note this builds one fat jar and it is not recommended for production use - just for illustration purpose
-   from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 }
 
 
