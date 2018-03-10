@@ -75,9 +75,9 @@ object FlinkTableSourceTableSinkExample {
     val hocr: HadoopOfficeReadConfiguration = new HadoopOfficeReadConfiguration()
     val dateFormat: SimpleDateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.US).asInstanceOf[SimpleDateFormat]
     val decimalFormat: DecimalFormat = NumberFormat.getInstance(Locale.GERMANY).asInstanceOf[DecimalFormat]
+    hocr.setReadHeader(true)
     val source: ExcelFlinkTableSource = ExcelFlinkTableSource.builder()
       .path(inputFile)
-      .useHeader(true)
       .field("decimalsc1", Types.DECIMAL)
       .field("booleancolumn", Types.BOOLEAN)
       .field("datecolumn", Types.SQL_DATE)

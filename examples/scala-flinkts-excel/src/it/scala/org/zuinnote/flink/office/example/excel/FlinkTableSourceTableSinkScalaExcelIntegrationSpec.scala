@@ -162,9 +162,9 @@ override def beforeAll(): Unit = {
  	val hocr: HadoopOfficeReadConfiguration = new HadoopOfficeReadConfiguration()
  	val dateFormat: SimpleDateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.US).asInstanceOf[SimpleDateFormat]
     val decimalFormat: DecimalFormat = NumberFormat.getInstance(Locale.GERMANY).asInstanceOf[DecimalFormat]	
+    hocr.setReadHeader(true)
 	val sourceReWritten: ExcelFlinkTableSource = ExcelFlinkTableSource.builder()
       .path(dfsCluster.getFileSystem().getUri().toString() + DFS_OUTPUT_DIR_NAME)
-      .useHeader(true)
       .field("decimalsc1", Types.DECIMAL)
       .field("booleancolumn", Types.BOOLEAN)
       .field("datecolumn", Types.SQL_DATE)
