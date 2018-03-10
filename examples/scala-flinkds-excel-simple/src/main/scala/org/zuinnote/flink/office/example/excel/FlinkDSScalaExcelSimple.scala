@@ -71,10 +71,10 @@ object FlinkDSScalaExcelSimple {
       // load Excel file, in order to do the conversion correctly, we need to define the format for date and decimal
 	   val dateFormat: SimpleDateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.US).asInstanceOf[SimpleDateFormat] //important: even for non-US excel files US must be used most of the time, because this is how Excel stores them internally
 	   val decimalFormat: DecimalFormat = NumberFormat.getInstance(Locale.GERMAN).asInstanceOf[DecimalFormat] 
-	  val useHeader = true // the Excel file contains in the first line the header
+	  hocr.setReadHeader(true) // the Excel file contains in the first line the header
 	  // we have maxInferRows = -1 , which means we read the full Excel file first to infer the underlying schema
 	  val maxInferRows = -1
-	  val inputFormat = new SimpleExcelFlinkFileInputFormat(hocr, maxInferRows, useHeader, dateFormat, decimalFormat)
+	  val inputFormat = new SimpleExcelFlinkFileInputFormat(hocr, maxInferRows, dateFormat, decimalFormat)
       val excelInData = env.readFile(inputFormat, inputFile)
       // create dataset
 	  val excelData = excelInData.map{ // note that each row is just an Array of Objects (Array[AnyRef]) of simple datatypes, e.g. int, long, string etc.

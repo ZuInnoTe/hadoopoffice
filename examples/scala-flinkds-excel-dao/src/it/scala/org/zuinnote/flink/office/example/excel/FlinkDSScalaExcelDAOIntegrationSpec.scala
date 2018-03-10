@@ -147,8 +147,8 @@ override def beforeAll(): Unit = {
 	val hocr = new HadoopOfficeReadConfiguration()
     hocr.setLocale(new Locale.Builder().setLanguageTag("us").build())
     // load Excel file
-    val useHeader = false 
-    val inputFormat = new ExcelFlinkFileInputFormat(hocr, false)
+    hocr.setReadHeader(false)
+    val inputFormat = new ExcelFlinkFileInputFormat(hocr)
     val excelData = flinkEnvironment.readFile(inputFormat, dfsCluster.getFileSystem().getUri().toString()+DFS_OUTPUT_DIR_NAME)
     // check content
     val excelDataList = excelData.collect

@@ -61,8 +61,8 @@ object FlinkDSScalaExcelDAO {
         val hocr = new HadoopOfficeReadConfiguration()
         hocr.setLocale(new Locale.Builder().setLanguageTag("us").build())
       // load Excel file
-      val useHeader = false // set to true if you want to skip the first row
-      val inputFormat = new ExcelFlinkFileInputFormat(hocr, false)
+      hocr.setReadHeader(false)  // set to true if you want to skip the first row
+      val inputFormat = new ExcelFlinkFileInputFormat(hocr)
       val excelData = env.readFile(inputFormat, inputFile)
       // add some comments to each cell
       val excelDataWithComment = excelData.map(spreadSheetRow => {
