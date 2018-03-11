@@ -10,7 +10,7 @@ use excel;
 -- based on example file: https://github.com/ZuInnoTe/hadoopoffice/blob/master/fileformat/src/test/resources/testsimple.xlsx?raw=true
 -- all options: https://github.com/ZuInnoTe/hadoopoffice/wiki/Hive-Serde
 
-create external table ExcelTable ROW FORMAT SERDE 'org.zuinnote.hadoop.excel.hive.serde.ExcelSerde' STORED AS INPUTFORMAT 'org.zuinnote.hadoop.office.format.mapred.ExcelFileInputFormat' OUTPUTFORMAT 'org.zuinnote.hadoop.office.format.mapred.ExcelRowFileOutputFormat' LOCATION '/user/office/files' TBLPROPERTIES("office.hive.decimalFormat"="DE","skip.header.line.count"="1", "hadoopoffice.read.locale.bcp47"="DE","hadoopoffice.write.locale.bcp47"="DE");
+create external table ExcelTable ROW FORMAT SERDE 'org.zuinnote.hadoop.excel.hive.serde.ExcelSerde' STORED AS INPUTFORMAT 'org.zuinnote.hadoop.office.format.mapred.ExcelFileInputFormat' OUTPUTFORMAT 'org.zuinnote.hadoop.office.format.mapred.ExcelRowFileOutputFormat' LOCATION '/user/office/files' TBLPROPERTIES("office.hive.decimalFormat"="DE","hadoopoffice.read.header.read"="true", "hadoopoffice.read.locale.bcp47"="DE","hadoopoffice.write.locale.bcp47"="DE");
 
 -- show schema 
 describe ExcelTable;
