@@ -20,7 +20,7 @@ import java.util.Set;
 
 import org.apache.hadoop.hive.ql.io.AbstractStorageFormatDescriptor;
 import org.zuinnote.hadoop.office.format.mapred.ExcelFileInputFormat;
-import org.zuinnote.hadoop.office.format.mapred.ExcelRowFileOutputFormat;
+import org.zuinnote.hadoop.excel.hive.outputformat.HiveExcelRowFileOutputFormat;
 
 /**
  *
@@ -42,7 +42,7 @@ public class ExcelStorageFormatDescriptor extends AbstractStorageFormatDescripto
 
 	@Override
 	public String getOutputFormat() {
-		return ExcelRowFileOutputFormat.class.getName();
+		return HiveExcelRowFileOutputFormat.class.getName();
 	}
 
 }
