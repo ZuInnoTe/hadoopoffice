@@ -19,6 +19,11 @@ jar {
     }
 
     baseName = 'hadoopoffice-hiveserde'
+    // note this builds one fat jar. This is needed for Hive, otherwise Apache POI cannot load its classes properly in Hive
+ doFirst {
+        from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    }
+    exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA' // remove signature digests of other libraries
 }
 
 
@@ -94,7 +99,8 @@ sourceSets {
 
 dependencies {
    // hadoop lib for driver
-     provided("org.apache.hadoop:hadoop-client:2.7.0")
+    provided("org.apache.hadoop:hadoop-client:2.7.0")
+    
        // hadoopoffice library
    compile("com.github.zuinnote:hadoopoffice-fileformat:1.1.0")
     // hive serde API
