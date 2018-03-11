@@ -23,7 +23,9 @@ select * from ExcelTable LIMIT 10;
 
 
 -- simply insert by using select from any other table
-create external table ExcelOut ROW FORMAT SERDE 'org.zuinnote.hadoop.excel.hive.serde.ExcelSerde' STORED AS INPUTFORMAT 'org.zuinnote.hadoop.office.format.mapred.ExcelFileInputFormat' OUTPUTFORMAT 'org.zuinnote.hadoop.excel.hive.outputformat.HiveExcelRowFileOutputFormat' LOCATION '/user/office/files' TBLPROPERTIES("office.hive.write.defaultSheetName"="FirstSheet","office.hive.write.header"="true", "hadoopoffice.write.mimeType"="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "hadoopoffice.read.locale.bcp47"="DE","hadoopoffice.write.locale.bcp47"="DE")
+-- note: we instruct Hive to write the table in : /user/office/output
+-- we use as decimalFormat locale "DE" which is Germany, because it fits to the file of the source table "ExcelTable" defined above
+create  table ExcelOut ROW FORMAT SERDE 'org.zuinnote.hadoop.excel.hive.serde.ExcelSerde' STORED AS INPUTFORMAT 'org.zuinnote.hadoop.office.format.mapred.ExcelFileInputFormat' OUTPUTFORMAT 'org.zuinnote.hadoop.excel.hive.outputformat.HiveExcelRowFileOutputFormat' LOCATION '/user/office/output' TBLPROPERTIES("office.hive.write.defaultSheetName"="FirstSheet","office.hive.write.header"="true", "hadoopoffice.write.mimeType"="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "office.hive.decimalFormat"="DE","hadoopoffice.read.locale.bcp47"="DE","hadoopoffice.write.locale.bcp47"="DE")
 AS 
-select * from sourcetable;
+select * from ExcelTable;
 
