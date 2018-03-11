@@ -53,10 +53,14 @@ public class ExcelRowFileOutputFormat extends AbstractSpreadSheetDocumentFileOut
 		String defaultConf = conf.get(HadoopOfficeWriteConfiguration.CONF_MIMETYPE,
 				ExcelFileOutputFormat.DEFAULT_MIMETYPE);
 		conf.set(HadoopOfficeWriteConfiguration.CONF_MIMETYPE, defaultConf);
-
-		Path file = getTaskOutputPath(conf, name);
-		// add suffix
-		file = file.suffix(ExcelFileOutputFormat.getSuffix(conf.get(HadoopOfficeWriteConfiguration.CONF_MIMETYPE)));
+		Path file;
+		if (name!=null) {
+			file = getTaskOutputPath(conf, name);
+			// add suffix
+			file = file.suffix(ExcelFileOutputFormat.getSuffix(conf.get(HadoopOfficeWriteConfiguration.CONF_MIMETYPE)));
+		} else {
+			file = getOutputPath(conf);
+		}
 		try {
 			return new ExcelRowRecordWriter<>(
 					HadoopUtil.getDataOutputStream(conf, file, progress, getCompressOutput(conf),
