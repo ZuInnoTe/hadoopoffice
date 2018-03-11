@@ -5,7 +5,7 @@ apply plugin: 'signing'
 apply plugin: 'jacoco'
 apply plugin: 'org.junit.platform.gradle.plugin'
 
-sourceCompatibility = 1.7
+sourceCompatibility = 1.8
 compileJava.options.encoding = 'UTF-8'
 
 group = "com.github.zuinnote"
