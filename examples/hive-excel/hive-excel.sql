@@ -23,7 +23,7 @@ select * from ExcelTable LIMIT 10;
 
 
 -- simply insert by using select from any other table
-create external table ExcelOut ROW FORMAT SERDE 'org.zuinnote.hadoop.excel.hive.serde.ExcelSerde' STORED AS INPUTFORMAT 'org.zuinnote.hadoop.office.format.mapred.ExcelFileInputFormat' OUTPUTFORMAT 'org.zuinnote.hadoop.office.format.mapred.ExcelRowFileOutputFormat' LOCATION '/user/office/files' TBLPROPERTIES("office.hive.write.defaultSheetName"="FirstSheet","office.hive.write.header"="true", "hadoopoffice.read.locale.bcp47"="DE","hadoopoffice.write.locale.bcp47"="DE")
+create external table ExcelOut ROW FORMAT SERDE 'org.zuinnote.hadoop.excel.hive.serde.ExcelSerde' STORED AS INPUTFORMAT 'org.zuinnote.hadoop.office.format.mapred.ExcelFileInputFormat' OUTPUTFORMAT 'org.zuinnote.hadoop.office.format.mapred.ExcelRowFileOutputFormat' LOCATION '/user/office/files' TBLPROPERTIES("office.hive.write.defaultSheetName"="FirstSheet","office.hive.write.header"="true", "hadoopoffice.write.mimeType"="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "hadoopoffice.read.locale.bcp47"="DE","hadoopoffice.write.locale.bcp47"="DE")
 AS 
 select * from sourcetable;
 
