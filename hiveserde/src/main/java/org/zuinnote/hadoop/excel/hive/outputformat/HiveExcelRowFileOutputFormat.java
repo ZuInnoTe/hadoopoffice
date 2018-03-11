@@ -50,8 +50,8 @@ public class HiveExcelRowFileOutputFormat extends ExcelRowFileOutputFormat imple
 			Path finalOutPath, Class<? extends Writable> valueClass, boolean isCompressed, Properties tableProperties,
 			Progressable progress) throws IOException {
 		FileSystem fs = finalOutPath.getFileSystem(jc);
-		HiveExcelRowFileOutputFormat.setOutputPath(jc, finalOutPath); // for HadoopOffice
-	    RecordWriter<?, ?> recordWriter = this.getRecordWriter(fs, jc, null, progress);
+		HiveExcelRowFileOutputFormat.setOutputPath(jc, finalOutPath.getParent()); // for HadoopOffice
+	    RecordWriter<?, ?> recordWriter = this.getRecordWriter(fs, jc, finalOutPath.getName(), progress);
 	    return new HivePassThroughRecordWriter(recordWriter);
 	}
 
