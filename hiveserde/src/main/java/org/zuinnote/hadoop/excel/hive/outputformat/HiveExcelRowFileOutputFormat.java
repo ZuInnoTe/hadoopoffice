@@ -50,6 +50,7 @@ public class HiveExcelRowFileOutputFormat extends ExcelRowFileOutputFormat imple
 			Path finalOutPath, Class<? extends Writable> valueClass, boolean isCompressed, Properties tableProperties,
 			Progressable progress) throws IOException {
 		FileSystem fs = finalOutPath.getFileSystem(jc);
+		HiveExcelRowFileOutputFormat.setOutputPath(jc, finalOutPath);
 	    RecordWriter<?, ?> recordWriter = this.getRecordWriter(fs, jc, null, progress);
 	    return new HivePassThroughRecordWriter(recordWriter);
 	}
