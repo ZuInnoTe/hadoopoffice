@@ -18,7 +18,6 @@ package org.zuinnote.hadoop.excel.hive.outputformat;
 import org.apache.hadoop.hive.ql.io.HivePassThroughOutputFormat;
 
 import org.apache.hadoop.io.NullWritable;
-import org.apache.hadoop.mapred.OutputFormat;
 
 import org.zuinnote.hadoop.office.format.mapred.ExcelRowFileOutputFormat;
 
@@ -28,9 +27,11 @@ import org.zuinnote.hadoop.office.format.mapred.ExcelRowFileOutputFormat;
  */
 public class HiveExcelRowFileOutputFormat extends HivePassThroughOutputFormat<NullWritable,ExcelRowFileOutputFormat> {
 
-	public HiveExcelRowFileOutputFormat(OutputFormat<?, ?> outputFormat) {
-		super(outputFormat);
+	public HiveExcelRowFileOutputFormat() {
+		super(new ExcelRowFileOutputFormat());
+		
 	}
+
 
 
 
