@@ -82,7 +82,7 @@ class ExcelFlinkTableSource(
       } else if (ct.equals(Types.SQL_TIMESTAMP)) {
         customSchema(i) = new GenericTimestampDataType()
       } else if (ct.equals(Types.DECIMAL)) {
-        customSchema(i) = new GenericBigDecimalDataType(10, 0)
+        customSchema(i) = new GenericBigDecimalDataType(10, 0) // note: the precision and scale are ignored and always the correct precision/scale are returned based on the data
       } else if (ct.equals(Types.BYTE)) {
         customSchema(i) = new GenericByteDataType()
       } else if (ct.equals(Types.SHORT)) {
