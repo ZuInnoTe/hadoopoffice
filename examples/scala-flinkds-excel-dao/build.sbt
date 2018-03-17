@@ -5,7 +5,7 @@ import scala._
 
 lazy val root = (project in file("."))
 .settings(
-    name := "example-ho-flink-scala-excel-dao",
+    name := "example-ho-flinkds-scala-excel-dao",
     version := "0.1"
 )
  .configs( IntegrationTest )
