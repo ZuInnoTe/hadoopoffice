@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.Serializable;
 
 import org.apache.hadoop.io.Writable;
+import org.apache.hadoop.io.WritableFactories;
 import org.apache.hadoop.io.Text;
 
 
@@ -114,7 +115,6 @@ public void set(SpreadSheetCellDAO newSpreadSheetCellDAO) {
     if (sheetName!=null) {
 	sheetNameText = new Text(sheetName);
     }
-
     formattedValueText.write(dataOutput);
     commentText.write(dataOutput);
     formulaText.write(dataOutput);
@@ -125,19 +125,19 @@ public void set(SpreadSheetCellDAO newSpreadSheetCellDAO) {
 
   @Override
   public void readFields(DataInput dataInput) throws IOException {
-    Text formattedValueText = new Text();
+    Text formattedValueText =  (Text) WritableFactories.newInstance(Text.class);
     formattedValueText.readFields(dataInput);
     this.formattedValue=formattedValueText.toString();
-    Text commentText = new Text();
+    Text commentText = (Text) WritableFactories.newInstance(Text.class);
     commentText.readFields(dataInput);
     this.comment=commentText.toString();
-    Text formulaText = new Text();
+    Text formulaText = (Text) WritableFactories.newInstance(Text.class);
     formulaText.readFields(dataInput);
     this.formula=formulaText.toString();
-    Text addressText = new Text();
+    Text addressText = (Text) WritableFactories.newInstance(Text.class);
     addressText.readFields(dataInput);
     this.address=addressText.toString();
-    Text sheetNameText = new Text();
+    Text sheetNameText = (Text) WritableFactories.newInstance(Text.class);
     sheetNameText.readFields(dataInput);
     this.sheetName=sheetNameText.toString();
 }

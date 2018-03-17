@@ -23,7 +23,7 @@ import org.apache.hadoop.io.ArrayWritable;
  *
  *
  */
-public class SpreadSheetCellDAOArrayWritable extends ArrayWritable {
+public class SpreadSheetCellDAOArrayWritable extends ArrayWritable implements Serializable {
 
 
 	/**
