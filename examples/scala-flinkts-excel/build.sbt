@@ -34,7 +34,7 @@ libraryDependencies += "com.github.zuinnote" %% "hadoopoffice-flinkts" % "1.1.0"
 
 libraryDependencies += "org.apache.flink" %% "flink-scala" % "1.3.2" % "provided" 
 
-libraryDependencies += "org.apache.flink" %% "flink-table" % "1.3.2" % "provided" 
+libraryDependencies += "org.apache.flink" %% "flink-table" % "1.3.2" % "compile" 
 
 // following is needed for flink-table
 libraryDependencies += "org.apache.flink" %% "flink-streaming-scala" % "1.3.2" % "provided" 
