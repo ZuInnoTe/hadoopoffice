@@ -80,8 +80,8 @@ object SparkScalaExcelOut {
      	val outputRowWritable = new SpreadSheetCellDAOArrayWritable()
      	outputRowWritable.set(outputRow)
      	outputRowWritable
-     }}.map(spreadSheetCellArrayWritable => (NullWritable.get(),spreadSheetCellArrayWritable)) // create key/value pair for outputformat
-     .repartition(1).saveAsNewAPIHadoopFile(outputFile,classOf[NullWritable], classOf[SpreadSheetCellDAOArrayWritable], classOf[ExcelRowFileOutputFormat], hadoopConf) // use new hadoopp api (mapreduce.*)
+     }}.repartition(1).map(spreadSheetCellArrayWritable => (NullWritable.get(),spreadSheetCellArrayWritable)) // create key/value pair for outputformat
+     .saveAsNewAPIHadoopFile(outputFile,classOf[NullWritable], classOf[SpreadSheetCellDAOArrayWritable], classOf[ExcelRowFileOutputFormat], hadoopConf) // use new hadoopp api (mapreduce.*)
 }
 }
 
