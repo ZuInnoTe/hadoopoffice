@@ -127,6 +127,7 @@ public class FlinkSimpleExcelFileOutputFormatTest {
 		Path fileOut = new Path(this.tmpPath.toString(), fileNameOut);
 		HadoopOfficeWriteConfiguration howc = new HadoopOfficeWriteConfiguration("1");
 		howc.setMimeType(FlinkExcelFileOutputFormatTest.MIMETYPE_XLS);
+		howc.setLocale(Locale.GERMAN);
 		String[] header = inputFormat.getHeader();
 		String defaultSheetName = "Sheet1";
 
@@ -277,6 +278,7 @@ public class FlinkSimpleExcelFileOutputFormatTest {
 		String fileNameOut = "excel2013singlesheetoutsimple.xlsx";
 		Path fileOut = new Path(this.tmpPath.toString(), fileNameOut);
 		HadoopOfficeWriteConfiguration howc = new HadoopOfficeWriteConfiguration("1");
+		howc.setLocale(Locale.GERMAN);
 		howc.setMimeType(FlinkExcelFileOutputFormatTest.MIMETYPE_XLSX);
 		String[] header = inputFormat.getHeader();
 		String defaultSheetName = "Sheet1";
