@@ -163,6 +163,7 @@ override def beforeAll(): Unit = {
  	val dateFormat: SimpleDateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.US).asInstanceOf[SimpleDateFormat]
     val decimalFormat: DecimalFormat = NumberFormat.getInstance(Locale.GERMANY).asInstanceOf[DecimalFormat]	
     hocr.setReadHeader(true)
+    hocr.setLocale(Locale.GERMANY)
 	val sourceReWritten: ExcelFlinkTableSource = ExcelFlinkTableSource.builder()
       .path(dfsCluster.getFileSystem().getUri().toString() + DFS_OUTPUT_DIR_NAME)
       .field("decimalsc1", Types.DECIMAL)

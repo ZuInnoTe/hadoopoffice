@@ -152,7 +152,7 @@ override def beforeAll(): Unit = {
 	flinkEnvironment.execute("HadoopOffice Flink DataSource/DataSink for Excel files (with automatic conversion from/to simple data types) Demonstration")
 	Then("written Excel corresponds to read Excel")
 	val hocr = new HadoopOfficeReadConfiguration()
-	  hocr.setLocale(new Locale.Builder().setLanguageTag("de").build())
+	hocr.setLocale(new Locale.Builder().setLanguageTag("de").build())
     val dateFormat: SimpleDateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.US).asInstanceOf[SimpleDateFormat] //important: even for non-US excel files US must be used most of the time, because this is how Excel stores them internally
 	val decimalFormat: DecimalFormat = NumberFormat.getInstance(Locale.GERMAN).asInstanceOf[DecimalFormat] 
 	hocr.setReadHeader(false) // the Excel file does not contain header in first line

@@ -89,6 +89,7 @@ object FlinkDSScalaExcelSimple {
 	  // write Excel file
 	  val howc = new HadoopOfficeWriteConfiguration(new Path(outputFile).getName())
 	  howc.setMimeType(MIMETYPE_XLSX)
+	  howc.setLocale(new Locale.Builder().setLanguageTag("de").build())
 	  val defaultSheetName = "Sheet2"
 	  val header = null // is an Array of Strings, if null then no header line is written
 	  val outputFormat = new SimpleExcelFlinkFileOutputFormat(howc, header,defaultSheetName, dateFormat, decimalFormat)
