@@ -15,13 +15,22 @@
 **/
 package org.zuinnote.hadoop.office.format.common.dao;
 
+import java.io.Serializable;
+
 import org.apache.hadoop.io.ArrayWritable;
 
 /**
  *
  *
  */
-public class SpreadSheetCellDAOArrayWritable extends ArrayWritable {
+public class SpreadSheetCellDAOArrayWritable extends ArrayWritable implements Serializable {
+
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8628020322181414463L;
+
 	public SpreadSheetCellDAOArrayWritable() {
 		super(SpreadSheetCellDAO.class);
 	}

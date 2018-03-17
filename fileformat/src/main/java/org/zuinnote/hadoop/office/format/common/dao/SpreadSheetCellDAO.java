@@ -19,6 +19,7 @@ package org.zuinnote.hadoop.office.format.common.dao;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.io.Serializable;
 
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.io.Text;
@@ -28,7 +29,11 @@ import org.apache.hadoop.io.Text;
 * This DAO represents a spreadsheet cell
 */
 
-public class SpreadSheetCellDAO implements Writable {
+public class SpreadSheetCellDAO implements Writable, Serializable {
+/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1687737381474332741L;
 private String formattedValue;
 private String comment;
 private String formula;
