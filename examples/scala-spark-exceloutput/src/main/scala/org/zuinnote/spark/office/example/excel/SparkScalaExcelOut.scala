@@ -32,6 +32,7 @@ import org.zuinnote.hadoop.office.format.common.util._
 import org.zuinnote.hadoop.office.format.common.converter._
 import org.zuinnote.hadoop.office.format.common.dao._
 import org.zuinnote.hadoop.office.format.mapreduce._
+import java.io.{ ObjectInputStream, ObjectOutputStream }
    
 import collection.JavaConverters._
 /**
@@ -79,9 +80,26 @@ object SparkScalaExcelOut {
      	}
      	val outputRowWritable = new SpreadSheetCellDAOArrayWritable()
      	outputRowWritable.set(outputRow)
-     	outputRowWritable
-     }}.repartition(1).map(spreadSheetCellArrayWritable => (NullWritable.get(),spreadSheetCellArrayWritable)) // create key/value pair for outputformat
+     	new SpreadSheetCellDAOArrayWritableSerializable(outputRowWritable)
+     }}.repartition(1).map(spreadSheetCellArrayWritable => 
+     
+     	(NullWritable.get(),spreadSheetCellArrayWritable.value)
+     )// create key/value pair for outputformat
      .saveAsNewAPIHadoopFile(outputFile,classOf[NullWritable], classOf[SpreadSheetCellDAOArrayWritable], classOf[ExcelRowFileOutputFormat], hadoopConf) // use new hadoopp api (mapreduce.*)
 }
+}
+
+
+private[excel] class SpreadSheetCellDAOArrayWritableSerializable(@transient var value: SpreadSheetCellDAOArrayWritable) extends Serializable {
+
+  private def writeObject(out: ObjectOutputStream): Unit = {
+    out.defaultWriteObject()
+    value.write(out)
+  }
+
+  private def readObject(in: ObjectInputStream): Unit = {
+    value = new SpreadSheetCellDAOArrayWritable()
+    value.readFields(in)
+  }
 }
 

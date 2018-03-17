@@ -138,7 +138,7 @@ override def beforeAll(): Unit = {
 
 
 "The test csv file" should "be converted into a 2 lines Excel" in {
-	Given("Excel 2013 test file on DFS")
+	Given("CSV test file on DFS")
 	// create input directory
 	dfsCluster.getFileSystem().mkdirs(DFS_INPUT_DIR)
 	// copy CSV input file 
@@ -150,7 +150,7 @@ override def beforeAll(): Unit = {
     	dfsCluster.getFileSystem().copyFromLocalFile(false, false, inputFile, DFS_INPUT_DIR)	
 	Given("Configuration")
 	conf.set("hadoopoffice.write.locale.bcp47","us");
-	When("convert to CSV")
+	When("convert to Excel")
 	SparkScalaExcelOut.convertToExcel(sc,conf,dfsCluster.getFileSystem().getUri().toString()+DFS_INPUT_DIR_NAME,dfsCluster.getFileSystem().getUri().toString()+DFS_OUTPUT_DIR_NAME)
 	Then("Excel correspond to CSV")
 	val listExcel = readDefaultExcelResults(2)
