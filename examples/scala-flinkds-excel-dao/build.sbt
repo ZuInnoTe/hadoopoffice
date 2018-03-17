@@ -23,7 +23,7 @@ scalacOptions += "-target:jvm-1.7"
 
 resolvers += Resolver.mavenLocal
 
-assemblyJarName in assembly := "example-ho-flink-scala-excel-dao.jar"
+assemblyJarName in assembly := "example-ho-flinkds-scala-excel-dao.jar"
 
 fork  := true
 
