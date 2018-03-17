@@ -6,6 +6,10 @@ echo -e "Publishing javadoc...\n"
 # copy to home
 mkdir -p $HOME/fileformat/javadoc-latest
 cp -R fileformat/build/docs/javadoc $HOME/fileformat/javadoc-latest
+mkdir -p $HOME/hiveserde/javadoc-latest
+cp -R hiveserde/build/docs/javadoc $HOME/hiveserde/javadoc-latest
+mkdir -p $HOME/flinkds/javadoc-latest
+cp -R flinkds/build/docs/javadoc $HOME/flinkds/javadoc-latest
 
 # Get to the Travis build directory, configure git and clone the repo
 cd $HOME
@@ -19,6 +23,12 @@ cd gh-pages
 git rm -rf ./javadoc/fileformat
 mkdir -p ./javadoc/fileformat
 cp -Rf $HOME/fileformat/javadoc-latest ./javadoc/fileformat
+git rm -rf ./javadoc/hiveserde
+mkdir -p ./javadoc/hiveserde
+cp -Rf $HOME/hiveserde/javadoc-latest ./javadoc/hiveserde
+git rm -rf ./javadoc/flinkds
+mkdir -p ./javadoc/flinkds
+cp -Rf $HOME/flinkds/javadoc-latest ./javadoc/flinkds
 git add -f .
 git commit -m "Lastest javadoc on successful travis build $TRAVIS_BUILD_NUMBER auto-pushed to gh-pages"
 git push -fq origin gh-pages > /dev/null

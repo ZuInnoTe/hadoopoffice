@@ -6,6 +6,10 @@ echo -e "Publishing test results...\n"
 # copy to home
 mkdir -p $HOME/fileformat/tests-latest
 cp -R fileformat/build/test-results/junit-platform $HOME/fileformat/tests-latest
+mkdir -p $HOME/hiveserde/tests-latest
+cp -R hiveserde/build/test-results/junit-platform $HOME/hiveserde/tests-latest
+mkdir -p $HOME/flinkds/tests-latest
+cp -R flinkds/build/test-results/junit-platform $HOME/flinkds/tests-latest
 
 # Get to the Travis build directory, configure git and clone the repo
 cd $HOME
@@ -18,6 +22,12 @@ cd gh-pages
 git rm -rf ./tests/fileformat
 mkdir -p ./tests/fileformat
 cp -Rf $HOME/fileformat/tests-latest ./tests/fileformat
+git rm -rf ./tests/hiveserde
+mkdir -p ./tests/hiveserde
+cp -Rf $HOME/hiveserde/tests-latest ./tests/hiveserde
+git rm -rf ./tests/flinkds
+mkdir -p ./tests/flinkds
+cp -Rf $HOME/flinkds/tests-latest ./tests/flinkds
 git add -f .
 git commit -m "Lastest javadoc on successful travis build $TRAVIS_BUILD_NUMBER auto-pushed to gh-pages"
 git push -fq origin gh-pages > /dev/null
