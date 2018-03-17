@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Locale;
 import java.util.Properties;
 
 import org.apache.hadoop.conf.Configuration;
@@ -127,6 +128,7 @@ public class ExcelTextSerdeTest {
 
 		HadoopOfficeReadConfiguration hocr = new HadoopOfficeReadConfiguration();
 		hocr.setMimeType("ms-excel");
+		hocr.setLocale(Locale.GERMAN);
 		OfficeReader reader = new OfficeReader(documentInputStream, hocr);
 		reader.parse();
 		// skip header
@@ -248,6 +250,7 @@ public class ExcelTextSerdeTest {
 
 		HadoopOfficeReadConfiguration hocr = new HadoopOfficeReadConfiguration();
 		hocr.setMimeType("ms-excel");
+		hocr.setLocale(Locale.GERMAN);
 		OfficeReader reader = new OfficeReader(documentInputStream, hocr);
 		reader.parse();
 		// skip header
@@ -819,6 +822,7 @@ public class ExcelTextSerdeTest {
 
 		HadoopOfficeReadConfiguration hocr = new HadoopOfficeReadConfiguration();
 		hocr.setMimeType("ms-excel");
+		hocr.setLocale(Locale.GERMAN);
 		OfficeReader reader = new OfficeReader(documentInputStream, hocr);
 		reader.parse();
 		// skip header
