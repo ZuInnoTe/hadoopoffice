@@ -152,6 +152,7 @@ public class FlinkSimpleExcelFileOutputFormatTest {
 		SimpleDateFormat dateFormatOut = (SimpleDateFormat) DateFormat.getDateInstance(DateFormat.SHORT, Locale.US);
 		DecimalFormat decimalFormatOut = (DecimalFormat) DecimalFormat.getInstance(Locale.GERMAN);
 		hocrOut.setReadHeader(true);
+		hocr.setLocale(Locale.GERMAN);
 		SimpleExcelFlinkFileInputFormat inputFormatOut = new SimpleExcelFlinkFileInputFormat(hocrOut, -1,
 				dateFormatOut, decimalFormatOut);
 		inputFormatOut.open(spreadSheetInputSplitOut);
@@ -267,7 +268,7 @@ public class FlinkSimpleExcelFileOutputFormatTest {
 		Path file = new Path(fileNameSpreadSheet);
 		FileInputSplit spreadSheetInputSplit = new FileInputSplit(0, file, 0, -1, null);
 		HadoopOfficeReadConfiguration hocr = new HadoopOfficeReadConfiguration();
-
+		hocr.setLocale(Locale.GERMAN);
 		hocr.setReadHeader(true);
 		SimpleExcelFlinkFileInputFormat inputFormat = new SimpleExcelFlinkFileInputFormat(hocr, -1,
 				dateFormat, decimalFormat);
