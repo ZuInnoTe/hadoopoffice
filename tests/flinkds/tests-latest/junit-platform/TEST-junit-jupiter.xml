@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="JUnit Jupiter" tests="24" skipped="0" failures="0" errors="0" time="6.061" hostname="travis-job-zuinnote-hadoopoffice-354954784.travisci.net" timestamp="2018-03-18T09:53:07">
+<testsuite name="JUnit Jupiter" tests="24" skipped="0" failures="0" errors="0" time="6.279" hostname="travis-job-zuinnote-hadoopoffice-357728169.travisci.net" timestamp="2018-03-24T09:40:43">
 <properties>
 <property name="awt.toolkit" value="sun.awt.X11.XToolkit"/>
 <property name="file.encoding" value="UTF-8"/>
@@ -55,31 +55,31 @@
 <property name="user.timezone" value="UTC"/>
 <property name="user.variant" value=""/>
 </properties>
-<testcase name="createKeyStoreforPasswords()" classname="org.zuinnote.flink.office.common.FlinkKeyStoreManagerTest" time="0.807">
+<testcase name="createKeyStoreforPasswords()" classname="org.zuinnote.flink.office.common.FlinkKeyStoreManagerTest" time="0.633">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.flink.office.common.FlinkKeyStoreManagerTest]/[method:createKeyStoreforPasswords()]
 display-name: createKeyStoreforPasswords()
 ]]></system-out>
 </testcase>
-<testcase name="getPrivateKeyAndCertificate()" classname="org.zuinnote.flink.office.common.FlinkKeyStoreManagerTest" time="0.024">
+<testcase name="getPrivateKeyAndCertificate()" classname="org.zuinnote.flink.office.common.FlinkKeyStoreManagerTest" time="0.028">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.flink.office.common.FlinkKeyStoreManagerTest]/[method:getPrivateKeyAndCertificate()]
 display-name: getPrivateKeyAndCertificate()
 ]]></system-out>
 </testcase>
-<testcase name="loadExistingKeyStore()" classname="org.zuinnote.flink.office.common.FlinkKeyStoreManagerTest" time="0.007">
+<testcase name="loadExistingKeyStore()" classname="org.zuinnote.flink.office.common.FlinkKeyStoreManagerTest" time="0.003">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.flink.office.common.FlinkKeyStoreManagerTest]/[method:loadExistingKeyStore()]
 display-name: loadExistingKeyStore()
 ]]></system-out>
 </testcase>
-<testcase name="getAllX509Certificates()" classname="org.zuinnote.flink.office.common.FlinkKeyStoreManagerTest" time="0.042">
+<testcase name="getAllX509Certificates()" classname="org.zuinnote.flink.office.common.FlinkKeyStoreManagerTest" time="0.015">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.flink.office.common.FlinkKeyStoreManagerTest]/[method:getAllX509Certificates()]
 display-name: getAllX509Certificates()
 ]]></system-out>
 </testcase>
-<testcase name="checkCertificateAvailable()" classname="org.zuinnote.flink.office.common.FlinkKeyStoreManagerTest" time="0.005">
+<testcase name="checkCertificateAvailable()" classname="org.zuinnote.flink.office.common.FlinkKeyStoreManagerTest" time="0.013">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.flink.office.common.FlinkKeyStoreManagerTest]/[method:checkCertificateAvailable()]
 display-name: checkCertificateAvailable()
@@ -91,73 +91,73 @@ unique-id: [engine:junit-jupiter]/[class:org.zuinnote.flink.office.common.FlinkK
 display-name: checkKeystoreAvailable()
 ]]></system-out>
 </testcase>
-<testcase name="restoreExcel2013SingleSheet()" classname="org.zuinnote.flink.office.excel.FlinkExcelFileInputFormatTest" time="1.397">
+<testcase name="restoreExcel2013SingleSheet()" classname="org.zuinnote.flink.office.excel.FlinkExcelFileInputFormatTest" time="2.407">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.flink.office.excel.FlinkExcelFileInputFormatTest]/[method:restoreExcel2013SingleSheet()]
 display-name: restoreExcel2013SingleSheet()
 ]]></system-out>
 </testcase>
-<testcase name="checkTestExcelSimpleSheetAvailable()" classname="org.zuinnote.flink.office.excel.FlinkExcelFileInputFormatTest" time="0.002">
+<testcase name="checkTestExcelSimpleSheetAvailable()" classname="org.zuinnote.flink.office.excel.FlinkExcelFileInputFormatTest" time="0.001">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.flink.office.excel.FlinkExcelFileInputFormatTest]/[method:checkTestExcelSimpleSheetAvailable()]
 display-name: checkTestExcelSimpleSheetAvailable()
 ]]></system-out>
 </testcase>
-<testcase name="restoreExcel2003SingleSheet()" classname="org.zuinnote.flink.office.excel.FlinkExcelFileInputFormatTest" time="0.454">
+<testcase name="restoreExcel2003SingleSheet()" classname="org.zuinnote.flink.office.excel.FlinkExcelFileInputFormatTest" time="0.428">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.flink.office.excel.FlinkExcelFileInputFormatTest]/[method:restoreExcel2003SingleSheet()]
 display-name: restoreExcel2003SingleSheet()
 ]]></system-out>
 </testcase>
-<testcase name="checkTestExcel2003SingleSheetAvailable()" classname="org.zuinnote.flink.office.excel.FlinkExcelFileInputFormatTest" time="0">
+<testcase name="checkTestExcel2003SingleSheetAvailable()" classname="org.zuinnote.flink.office.excel.FlinkExcelFileInputFormatTest" time="0.001">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.flink.office.excel.FlinkExcelFileInputFormatTest]/[method:checkTestExcel2003SingleSheetAvailable()]
 display-name: checkTestExcel2003SingleSheetAvailable()
 ]]></system-out>
 </testcase>
-<testcase name="readExcel2013SingleSheet()" classname="org.zuinnote.flink.office.excel.FlinkExcelFileInputFormatTest" time="0.039">
+<testcase name="readExcel2013SingleSheet()" classname="org.zuinnote.flink.office.excel.FlinkExcelFileInputFormatTest" time="0.027">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.flink.office.excel.FlinkExcelFileInputFormatTest]/[method:readExcel2013SingleSheet()]
 display-name: readExcel2013SingleSheet()
 ]]></system-out>
 </testcase>
-<testcase name="readExcel2003SingleSheet()" classname="org.zuinnote.flink.office.excel.FlinkExcelFileInputFormatTest" time="0.013">
+<testcase name="readExcel2003SingleSheet()" classname="org.zuinnote.flink.office.excel.FlinkExcelFileInputFormatTest" time="0.019">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.flink.office.excel.FlinkExcelFileInputFormatTest]/[method:readExcel2003SingleSheet()]
 display-name: readExcel2003SingleSheet()
 ]]></system-out>
 </testcase>
-<testcase name="checkTestExcel2013SingleSheetAvailable()" classname="org.zuinnote.flink.office.excel.FlinkExcelFileInputFormatTest" time="0.001">
+<testcase name="checkTestExcel2013SingleSheetAvailable()" classname="org.zuinnote.flink.office.excel.FlinkExcelFileInputFormatTest" time="0">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.flink.office.excel.FlinkExcelFileInputFormatTest]/[method:checkTestExcel2013SingleSheetAvailable()]
 display-name: checkTestExcel2013SingleSheetAvailable()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcel2013SingleSheetWithHeader()" classname="org.zuinnote.flink.office.excel.FlinkExcelFileOutputFormatTest" time="0.369">
+<testcase name="writeExcel2013SingleSheetWithHeader()" classname="org.zuinnote.flink.office.excel.FlinkExcelFileOutputFormatTest" time="0.285">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.flink.office.excel.FlinkExcelFileOutputFormatTest]/[method:writeExcel2013SingleSheetWithHeader()]
 display-name: writeExcel2013SingleSheetWithHeader()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcel2003SingleSheetWithoutHeader()" classname="org.zuinnote.flink.office.excel.FlinkExcelFileOutputFormatTest" time="0.074">
+<testcase name="writeExcel2003SingleSheetWithoutHeader()" classname="org.zuinnote.flink.office.excel.FlinkExcelFileOutputFormatTest" time="0.091">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.flink.office.excel.FlinkExcelFileOutputFormatTest]/[method:writeExcel2003SingleSheetWithoutHeader()]
 display-name: writeExcel2003SingleSheetWithoutHeader()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcel2013SingleSheetWithoutheader()" classname="org.zuinnote.flink.office.excel.FlinkExcelFileOutputFormatTest" time="0.125">
+<testcase name="writeExcel2013SingleSheetWithoutheader()" classname="org.zuinnote.flink.office.excel.FlinkExcelFileOutputFormatTest" time="0.103">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.flink.office.excel.FlinkExcelFileOutputFormatTest]/[method:writeExcel2013SingleSheetWithoutheader()]
 display-name: writeExcel2013SingleSheetWithoutheader()
 ]]></system-out>
 </testcase>
-<testcase name="writeExcel2003SingleSheetWithHeader()" classname="org.zuinnote.flink.office.excel.FlinkExcelFileOutputFormatTest" time="0.019">
+<testcase name="writeExcel2003SingleSheetWithHeader()" classname="org.zuinnote.flink.office.excel.FlinkExcelFileOutputFormatTest" time="0.027">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.flink.office.excel.FlinkExcelFileOutputFormatTest]/[method:writeExcel2003SingleSheetWithHeader()]
 display-name: writeExcel2003SingleSheetWithHeader()
 ]]></system-out>
 </testcase>
-<testcase name="readSimpleExcel2013()" classname="org.zuinnote.flink.office.excel.FlinkSimpleExcelFileInputFormatTest" time="0.253">
+<testcase name="readSimpleExcel2013()" classname="org.zuinnote.flink.office.excel.FlinkSimpleExcelFileInputFormatTest" time="0.186">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.flink.office.excel.FlinkSimpleExcelFileInputFormatTest]/[method:readSimpleExcel2013()]
 display-name: readSimpleExcel2013()
@@ -175,7 +175,7 @@ unique-id: [engine:junit-jupiter]/[class:org.zuinnote.flink.office.excel.FlinkSi
 display-name: checkTestExcel2003SingleSheetAvailable()
 ]]></system-out>
 </testcase>
-<testcase name="restoreSimpleExcel2013()" classname="org.zuinnote.flink.office.excel.FlinkSimpleExcelFileInputFormatTest" time="0.184">
+<testcase name="restoreSimpleExcel2013()" classname="org.zuinnote.flink.office.excel.FlinkSimpleExcelFileInputFormatTest" time="0.128">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.flink.office.excel.FlinkSimpleExcelFileInputFormatTest]/[method:restoreSimpleExcel2013()]
 display-name: restoreSimpleExcel2013()
@@ -187,13 +187,13 @@ unique-id: [engine:junit-jupiter]/[class:org.zuinnote.flink.office.excel.FlinkSi
 display-name: checkTestExcel2013SingleSheetAvailable()
 ]]></system-out>
 </testcase>
-<testcase name="writeSimpleExcel2013SingleSheetWithtHeader()" classname="org.zuinnote.flink.office.excel.FlinkSimpleExcelFileOutputFormatTest" time="0.358">
+<testcase name="writeSimpleExcel2013SingleSheetWithtHeader()" classname="org.zuinnote.flink.office.excel.FlinkSimpleExcelFileOutputFormatTest" time="0.295">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.flink.office.excel.FlinkSimpleExcelFileOutputFormatTest]/[method:writeSimpleExcel2013SingleSheetWithtHeader()]
 display-name: writeSimpleExcel2013SingleSheetWithtHeader()
 ]]></system-out>
 </testcase>
-<testcase name="writeSimpleExcel2003SingleSheetWithHeader()" classname="org.zuinnote.flink.office.excel.FlinkSimpleExcelFileOutputFormatTest" time="0.217">
+<testcase name="writeSimpleExcel2003SingleSheetWithHeader()" classname="org.zuinnote.flink.office.excel.FlinkSimpleExcelFileOutputFormatTest" time="0.13">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.flink.office.excel.FlinkSimpleExcelFileOutputFormatTest]/[method:writeSimpleExcel2003SingleSheetWithHeader()]
 display-name: writeSimpleExcel2003SingleSheetWithHeader()
