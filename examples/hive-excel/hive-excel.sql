@@ -1,4 +1,4 @@
-- create database
+-- create database
 create database excel;
 
 use excel;
