@@ -94,7 +94,7 @@ public boolean next(Text key, ArrayWritable value) throws IOException {
 		return false; // no more to read
 	}
 	SpreadSheetCellDAO[] cellRows = (SpreadSheetCellDAO[])objectArray;
-	key.set(new Text("["+this.split.getPath().getName()+"]"+this.getOfficeReader().getCurrentSheetName()+"!A"+this.getOfficeReader().getCurrentRow()));
+	key.set("["+this.split.getPath().getName()+"]"+this.getOfficeReader().getCurrentSheetName()+"!A"+this.getOfficeReader().getCurrentRow());
 	value.set(cellRows);
 	return true;	
 }
