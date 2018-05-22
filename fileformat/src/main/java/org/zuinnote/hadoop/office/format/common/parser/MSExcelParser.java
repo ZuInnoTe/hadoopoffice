@@ -426,7 +426,7 @@ private int currentSkipLine=0;
 		// read row from the sheet currently to be processed
 		Sheet rSheet = this.currentWorkbook.getSheetAt(this.currentSheet);
 		Row rRow = rSheet.getRow(this.currentRow);
-		if (rRow==null) {
+		if ((rRow==null) || (rRow.getLastCellNum()<0)) {
 			this.currentRow++;
 			return new SpreadSheetCellDAO[0]; // emtpy row
 		}
