@@ -8,7 +8,7 @@ lazy val root = (project in file("."))
 .settings(
 organization := "com.github.zuinnote",
 name := "hadoopoffice-flinkts",
-version := "1.1.0"
+version := "1.1.1"
 )
  .configs( IntegrationTest )
   .settings( Defaults.itSettings : _*)
@@ -25,9 +25,9 @@ crossScalaVersions := Seq("2.10.7","2.11.10")
 
 scalacOptions += "-target:jvm-1.7"
 
-libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.1.0" % "compile"
+libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.1.1" % "compile"
 
-libraryDependencies += "com.github.zuinnote" % "hadoopoffice-flinkds" % "1.1.0" % "compile"
+libraryDependencies += "com.github.zuinnote" % "hadoopoffice-flinkds" % "1.1.1" % "compile"
 // following three libraries are only needed for digital signatures
 libraryDependencies += "org.bouncycastle" % "bcprov-ext-jdk15on" % "1.58" % "provided"
 libraryDependencies += "org.bouncycastle" % "bcpkix-jdk15on" % "1.58" % "provided"
