@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<testsuite name="JUnit Jupiter" tests="7" skipped="0" failures="0" errors="0" time="2.473" hostname="travis-job-zuinnote-hadoopoffice-386230909.travisci.net" timestamp="2018-05-31T15:23:51">
+<testsuite name="JUnit Jupiter" tests="7" skipped="0" failures="0" errors="0" time="2.514" hostname="travis-job-zuinnote-hadoopoffice-386233736.travisci.net" timestamp="2018-05-31T15:30:17">
 <properties>
 <property name="awt.toolkit" value="sun.awt.X11.XToolkit"/>
 <property name="file.encoding" value="UTF-8"/>
@@ -54,19 +54,19 @@
 <property name="user.timezone" value="UTC"/>
 <property name="user.variant" value=""/>
 </properties>
-<testcase name="serializeSimple2013WithHeader()" classname="org.zuinnote.hadoop.excel.hive.serde.ExcelTextSerdeTest" time="2.024">
+<testcase name="serializeSimple2013WithHeader()" classname="org.zuinnote.hadoop.excel.hive.serde.ExcelTextSerdeTest" time="2.161">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.excel.hive.serde.ExcelTextSerdeTest]/[method:serializeSimple2013WithHeader()]
 display-name: serializeSimple2013WithHeader()
 ]]></system-out>
 </testcase>
-<testcase name="deserializeSimpleExcel2013()" classname="org.zuinnote.hadoop.excel.hive.serde.ExcelTextSerdeTest" time="0.141">
+<testcase name="deserializeSimpleExcel2013()" classname="org.zuinnote.hadoop.excel.hive.serde.ExcelTextSerdeTest" time="0.129">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.excel.hive.serde.ExcelTextSerdeTest]/[method:deserializeSimpleExcel2013()]
 display-name: deserializeSimpleExcel2013()
 ]]></system-out>
 </testcase>
-<testcase name="serializeSimple2013WithoutHeader()" classname="org.zuinnote.hadoop.excel.hive.serde.ExcelTextSerdeTest" time="0.111">
+<testcase name="serializeSimple2013WithoutHeader()" classname="org.zuinnote.hadoop.excel.hive.serde.ExcelTextSerdeTest" time="0.092">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.excel.hive.serde.ExcelTextSerdeTest]/[method:serializeSimple2013WithoutHeader()]
 display-name: serializeSimple2013WithoutHeader()
@@ -78,19 +78,19 @@ unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.excel.hive.serde.Ex
 display-name: checkTestExcel2003SingleSheetAvailable()
 ]]></system-out>
 </testcase>
-<testcase name="initializePositive()" classname="org.zuinnote.hadoop.excel.hive.serde.ExcelTextSerdeTest" time="0.102">
+<testcase name="initializePositive()" classname="org.zuinnote.hadoop.excel.hive.serde.ExcelTextSerdeTest" time="0.07">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.excel.hive.serde.ExcelTextSerdeTest]/[method:initializePositive()]
 display-name: initializePositive()
 ]]></system-out>
 </testcase>
-<testcase name="checkTestExcel2013SimpleAvailable()" classname="org.zuinnote.hadoop.excel.hive.serde.ExcelTextSerdeTest" time="0">
+<testcase name="checkTestExcel2013SimpleAvailable()" classname="org.zuinnote.hadoop.excel.hive.serde.ExcelTextSerdeTest" time="0.001">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.excel.hive.serde.ExcelTextSerdeTest]/[method:checkTestExcel2013SimpleAvailable()]
 display-name: checkTestExcel2013SimpleAvailable()
 ]]></system-out>
 </testcase>
-<testcase name="checkTestExcel2013SingleSheetAvailable()" classname="org.zuinnote.hadoop.excel.hive.serde.ExcelTextSerdeTest" time="0">
+<testcase name="checkTestExcel2013SingleSheetAvailable()" classname="org.zuinnote.hadoop.excel.hive.serde.ExcelTextSerdeTest" time="0.001">
 <system-out><![CDATA[
 unique-id: [engine:junit-jupiter]/[class:org.zuinnote.hadoop.excel.hive.serde.ExcelTextSerdeTest]/[method:checkTestExcel2013SingleSheetAvailable()]
 display-name: checkTestExcel2013SingleSheetAvailable()
