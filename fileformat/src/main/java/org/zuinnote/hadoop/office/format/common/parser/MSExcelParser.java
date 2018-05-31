@@ -500,6 +500,10 @@ private int currentSkipLine=0;
 						}
 						while (this.currentRow>this.currentWorkbook.getSheet(this.sheets[this.sheetsIndex]).getLastRowNum()) {
 							this.sheetsIndex++;
+							if (this.sheetsIndex==this.sheets.length) {
+								LOG.info("No further sheets found");
+								break;
+							}
 							this.currentRow=0;
 							// check if we need to skip lines
 							if (this.hocr.getSkipLinesAllSheets()) {
