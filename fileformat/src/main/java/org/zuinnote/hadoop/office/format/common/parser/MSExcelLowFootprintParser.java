@@ -377,7 +377,7 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 						 this.header[i]=((SpreadSheetCellDAO)firstRow[i]).getFormattedValue();
 					 } else {
 						 LOG.warn("Header at position "+i+" does not contain a cell or is the empty string");
-						 this.header[i]="Column "+i;
+						 this.header[i]="Column"+i;
 					 }
 				 }
 			 } else {
