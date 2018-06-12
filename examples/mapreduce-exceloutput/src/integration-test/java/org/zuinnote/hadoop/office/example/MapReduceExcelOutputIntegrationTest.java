@@ -187,6 +187,8 @@ public final class MapReduceExcelOutputIntegrationTest {
 	         // Let ToolRunner handle generic command-line options
 	  	int res = ToolRunner.run(miniCluster.getConfig(), new CSV2ExcelDriver(), new String[]{DFS_INPUT_DIR_NAME,DFS_OUTPUT_DIR_NAME}); 
 	    	// check if successfully executed
+		// note the following does only work on Linux platforms, other platforms may show issue due to the Hadoop Unit testing framework only supports Linux
+	  	// You can remove this test if you work on another platform. The application itself builds and run on a real cluster without any issues.
 		assertEquals( 0, res, "Successfully executed mapreduce application");
 	    	// fetch results
 		List<SpreadSheetCellDAO[]> resultLines = readDefaultExcelResults(2);
