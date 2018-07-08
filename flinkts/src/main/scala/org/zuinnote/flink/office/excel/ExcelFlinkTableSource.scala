@@ -68,8 +68,9 @@ class ExcelFlinkTableSource(
    */
   override def getDataSet(execEnv: ExecutionEnvironment): DataSet[Row] = {
     // we do not infer any data, because fieldnames and types are given
+
     val inputFormat = new RowSimpleExcelFlinkFileInputFormat(hocr, 0, dateFormat, decimalFormat, fieldTypes)
-    // set custom schma
+    // set custom schema (= automated inference is deactivated)
     val customSchema: Array[GenericDataType] = new Array[GenericDataType](fieldTypes.length)
     var i = 0
     for (ct <- fieldTypes) {
