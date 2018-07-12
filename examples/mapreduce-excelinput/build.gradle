@@ -2,7 +2,6 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'application'
 apply plugin: 'jacoco'
- apply plugin: 'org.junit.platform.gradle.plugin'
 
 mainClassName = "org.zuinnote.hadoop.office.example.driver.Excel2CSVDriver"
 compileJava.options.encoding = 'UTF-8'
@@ -55,24 +54,6 @@ eclipse {
 javadoc.classpath += configurations.provided
 
 
-// Integrate JaCoCo for jUnit5
-project.afterEvaluate {
-    def junitPlatformTestTask = project.tasks.getByName('junitPlatformTest')
-
-    // configure jacoco to analyze the junitPlatformTest task
-    jacoco {
-        applyTo junitPlatformTestTask
-    }
-
-    // create junit platform jacoco task
-    project.task(type: JacocoReport, "junitPlatformJacocoReport",
-            {
-                sourceDirectories = files("./src/main")
-                classDirectories = files("$buildDir/classes/main")
-                executionData junitPlatformTestTask
-            })
-}
-
 
 sourceSets {
     main.compileClasspath += configurations.provided
@@ -96,11 +77,11 @@ dependencies {
      // hadoopoffice library
    compile("com.github.zuinnote:hadoopoffice-fileformat:1.1.1")
 
-       testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.1.1'
+       testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.2.0'
  
-   testRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.1.1'
-    testIntegrationRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.1.1'
-    testIntegrationRuntime group: 'org.junit.platform', name: 'junit-platform-console', version: '1.1.1'
+   testRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.2.0'
+    testIntegrationRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.2.0'
+    testIntegrationRuntime group: 'org.junit.platform', name: 'junit-platform-console', version: '1.2.0'
      testIntegrationCompile group: 'org.apache.hadoop', name: 'hadoop-minicluster', version: '2.7.0'
 }
 
@@ -115,39 +96,19 @@ uploadArchives {
     }
 }
 
-task testUnit(type: JavaExec, dependsOn: jar) {
-    group 'Verification'
-    description 'Runs the unit tests.'
-
-    classpath = sourceSets.test.runtimeClasspath
-    systemProperties['jar.path'] = jar.archivePath
-
-    main 'org.junit.platform.console.ConsoleLauncher'
-    args = ['--scan-classpath', sourceSets.testIntegration.output.classesDirs.asPath,
-            '--reports-dir', "${buildDir}/test-results/testIntegration"
-    ]
+test {
+    testLogging.showStandardStreams = true
+    useJUnitPlatform()
 }
 
-task testIntegration(type: JavaExec, dependsOn: jar) {
-    group 'Verification'
-    description 'Runs the integration tests.'
- 
+task testIntegration(type: Test) {
+    testClassesDirs = sourceSets.testIntegration.output.classesDirs
     classpath = sourceSets.testIntegration.runtimeClasspath
-    systemProperties['jar.path'] = jar.archivePath
-
-    main 'org.junit.platform.console.ConsoleLauncher'
-    args = ['--scan-classpath', sourceSets.testIntegration.output.classesDirs.asPath,
-            '--reports-dir', "${buildDir}/test-results/integration-test"
-    ]
+    useJUnitPlatform()
 }
 
-
+1
+2
+	
 check.dependsOn testIntegration
-testIntegration.mustRunAfter testUnit
-
-afterEvaluate {
-    jacoco {
-        applyTo testUnit
-        applyTo testIntegration
-    }
-}
+testIntegration.mustRunAfter test

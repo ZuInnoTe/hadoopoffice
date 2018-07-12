@@ -3,14 +3,14 @@ apply plugin: 'maven-publish'
 apply plugin: 'maven'
 apply plugin: 'signing'
 apply plugin: 'jacoco'
-apply plugin: 'org.junit.platform.gradle.plugin'
+
 
 sourceCompatibility = 1.8
 compileJava.options.encoding = 'UTF-8'
 
 group = "com.github.zuinnote"
 archivesBaseName = "hadoopoffice-flinkds"
-version = "1.1.1"
+version = "1.2.0"
 
 
 jar {
@@ -35,25 +35,6 @@ jacocoTestReport {
         xml.enabled true
         csv.enabled true
     }
-}
-
-
-// Integrate JaCoCo for jUnit5
-project.afterEvaluate {
-    def junitPlatformTestTask = project.tasks.getByName('junitPlatformTest')
-
-    // configure jacoco to analyze the junitPlatformTest task
-    jacoco {
-        applyTo junitPlatformTestTask
-    }
-
-    // create junit platform jacoco task
-    project.task(type: JacocoReport, "junitPlatformJacocoReport",
-            {
-                sourceDirectories = files("./src/main")
-                classDirectories = files("$buildDir/classes/main")
-                executionData junitPlatformTestTask
-            })
 }
 
 
@@ -90,12 +71,12 @@ dependencies {
     // hadoopoffice library
    compile("com.github.zuinnote:hadoopoffice-fileformat:1.1.1")
     // flink api
-   provided("org.apache.flink:flink-java:1.3.2")
+   provided("org.apache.flink:flink-java:1.5.0")
    // log4j2
-   provided("org.apache.logging.log4j:log4j-api:2.4.1")
+   provided("org.apache.logging.log4j:log4j-api:2.11.0")
    // testing
-     testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.1.1'
- 	 testRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.1.1'
+     testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.2.0'
+ 	 testRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.2.0'
 }
 
 publishing {
@@ -103,7 +84,7 @@ publishing {
         maven(MavenPublication) {
             groupId 'com.github.zuinnote'
             artifactId 'hadoopoffice-flinkds'
-            version '1.1.1'
+            version '1.2.0'
 
             from components.java
         }
@@ -115,6 +96,7 @@ publishing {
 
 test {
     testLogging.showStandardStreams = true
+    useJUnitPlatform()
 }
 
 javadoc.classpath += configurations.provided
