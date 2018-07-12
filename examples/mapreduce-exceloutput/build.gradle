@@ -110,10 +110,3 @@ task testIntegration(type: Test) {
 	
 check.dependsOn testIntegration
 testIntegration.mustRunAfter test
-
-afterEvaluate {
-    jacoco {
-        applyTo testUnit
-        applyTo testIntegration
-    }
-}
