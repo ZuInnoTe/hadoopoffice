@@ -45,6 +45,7 @@ import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericStrin
 
 import org.zuinnote.flink.office.excel.RowSimpleExcelFlinkFileInputFormat
 import org.apache.flink.table.api.Types
+import org.apache.flink.table.api.{TableException, TableSchema}
 
 import scala.collection.mutable
 import java.util.Locale
@@ -106,6 +107,9 @@ class ExcelFlinkTableSource(
     execEnv.createInput(inputFormat, returnType).name(explainSource())
 
   }
+
+/** for newer flink versions **/
+  def getTableSchema = new TableSchema(fieldNames, fieldTypes)
 
   /** Returns the [[RowTypeInfo]] for the return type of the [[ExcelTableSource]]. */
   override def getReturnType: RowTypeInfo = returnType
