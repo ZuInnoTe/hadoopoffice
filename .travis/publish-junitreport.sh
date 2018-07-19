@@ -5,11 +5,11 @@ echo -e "Publishing test results...\n"
 
 # copy to home
 mkdir -p $HOME/fileformat/tests-latest
-cp -R fileformat/build/test-results/junit-platform $HOME/fileformat/tests-latest
+cp -R fileformat/build/reports/tests/test $HOME/fileformat/tests-latest
 mkdir -p $HOME/hiveserde/tests-latest
-cp -R hiveserde/build/test-results/junit-platform $HOME/hiveserde/tests-latest
+cp -R hiveserde/build/reports/tests/test $HOME/hiveserde/tests-latest
 mkdir -p $HOME/flinkds/tests-latest
-cp -R flinkds/build/test-results/junit-platform $HOME/flinkds/tests-latest
+cp -R flinkds/build/reports/tests/test $HOME/flinkds/tests-latest
 
 # Get to the Travis build directory, configure git and clone the repo
 cd $HOME
