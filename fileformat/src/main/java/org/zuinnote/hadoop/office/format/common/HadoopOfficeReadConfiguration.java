@@ -18,6 +18,10 @@ package org.zuinnote.hadoop.office.format.common;
 import java.io.Serializable;
 import java.security.cert.PKIXParameters;
 import java.security.cert.X509Certificate;
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -38,6 +42,7 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 		 * 
 		 */
 	private static final long serialVersionUID = 8028549445862365699L;
+	public static final String PREFIX_UNKNOWN_COL = "Col"; // only for reading headers, if a column does not have a name
 	public static final String CONF_MIMETYPE = "hadoopoffice.read.mimeType";
 	public static final String CONF_SHEETS = "hadoopoffice.read.sheets";
 	public static final String CONF_LOCALE = "hadoopoffice.read.locale.bcp47";
@@ -52,6 +57,9 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 																							// the corresponding reader
 																							// which does the filtering!
 	public static final String CONF_LOWFOOTPRINT = "hadoopoffice.read.lowFootprint";
+	public static final String CONF_LOWFOOTPRINT_PARSER = "hadoopoffice.read.lowFootprint.parser";
+	public static final String CONF_LOWFOOTPRINT_STAX_CACHE = "hadoopoffice.read.lowFootprint.stax.sst.cache";
+	public static final String CONF_LOWFOOTPRINT_STAX_COMPRESS = "hadoopoffice.read.lowFootprint.stax.sst.compress";
 	public static final String CONF_CRYKEYSTOREFILE = "hadoopoffice.read.security.crypt.credential.keystore.file";
 	public static final String CONF_CRYKEYSTORETYPE = "hadoopoffice.read.security.crypt.credential.keystore.type";
 	public static final String CONF_CRYKEYSTOREPW = "hadoopoffice.read.security.crypt.credential.keystore.password";
@@ -64,7 +72,25 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 	public static final String CONF_HEADERIGNOREHEADERALLSHEETS = "hadoopoffice.read.header.skipheaderinallsheets";
 	public static final String CONF_SKIPLINES = "hadoopoffice.read.sheet.skiplines.num";
 	public static final String CONF_SKIPLINESALLSHEETS = "hadoopoffice.read.sheet.skiplines.allsheets";
+	public static final String CONF_COLUMNNAMESREGEX = "hadoopoffice.read.header.column.names.regex";
+	public static final String CONF_COLUMNNAMESREPLACE = "hadoopoffice.read.header.column.names.replace";
 
+	
+	public static final String CONF_SIMPLEDATEFORMAT = "hadoopoffice.read.simple.dateFormat";
+
+	public static final String CONF_SIMPLEDATEPATTERN = "hadoopoffice.read.simple.datePattern";
+
+	public static final String CONF_SIMPLEDATETIMEFORMAT = "hadoopoffice.read.simple.dateTimeFormat";
+
+	public static final String CONF_SIMPLEDATETIMEPATTERN = "hadoopoffice.read.simple.dateTimePattern";
+	
+	public static final String CONF_SIMPLEDECIMALFORMAT = "hadoopoffice.read.simple.decimalFormat";
+	
+	
+	
+	
+	public static final String OPTION_LOWFOOTPRINT_PARSER_STAX = "stax"; // STAX parser uses pull mode meaning a real improvement for reading XML-based spreadsheet formats in low footprint mode
+	public static final String OPTION_LOWFOOTPRINT_PARSER_SAX = "sax"; // SAX parser uses push mode meaning despite low footprint mode a significant amount of data needs to be kept in memory
 	
 	public static final String DEFAULT_MIMETYPE = "";
 	public static final String DEFAULT_LOCALE = "";
@@ -73,7 +99,12 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 	public static final boolean DEFAULT_IGNOREMISSINGLINKEDWB = false;
 
 	public static final boolean DEFAULT_LOWFOOTPRINT = false;
+
 	public static final String DEFAULT_CRYKEYSTOREFILE = "";
+	public static final String DEFAULT_LOWFOOTPRINT_PARSER = HadoopOfficeReadConfiguration.OPTION_LOWFOOTPRINT_PARSER_SAX;
+	public static final int DEFAULT_LOWFOOTPRINT_STAX_CACHE = 10000;
+	public static final boolean DEFAULT_LOWFOOTPRINT_STAX_COMPRESS = false;
+	
 	public static final String DEFAULT_CRYKEYSTORETYPE = "JCEKS";
 	public static final String DEFAULT_CRYKEYSTOREPW = "";
 	public static final String DEFAULT_CRYKEYSTOREALIAS = "";
@@ -91,6 +122,23 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 	public static final Integer DEFAULT_SKIPLINES = 0;
 	public static final boolean DEFAULT_SKIPLINESALLSHEETS = false;
 	
+	public static final String DEFAULT_COLUMNNAMESREGEX = "";
+	public static final String DEFAULT_COLUMNNAMESREPLACE = "";
+
+	
+	public static final String DEFAULT_SIMPLEDATEFORMAT = "US";
+
+	public static final String DEFAULT_SIMPLEDATEPATTERN = "";
+
+	public static final String DEFAULT_SIMPLEDATETIMEFORMAT = "US";
+
+	public static final String DEFAULT_SIMPLEDATETIMEPATTERN = "";
+	
+	public static final String DEFAULT_SIMPLEDECIMALFORMAT = "";
+	
+	
+	
+	
 	private String fileName;
 	private String mimeType = null;
 	private String localeStrBCP47 = null;
@@ -102,6 +150,7 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 	private Map<String, String> metadataFilter;
 	private Map<String, String> linkedWBCredentialMap;
 	private boolean lowFootprint;
+	private String lowFootprintParser;
 	private String cryptKeystoreFile;
 	private String cryptKeystoreType;
 	private String cryptKeystorePassword;
@@ -115,7 +164,13 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 	private boolean ignoreHeaderInAllSheets;
     private int skipLines;
     private boolean skipLinesAllSheets;
-	
+	private String columnNameRegex;
+	private String columnNameReplace;
+	private SimpleDateFormat simpleDateFormat;
+	private SimpleDateFormat simpleDateTimeFormat;
+	private DecimalFormat simpleDecimalFormat;
+	private int sstCacheSize;
+	private boolean compressSST;
 
 	/*
 	 * Create an empty configuration
@@ -127,13 +182,15 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 		this.localeStrBCP47 = HadoopOfficeReadConfiguration.DEFAULT_LOCALE;
 		if (!("".equals(localeStrBCP47))) { // create locale
 			this.locale = new Locale.Builder().setLanguageTag(this.localeStrBCP47).build();
+		} else {
+			this.locale = Locale.getDefault();
 		}
 		this.readLinkedWorkbooks = HadoopOfficeReadConfiguration.DEFAULT_LINKEDWB;
 		this.ignoreMissingLinkedWorkbooks = HadoopOfficeReadConfiguration.DEFAULT_IGNOREMISSINGLINKEDWB;
 		this.password = null; // null if no password is set
 
 		this.lowFootprint = HadoopOfficeReadConfiguration.DEFAULT_LOWFOOTPRINT;
-
+		this.setLowFootprintParser(HadoopOfficeReadConfiguration.DEFAULT_LOWFOOTPRINT_PARSER);
 		this.setCryptKeystoreFile(HadoopOfficeReadConfiguration.DEFAULT_CRYKEYSTOREFILE);
 		this.setCryptKeystoreType(HadoopOfficeReadConfiguration.DEFAULT_CRYKEYSTORETYPE);
 		this.setCryptKeystorePassword(HadoopOfficeReadConfiguration.DEFAULT_CRYKEYSTOREPW);
@@ -148,66 +205,114 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 		this.setIgnoreHeaderInAllSheets(HadoopOfficeReadConfiguration.DEFAULT_HEADERIGNOREHEADERALLSHEETS);
 		this.setSkipLines(HadoopOfficeReadConfiguration.DEFAULT_SKIPLINES);
 	    this.setSkipLinesAllSheets(HadoopOfficeReadConfiguration.DEFAULT_SKIPLINESALLSHEETS);
+	    this.setColumnNameRegex(HadoopOfficeReadConfiguration.DEFAULT_COLUMNNAMESREGEX);
+	    this.setColumnNameReplace(HadoopOfficeReadConfiguration.DEFAULT_COLUMNNAMESREPLACE);
+
+		// set date for simple format
+		Locale dateLocale = Locale.getDefault();
+		if (!("".equals(HadoopOfficeReadConfiguration.DEFAULT_SIMPLEDATEFORMAT))) { // create locale
+			dateLocale = new Locale.Builder().setLanguageTag(HadoopOfficeReadConfiguration.DEFAULT_SIMPLEDATEFORMAT).build();
+		}
+		this.setSimpleDateFormat((SimpleDateFormat) DateFormat.getDateInstance(DateFormat.SHORT, dateLocale));
+		// set dateTime for simple format
+		Locale dateTimeLocale = Locale.getDefault();
+		if (!("".equals(HadoopOfficeReadConfiguration.DEFAULT_SIMPLEDATETIMEFORMAT))) { // create locale
+			dateTimeLocale = new Locale.Builder().setLanguageTag(HadoopOfficeReadConfiguration.DEFAULT_SIMPLEDATETIMEFORMAT).build();
+		}
+		this.setSimpleDateTimeFormat((SimpleDateFormat) DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, dateTimeLocale));
+		// check if should set pattern for date instead of locale
+		if (!"".equals(HadoopOfficeReadConfiguration.DEFAULT_SIMPLEDATEPATTERN)) {
+			this.setSimpleDateFormat(new SimpleDateFormat(HadoopOfficeReadConfiguration.DEFAULT_SIMPLEDATEPATTERN));
+		}
+		if (!"".equals(HadoopOfficeReadConfiguration.DEFAULT_SIMPLEDATETIMEPATTERN)) {
+			this.setSimpleDateTimeFormat(new SimpleDateFormat(HadoopOfficeReadConfiguration.DEFAULT_SIMPLEDATETIMEPATTERN));
+		}
+		// set decimal for simple format
+		Locale decimallocale = Locale.getDefault();
+		if (!"".equals(HadoopOfficeReadConfiguration.DEFAULT_SIMPLEDECIMALFORMAT)) {
+			decimallocale = new Locale.Builder().setLanguageTag(HadoopOfficeReadConfiguration.DEFAULT_SIMPLEDECIMALFORMAT).build();
+		}
+		this.setSimpleDecimalFormat((DecimalFormat) NumberFormat.getInstance(decimallocale));
 		// create an empty configuration
 		this.setX509CertificateChain(new HashSet<>());
+		this.setSstCacheSize(HadoopOfficeReadConfiguration.DEFAULT_LOWFOOTPRINT_STAX_CACHE);
+		this.setCompressSST(HadoopOfficeReadConfiguration.DEFAULT_LOWFOOTPRINT_STAX_COMPRESS);
+		
 	}
 
 	/**
 	 * Reasd HadoopOffice configuration from Hadoop configuration
 	 * 
-	 * @param conf
-	 *            * hadoopoffice.read.mimeType: Mimetype of the document
-	 *            hadoopoffice.read.locale: Locale of the document (e.g. needed for
+	 * @param conf <ul>
+	 *            <li> hadoopoffice.read.mimeType: Mimetype of the document </li>
+	 *            <li> hadoopoffice.read.locale: Locale of the document (e.g. needed for
 	 *            interpreting spreadsheets) in the BCP47 format (cf.
 	 *            https://tools.ietf.org/html/bcp47). If not specified then default
-	 *            system locale will be used. hadoopoffice.read.sheets: A ":"
+	 *            system locale will be used. </li>
+	 *            <li> hadoopoffice.read.sheets: A ":"
 	 *            separated list of sheets to be read. If not specified then all
-	 *            sheets will be read one after the other
-	 *            hadoopoffice.read.linkedworkbooks: true if linkedworkbooks should
+	 *            sheets will be read one after the other</li>
+	 *            <li> hadoopoffice.read.linkedworkbooks: true if linkedworkbooks should
 	 *            be fetched. They must be in the same folder as the main workbook.
 	 *            Linked Workbooks will be processed together with the main workbook
 	 *            on one node and thus it should be avoided to have a lot of linked
 	 *            workbooks. It does only read the linked workbooks that are
-	 *            directly linked to the main workbook. Default: false
-	 *            hadoopoffice.read.ignoremissinglinkedworkbooks: true if missing
-	 *            linked workbooks should be ignored. Default: false
-	 *            hadoopoffice.read.security.crypt.password: if set then
-	 *            hadoopoffice will try to decrypt the file
-	 *            hadoopoffice.read.security.crypt.linkedworkbooks.*: if set then
+	 *            directly linked to the main workbook. Default: false</li>
+	 *            <li> hadoopoffice.read.ignoremissinglinkedworkbooks: true if missing
+	 *            linked workbooks should be ignored. Default: false</li>
+	 *            <li> hadoopoffice.read.security.crypt.password: if set then</li>
+	 *            <li> hadoopoffice will try to decrypt the file</li>
+	 *            <li> hadoopoffice.read.security.crypt.linkedworkbooks.*: if set then
 	 *            hadoopoffice will try to decrypt all the linked workbooks where a
 	 *            password has been specified. If no password is specified then it
 	 *            is assumed that the linked workbook is not encrypted. Example:
 	 *            Property key for file "linkedworkbook1.xlsx" is
 	 *            "hadoopoffice.read.security.crypt.linkedworkbooks.linkedworkbook1.xslx".
 	 *            Value is the password. You must not include path or protocol
-	 *            information in the filename hadoopoffice.read.filter.metadata:
+	 *            information in the filename </li>
+	 *            <li> hadoopoffice.read.filter.metadata:
 	 *            filters documents according to metadata. For example,
 	 *            hadoopoffice.read.filter.metadata.author will filter by author and
 	 *            the filter defined as value. Filtering is done by the parser and
 	 *            it is recommended that it supports regular expression for
-	 *            filtering, but this is up to the parser!
-	 *            hadoopoffice.read.lowfootprint: uses low memory/cpu footprint for
+	 *            filtering, but this is up to the parser!</li>
+	 *            <li> hadoopoffice.read.lowfootprint: uses low memory/cpu footprint for
 	 *            reading documents. Note: In this mode certain features are not
-	 *            availanble, such as reading formulas. Default: false
+	 *            available, such as reading formulas. Default: false
 	 *            hadoopoffice.read.security.crypt.credential.keystore.file:
 	 *            keystore file that is used to store credentials, such as
 	 *            passwords, for reading secured office documents. Note that the
 	 *            alias in the keystore needs to correspond to the filename (without
-	 *            the path)
-	 *            hadoopoffice.read.security.crypt.credential.keystore.alias: alias
-	 *            for the password if different from filename
-	 *            hadoopoffice.read.security.crypt.credential.keystore.type:
-	 *            keystore type. Default: JCEKS
-	 *            hadoopoffice.read.security.crypt.credential.keystore.password:
-	 *            keystore password: password of the keystore
-	 *            hadoopoffice.read.security.sign.verifysignature: verify digital
+	 *            the path)</li>
+	 *            <li> hadoopoffice.read.security.crypt.credential.keystore.alias: alias
+	 *            for the password if different from filename</li>
+	 *            <li> hadoopoffice.read.security.crypt.credential.keystore.type:
+	 *            keystore type. Default: JCEKS</li>
+	 *            <li> hadoopoffice.read.security.crypt.credential.keystore.password:
+	 *            keystore password: password of the keystore</li>
+	 *            <li>hadoopoffice.read.security.sign.verifysignature: verify digital
 	 *            signature, true if it should be verfied, false if not. Default:
 	 *            false. Requires to add bc libaries to your dependencies (use
 	 *            latest version and upgrade regularly!). Note: The public key is
 	 *            included in the document itself and Excel (similarly to POI) does
 	 *            only verify if the signature belongs to the supplied public key.
 	 *            The link between the public key and a real identity (person) is
-	 *            part of other processes.
+	 *            part of other processes.</li>
+	 *            <li>hadoopoffice.read.security.sign.truststore.file: file to trust store to validate certification chain (if none is defined then certification chain is not validated) </li>
+	 *            <li>hadoopoffice.read.security.sign.truststore.type: format of truststore to validate certification chain. Default: JCEKS</li>
+	 *            <li> hadoopoffice.read.security.sign.truststore.password: password for truststore to validate certification chain</li>
+	 *            <li>hadoopoffice.read.header.read: if true then the next row of the first sheet is interpreted as header and ignored for subsequent reads (you can get the header row content by calling reader.getOfficeReader().getCurrentParser().getHeader()). Default false</li>
+	 *            <li>hadoopoffice.read.header.skipheaderinallsheets: if true then the next row in all sheet is interpreted as header and ignored. Default false.</li>
+	 *            <li>hadoopoffice.read.sheet.skiplines.num:number of rows to be skipped of the first Excel sheet. Default: 0. Note: this applies before reading the header. E.g. if the header row is in the 5th line then you can skip the previous 4 lines. </li>
+	 *            <li>hadoopoffice.read.sheet.skiplines.allsheets: skip number of rows configured using the previous option in all sheets.</li>
+	 *            <li>hadoopoffice.read.header.column.names.regex: regex to identify header names to be replaced (e.g. all dots in header names). Default: "" (no replacement)</li>
+	 *            <li>hadoopoffice.read.header.column.names.replace: string to replace all occurrences identified by hadoopoffice.read.header.column.names.regex in header names (e.g. replace by -). Default: "" (removal of identified occurrences)</li>
+	 *            <li>hadoopoffice.read.simple.dateFormat: applies only to HadoopOffice components that use the Converter to convert SpreadSheetCellDAOs into simple Java objects.  Describes the date format to interpret dates using the BCP47 notation. Note that even in non-US Excel versions Excel stores them most of the times internally in US format. Leave it empty for using the systems locale. Default: "US".</li>
+	 *            <li>hadoopoffice.read.simple.datePattern: applies only to HadoopOffice components that use the Converter to convert SpreadSheetCellDAOs into simple Java objects. Overrides "hadoopoffice.read.simple.dateFormat" - describes a date pattern according to the pattern in SimpleDateFormat - you can define any pattern that dates have</li>
+	 *            <li>hadoopoffice.read.simple.dateTimeFormat: applies only to HadoopOffice components that use the Converter to convert SpreadSheetCellDAOs into simple Java objects. Describes the date/time format to interpret date/timestamps using the BCP47 notation. Leave it empty for using the systems locale. Default: "US". </li>
+	 *            <li>hadoopoffice.read.simple.dateTimePattern: applies only to HadoopOffice components that use the Converter to convert SpreadSheetCellDAOs into simple Java objects. Overrides "hadoopoffice.read.simple.dateTimeFormat" - describes a date/time pattern according to the pattern in SimpleDateFormat - you can define any pattern that date/time have. Defaults to java.sql.Timestamp, if not specified</li>
+	 *            <li>hadoopoffice.read.simple.decimalFormat: applies only to HadoopOffice components that use the Converter to convert SpreadSheetCellDAOs into simple Java objects. Describes the decimal format to interpret decimal numbers using the BCP47 notation. Leave it empty for using the systems locale. Default: "".</li>
+	 *            </ul>
 	 * 
 	 */
 	public HadoopOfficeReadConfiguration(Configuration conf) {
@@ -230,7 +335,8 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 				HadoopOfficeReadConfiguration.CONF_DECRYPTLINKEDWBBASE);
 		this.lowFootprint = conf.getBoolean(HadoopOfficeReadConfiguration.CONF_LOWFOOTPRINT,
 				HadoopOfficeReadConfiguration.DEFAULT_LOWFOOTPRINT);
-
+		this.setLowFootprintParser(conf.get(HadoopOfficeReadConfiguration.CONF_LOWFOOTPRINT_PARSER,HadoopOfficeReadConfiguration.DEFAULT_LOWFOOTPRINT_PARSER));
+		
 		this.setCryptKeystoreFile(conf.get(HadoopOfficeReadConfiguration.CONF_CRYKEYSTOREFILE,
 				HadoopOfficeReadConfiguration.DEFAULT_CRYKEYSTOREFILE));
 		this.setCryptKeystoreType(conf.get(HadoopOfficeReadConfiguration.CONF_CRYKEYSTORETYPE,
@@ -254,7 +360,38 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 		this.setIgnoreHeaderInAllSheets(conf.getBoolean(HadoopOfficeReadConfiguration.CONF_HEADERIGNOREHEADERALLSHEETS, HadoopOfficeReadConfiguration.DEFAULT_HEADERIGNOREHEADERALLSHEETS));
 		this.setSkipLines(conf.getInt(HadoopOfficeReadConfiguration.CONF_SKIPLINES, HadoopOfficeReadConfiguration.DEFAULT_SKIPLINES));
 	    this.setSkipLinesAllSheets(conf.getBoolean(HadoopOfficeReadConfiguration.CONF_SKIPLINESALLSHEETS, HadoopOfficeReadConfiguration.DEFAULT_SKIPLINESALLSHEETS));
-		this.setX509CertificateChain(new HashSet<>());
+		
+	    this.setColumnNameRegex(conf.get(HadoopOfficeReadConfiguration.CONF_COLUMNNAMESREGEX,HadoopOfficeReadConfiguration.DEFAULT_COLUMNNAMESREGEX));
+	    this.setColumnNameReplace(conf.get(HadoopOfficeReadConfiguration.CONF_COLUMNNAMESREPLACE,HadoopOfficeReadConfiguration.DEFAULT_COLUMNNAMESREPLACE));
+
+		// set date for simple format
+		Locale dateLocale = new Locale.Builder().setLanguageTag(conf.get(HadoopOfficeReadConfiguration.CONF_SIMPLEDATEFORMAT,HadoopOfficeReadConfiguration.DEFAULT_SIMPLEDATEFORMAT)).build();	
+		this.setSimpleDateFormat((SimpleDateFormat) DateFormat.getDateInstance(DateFormat.SHORT, dateLocale));
+		// set dateTime for simple format
+
+		Locale	dateTimeLocale = new Locale.Builder().setLanguageTag(conf.get(HadoopOfficeReadConfiguration.CONF_SIMPLEDATETIMEFORMAT,HadoopOfficeReadConfiguration.DEFAULT_SIMPLEDATETIMEFORMAT)).build();
+		this.setSimpleDateTimeFormat((SimpleDateFormat) DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, dateTimeLocale));
+		// check if should set pattern for date instead of locale
+		String datePattern=conf.get(HadoopOfficeReadConfiguration.CONF_SIMPLEDATEPATTERN,HadoopOfficeReadConfiguration.DEFAULT_SIMPLEDATEPATTERN);
+		if (!"".equals(datePattern)) {
+			this.setSimpleDateFormat(new SimpleDateFormat(datePattern));
+		}
+		String dateTimePattern=conf.get(HadoopOfficeReadConfiguration.CONF_SIMPLEDATETIMEPATTERN,HadoopOfficeReadConfiguration.DEFAULT_SIMPLEDATETIMEPATTERN);
+		if (!"".equals(dateTimePattern)) {
+			this.setSimpleDateFormat(new SimpleDateFormat(dateTimePattern));
+		}
+		// set decimal for simple format
+		String decimaleStr = conf.get(HadoopOfficeReadConfiguration.CONF_SIMPLEDECIMALFORMAT,HadoopOfficeReadConfiguration.DEFAULT_SIMPLEDECIMALFORMAT);
+		Locale decimallocale = Locale.getDefault();
+		if (!"".equals(decimaleStr)){
+			decimallocale = new Locale.Builder().setLanguageTag(decimaleStr).build();
+		}
+		this.setSimpleDecimalFormat((DecimalFormat) NumberFormat.getInstance(decimallocale));
+
+	    
+	    this.setX509CertificateChain(new HashSet<>());
+	    this.setSstCacheSize(conf.getInt(HadoopOfficeReadConfiguration.CONF_LOWFOOTPRINT_STAX_CACHE, HadoopOfficeReadConfiguration.DEFAULT_LOWFOOTPRINT_STAX_CACHE));
+	    this.setCompressSST(conf.getBoolean(HadoopOfficeReadConfiguration.CONF_LOWFOOTPRINT_STAX_COMPRESS, HadoopOfficeReadConfiguration.DEFAULT_LOWFOOTPRINT_STAX_COMPRESS));
 	}
 
 	/*
@@ -565,5 +702,71 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 	public void setSkipLinesAllSheets(boolean skipLinesAllSheets) {
 		this.skipLinesAllSheets = skipLinesAllSheets;
 	}
+
+	public String getLowFootprintParser() {
+		return lowFootprintParser;
+	}
+
+	public void setLowFootprintParser(String lowFootprintParser) {
+		this.lowFootprintParser = lowFootprintParser;
+	}
+
+	public String getColumnNameRegex() {
+		return columnNameRegex;
+	}
+
+	public void setColumnNameRegex(String columnNameRegex) {
+		this.columnNameRegex = columnNameRegex;
+	}
+
+	public String getColumnNameReplace() {
+		return columnNameReplace;
+	}
+
+	public void setColumnNameReplace(String columnNameReplace) {
+		this.columnNameReplace = columnNameReplace;
+	}
+
+	public SimpleDateFormat getSimpleDateFormat() {
+		return simpleDateFormat;
+	}
+
+	public void setSimpleDateFormat(SimpleDateFormat simpleDateFormat) {
+		this.simpleDateFormat = simpleDateFormat;
+	}
+
+	public SimpleDateFormat getSimpleDateTimeFormat() {
+		return simpleDateTimeFormat;
+	}
+
+	public void setSimpleDateTimeFormat(SimpleDateFormat simpleDateTimeFormat) {
+		this.simpleDateTimeFormat = simpleDateTimeFormat;
+	}
+
+	public DecimalFormat getSimpleDecimalFormat() {
+		return simpleDecimalFormat;
+	}
+
+	public void setSimpleDecimalFormat(DecimalFormat simpleDecimalFormat) {
+		this.simpleDecimalFormat = simpleDecimalFormat;
+	}
+
+	public int getSstCacheSize() {
+		return sstCacheSize;
+	}
+
+	public void setSstCacheSize(int sstCacheSize) {
+		this.sstCacheSize = sstCacheSize;
+	}
+
+	public boolean getCompressSST() {
+		return compressSST;
+	}
+
+	public void setCompressSST(boolean compressSST) {
+		this.compressSST = compressSST;
+	}
+	
+
 
 }

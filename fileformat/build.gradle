@@ -88,8 +88,8 @@ publishing {
 dependencies {
 
    // Apache POI (for Excel parsing)
-   compile("org.apache.poi:poi:3.17")
-   compile("org.apache.poi:poi-ooxml:3.17")
+   compile("org.apache.poi:poi:4.0.0")
+   compile("org.apache.poi:poi-ooxml:4.0.0")
    // for signing and verification of signatures
     provided("org.bouncycastle:bcprov-ext-jdk15on:1.59")
     provided("org.bouncycastle:bcpkix-jdk15on:1.59")

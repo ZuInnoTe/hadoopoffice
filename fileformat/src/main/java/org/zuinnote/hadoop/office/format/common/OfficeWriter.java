@@ -26,13 +26,11 @@ import java.util.Map;
 
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
-
-
-import org.zuinnote.hadoop.office.format.common.writer.MSExcelWriter;
 import org.zuinnote.hadoop.office.format.common.writer.OfficeSpreadSheetWriterInterface;
 import org.zuinnote.hadoop.office.format.common.writer.OfficeWriterException;
+import org.zuinnote.hadoop.office.format.common.writer.msexcel.MSExcelLowFootprintWriter;
+import org.zuinnote.hadoop.office.format.common.writer.msexcel.MSExcelWriter;
 import org.zuinnote.hadoop.office.format.common.writer.InvalidWriterConfigurationException;
-import org.zuinnote.hadoop.office.format.common.writer.MSExcelLowFootprintWriter;
  
 
 /*

@@ -51,6 +51,7 @@ import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericInteg
 import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericLongDataType;
 import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericShortDataType;
 import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericStringDataType;
+import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericTimestampDataType;
 import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 import org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException;
 
@@ -200,6 +201,78 @@ public class ExcelConverterSimpleSpreadSheetCellDAOTest {
 	    		assertEquals((short)100,simpleRow6[6], "G7 = 100");
 	    		assertEquals((int)10000,simpleRow6[7], "H7 = 10000");
 	    		assertEquals(10L,simpleRow6[8], "I6 = 10");
+	    }
+	    
+	    
+	    @Test
+	    public void convertCaseTestDateTimeStamp() throws FileNotFoundException, FormatNotUnderstoodException, ParseException {
+	    	ClassLoader classLoader = getClass().getClassLoader();
+			String fileName="datetimestamp.xlsx";
+			String fileNameSpreadSheet=classLoader.getResource(fileName).getFile();	
+    			File file = new File(fileNameSpreadSheet);
+	    		HadoopOfficeReadConfiguration hocr = new HadoopOfficeReadConfiguration();
+	    		hocr.setFileName(fileName);
+	    		hocr.setMimeType("ms-excel");
+	    		hocr.setLocale(Locale.GERMAN);
+	    		OfficeReader officeReader = new OfficeReader(new FileInputStream(file), hocr);  
+	    		officeReader.parse();
+	    		// read excel file
+	    		ArrayList<SpreadSheetCellDAO[]> excelContent = new ArrayList<>();
+	    		SpreadSheetCellDAO[] currentRow =(SpreadSheetCellDAO[]) officeReader.getNext();
+	   
+	    		while (currentRow!=null) {
+	    			excelContent.add(currentRow);
+	    			currentRow = (SpreadSheetCellDAO[]) officeReader.getNext();
+	    		
+	    		}
+	    		
+	    		assertEquals(5,excelContent.size(),"5 rows (including header) read");
+	    		// configure converter
+	    		SimpleDateFormat dateFormat = (SimpleDateFormat)DateFormat.getDateInstance(DateFormat.SHORT, Locale.US);
+	    		SimpleDateFormat timeStampFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+	    		
+	    		DecimalFormat decimalFormat = (DecimalFormat) DecimalFormat.getInstance(Locale.GERMAN);
+	    		ExcelConverterSimpleSpreadSheetCellDAO converter = new ExcelConverterSimpleSpreadSheetCellDAO(dateFormat,decimalFormat,timeStampFormat);
+	    		///// auto detect schema (skip header)
+	    		for (int i=1;i<excelContent.size();i++) {
+	    			converter.updateSpreadSheetCellRowToInferSchemaInformation(excelContent.get(i));
+	    		}
+	    		GenericDataType[] schema = converter.getSchemaRow();
+	    		// check schema
+	    		
+	    		assertEquals(3,schema.length,"File contains three columns");
+	    		assertTrue(schema[0] instanceof GenericDateDataType, "First column is a date");
+	    		//assertFalse(((GenericDateDataType)schema[0]).getIncludeTime(),"First column does not contain time data");
+	    		assertTrue(schema[1] instanceof GenericTimestampDataType, "Second column is a timestamp");
+	    		//assertFalse(((GenericDateDataType)schema[1]).getIncludeTime(),"Second column contains time data");
+	    		assertTrue(schema[2] instanceof GenericTimestampDataType, "Third column is a timestamp");
+	    		//assertFalse(((GenericDateDataType)schema[2]).getIncludeTime(),"Third column contains time data");
+	    		// first row skip header beforehand
+	    		///// check conversion
+	    		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+	    		SimpleDateFormat sdfTime =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	    		// check data (skip row 0, because it contains header)
+	    
+	    		Object[] simpleRow1 = converter.getDataAccordingToSchema(excelContent.get(1));
+	    		assertEquals(sdf.parse("2018-08-07"),simpleRow1[0],"A2 = 2018-08-07");
+	    		assertEquals(sdfTime.parse("2018-08-07 12:00:00"),simpleRow1[1],"B2 = 2018-08-07 12:00:00");
+	    		assertEquals(Timestamp.valueOf("2018-08-08 12:00:00.001"),simpleRow1[2],"C2 = 2018-08-08 12:00:00.001");
+	    		Object[] simpleRow2 = converter.getDataAccordingToSchema(excelContent.get(2));
+	    		assertEquals(sdf.parse("1999-03-03"),simpleRow2[0],"A3 = 1999-03-03");
+	    		assertEquals(sdfTime.parse("1999-03-03 13:00:00"),simpleRow2[1],"B3 = 1999-03-03 13:00:00");
+	    		assertEquals(Timestamp.valueOf("2006-02-26 13:01:01.002"),simpleRow2[2],"C3 = 2006-02-26 13:01:01.002");
+
+	    		Object[] simpleRow3 = converter.getDataAccordingToSchema(excelContent.get(3));
+	    		assertEquals(sdf.parse("2000-02-29"),simpleRow3[0],"A4 = 2000-02-29");
+	    		assertEquals(sdfTime.parse("2000-02-29 13:01:01"),simpleRow3[1],"B4 = 2000-02-29 13:01:01");
+	    		assertEquals(Timestamp.valueOf("2000-02-29 13:01:01.002"),simpleRow3[2],"C4 = 2000-02-29 13:01:01.002");
+
+	    		Object[] simpleRow4 = converter.getDataAccordingToSchema(excelContent.get(4));
+	    		assertEquals(sdf.parse("1999-12-31"),simpleRow4[0],"A5 = 1999-12-31");
+	    		assertEquals(sdfTime.parse("1999-12-31 00:00:00"),simpleRow4[1],"B5 = 1999-12-31 00:00:00");
+	    		assertEquals(Timestamp.valueOf("1999-12-31 23:59:59.003"),simpleRow4[2],"C4 = 1999-12-31 23:59:59.003");
+	    		
+	    	
 	    }
 	    
 	    

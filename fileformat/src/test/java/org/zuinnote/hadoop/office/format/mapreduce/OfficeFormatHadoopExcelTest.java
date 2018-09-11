@@ -47,7 +47,6 @@ import org.apache.hadoop.conf.Configuration;
 
 import org.apache.hadoop.io.compress.BZip2Codec;
 import org.apache.hadoop.io.compress.GzipCodec;
-
 import org.apache.hadoop.io.compress.CompressionCodec;
 
 import org.apache.hadoop.util.ReflectionUtils;
@@ -1497,6 +1496,37 @@ public class OfficeFormatHadoopExcelTest {
 		assertEquals("Sheet2", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getSheetName(), "Correct sheet");
 		assertFalse(reader.nextKeyValue(), "Input Split for Excel file contains no further row");
 	}
+	
+	@Test
+	public void readExcelInputFormatExcel2013MultiSheetHeaderRegEx() throws IOException, InterruptedException {
+		Configuration conf = new Configuration(defaultConf);
+		ClassLoader classLoader = getClass().getClassLoader();
+		String fileName = "multisheetheader.xlsx";
+		String fileNameSpreadSheet = classLoader.getResource(fileName).getFile();
+		Path file = new Path(fileNameSpreadSheet);
+		// set locale to the one of the test data
+		conf.set("hadoopoffice.read.locale.bcp47", "us");
+		conf.set("hadoopoffice.read.header.read", "true");
+		conf.set("hadoopoffice.read.header.skipheaderinallsheets", "true");
+		conf.set("hadoopoffice.read.header.column.names.regex","column");
+		conf.set("hadoopoffice.read.header.column.names.replace", "spalte");
+		Job job = Job.getInstance(conf);
+		FileInputFormat.setInputPaths(job, file);
+		TaskAttemptContext context = new TaskAttemptContextImpl(conf, new TaskAttemptID());
+		ExcelFileInputFormat format = new ExcelFileInputFormat();
+		List<InputSplit> splits = format.getSplits(job);
+		assertEquals(1, splits.size(), "Only one split generated for Excel file");
+		RecordReader<Text, ArrayWritable> reader = format.createRecordReader(splits.get(0), context);
+		assertNotNull(reader, "Format returned  null RecordReader");
+		reader.initialize(splits.get(0), context);
+
+		assertEquals("spalte1", ((ExcelRecordReader) reader).getOfficeReader().getCurrentParser().getHeader()[0],
+				" header column 1 correctly read");
+		assertEquals("spalte2", ((ExcelRecordReader) reader).getOfficeReader().getCurrentParser().getHeader()[1],
+				" header column 2 correctly read");
+		assertEquals("spalte3", ((ExcelRecordReader) reader).getOfficeReader().getCurrentParser().getHeader()[2],
+				" header column 3 correctly read");
+	}
 
 	@Test
 	public void readExcelInputFormatExcel2013MultiSheetHeaderLowFootPrint() throws IOException, InterruptedException {
@@ -1654,6 +1684,38 @@ public class OfficeFormatHadoopExcelTest {
 		assertEquals("C4", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getAddress(), "Correct address");
 		assertEquals("Sheet2", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getSheetName(), "Correct sheet");
 		assertFalse(reader.nextKeyValue(), "Input Split for Excel file contains no further row");
+	}
+	
+	@Test
+	public void readExcelInputFormatExcel2013MultiSheetHeaderRegExLowFootprint() throws IOException, InterruptedException {
+		Configuration conf = new Configuration(defaultConf);
+		ClassLoader classLoader = getClass().getClassLoader();
+		String fileName = "multisheetheader.xlsx";
+		String fileNameSpreadSheet = classLoader.getResource(fileName).getFile();
+		Path file = new Path(fileNameSpreadSheet);
+		// set locale to the one of the test data
+		conf.set("hadoopoffice.read.locale.bcp47", "us");
+		conf.set("hadoopoffice.read.header.read", "true");
+		conf.set("hadoopoffice.read.header.skipheaderinallsheets", "true");
+		conf.set("hadoopoffice.read.header.column.names.regex","column");
+		conf.set("hadoopoffice.read.header.column.names.replace", "spalte");
+		conf.set("hadoopoffice.read.lowFootprint", "true");
+		Job job = Job.getInstance(conf);
+		FileInputFormat.setInputPaths(job, file);
+		TaskAttemptContext context = new TaskAttemptContextImpl(conf, new TaskAttemptID());
+		ExcelFileInputFormat format = new ExcelFileInputFormat();
+		List<InputSplit> splits = format.getSplits(job);
+		assertEquals(1, splits.size(), "Only one split generated for Excel file");
+		RecordReader<Text, ArrayWritable> reader = format.createRecordReader(splits.get(0), context);
+		assertNotNull(reader, "Format returned  null RecordReader");
+		reader.initialize(splits.get(0), context);
+
+		assertEquals("spalte1", ((ExcelRecordReader) reader).getOfficeReader().getCurrentParser().getHeader()[0],
+				" header column 1 correctly read");
+		assertEquals("spalte2", ((ExcelRecordReader) reader).getOfficeReader().getCurrentParser().getHeader()[1],
+				" header column 2 correctly read");
+		assertEquals("spalte3", ((ExcelRecordReader) reader).getOfficeReader().getCurrentParser().getHeader()[2],
+				" header column 3 correctly read");
 	}
 
 	@Test

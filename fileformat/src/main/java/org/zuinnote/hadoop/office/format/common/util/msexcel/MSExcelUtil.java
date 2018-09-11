@@ -14,7 +14,7 @@
 * limitations under the License.
 **/
 
-package org.zuinnote.hadoop.office.format.common.util;
+package org.zuinnote.hadoop.office.format.common.util.msexcel;
 
 import org.apache.poi.ss.util.CellAddress;
 

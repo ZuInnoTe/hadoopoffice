@@ -13,7 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 **/
-package org.zuinnote.hadoop.office.format.common.writer;
+package org.zuinnote.hadoop.office.format.common.writer.msexcel;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -75,7 +75,12 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.zuinnote.hadoop.office.format.common.HadoopOfficeWriteConfiguration;
 import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 import org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException;
-import org.zuinnote.hadoop.office.format.common.util.MSExcelOOXMLSignUtil;
+import org.zuinnote.hadoop.office.format.common.util.msexcel.MSExcelOOXMLSignUtil;
+import org.zuinnote.hadoop.office.format.common.writer.InvalidWriterConfigurationException;
+import org.zuinnote.hadoop.office.format.common.writer.OfficeSpreadSheetWriterInterface;
+import org.zuinnote.hadoop.office.format.common.writer.OfficeWriterException;
+import org.zuinnote.hadoop.office.format.common.writer.msexcel.internal.EncryptedTempData;
+import org.zuinnote.hadoop.office.format.common.writer.msexcel.internal.SecureSXSSFWorkbook;
 
 /**
  * @author Jörn Franke (zuinnote@gmail.com)
@@ -198,8 +203,14 @@ public MSExcelLowFootprintWriter(String excelFormat, HadoopOfficeWriteConfigurat
 			if (this.signUtil!=null) {
 				this.currentWorkbook.write(this.signUtil.getTempOutputStream());
 			} else {
+	
 				this.currentWorkbook.write(this.osStream);
+				if (this.osStream!=null) {
+					this.osStream.close();
+				}
 			}
+			
+		
 		} else {
 			// encrypt if needed
 	
@@ -209,7 +220,13 @@ public MSExcelLowFootprintWriter(String excelFormat, HadoopOfficeWriteConfigurat
 			
 			enc.confirmPassword(this.howc.getPassword());
 			try {
-				this.currentWorkbook.write(enc.getDataStream(fs));
+				OutputStream os = enc.getDataStream(fs);
+				if (os!=null) {
+					this.currentWorkbook.write(os);
+				}
+				if (os!=null) {
+					os.close();
+				}
 			} catch (GeneralSecurityException e) {
 				
 				LOG.error(e);
@@ -260,203 +277,10 @@ public MSExcelLowFootprintWriter(String excelFormat, HadoopOfficeWriteConfigurat
 	}
 	
 
-	/**
-	 * 
-	 * This class is inspired by https://bz.apache.org/bugzilla/show_bug.cgi?id=60321 to create - in case of encrypted excel - also use encrypted and compressed temporary files
-	 *
-	 * The underlying ideas of the examples have been enhanced, e.g. temporary data is encrypted with the same algorithm as the output data. The examples uses only AES128, which may not be sufficient for all cases of confidential data
-	 * 
-	 */
-	public class SecureSXSSFWorkbook extends SXSSFWorkbook {
-		private CipherAlgorithm ca;
-		private ChainingMode cm;
-		
-		public SecureSXSSFWorkbook(int cacherows, CipherAlgorithm ca, ChainingMode cm) {
-			super(cacherows);
-			setCompressTempFiles(true);
-			this.ca=ca;
-			this.cm=cm;
-		}
-		
-		@Override
-		public void write(OutputStream stream) throws IOException {
-			
-			this.flushSheets();
-			EncryptedTempData tempData = new EncryptedTempData(this.ca,this.cm);
-			ZipEntrySource source = null;
-			
-				OutputStream os = tempData.getOutputStream();
-				try {
-					getXSSFWorkbook().write(os);
-				} finally {
-					IOUtils.closeQuietly(os);
-				}
-				// provide ZipEntrySoruce to poi to decrypt on the fly (if necessary)
-				source = new EncryptedZipEntrySource(this.ca,this.cm);
-				((EncryptedZipEntrySource)source).setInputStream(tempData.getInputStream());
-				injectData(source,stream);
-		
-				tempData.dispose();
-		
-			
-		}
-	}
+
 	
-	public class EncryptedTempData {
-		private CipherAlgorithm ca;
-		private ChainingMode cm;
-		private Cipher ciEncrypt;
-		private Cipher ciDecrypt;
-		private File tempFile;
-		
-		public EncryptedTempData(CipherAlgorithm ca, ChainingMode cm) throws IOException {
-			// generate random key for temnporary files
-			if (ca!=null) {
-						SecureRandom sr = new SecureRandom();
-						byte[] iv = new byte[ca.blockSize];
-						byte[] key = new byte[ca.defaultKeySize/8];
-						sr.nextBytes(iv);
-						sr.nextBytes(key);
-						SecretKeySpec skeySpec = new SecretKeySpec(key,ca.jceId);
-						this.ca = ca;
-						this.cm = cm;
-						this.ciEncrypt=CryptoFunctions.getCipher(skeySpec, ca, cm, iv, Cipher.ENCRYPT_MODE,"PKCS5Padding");
-						this.ciDecrypt=CryptoFunctions.getCipher(skeySpec, ca, cm, iv, Cipher.DECRYPT_MODE,"PKCS5Padding");
-			}
-					this.tempFile=TempFile.createTempFile("hadooffice-poi-temp-data",".tmp");
-		}
-		
-		public OutputStream getOutputStream() throws FileNotFoundException {
-			if (this.ciEncrypt!=null) { // encrypted tempdata
-				LOG.debug("Returning encrypted OutputStream for "+this.tempFile.getAbsolutePath());
-				
-				return new CipherOutputStream(new FileOutputStream(this.tempFile),this.ciEncrypt);
-			}
-			return new FileOutputStream(this.tempFile);
-		}
-		
-		public InputStream getInputStream() throws FileNotFoundException {
-			if (this.ciDecrypt!=null) { // decrypt tempdata
-				LOG.debug("Returning decrypted InputStream for "+this.tempFile.getAbsolutePath());
-				LOG.debug("Size of temp file: "+this.tempFile.length());
-				return new CipherInputStream(new FileInputStream(this.tempFile),this.ciDecrypt);
-			}
-			return new FileInputStream(this.tempFile);
-		}
-		
-		public void dispose() {
-			if (!this.tempFile.delete()) {
-				LOG.warn("Could not delete temporary files");
-			}
-		}
-	}
 	
-	public class EncryptedZipEntrySource implements ZipEntrySource {
-
-		private ZipFile zipFile;
-		private CipherAlgorithm ca;
-		private ChainingMode cm;
-		private Cipher ciEncoder;
-		private Cipher ciDecoder;
-		private File tmpFile;
-		private boolean closed;
-
-		public EncryptedZipEntrySource( CipherAlgorithm ca, ChainingMode cm) throws ZipException, IOException {
-			// generate random key for temporary files
-			if (ca!=null) { // encrypted files
-				SecureRandom sr = new SecureRandom();
-				byte[] iv = new byte[ca.blockSize];
-				byte[] key = new byte[ca.defaultKeySize/8];
-				sr.nextBytes(iv);
-				sr.nextBytes(key);
-				SecretKeySpec skeySpec = new SecretKeySpec(key,ca.jceId);
-				this.ca = ca;
-				this.cm = cm;
-				this.ciEncoder=CryptoFunctions.getCipher(skeySpec, ca, cm, iv, Cipher.ENCRYPT_MODE,"PKCS5Padding");
-				this.ciDecoder=CryptoFunctions.getCipher(skeySpec, ca, cm, iv, Cipher.DECRYPT_MODE,"PKCS5Padding");
-			}
-			
-			
-			this.closed=false;
-		
-		}
-		
-		@Override
-		public Enumeration<? extends ZipEntry> getEntries() {
-			return zipFile.entries();
-		}
-		
-		public void setInputStream(InputStream is) throws IOException {
-			this.tmpFile = TempFile.createTempFile("hadoopoffice-protected", ".zip");
-			
-			ZipInputStream zis = new ZipInputStream(is);
-			FileOutputStream fos = new FileOutputStream(tmpFile);
-			ZipOutputStream zos = new ZipOutputStream(fos);
-			ZipEntry ze;
-			while ((ze = zis.getNextEntry()) !=null) {
-				// rewrite zip entries to match the size of the encrypted data (with padding)
-				ZipEntry zeNew = new ZipEntry(ze.getName());
-				zeNew.setComment(ze.getComment());
-				zeNew.setExtra(ze.getExtra());
-				zeNew.setTime(ze.getTime());
-				zos.putNextEntry(zeNew);
-				FilterOutputStream fos2 = new FilterOutputStream(zos) {
-					// do not close underlyzing ZipOutputStream
-					@Override
-					public void close() {}
-				};
-				OutputStream nos;
-				if (this.ciEncoder!=null) { // encrypt if needed
-					nos= new CipherOutputStream(fos2,this.ciEncoder);
-				} else { // do not encrypt
-					nos = fos2;
-				}
-				IOUtils.copy(zis, nos);
-				nos.close();
-				if (fos2!=null) {
-					fos2.close();
-				}
-				zos.closeEntry();
-				zis.closeEntry();
-			}
-			zos.close();
-			fos.close();
-			zis.close();
-			IOUtils.closeQuietly(is);
-			this.zipFile=new ZipFile(this.tmpFile);
-			
-		}
-
-		@Override
-		public InputStream getInputStream(ZipEntry entry) throws IOException {
-			InputStream is = this.zipFile.getInputStream(entry);
-			if (this.ciDecoder!=null) {
-				return new CipherInputStream(is,this.ciDecoder);
-			}
-			return is;
-		}
-
-		@Override
-		public void close() throws IOException {
-			if (!this.closed) {
-				this.zipFile.close();
-				if (this.tmpFile!=null) {
-					
-					if (!this.tmpFile.delete()) {
-						LOG.warn("Could not delete temporary files");
-					}
-				}
-			}
-			this.closed=true;
-		}
-
-		@Override
-		public boolean isClosed() {
-			
-			return this.closed;
-		}
-		
-	}
+	
 	
 
 }

@@ -14,7 +14,7 @@
 * limitations under the License.
 **/
 
-package org.zuinnote.hadoop.office.format.common.parser;
+package org.zuinnote.hadoop.office.format.common.parser.msexcel;
 
 import java.io.InputStream;
 import java.io.IOException;
@@ -30,6 +30,7 @@ import java.util.Iterator;
 
 import org.apache.poi.hssf.model.InternalWorkbook;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ooxml.POIXMLProperties;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Cell;
@@ -42,14 +43,13 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory; 
 import org.apache.poi.xssf.model.ExternalLinksTable;
 import org.apache.poi.EncryptedDocumentException;
-import org.apache.poi.POIXMLProperties;
 import org.apache.poi.hpsf.SummaryInformation;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.poifs.crypt.dsig.SignatureConfig;
 import org.apache.poi.poifs.crypt.dsig.SignatureInfo;
-import org.apache.poi.poifs.crypt.dsig.SignatureInfo.SignaturePart;
+import org.apache.poi.poifs.crypt.dsig.SignaturePart;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 
@@ -63,6 +63,8 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.zuinnote.hadoop.office.format.common.HadoopOfficeReadConfiguration;
 import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
+import org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException;
+import org.zuinnote.hadoop.office.format.common.parser.OfficeReaderParserInterface;
 import org.zuinnote.hadoop.office.format.common.util.CertificateChainVerificationUtil;
 
 /*
@@ -156,7 +158,7 @@ private int currentSkipLine=0;
 	
 			try {
 				this.currentWorkbook=WorkbookFactory.create(in,this.hocr.getPassword());
-			} catch (EncryptedDocumentException | InvalidFormatException | IOException e) {
+			} catch (EncryptedDocumentException  | IOException e) {
 				LOG.error(e);
 				throw new FormatNotUnderstoodException(e.toString());
 			} finally 
@@ -226,18 +228,17 @@ private int currentSkipLine=0;
 		 this.currentRow+=this.hocr.getSkipLines();
 		 // check header
 		 if (this.hocr.getReadHeader()) {
+			
 			 LOG.debug("Reading header...");
 			 Object[] firstRow = this.getNext();
 			 if (firstRow!=null) {
 				 this.header=new String[firstRow.length];
 				 for (int i=0;i<firstRow.length;i++) {
-					 if ((firstRow[i]!=null) && (!"".equals(firstRow[i]))) {
+					 if ((firstRow[i]!=null) && (!"".equals(((SpreadSheetCellDAO)firstRow[i]).getFormattedValue()))) {
 						 this.header[i]=((SpreadSheetCellDAO)firstRow[i]).getFormattedValue();
-					 } else {
-						 LOG.warn("Header at position "+i+" does not contain a cell or is the empty string");
-						 this.header[i]="Column"+i;
 					 }
 				 }
+				 this.header=MSExcelParser.sanitizeHeaders(this.header, this.hocr.getColumnNameRegex(), this.hocr.getColumnNameReplace());
 			 } else {
 				 this.header=new String[0];
 			 }
@@ -969,4 +970,45 @@ private int currentSkipLine=0;
 		return this.header;
 	}
 
+	/**
+	 * Sanitize headers
+	 * 1) Replace empty/null column names by "Col" + column number
+	 * 2) Replace duplicate column names by column name + increasing number
+	 * 3) Replace column names based on regular expressions with another string (useful in case your Big Data platform does not support certain characters in the column String)
+	 * 
+	 * 
+	 * @param headers original headers to sanitize
+	 * @param regex regex to be searched in each column name (all occurrences, see String.replaceAll)
+	 * @param replace String to replace the matched regular expression
+	 * @return sanitized headers
+	 */
+	
+	public static String[] sanitizeHeaders(String[] headers, String regex, String replace) {
+		String result[] = new String[headers.length];
+		 HashMap<String,Integer> headerHashMap = new HashMap<>(); // for detecting duplicates
+		for (int i=0;i<headers.length;i++) {
+			String currentColumn=headers[i];
+			// if column name is empty create artificial column name
+			if ((currentColumn==null) || "".equals(currentColumn)) {
+				currentColumn= HadoopOfficeReadConfiguration.PREFIX_UNKNOWN_COL+i;
+				
+			} 				 
+			// apply regex to column name
+			if ((regex!=null) && (!"".equals(regex))) {
+				currentColumn=currentColumn.replaceAll(regex, replace);
+			}
+			// check if column name already exist
+			Integer existingEntry = headerHashMap.get(currentColumn);
+			if (existingEntry==null) {
+				 existingEntry = 1;
+				 
+			 } else {
+				 existingEntry+=1;
+				 currentColumn+=existingEntry;
+			 }
+			result[i]=currentColumn;
+			headerHashMap.put(currentColumn, existingEntry);
+		}
+		return result;
+	}
 }

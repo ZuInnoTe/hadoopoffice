@@ -19,13 +19,17 @@ package org.zuinnote.hadoop.office.format.common.converter;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.FieldPosition;
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -45,7 +49,7 @@ import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericShort
 import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericStringDataType;
 import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericTimestampDataType;
 import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
-import org.zuinnote.hadoop.office.format.common.util.MSExcelUtil;
+import org.zuinnote.hadoop.office.format.common.util.msexcel.MSExcelUtil;
 
 /**
  * This class allows to infer the Java datatypes underlying a SpreadSheet and
@@ -62,21 +66,36 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 
 	private List<GenericDataType> schemaRow;
 	private SimpleDateFormat dateFormat;
+	private SimpleDateFormat dateTimeFormat;
 	private DecimalFormat decimalFormat;
+
+	private Calendar converterCalendar;
 
 	/***
 	 * Create a new converter
 	 * 
-	 * @param dateFormat
-	 *            format of the dates in the Excel
-	 * @param decimalFormat
-	 *            format of the decimals in the Excel
+	 * @param dateFormat    format of the dates in the Excel
+	 * @param decimalFormat format of the decimals in the Excel
 	 */
 	public ExcelConverterSimpleSpreadSheetCellDAO(SimpleDateFormat dateFormat, DecimalFormat decimalFormat) {
+		this(dateFormat,decimalFormat,null);
+	}
+
+	/***
+	 * Create a new converter
+	 * 
+	 * @param dateFormat     format of the dates in the Excel
+	 * @param decimalFormat  format of the decimals in the Excel
+	 * @param dateTimeFormat format of date time cells in the Excel
+	 */
+	public ExcelConverterSimpleSpreadSheetCellDAO(SimpleDateFormat dateFormat, DecimalFormat decimalFormat,
+			SimpleDateFormat dateTimeFormat) {
 		this.schemaRow = new ArrayList<>();
 		this.dateFormat = dateFormat;
 		this.decimalFormat = decimalFormat;
 		this.decimalFormat.setParseBigDecimal(true);
+		this.dateTimeFormat = dateTimeFormat;
+		this.converterCalendar = Calendar.getInstance(this.dateFormat.getTimeZone());
 	}
 
 	/***
@@ -101,6 +120,7 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 						this.schemaRow.add(null);
 					}
 				}
+				// check if boolean data type
 				if ((currentSpreadSheetCellDAO.getFormattedValue() != null)
 						&& (!"".equals(currentSpreadSheetCellDAO.getFormattedValue()))) { // skip null value
 					String currentCellValue = currentSpreadSheetCellDAO.getFormattedValue();
@@ -118,7 +138,39 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 							this.schemaRow.set(j, new GenericBooleanDataType());
 						}
 					}
+					// check if timestamp using provided format
+					if (!dataTypeFound) {
+						if (this.dateTimeFormat!=null) { // only if a format is specified
+							Date theDate = this.dateTimeFormat.parse(currentCellValue, new ParsePosition(0));
+							if (theDate !=null) { // we found indeed a date time
+								
+								dataTypeFound = true;
+								if (this.schemaRow.get(j) != null) { // check if previous assumption was date
 
+									if (!(this.schemaRow.get(j) instanceof GenericTimestampDataType)) {
+										// if not then the type needs to be set to string
+										this.schemaRow.set(j, new GenericStringDataType());
+									} 
+								} else { // we face this the first time
+									this.schemaRow.set(j, new GenericTimestampDataType());
+		
+								}
+								
+							}
+						}
+					}
+					 // check for timestamp using java.sql.Timestamp
+					if (!dataTypeFound) {
+						
+						try {
+							java.sql.Timestamp ts = java.sql.Timestamp.valueOf(currentCellValue);
+							dataTypeFound=true;
+							this.schemaRow.set(j, new GenericTimestampDataType());
+						} catch (IllegalArgumentException e) {
+							LOG.warn("Could not identify timestamp using TimeStamp.valueOf. Trying last resort Date parsing....");
+						}
+					}
+					// check if date data type
 					if (!dataTypeFound) {
 
 						Date theDate = this.dateFormat.parse(currentCellValue, new ParsePosition(0));
@@ -130,9 +182,12 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 								if (!(this.schemaRow.get(j) instanceof GenericDateDataType)) {
 									// if not then the type needs to be set to string
 									this.schemaRow.set(j, new GenericStringDataType());
-								}
+								} 
+								
 							} else { // we face this the first time
 								this.schemaRow.set(j, new GenericDateDataType());
+								// check if it has a time component
+								
 							}
 						}
 					}
@@ -292,8 +347,7 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 	/**
 	 * Translate a data row according to the currently defined schema.
 	 * 
-	 * @param dataRow
-	 *            cells containing data
+	 * @param dataRow cells containing data
 	 * @return an array of objects of primitive datatypes (boolean, int, byte, etc.)
 	 *         containing the data of datarow, null if dataRow does not fit into
 	 *         schema. Note: single elements can be null depending on the original
@@ -308,12 +362,12 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 			LOG.warn("Data row is larger than schema. Will return String for everything that is not specified. ");
 		}
 		List<Object> returnList = new ArrayList<>();
-		for (int i=0;i<this.schemaRow.size();i++) { // fill up with schema rows
+		for (int i = 0; i < this.schemaRow.size(); i++) { // fill up with schema rows
 			returnList.add(null);
 		}
 		for (int i = 0; i < dataRow.length; i++) {
 			SpreadSheetCellDAO currentCell = dataRow[i];
-			
+
 			if (currentCell != null) {
 				// determine real position
 				int j = new CellAddress(currentCell.getAddress()).getColumn();
@@ -325,7 +379,8 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 				}
 				GenericDataType applyDataType = null;
 				if (j >= this.schemaRow.size()) {
-					LOG.warn("No further schema row for column defined: " + String.valueOf(j)+". Will assume String.");
+					LOG.warn(
+							"No further schema row for column defined: " + String.valueOf(j) + ". Will assume String.");
 				} else {
 					applyDataType = this.schemaRow.get(j);
 				}
@@ -335,32 +390,60 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 					returnList.set(j, currentCell.getFormattedValue());
 				} else if (applyDataType instanceof GenericBooleanDataType) {
 					if (!"".equals(currentCell.getFormattedValue())) {
-						if (currentCell.getFormattedValue().equalsIgnoreCase("true") ||currentCell.getFormattedValue().equalsIgnoreCase("false")) {
+						if (currentCell.getFormattedValue().equalsIgnoreCase("true")
+								|| currentCell.getFormattedValue().equalsIgnoreCase("false")) {
 							returnList.set(j, Boolean.valueOf(currentCell.getFormattedValue()));
-						} 
-					}
-				} else if (applyDataType instanceof GenericDateDataType) {
-					if (!"".equals(currentCell.getFormattedValue())) {
-						Date theDate = this.dateFormat.parse(currentCell.getFormattedValue(), new ParsePosition(0));
-						if (theDate != null) {
-							returnList.set(j,theDate);
-
-						} else {
-							returnList.set(j, null);
 						}
 					}
-				} else if (applyDataType instanceof GenericTimestampDataType) {
+				} 
+				else if (applyDataType instanceof GenericTimestampDataType) {
+					if (!"".equals(currentCell.getFormattedValue())) {
+						boolean timestampFound=false;
+						if (this.dateTimeFormat!=null) { // check first dateTimeFormat
+							Date theDate = this.dateTimeFormat.parse(currentCell.getFormattedValue(), new ParsePosition(0));
+							if (theDate != null) {
+								returnList.set(j, new java.sql.Timestamp(theDate.getTime()));
+								timestampFound=true;
+							} else {
+								returnList.set(j, null);
+								LOG.warn("Could not identify timestamp using Date.parse using provided dateTime format. Trying Timestamp.valueOf. Original value: "+currentCell.getFormattedValue());
+							}
+						} 
+						if (!timestampFound) {
+							try {
+								returnList.set(j, java.sql.Timestamp.valueOf(currentCell.getFormattedValue()));
+								timestampFound=true;
+							} catch (IllegalArgumentException e) {
+								returnList.set(j, null);
+								LOG.warn("Could not identify timestamp using TimeStamp.valueOf. Trying last resort Date parsing. Original value: "+currentCell.getFormattedValue());
+							}
+						}
+						if (!timestampFound) {
+							Date theDate = this.dateFormat.parse(currentCell.getFormattedValue(), new ParsePosition(0));
+							if (theDate != null) {
+								returnList.set(j, new java.sql.Timestamp(theDate.getTime()));
+	
+							} else {
+								returnList.set(j, null);
+								LOG.warn("Could not identify timestamp using Date.parse using provided date format");
+							}
+						}
+					
+					}
+				}
+				else if (applyDataType instanceof GenericDateDataType) {
 					if (!"".equals(currentCell.getFormattedValue())) {
 						Date theDate = this.dateFormat.parse(currentCell.getFormattedValue(), new ParsePosition(0));
+						
 						if (theDate != null) {
-							returnList.set(j,new java.sql.Timestamp(theDate.getTime()));
+							returnList.set(j, theDate);
 
 						} else {
 							returnList.set(j, null);
 						}
 					}
 				} 
-				
+
 				else if (applyDataType instanceof GenericNumericDataType) {
 					if (!"".equals(currentCell.getFormattedValue())) {
 						BigDecimal bd = null;
@@ -375,27 +458,26 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 						if (bd != null) {
 							BigDecimal bdv = bd.stripTrailingZeros();
 							if (applyDataType instanceof GenericByteDataType) {
-								returnList.set(j,(byte)bdv.byteValueExact());
+								returnList.set(j, (byte) bdv.byteValueExact());
 							} else if (applyDataType instanceof GenericShortDataType) {
-								returnList.set(j,(short)bdv.shortValueExact());
+								returnList.set(j, (short) bdv.shortValueExact());
 							} else if (applyDataType instanceof GenericIntegerDataType) {
-								returnList.set(j,(int) bdv.intValueExact());
+								returnList.set(j, (int) bdv.intValueExact());
 							} else if (applyDataType instanceof GenericLongDataType) {
-								returnList.set(j,(long)bdv.longValueExact());
-							}  else if (applyDataType instanceof GenericDoubleDataType) {
-								returnList.set(j,(double)bdv.doubleValue());
+								returnList.set(j, (long) bdv.longValueExact());
+							} else if (applyDataType instanceof GenericDoubleDataType) {
+								returnList.set(j, (double) bdv.doubleValue());
 							} else if (applyDataType instanceof GenericFloatDataType) {
-								returnList.set(j,(float)bdv.floatValue());
-							} 
-							else if (applyDataType instanceof GenericBigDecimalDataType) {
-								returnList.set(j,bd);
+								returnList.set(j, (float) bdv.floatValue());
+							} else if (applyDataType instanceof GenericBigDecimalDataType) {
+								returnList.set(j, bd);
 							} else {
-								returnList.set(j,null);
+								returnList.set(j, null);
 							}
 						}
 					}
 				} else {
-					returnList.set(j,null);
+					returnList.set(j, null);
 					LOG.warn("Could not convert object in spreadsheet cellrow. Did you add a new datatype?");
 				}
 			}
@@ -425,6 +507,7 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 			String comment = "";
 			String formula = "";
 			String address = "";
+			StringBuffer sb = new StringBuffer();
 			if (x != null) {
 				if (x instanceof SpreadSheetCellDAO) {
 					result[currentColumnNum] = (SpreadSheetCellDAO) x;
@@ -468,10 +551,15 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 					} else if (x instanceof BigDecimal) {
 						formattedValue = "";
 						comment = "";
-						formula = ((BigDecimal)x).toString();
+						formula = ((BigDecimal) x).toString();
 						address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
 					} else if (x instanceof Timestamp) {
-						formattedValue = String.valueOf(x);
+						if (this.dateTimeFormat==null) {
+							formattedValue = String.valueOf(x);
+						} else {
+							formattedValue=this.dateTimeFormat.format(x,sb,new FieldPosition(0)).toString();
+							sb.setLength(0);
+						}
 						comment = "";
 						formula = "";
 						address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
@@ -504,6 +592,35 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 							sheetName);
 				}
 			}
+		}
+		return result;
+	}
+
+	/**
+	 * Determines if a date contains a time component. This is only needed for
+	 * automatically inferring the schema of an Excel for those systems that have
+	 * date-only data types. It is a heuristic and should be used with care (be
+	 * careful, e.g., with time zones etc.) . Basically it just checks if hour,
+	 * minute, second,millisecond are set to something else than 0.
+	 * 
+	 * @param theDate
+	 * @return true, if it hour, minute, second, millisecond are !=0, otherwise
+	 *         false
+	 */
+	private boolean containsTimeComponent(Date theDate) {
+		LOG.info("##DateTimeComponent");
+		boolean result = true;
+
+		this.converterCalendar.setTime(theDate);
+		int hour = this.converterCalendar.get(Calendar.HOUR);
+		int minute = this.converterCalendar.get(Calendar.MINUTE);
+		int second = this.converterCalendar.get(Calendar.SECOND);
+		int millisecond = this.converterCalendar.get(Calendar.MILLISECOND);
+		LOG.info(this.converterCalendar.get(Calendar.YEAR) + "." + this.converterCalendar.get(Calendar.MONTH) + "."
+				+ this.converterCalendar.get(Calendar.DAY_OF_MONTH) + " " + hour + "-" + minute + "-" + second + "-"
+				+ millisecond);
+		if ((hour == 0) && (minute == 0) && (second == 0) && (millisecond == 0)) {
+			result = false;
 		}
 		return result;
 	}

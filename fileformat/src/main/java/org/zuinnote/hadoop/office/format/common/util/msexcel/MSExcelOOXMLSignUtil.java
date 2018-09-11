@@ -13,7 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 **/
-package org.zuinnote.hadoop.office.format.common.util;
+package org.zuinnote.hadoop.office.format.common.util.msexcel;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -44,7 +44,7 @@ import org.apache.poi.poifs.crypt.dsig.facets.KeyInfoSignatureFacet;
 import org.apache.poi.poifs.crypt.dsig.facets.OOXMLSignatureFacet;
 import org.apache.poi.poifs.crypt.dsig.facets.Office2010SignatureFacet;
 import org.apache.poi.poifs.crypt.dsig.facets.XAdESSignatureFacet;
-import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.util.TempFile;
 import org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException;
 import org.zuinnote.hadoop.office.format.common.writer.OfficeWriterException;
@@ -127,18 +127,39 @@ public class MSExcelOOXMLSignUtil {
 	private void signUnencryptedOpcPackage(InputStream tmpFileInputStream, SignatureConfig sc) throws InvalidFormatException, IOException, XMLSignatureException, MarshalException {
 		OPCPackage	pkg = OPCPackage.open(tmpFileInputStream);
 		sc.setOpcPackage(pkg);
-		SignatureInfo si = new SignatureInfo();
-		si.setSignatureConfig(sc);
-		si.confirmSignature();
-		pkg.save(this.finalOutputStream);
-		pkg.close();
+		// needed to avoid linebreaks for xmlsec
+		String originalPropertyValue=null;
+		try {
+			if (sc.getDigestAlgo().hashSize>=64) {
+				originalPropertyValue=System.getProperty("org.apache.xml.security.ignoreLineBreaks");
+				if (originalPropertyValue==null) {
+					originalPropertyValue="";
+				}
+				System.setProperty("org.apache.xml.security.ignoreLineBreaks", "true");
+			}
+			SignatureInfo si = new SignatureInfo();
+			si.setSignatureConfig(sc);
+			si.confirmSignature();
+			pkg.save(this.finalOutputStream);
+			pkg.close();
+		} finally {
+			if (originalPropertyValue!=null) { // restore original property for linebreaks in xmlsec
+				if ("".equals(originalPropertyValue)) {
+					System.clearProperty("org.apache.xml.security.ignoreLineBreaks");
+				} else {
+					System.setProperty("org.apache.xml.security.ignoreLineBreaks", originalPropertyValue);
+				}
+			}
+		}
 	}
 	
 	private void signEncryptedPackage(InputStream tmpFileInputStream, SignatureConfig sc, String password) throws IOException, InvalidFormatException, FormatNotUnderstoodException, XMLSignatureException, MarshalException {
 	
-		NPOIFSFileSystem poifsTemp = new NPOIFSFileSystem(tmpFileInputStream);
+		POIFSFileSystem poifsTemp = new POIFSFileSystem(tmpFileInputStream);
 		EncryptionInfo info = new EncryptionInfo(poifsTemp);
 		Decryptor d = Decryptor.getInstance(info);
+
+		String originalPropertyValue=null;
 		try {
 			if (!d.verifyPassword(password)) {
 				throw new FormatNotUnderstoodException("Error: Cannot decrypt new Excel file (.xlsx) for signing. Invalid password");
@@ -146,13 +167,20 @@ public class MSExcelOOXMLSignUtil {
 			// signing
 			OPCPackage pkg = OPCPackage.open(d.getDataStream(poifsTemp));
 			sc.setOpcPackage(pkg);
+			if (sc.getDigestAlgo().hashSize>=64) {
+				originalPropertyValue=System.getProperty("org.apache.xml.security.ignoreLineBreaks");
+				if (originalPropertyValue==null) {
+					originalPropertyValue="";
+				}
+				System.setProperty("org.apache.xml.security.ignoreLineBreaks", "true");
+			}
 			SignatureInfo si = new SignatureInfo();
 			si.setSignatureConfig(sc);
 			si.confirmSignature();
 			// encrypt again
 			Encryptor enc = info.getEncryptor();
 			enc.confirmPassword(password);
-			NPOIFSFileSystem poifs = new NPOIFSFileSystem();
+			POIFSFileSystem poifs = new POIFSFileSystem();
 			OutputStream os = enc.getDataStream(poifs);
 			pkg.save(os);
 			pkg.close();
@@ -170,6 +198,14 @@ public class MSExcelOOXMLSignUtil {
 			
 			LOG.error(e);
 			throw new FormatNotUnderstoodException("Error: Cannot decrypt new Excel file (.xlsx)  for signing.");
+		} finally {
+			if (originalPropertyValue!=null) { // restore original property for linebreaks in xmlsec
+				if ("".equals(originalPropertyValue)) {
+					System.clearProperty("org.apache.xml.security.ignoreLineBreaks");
+				} else {
+					System.setProperty("org.apache.xml.security.ignoreLineBreaks", originalPropertyValue);
+				}
+			}
 		}
 	}
 

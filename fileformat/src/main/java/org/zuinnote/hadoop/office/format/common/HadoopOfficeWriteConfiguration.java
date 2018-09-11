@@ -18,9 +18,11 @@ package org.zuinnote.hadoop.office.format.common;
 import java.io.Serializable;
 import java.security.Key;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -69,6 +71,20 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 	public static final String CONF_SIGKEYSTOREPW = "hadoopoffice.write.security.sign.keystore.password";
 	public static final String CONF_SIGKEYSTOREALIAS = "hadoopoffice.write.security.sign.keystore.alias";
 	public static final String CONF_SIGHASH = "hadoopoffice.write.security.sign.hash.algorithm";
+	
+	public static final String CONF_WRITEHEADER = "hadoopoffice.write.header.write";
+	
+	
+	public static final String CONF_SIMPLEDATEFORMAT = "hadoopoffice.write.simple.dateFormat";
+
+	public static final String CONF_SIMPLEDATEPATTERN = "hadoopoffice.write.simple.datePattern";
+
+	public static final String CONF_SIMPLEDATETIMEFORMAT = "hadoopoffice.write.simple.dateTimeFormat";
+
+	public static final String CONF_SIMPLEDATETIMEPATTERN = "hadoopoffice.write.simple.dateTimePattern";
+	
+	public static final String CONF_SIMPLEDECIMALFORMAT = "hadoopoffice.write.simple.decimalFormat";
+
 
 	public static final String DEFAULT_MIMETYPE = "";
 	public static final String DEFAULT_LOCALE = "";
@@ -95,6 +111,19 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 	public static final String DEFAULT_SIGKEYSTOREALIAS = "";
 	public static final String DEFAULT_SIGHASH = "sha512";
 
+	public static final boolean DEFAULT_WRITEHEADER = false;
+	
+	public static final String DEFAULT_SIMPLEDATEFORMAT = "US";
+
+	public static final String DEFAULT_SIMPLEDATEPATTERN = "";
+
+	public static final String DEFAULT_SIMPLEDATETIMEFORMAT = "US";
+
+	public static final String DEFAULT_SIMPLEDATETIMEPATTERN = "";
+	
+	public static final String DEFAULT_SIMPLEDECIMALFORMAT = "";
+
+	
 	private String[] linkedWorkbooksName;
 	private String fileName;
 	private String mimeType;
@@ -126,7 +155,12 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 	private String sigHash;
 	private X509Certificate sigCertificate;
 	private Key sigKey;
-
+	private boolean writeHeader;
+	private SimpleDateFormat simpleDateFormat;
+	private SimpleDateFormat simpleDateTimeFormat;
+	private DecimalFormat simpleDecimalFormat;
+	
+	
 	public HadoopOfficeWriteConfiguration(String fileName) {
 
 		this.linkedWorkbooksName = new String[0];
@@ -162,83 +196,127 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 		this.setSigKeystorePassword(HadoopOfficeWriteConfiguration.DEFAULT_SIGKEYSTOREPW);
 		this.setSigKeystoreAlias(HadoopOfficeWriteConfiguration.DEFAULT_SIGKEYSTOREALIAS);
 		this.setSigHash(HadoopOfficeWriteConfiguration.DEFAULT_SIGHASH);
+
+		// set date for simple format
+		Locale dateLocale = Locale.getDefault();
+		if (!("".equals(HadoopOfficeWriteConfiguration.DEFAULT_SIMPLEDATEFORMAT))) { // create locale
+			dateLocale = new Locale.Builder().setLanguageTag(HadoopOfficeWriteConfiguration.DEFAULT_SIMPLEDATEFORMAT).build();
+		}
+		this.setSimpleDateFormat((SimpleDateFormat) DateFormat.getDateInstance(DateFormat.SHORT, dateLocale));
+		// set dateTime for simple format
+		Locale dateTimeLocale = Locale.getDefault();
+		if (!("".equals(HadoopOfficeWriteConfiguration.DEFAULT_SIMPLEDATETIMEFORMAT))) { // create locale
+			dateTimeLocale = new Locale.Builder().setLanguageTag(HadoopOfficeWriteConfiguration.DEFAULT_SIMPLEDATETIMEFORMAT).build();
+		}
+		this.setSimpleDateTimeFormat((SimpleDateFormat) DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, dateTimeLocale));
+		// check if should set pattern for date instead of locale
+		if (!"".equals(HadoopOfficeWriteConfiguration.DEFAULT_SIMPLEDATEPATTERN)) {
+			this.setSimpleDateFormat(new SimpleDateFormat(HadoopOfficeWriteConfiguration.DEFAULT_SIMPLEDATEPATTERN));
+		}
+		if (!"".equals(HadoopOfficeWriteConfiguration.DEFAULT_SIMPLEDATETIMEPATTERN)) {
+			this.setSimpleDateTimeFormat(new SimpleDateFormat(HadoopOfficeWriteConfiguration.DEFAULT_SIMPLEDATETIMEPATTERN));
+		}
+		// set decimal for simple format
+		Locale decimallocale = Locale.getDefault();
+		if (!"".equals(HadoopOfficeWriteConfiguration.DEFAULT_SIMPLEDECIMALFORMAT)) {
+			decimallocale = new Locale.Builder().setLanguageTag(HadoopOfficeWriteConfiguration.DEFAULT_SIMPLEDECIMALFORMAT).build();
+		}
+		this.setSimpleDecimalFormat((DecimalFormat) NumberFormat.getInstance(decimallocale));
+		this.setWriteHeader(HadoopOfficeWriteConfiguration.DEFAULT_WRITEHEADER);
 	}
 
 	/*
 	 * Read the configuration for writing office files from a Hadoop configuration
 	 * 
-	 * @conf Hadoop configuration hadoopoffice.write.mimeType: Mimetype of the
-	 * document hadoopoffice.write.locale: Locale of the document (e.g. needed for
+	 * @conf Hadoop configuration 
+	 * 
+	 * <ul>
+	 * <li>hadoopoffice.write.mimeType: Mimetype of the document </li>
+	 * <li> hadoopoffice.write.locale: Locale of the document (e.g. needed for
 	 * interpreting spreadsheets) in the BCP47 format (cf.
 	 * https://tools.ietf.org/html/bcp47). If not specified then default system
-	 * locale will be used. hadoopoffice.write.linkedworkbooks a []: separated list
+	 * locale will be used. </li> 
+	 * <li> hadoopoffice.write.linkedworkbooks a []: separated list
 	 * of existing linked workbooks. Example:
 	 * [hdfs:///home/user/excel/linkedworkbook1.xls]:[hdfs:///home/user/excel/
 	 * linkedworkbook2.xls]. Note: these workbooks are loaded during writing the
 	 * current workbook. This means you may need a lot of memory on the node writing
-	 * the file. Furthermore, you can only specify files and NOT directories.
-	 * hadoopoffice.write.ignoremissinglinkedworkbooks: if you have specified
+	 * the file. Furthermore, you can only specify files and NOT directories. </li>
+	 * <li>hadoopoffice.write.ignoremissinglinkedworkbooks: if you have specified
 	 * linkedworkbooks then they are not read during writing. This implies also that
 	 * the written document does NOT have a cached value. Value is ignored if you
-	 * did not specify linkedworkbooks. Default: false.
-	 * hadoopoffice.write.security.crypt.password: use password to encrypt the
+	 * did not specify linkedworkbooks. Default: false.</li>
+	 * <li>hadoopoffice.write.security.crypt.password: use password to encrypt the
 	 * document. Note: There is no security check of strongness of password. This is
-	 * up to the application developer.
-	 * hadoopoffice.write.security.crypt.encrypt.algorithm: use the following
+	 * up to the application developer.</li>
+	 * <li>hadoopoffice.write.security.crypt.encrypt.algorithm: use the following
 	 * algorithm to encrypt. Note that some writers do not support all algorithms
 	 * and an exception will be thrown if the algorithm is not supported. See
-	 * corresponding writer documentation for supported algorithms.
-	 * hadoopoffice.write.security.crypt.hash.algorithm: use the following algorithm
+	 * corresponding writer documentation for supported algorithms.</li>
+	 * <li>hadoopoffice.write.security.crypt.hash.algorithm: use the following algorithm
 	 * to hash. Note that some writers do not support all algorithms and an
 	 * exception will be thrown if the algorithm is not supported. See corresponding
-	 * writer documentation for supported algorithms.
-	 * hadoopoffice.write.security.crypt.encrypt.mode: use the following mode to
+	 * writer documentation for supported algorithms.</li>
+	 * <li>hadoopoffice.write.security.crypt.encrypt.mode: use the following mode to
 	 * encrypt. Note that some writers do not support all modes and an exception
 	 * will be thrown if the mode is not supported. See corresponding writer
-	 * documentation for supported algorithms.
-	 * hadoopoffice.write.security.crypt.chain.mode: use the following mode to
+	 * documentation for supported algorithms.</li>
+	 * <li>hadoopoffice.write.security.crypt.chain.mode: use the following mode to
 	 * chain. Note that some writers do not support all modes and an exception will
 	 * be thrown if the mode is not supported. See corresponding writer
-	 * documentation for supported algorithms.
-	 * hadoopoffice.write.security.crypt.linkedworkbooks.*: if set then hadoopoffice
+	 * documentation for supported algorithms.</li>
+	 * <li>hadoopoffice.write.security.crypt.linkedworkbooks.*: if set then hadoopoffice
 	 * will try to decrypt all the linked workbooks where a password has been
 	 * specified. If no password is specified then it is assumed that the linked
 	 * workbook is not encrypted. Example: Property key for file
 	 * "linkedworkbook1.xlsx" is
 	 * "hadoopoffice.read.security.crypt.linkedworkbooks.linkedworkbook1.xslx".
 	 * Value is the password. You must not include path or protocol information in
-	 * the filename hadoopoffice.write.metadata.*: Write metadata properties of the
+	 * the filename</li> 
+	 * <li>hadoopoffice.write.metadata.*: Write metadata properties of the
 	 * document. All properties belonging to the base (e.g.
 	 * hadoopoffice.write.metadata.author for author) will be handed over to the
-	 * corresponding writer. See writer documentation which properties are supported
-	 * hadoopoffice.write.template.file: Use a template as input to modify selected
+	 * corresponding writer. See writer documentation which properties are supported </li>
+	 * <li>hadoopoffice.write.template.file: Use a template as input to modify selected
 	 * cells of it hadoopoffice.write.lowFootprint: if true then a file is written
 	 * in low footprint mode to save cpu/memory resources, false if it should be
 	 * written in normal mode. Option is ignored for old Excel files (.xls). Note
 	 * that if it is set to true then certain options are not available, such as
-	 * formula evaluation. Default false.
-	 * hadoopoffice.write.security.crypt.credential.keystore.file: keystore file
+	 * formula evaluation. It requires additional local temporal storage. Default false.</li>
+	 * <li>hadoopoffice.write.lowFootprint.cacherows: how many rows should be cached into memory before flushing to a temporal storage in low footprint mode</li>
+	 * <li>hadoopoffice.write.security.crypt.credential.keystore.file: keystore file
 	 * that is used to store credentials, such as passwords, for securing office
 	 * documents. Note that the alias in the keystore needs to correspond to the
-	 * filename (without the path)
-	 * hadoopoffice.write.security.crypt.credential.keystore.type: keystore type.
-	 * Default: JCEKS
-	 * hadoopoffice.write.security.crypt.credential.keystore.password: keystore
-	 * password: password of the keystore
-	 * hadoopoffice.write.security.crypt.credential.keystore.alias: alias for the
-	 * password if different from filename
-	 * hadoopoffice.write.security.sign.keystore.file: keystore file that contains
-	 * the private key used for signing a document
-	 * hadoopoffice.write.security.sign.keystore.type: keystore type of the private
-	 * key. Default PKCS12 hadoopoffice.write.security.sign.keystore.password:
-	 * keystore password for the private key.
-	 * hadoopoffice.write.security.sign.keystore.alias: alias of private key in
+	 * filename (without the path)</li>
+	 * <li>hadoopoffice.write.security.crypt.credential.keystore.type: keystore type.
+	 * Default: JCEKS</li>
+	 * <li>hadoopoffice.write.security.crypt.credential.keystore.password: keystore
+	 * password: password of the keystore</li>
+	 * <li>hadoopoffice.write.security.crypt.credential.keystore.alias: alias for the
+	 * password if different from filename</li>
+	 * <li>hadoopoffice.write.security.sign.keystore.file: keystore file that contains
+	 * the private key used for signing a document</li>
+	 * <li>hadoopoffice.write.security.sign.keystore.type: keystore type of the private
+	 * key. Default PKCS12</li>
+	 * <li>hadoopoffice.write.security.sign.keystore.password:
+	 * keystore password for the private key.</li>
+	 * <li>hadoopoffice.write.security.sign.keystore.alias: alias of private key in
 	 * keystore hadoopoffice.write.security.sign.hash.algorithm: use the following
 	 * algorithm to hash. Note that some writers do not support all algorithms and
 	 * an exception will be thrown if the algorithm is not supported. See
-	 * corresponding writer documentation for supported algorithms.
+	 * corresponding writer documentation for supported algorithms.</li>
+	 *            <li>hadoopoffice.write.simple.dateFormat: applies only to HadoopOffice components that use the Converter to convert simple Java objects into SpreadSheetCellDAOs.  Describes the date format to interpret dates using the BCP47 notation. Note that even in non-US Excel versions Excel stores them most of the times internally in US format. Leave it empty for using the systems locale. Default: "US".</li>
+	 *            <li>hadoopoffice.write.simple.datePattern: applies only to HadoopOffice components that use the Converter to convert simple Java objects into SpreadSheetCellDAOs. Overrides "hadoopoffice.write.simple.dateFormat" - describes a date pattern according to the pattern in SimpleDateFormat - you can define any pattern that dates have</li>
+	 *            <li>hadoopoffice.write.simple.dateTimeFormat: applies only to HadoopOffice components that use the Converter to convert simple Java objects into SpreadSheetCellDAOs. Describes the date/time format to interpret date/timestamps using the BCP47 notation. Leave it empty for using the systems locale. Default: "US". </li>
+	 *            <li>hadoopoffice.write.simple.dateTimePattern: applies only to HadoopOffice components that use the Converter to convert simple Java objects into SpreadSheetCellDAOs. Overrides "hadoopoffice.write.simple.dateTimeFormat" - describes a date/time pattern according to the pattern in SimpleDateFormat - you can define any pattern that date/time have. Defaults to java.sql.Timestamp, if not specified</li>
+	 *            <li>hadoopoffice.write.simple.decimalFormat: applies only to HadoopOffice components that use the Converter to convert simple Java objects into SpreadSheetCellDAOs. Describes the decimal format to interpret decimal numbers using the BCP47 notation. Leave it empty for using the systems locale. Default: "".</li>
+
+	 * </ul>
 	 *
 	 *
+	 *
+	
+
 	 * 
 	 * @param fileName filename to write
 	 * 
@@ -301,6 +379,33 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 		this.setSigHash(
 				conf.get(HadoopOfficeWriteConfiguration.CONF_SIGHASH, HadoopOfficeWriteConfiguration.DEFAULT_SIGHASH));
 
+		// set date for simple format
+		Locale dateLocale = new Locale.Builder().setLanguageTag(conf.get(HadoopOfficeWriteConfiguration.CONF_SIMPLEDATEFORMAT,HadoopOfficeWriteConfiguration.DEFAULT_SIMPLEDATEFORMAT)).build();	
+		this.setSimpleDateFormat((SimpleDateFormat) DateFormat.getDateInstance(DateFormat.SHORT, dateLocale));
+		// set dateTime for simple format
+
+		Locale	dateTimeLocale = new Locale.Builder().setLanguageTag(conf.get(HadoopOfficeWriteConfiguration.CONF_SIMPLEDATETIMEFORMAT,HadoopOfficeWriteConfiguration.DEFAULT_SIMPLEDATETIMEFORMAT)).build();
+		this.setSimpleDateTimeFormat((SimpleDateFormat) DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, dateTimeLocale));
+		// check if should set pattern for date instead of locale
+		String datePattern=conf.get(HadoopOfficeWriteConfiguration.CONF_SIMPLEDATEPATTERN,HadoopOfficeWriteConfiguration.DEFAULT_SIMPLEDATEPATTERN);
+		if (!"".equals(datePattern)) {
+			this.setSimpleDateFormat(new SimpleDateFormat(datePattern));
+		}
+		String dateTimePattern=conf.get(HadoopOfficeWriteConfiguration.CONF_SIMPLEDATETIMEPATTERN,HadoopOfficeWriteConfiguration.DEFAULT_SIMPLEDATETIMEPATTERN);
+		if (!"".equals(dateTimePattern)) {
+			this.setSimpleDateFormat(new SimpleDateFormat(dateTimePattern));
+		}
+		// set decimal for simple format
+		String decimaleStr = conf.get(HadoopOfficeWriteConfiguration.CONF_SIMPLEDECIMALFORMAT,HadoopOfficeWriteConfiguration.DEFAULT_SIMPLEDECIMALFORMAT);
+
+		Locale decimallocale = Locale.getDefault();
+		if (!"".equals(decimaleStr)){
+			decimallocale = new Locale.Builder().setLanguageTag(decimaleStr).build();
+		}
+		this.setSimpleDecimalFormat((DecimalFormat) NumberFormat.getInstance(decimallocale));
+		this.setWriteHeader(conf.getBoolean(HadoopOfficeWriteConfiguration.CONF_WRITEHEADER, HadoopOfficeWriteConfiguration.DEFAULT_WRITEHEADER));
+	    
+		
 	}
 
 	public String[] getLinkedWorkbooksName() {
@@ -541,6 +646,38 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 
 	public void setSigKey(Key sigKey) {
 		this.sigKey = sigKey;
+	}
+
+	public SimpleDateFormat getSimpleDateFormat() {
+		return simpleDateFormat;
+	}
+
+	public void setSimpleDateFormat(SimpleDateFormat simpleDateFormat) {
+		this.simpleDateFormat = simpleDateFormat;
+	}
+
+	public SimpleDateFormat getSimpleDateTimeFormat() {
+		return simpleDateTimeFormat;
+	}
+
+	public void setSimpleDateTimeFormat(SimpleDateFormat simpleDateTimeFormat) {
+		this.simpleDateTimeFormat = simpleDateTimeFormat;
+	}
+
+	public DecimalFormat getSimpleDecimalFormat() {
+		return simpleDecimalFormat;
+	}
+
+	public void setSimpleDecimalFormat(DecimalFormat simpleDecimalFormat) {
+		this.simpleDecimalFormat = simpleDecimalFormat;
+	}
+
+	public boolean getWriteHeader() {
+		return writeHeader;
+	}
+
+	public void setWriteHeader(boolean writeHeader) {
+		this.writeHeader = writeHeader;
 	}
 
 }

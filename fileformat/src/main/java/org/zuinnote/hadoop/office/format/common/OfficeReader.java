@@ -27,6 +27,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 
 import org.zuinnote.hadoop.office.format.common.parser.*;
+import org.zuinnote.hadoop.office.format.common.parser.msexcel.MSExcelLowFootprintParser;
+import org.zuinnote.hadoop.office.format.common.parser.msexcel.MSExcelParser;
 
 /*
 *

@@ -14,18 +14,17 @@
 * limitations under the License.
 **/
 
-package org.zuinnote.hadoop.office.format.common.writer;
+package org.zuinnote.hadoop.office.format.common.writer.msexcel;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.dsig.XMLSignatureException;
 
 import java.util.HashMap;
-import java.util.Date;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -48,6 +47,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Comment;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ooxml.POIXMLProperties;
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
@@ -58,9 +58,7 @@ import org.apache.poi.poifs.crypt.Encryptor;
 import org.apache.poi.poifs.crypt.EncryptionInfo;
 import org.apache.poi.poifs.crypt.ChainingMode;
 import org.apache.poi.hssf.record.crypto.Biff8EncryptionKey;
-import org.apache.poi.POIXMLProperties;
 import org.apache.poi.hpsf.SummaryInformation;
-import org.apache.poi.openxml4j.util.Nullable;
 
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
@@ -68,8 +66,11 @@ import org.zuinnote.hadoop.office.format.common.HadoopOfficeReadConfiguration;
 import org.zuinnote.hadoop.office.format.common.HadoopOfficeWriteConfiguration;
 import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 import org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException;
-import org.zuinnote.hadoop.office.format.common.parser.MSExcelParser;
-import org.zuinnote.hadoop.office.format.common.util.MSExcelOOXMLSignUtil;
+import org.zuinnote.hadoop.office.format.common.parser.msexcel.MSExcelParser;
+import org.zuinnote.hadoop.office.format.common.util.msexcel.MSExcelOOXMLSignUtil;
+import org.zuinnote.hadoop.office.format.common.writer.InvalidWriterConfigurationException;
+import org.zuinnote.hadoop.office.format.common.writer.OfficeSpreadSheetWriterInterface;
+import org.zuinnote.hadoop.office.format.common.writer.OfficeWriterException;
 
 public class MSExcelWriter implements OfficeSpreadSheetWriterInterface {
 public static final String FORMAT_OOXML = "ooxmlexcel";
@@ -460,6 +461,9 @@ private void finalizeWriteEncryptedXSSF() throws IOException{
 				if (os!=null) {
 					this.currentWorkbook.write(os);
 				}
+				if (os!=null) {
+					os.close();
+				}
 			} catch (GeneralSecurityException e) {
 				LOG.error(e);
 			} 
@@ -744,7 +748,7 @@ private void prepareXSSFMetaData() {
 				attribMatch=true; 
 				break;
 			case "created": 
-				coreProp.setCreated(new Nullable<Date>(formatSDF.parse(entry.getValue()))); 
+				coreProp.setCreated(Optional.of(formatSDF.parse(entry.getValue()))); 
 				attribMatch=true; 
 				break;
 			case "creator": 
@@ -768,11 +772,11 @@ private void prepareXSSFMetaData() {
 				attribMatch=true; 
 				break;
 			case "lastprinted": 
-				coreProp.setLastPrinted(new Nullable<Date>(formatSDF.parse(entry.getValue())));
+				coreProp.setLastPrinted(Optional.of(formatSDF.parse(entry.getValue())));
 				attribMatch=true; 
 				break;
 			case "modified": 
-				coreProp.setModified(new Nullable<Date>(formatSDF.parse(entry.getValue()))); 
+				coreProp.setModified(Optional.of(formatSDF.parse(entry.getValue()))); 
 				attribMatch=true; 
 				break;
 			case "revision":

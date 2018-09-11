@@ -27,5 +27,12 @@ public class GenericDateDataType extends GenericDataType implements Serializable
 	 * 
 	 */
 	private static final long serialVersionUID = 7797279183754012622L;
+	
+	
+	public GenericDateDataType() {
+	
+	}
+	
+
 
 }
