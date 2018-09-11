@@ -91,9 +91,9 @@ dependencies {
    compile("org.apache.poi:poi:4.0.0")
    compile("org.apache.poi:poi-ooxml:4.0.0")
    // for signing and verification of signatures
-    provided("org.bouncycastle:bcprov-ext-jdk15on:1.59")
-    provided("org.bouncycastle:bcpkix-jdk15on:1.59")
-    provided("org.apache.santuario:xmlsec:2.1.0")
+    provided("org.bouncycastle:bcprov-ext-jdk15on:1.60")
+    provided("org.bouncycastle:bcpkix-jdk15on:1.60")
+    provided("org.apache.santuario:xmlsec:2.1.2")
    // hadoop libraries
    provided("org.apache.hadoop:hadoop-common:2.7.0")
    provided("org.apache.hadoop:hadoop-mapreduce-client-common:2.7.0")
