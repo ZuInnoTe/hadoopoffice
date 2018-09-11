@@ -3,7 +3,13 @@ org.zuinnote.hadoop.office.format.common.converter
 org.zuinnote.hadoop.office.format.common.converter.datatypes
 org.zuinnote.hadoop.office.format.common.dao
 org.zuinnote.hadoop.office.format.common.parser
+org.zuinnote.hadoop.office.format.common.parser.msexcel
+org.zuinnote.hadoop.office.format.common.parser.msexcel.internal
+org.zuinnote.hadoop.office.format.common.parser.msexcel.internal.cache
 org.zuinnote.hadoop.office.format.common.util
+org.zuinnote.hadoop.office.format.common.util.msexcel
 org.zuinnote.hadoop.office.format.common.writer
+org.zuinnote.hadoop.office.format.common.writer.msexcel
+org.zuinnote.hadoop.office.format.common.writer.msexcel.internal
 org.zuinnote.hadoop.office.format.mapred
 org.zuinnote.hadoop.office.format.mapreduce
