@@ -129,28 +129,13 @@ public class MSExcelOOXMLSignUtil {
 		sc.setOpcPackage(pkg);
 		// needed to avoid linebreaks for xmlsec
 		String originalPropertyValue=null;
-		try {
-			if (sc.getDigestAlgo().hashSize>=64) {
-				originalPropertyValue=System.getProperty("org.apache.xml.security.ignoreLineBreaks");
-				if (originalPropertyValue==null) {
-					originalPropertyValue="";
-				}
-				System.setProperty("org.apache.xml.security.ignoreLineBreaks", "true");
-			}
+	
+			
 			SignatureInfo si = new SignatureInfo();
 			si.setSignatureConfig(sc);
 			si.confirmSignature();
 			pkg.save(this.finalOutputStream);
 			pkg.close();
-		} finally {
-			if (originalPropertyValue!=null) { // restore original property for linebreaks in xmlsec
-				if ("".equals(originalPropertyValue)) {
-					System.clearProperty("org.apache.xml.security.ignoreLineBreaks");
-				} else {
-					System.setProperty("org.apache.xml.security.ignoreLineBreaks", originalPropertyValue);
-				}
-			}
-		}
 	}
 	
 	private void signEncryptedPackage(InputStream tmpFileInputStream, SignatureConfig sc, String password) throws IOException, InvalidFormatException, FormatNotUnderstoodException, XMLSignatureException, MarshalException {
@@ -159,7 +144,6 @@ public class MSExcelOOXMLSignUtil {
 		EncryptionInfo info = new EncryptionInfo(poifsTemp);
 		Decryptor d = Decryptor.getInstance(info);
 
-		String originalPropertyValue=null;
 		try {
 			if (!d.verifyPassword(password)) {
 				throw new FormatNotUnderstoodException("Error: Cannot decrypt new Excel file (.xlsx) for signing. Invalid password");
@@ -167,13 +151,7 @@ public class MSExcelOOXMLSignUtil {
 			// signing
 			OPCPackage pkg = OPCPackage.open(d.getDataStream(poifsTemp));
 			sc.setOpcPackage(pkg);
-			if (sc.getDigestAlgo().hashSize>=64) {
-				originalPropertyValue=System.getProperty("org.apache.xml.security.ignoreLineBreaks");
-				if (originalPropertyValue==null) {
-					originalPropertyValue="";
-				}
-				System.setProperty("org.apache.xml.security.ignoreLineBreaks", "true");
-			}
+			
 			SignatureInfo si = new SignatureInfo();
 			si.setSignatureConfig(sc);
 			si.confirmSignature();
@@ -198,15 +176,7 @@ public class MSExcelOOXMLSignUtil {
 			
 			LOG.error(e);
 			throw new FormatNotUnderstoodException("Error: Cannot decrypt new Excel file (.xlsx)  for signing.");
-		} finally {
-			if (originalPropertyValue!=null) { // restore original property for linebreaks in xmlsec
-				if ("".equals(originalPropertyValue)) {
-					System.clearProperty("org.apache.xml.security.ignoreLineBreaks");
-				} else {
-					System.setProperty("org.apache.xml.security.ignoreLineBreaks", originalPropertyValue);
-				}
-			}
-		}
+		} 
 	}
 
 	/**

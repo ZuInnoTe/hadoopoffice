@@ -71,7 +71,7 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 	public static final String CONF_SIGKEYSTOREPW = "hadoopoffice.write.security.sign.keystore.password";
 	public static final String CONF_SIGKEYSTOREALIAS = "hadoopoffice.write.security.sign.keystore.alias";
 	public static final String CONF_SIGHASH = "hadoopoffice.write.security.sign.hash.algorithm";
-	
+	public static final String CONF_IGNORELINEBREAKS = "hadoopoffice.write.security.sign.ignoreLineBreaks"; 
 	public static final String CONF_WRITEHEADER = "hadoopoffice.write.header.write";
 	
 	
@@ -110,7 +110,7 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 	public static final String DEFAULT_SIGKEYSTOREPW = "";
 	public static final String DEFAULT_SIGKEYSTOREALIAS = "";
 	public static final String DEFAULT_SIGHASH = "sha512";
-
+	public static final boolean DEFAULT_IGNORELINEBREAKS = true;
 	public static final boolean DEFAULT_WRITEHEADER = false;
 	
 	public static final String DEFAULT_SIMPLEDATEFORMAT = "US";
@@ -155,6 +155,7 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 	private String sigHash;
 	private X509Certificate sigCertificate;
 	private Key sigKey;
+	private boolean ignoreLineBreaks;
 	private boolean writeHeader;
 	private SimpleDateFormat simpleDateFormat;
 	private SimpleDateFormat simpleDateTimeFormat;
@@ -223,6 +224,9 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 		}
 		this.setSimpleDecimalFormat((DecimalFormat) NumberFormat.getInstance(decimallocale));
 		this.setWriteHeader(HadoopOfficeWriteConfiguration.DEFAULT_WRITEHEADER);
+		this.setIgnoreLineBreaks(HadoopOfficeWriteConfiguration.DEFAULT_IGNORELINEBREAKS);
+		
+		
 	}
 
 	/*
@@ -378,7 +382,7 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 				HadoopOfficeWriteConfiguration.DEFAULT_SIGKEYSTOREALIAS));
 		this.setSigHash(
 				conf.get(HadoopOfficeWriteConfiguration.CONF_SIGHASH, HadoopOfficeWriteConfiguration.DEFAULT_SIGHASH));
-
+		this.setIgnoreLineBreaks(conf.getBoolean(HadoopOfficeWriteConfiguration.CONF_IGNORELINEBREAKS,HadoopOfficeWriteConfiguration.DEFAULT_IGNORELINEBREAKS));
 		// set date for simple format
 		Locale dateLocale = new Locale.Builder().setLanguageTag(conf.get(HadoopOfficeWriteConfiguration.CONF_SIMPLEDATEFORMAT,HadoopOfficeWriteConfiguration.DEFAULT_SIMPLEDATEFORMAT)).build();	
 		this.setSimpleDateFormat((SimpleDateFormat) DateFormat.getDateInstance(DateFormat.SHORT, dateLocale));
@@ -678,6 +682,17 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 
 	public void setWriteHeader(boolean writeHeader) {
 		this.writeHeader = writeHeader;
+	}
+
+	public boolean getIgnoreLineBreaks() {
+		return ignoreLineBreaks;
+	}
+
+	public void setIgnoreLineBreaks(boolean ignoreLineBreaks) {
+		this.ignoreLineBreaks = ignoreLineBreaks;
+		if (this.ignoreLineBreaks) {
+			System.setProperty("org.apache.xml.security.ignoreLineBreaks", "true");
+		}
 	}
 
 }
