@@ -45,7 +45,6 @@ import org.apache.poi.xssf.model.ExternalLinksTable;
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.hpsf.SummaryInformation;
 
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.poifs.crypt.dsig.SignatureConfig;
 import org.apache.poi.poifs.crypt.dsig.SignatureInfo;
@@ -444,7 +443,7 @@ private int currentSkipLine=0;
 			} else {	
 				String formattedValue=useDataFormatter.formatCellValue(currentCell,this.formulaEvaluator);
 				String formula = "";
-				if (currentCell.getCellTypeEnum()==CellType.FORMULA)  {
+				if (currentCell.getCellType()==CellType.FORMULA)  {
 					formula = currentCell.getCellFormula();
 				}
 				Comment currentCellComment = currentCell.getCellComment();
