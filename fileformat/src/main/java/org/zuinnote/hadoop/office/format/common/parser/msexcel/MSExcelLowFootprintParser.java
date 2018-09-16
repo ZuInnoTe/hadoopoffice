@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLStreamException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,6 +47,7 @@ import org.apache.poi.ooxml.util.SAXHelper;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.openxml4j.opc.PackagePart;
 import org.apache.poi.poifs.crypt.ChainingMode;
 import org.apache.poi.poifs.crypt.CipherAlgorithm;
 import org.apache.poi.poifs.crypt.Decryptor;
@@ -62,6 +64,11 @@ import org.apache.poi.xssf.eventusermodel.XSSFReader;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
 
 import org.apache.poi.xssf.model.StylesTable;
+import org.apache.poi.xssf.usermodel.XSSFRelation;
+import org.apache.xmlbeans.XmlException;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTWorkbook;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTWorkbookPr;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.WorkbookDocument;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -109,11 +116,14 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 	private boolean firstSheetSkipped=false;
 	private boolean event=true;
 	private List<InputStream> pullSheetInputList;
+	private List<String> pullSheetNameList;
 	private XSSFPullParser currentPullParser;
 	private EncryptedCachedDiskStringsTable pullSST;
 	private ReadOnlySharedStringsTable pushSST;
 	private CipherAlgorithm ca;
 	private ChainingMode cm;
+	private StylesTable styles;
+	private boolean isDate1904;
 	
 	public MSExcelLowFootprintParser(HadoopOfficeReadConfiguration hocr) {
 		this(hocr, null);
@@ -143,6 +153,7 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 		this.currentRow=0;
 		this.currentSheet=0;
 		this.pullSheetInputList=new ArrayList<>();
+		this.pullSheetNameList=new ArrayList<>();
 		// check not supported things and log
 		if ((this.hocr.getReadLinkedWorkbooks()) || (this.hocr.getIgnoreMissingLinkedWorkbooks())) {
 			LOG.warn("Linked workbooks not supported in low footprint parsing mode");
@@ -319,14 +330,21 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 			throw new FormatNotUnderstoodException("Error cannot parse new Excel file (.xlsx)");
 		}
 		try {
+			// read date format
+			InputStream workbookDataXML = r.getWorkbookData();
+			WorkbookDocument wd = WorkbookDocument.Factory.parse(workbookDataXML);
+			this.isDate1904 = wd.getWorkbook().getWorkbookPr().getDate1904();
+
 			
 			// read shared string tables
 			if (HadoopOfficeReadConfiguration.OPTION_LOWFOOTPRINT_PARSER_SAX.equalsIgnoreCase(this.hocr.getLowFootprintParser())) {
 				this.pushSST = new ReadOnlySharedStringsTable(pkg);
 			} else if (HadoopOfficeReadConfiguration.OPTION_LOWFOOTPRINT_PARSER_STAX.equalsIgnoreCase(this.hocr.getLowFootprintParser())) {
-				this.pullSST = new EncryptedCachedDiskStringsTable(pkg, this.hocr.getSstCacheSize(), this.hocr.getCompressSST(), this.ca, this.cm);			
+				List<PackagePart> pkgParts = pkg.getPartsByContentType(XSSFRelation.SHARED_STRINGS.getContentType());
+				
+				this.pullSST = new EncryptedCachedDiskStringsTable(pkgParts.get(0), this.hocr.getSstCacheSize(), this.hocr.getCompressSST(), this.ca, this.cm);			
 			}
-			StylesTable styles = r.getStylesTable();
+			this.styles = r.getStylesTable();
 			XSSFReader.SheetIterator iter = (XSSFReader.SheetIterator)r.getSheetsData();
 			int sheetNumber = 0;
 			while (iter.hasNext()) {
@@ -356,7 +374,7 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 						XSSFEventParser xssfp = new XSSFEventParser(sheetNumber,iter.getSheetName(), this.spreadSheetCellDAOCache);
 						
 			            ContentHandler handler = new XSSFSheetXMLHandler(
-			                  styles, iter.getSheetComments(), this.pushSST, xssfp, this.useDataFormatter, false);
+			                  this.styles, iter.getSheetComments(), this.pushSST, xssfp, this.useDataFormatter, false);
 			            sheetParser.setContentHandler(handler);
 			            sheetParser.parse(rawSheetInputSource);
 			            sheetNumber++;
@@ -364,6 +382,7 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 						LOG.info("Using STAX parser for low footprint Excel parsing");
 						this.event=false;
 						this.pullSheetInputList.add(rawSheetInputStream);
+						this.pullSheetNameList.add(iter.getSheetName());
 						// make shared string table available
 						
 						// everything else is in the getNext method
@@ -381,6 +400,9 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 			LOG.error(e);
 			throw new FormatNotUnderstoodException("Parsing Excel sheet in .xlsx format failed. Cannot read XML content");
 		} catch (ParserConfigurationException e) {
+			LOG.error(e);
+			throw new FormatNotUnderstoodException("Parsing Excel sheet in .xlsx format failed. Cannot read XML content");
+		} catch (XmlException e) {
 			LOG.error(e);
 			throw new FormatNotUnderstoodException("Parsing Excel sheet in .xlsx format failed. Cannot read XML content");
 		}
@@ -443,22 +465,35 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 		} else {
 			LOG.info("Using STAX parser for low footprint Excel parsing");
 			// everything else is in the getNextMethod
-			result=this.getNextPull();
+			try {
+				result=this.getNextPull();
+			} catch (XMLStreamException e) {
+				LOG.error(e);
+			}
 		} 
 		return result;
 	}
 	
-	private Object[] getNextPull() {
+	private Object[] getNextPull() throws XMLStreamException {
 		Object[] result=null;
 		// check if currentPullParser == null
-		 	// if yes check if we can load an input stream pullSheetInputList . size >0
-		// check pullParser .hasNext
-		 	// false?
-				//while 
-				// pullSheetInputList further item?
-					// pullParserGetNext
-				
-			// pullparser .getNext
+		if ((this.currentPullParser==null) || (!this.currentPullParser.hasNext())) {
+			if (this.pullSheetInputList.size()>0) {
+					try {
+						this.currentPullParser=new XSSFPullParser(this.pullSheetNameList.get(0),this.pullSheetInputList.get(0),this.pullSST,this.styles, this.isDate1904);
+						this.pullSheetNameList.remove(0);
+						this.pullSheetInputList.remove(0);
+					} catch (XMLStreamException e) {
+						LOG.error(e);
+
+					}
+	
+			} else {
+				return result;
+			}
+			
+		}
+		result= this.currentPullParser.getNext();
 		return result;
 	}
 	

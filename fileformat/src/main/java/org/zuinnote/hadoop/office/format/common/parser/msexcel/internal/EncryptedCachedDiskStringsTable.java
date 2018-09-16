@@ -16,14 +16,15 @@
 package org.zuinnote.hadoop.office.format.common.parser.msexcel.internal;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +42,6 @@ import javax.xml.stream.events.XMLEvent;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackagePart;
 import org.apache.poi.poifs.crypt.ChainingMode;
 import org.apache.poi.poifs.crypt.CipherAlgorithm;
@@ -50,10 +50,7 @@ import org.apache.poi.ss.usermodel.RichTextString;
 import org.apache.poi.util.StaxHelper;
 import org.apache.poi.util.TempFile;
 import org.apache.poi.xssf.model.SharedStringsTable;
-import org.apache.poi.xssf.usermodel.XSSFRelation;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTRst;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.impl.CTRstImpl;
 import org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException;
 import org.zuinnote.hadoop.office.format.common.parser.msexcel.internal.cache.LRUCache;
 
@@ -87,13 +84,14 @@ public class EncryptedCachedDiskStringsTable extends SharedStringsTable implemen
 	private boolean compressTempFile;
 	private long currentPos;
 	private int currentItem;
+	private RandomAccessFile tempRAF=null;
 	
 
 
 	/***
 	 * Create a new encrypted cached string table
 	 * 
-	 * @param pkg package where the string table is stored
+	 * @param part package part with Shared String Table
 	 * @param cacheSize cache = -1 means all is in memory, cache = 0 means nothing is in memory, positive means only that fractions is kept in-memory
 	 * @param compressTempFile true, if temporary file storage for shared string table should be gzip compressed, false if not
 	 * @param ca, cipher algorithm leave it null for disabling encryption (not recommended if source document is encrypted)
@@ -101,7 +99,7 @@ public class EncryptedCachedDiskStringsTable extends SharedStringsTable implemen
 	 * @throws IOException 
 	 */
 	
-	public EncryptedCachedDiskStringsTable(OPCPackage pkg, int cacheSize, boolean compressTempFile, CipherAlgorithm ca, ChainingMode cm) throws IOException {
+	public EncryptedCachedDiskStringsTable(PackagePart part, int cacheSize, boolean compressTempFile, CipherAlgorithm ca, ChainingMode cm) throws IOException {
 		this.cacheSize=cacheSize;
 		if (this.cacheSize>0) {
 			
@@ -128,9 +126,8 @@ public class EncryptedCachedDiskStringsTable extends SharedStringsTable implemen
 							this.ciEncrypt=CryptoFunctions.getCipher(skeySpec, ca, cm, iv, Cipher.ENCRYPT_MODE,"PKCS5Padding");
 							this.ciDecrypt=CryptoFunctions.getCipher(skeySpec, ca, cm, iv, Cipher.DECRYPT_MODE,"PKCS5Padding");
 				}
-			List<PackagePart> pkgParts = pkg.getPartsByContentType(XSSFRelation.SHARED_STRINGS.getContentType());
-			PackagePart sstTable = pkgParts.get(0);
-			this.originalIS=sstTable.getInputStream();
+			this.originalIS=part.getInputStream();
+			this.readFrom(this.originalIS);
 	}
 	
 
@@ -145,14 +142,18 @@ public class EncryptedCachedDiskStringsTable extends SharedStringsTable implemen
 		this.currentItem=0;
 		 // read from source and write into tempfile
 		// open temp file depending on options compressed/encrypted
-		OutputStream tempOS = new FileOutputStream(this.tempFile);
-		if (this.ca!=null) { // encrypt file if configured
-			tempOS=new CipherOutputStream(tempOS,this.ciEncrypt);
-		}
-		if (this.compressTempFile) { // compress file if configured
-			tempOS=new GZIPOutputStream(tempOS,EncryptedCachedDiskStringsTable.compressBufferSize);
-		} else { // configure a Buffer for writing
-			tempOS=new BufferedOutputStream(tempOS,EncryptedCachedDiskStringsTable.compressBufferSize);
+		OutputStream tempOS=null;
+		if ((this.ca!=null) || (this.compressTempFile)) {
+		 tempOS = new FileOutputStream(this.tempFile);
+			if (this.ca!=null) { // encrypt file if configured
+				tempOS=new CipherOutputStream(tempOS,this.ciEncrypt);
+			}
+			if (this.compressTempFile) { // compress file if configured
+				tempOS=new GZIPOutputStream(tempOS,EncryptedCachedDiskStringsTable.compressBufferSize);
+			}
+		} 
+		else { // not encrypted and not compressed: configure a random access file for writing/reading = highest performance
+			this.tempRAF = new RandomAccessFile(this.tempFile,"rw");
 		}
 		// read from source
 			// use Stax event reader
@@ -178,7 +179,9 @@ public class EncryptedCachedDiskStringsTable extends SharedStringsTable implemen
 			throw new IOException(e);
 		} finally {
 			// close temporary Stream (tempfile should be deleted using the close method of this class and not here)
-			tempOS.close();
+			if (tempOS!=null) {
+				tempOS.close();
+			}
 		}
 		// open the input stream towards the temp file
 		this.accessTempFile(0L);
@@ -195,6 +198,7 @@ public class EncryptedCachedDiskStringsTable extends SharedStringsTable implemen
 	 * @return entry 
 	 * 
 	 */
+	@Override
 	public RichTextString getItemAt(int idx)   {
 		try {
 			return new XSSFRichTextString(this.getString(idx));
@@ -232,8 +236,14 @@ public class EncryptedCachedDiskStringsTable extends SharedStringsTable implemen
 			byte[] strbytes = str.getBytes(EncryptedCachedDiskStringsTable.encoding);
 			byte[] sizeOfStr = ByteBuffer.allocate(4).putInt(strbytes.length).array();
 			this.stringPositionInFileList.add(this.tempFileSize);
-			os.write(sizeOfStr);
-			os.write(strbytes);
+			if (os!=null) {
+				os.write(sizeOfStr);
+				os.write(strbytes);
+			} else { // we can write to the random access file
+				FileChannel fc = this.tempRAF.getChannel().position(this.tempFileSize);
+				fc.write(ByteBuffer.wrap(sizeOfStr));
+				fc.write(ByteBuffer.wrap(strbytes));
+			}
 			this.tempFileSize+=4+strbytes.length;
 		}
 		if (this.cacheSize<0) { // put it into cache
@@ -322,13 +332,28 @@ public class EncryptedCachedDiskStringsTable extends SharedStringsTable implemen
 		} 
 		// if not we have to read it from the file
 		long itemPosition = this.stringPositionInFileList.get(index);
-		this.accessTempFile(itemPosition);
-		byte[] readSize = new byte[4];
-		this.in.read(readSize);
-		int sizeOfString = ByteBuffer.wrap(readSize).getInt();
-		byte[] strbytes = new byte[sizeOfString];
-		this.in.read(strbytes);
-		String result = new String(strbytes,EncryptedCachedDiskStringsTable.encoding);
+		String result=null;
+		if (this.tempRAF==null) {
+			this.accessTempFile(itemPosition);
+			byte[] readSize = new byte[4];
+			this.in.read(readSize);
+			int sizeOfString = ByteBuffer.wrap(readSize).getInt();
+			byte[] strbytes = new byte[sizeOfString];
+			this.in.read(strbytes);
+			result = new String(strbytes,EncryptedCachedDiskStringsTable.encoding);
+		} else {
+			FileChannel fc = this.tempRAF.getChannel().position(itemPosition);
+			ByteBuffer bb = ByteBuffer.allocate(4);
+			// read size of String
+			fc.read(bb);
+			bb.flip();
+			int sizeOfStr = bb.getInt();
+			// read string
+			bb = ByteBuffer.allocate(sizeOfStr);
+			fc.read(bb);
+			bb.flip();
+			result = new String(bb.array(),EncryptedCachedDiskStringsTable.encoding);
+		}
 		if (this.cacheSize!=0) {
 			this.cache.put(index, result);
 		}
@@ -355,6 +380,7 @@ public class EncryptedCachedDiskStringsTable extends SharedStringsTable implemen
 	 * @throws IOException
 	 */
 	private void accessTempFile(long position) throws IOException {
+	
 		if ((position==0L) ||(position<this.currentPos)) { // in those cases we have to read from scratch
 			this.in = new FileInputStream(this.tempFile);
 			if (this.ca!=null) {
