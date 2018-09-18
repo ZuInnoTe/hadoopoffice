@@ -101,7 +101,7 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 	public static final boolean DEFAULT_LOWFOOTPRINT = false;
 
 	public static final String DEFAULT_CRYKEYSTOREFILE = "";
-	public static final String DEFAULT_LOWFOOTPRINT_PARSER = HadoopOfficeReadConfiguration.OPTION_LOWFOOTPRINT_PARSER_SAX;
+	public static final String DEFAULT_LOWFOOTPRINT_PARSER = HadoopOfficeReadConfiguration.OPTION_LOWFOOTPRINT_PARSER_STAX;
 	public static final int DEFAULT_LOWFOOTPRINT_STAX_CACHE = 10000;
 	public static final boolean DEFAULT_LOWFOOTPRINT_STAX_COMPRESS = false;
 	
