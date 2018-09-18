@@ -474,14 +474,14 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 			// everything else is in the getNextMethod
 			try {
 				result=this.getNextPull();
-			} catch (XMLStreamException e) {
+			} catch (XMLStreamException | FormatNotUnderstoodException e) {
 				LOG.error(e);
 			}
 		} 
 		return result;
 	}
 	
-	private Object[] getNextPull() throws XMLStreamException {
+	private Object[] getNextPull() throws XMLStreamException, FormatNotUnderstoodException {
 		Object[] result=null;
 		// check if currentPullParser == null
 		if ((this.currentPullParser==null) || (!this.currentPullParser.hasNext())) {
