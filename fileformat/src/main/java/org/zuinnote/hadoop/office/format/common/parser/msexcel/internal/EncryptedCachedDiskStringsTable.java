@@ -244,7 +244,7 @@ public class EncryptedCachedDiskStringsTable extends SharedStringsTable implemen
 				fc.write(ByteBuffer.wrap(sizeOfStr));
 				fc.write(ByteBuffer.wrap(strbytes));
 			}
-			this.tempFileSize+=4+strbytes.length;
+			this.tempFileSize+=sizeOfStr.length+strbytes.length;
 		}
 		if (this.cacheSize<0) { // put it into cache
 			this.cache.put(this.currentItem, str);
@@ -340,6 +340,7 @@ public class EncryptedCachedDiskStringsTable extends SharedStringsTable implemen
 			int sizeOfString = ByteBuffer.wrap(readSize).getInt();
 			byte[] strbytes = new byte[sizeOfString];
 			this.in.read(strbytes);
+			this.currentPos+=readSize.length+strbytes.length;
 			result = new String(strbytes,EncryptedCachedDiskStringsTable.encoding);
 		} else {
 			FileChannel fc = this.tempRAF.getChannel().position(itemPosition);
@@ -380,7 +381,6 @@ public class EncryptedCachedDiskStringsTable extends SharedStringsTable implemen
 	 * @throws IOException
 	 */
 	private void accessTempFile(long position) throws IOException {
-	
 		if ((position==0L) ||(position<this.currentPos)) { // in those cases we have to read from scratch
 			this.in = new FileInputStream(this.tempFile);
 			if (this.ca!=null) {
@@ -393,8 +393,11 @@ public class EncryptedCachedDiskStringsTable extends SharedStringsTable implemen
 				this.in=new BufferedInputStream(this.in, EncryptedCachedDiskStringsTable.compressBufferSize);
 			}
 			this.currentPos=0L;
+		} 
+		else if (position>this.currentPos) {
+			this.in.skip(position-this.currentPos);
+			this.currentPos=position; // attention needs to be updated after read!
 		}
-		this.in.skip(position-this.currentPos);
-		this.currentPos=position;
+		
 	}
 }
