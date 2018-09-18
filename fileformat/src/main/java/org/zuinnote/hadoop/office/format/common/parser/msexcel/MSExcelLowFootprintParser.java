@@ -567,7 +567,9 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
  	  if (this.in!=null) {
  		  this.in.close();
  	  }
-		
+	  if (this.pullSST!=null) {
+		  this.pullSST.close();
+	  }
 	}
 
 	
