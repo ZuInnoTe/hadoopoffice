@@ -161,6 +161,8 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 		if ((this.hocr.getMetaDataFilter()!=null) && (this.hocr.getMetaDataFilter().size()>0))  {
 			LOG.warn("Metadata filtering is not supported in low footprint parsing mode");
 		}
+	
+		
 	}
 	
 	/*
@@ -480,7 +482,7 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 		if ((this.currentPullParser==null) || (!this.currentPullParser.hasNext())) {
 			if (this.pullSheetInputList.size()>0) {
 					try {
-						this.currentPullParser=new XSSFPullParser(this.pullSheetNameList.get(0),this.pullSheetInputList.get(0),this.pullSST,this.styles, this.isDate1904);
+						this.currentPullParser=new XSSFPullParser(this.pullSheetNameList.get(0),this.pullSheetInputList.get(0),this.pullSST,this.styles, this.useDataFormatter, this.isDate1904);
 						this.pullSheetNameList.remove(0);
 						this.pullSheetInputList.remove(0);
 					} catch (XMLStreamException e) {

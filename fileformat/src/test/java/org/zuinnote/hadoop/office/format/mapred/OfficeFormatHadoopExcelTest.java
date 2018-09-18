@@ -5043,7 +5043,6 @@ public class OfficeFormatHadoopExcelTest {
 	}
 	
 	@Test
-	@Disabled("Work in progress")
 	public void readExcelInputFormatExcel2013SingleSheetLowFootprintStax() throws IOException {
 		JobConf job = new JobConf(defaultConf);
 		ClassLoader classLoader = getClass().getClassLoader();
