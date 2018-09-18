@@ -62,6 +62,9 @@ public class EncryptedTempData {
 					SecretKeySpec skeySpec = new SecretKeySpec(key,ca.jceId);
 					this.ca = ca;
 					this.cm = cm;
+					if (this.cm.jceId.equals(ChainingMode.ecb.jceId)) { // does not work with Crpyto Functions since it does not require IV
+						this.cm=ChainingMode.cbc;
+					}
 					this.ciEncrypt=CryptoFunctions.getCipher(skeySpec, ca, cm, iv, Cipher.ENCRYPT_MODE,"PKCS5Padding");
 					this.ciDecrypt=CryptoFunctions.getCipher(skeySpec, ca, cm, iv, Cipher.DECRYPT_MODE,"PKCS5Padding");
 		}

@@ -95,6 +95,7 @@ public class EncryptedCachedDiskStringsTable extends SharedStringsTable implemen
 	private boolean compressTempFile;
 	private long currentPos;
 	private int currentItem;
+	private int count;
 	private RandomAccessFile tempRAF = null;
 
 	/***
@@ -117,6 +118,7 @@ public class EncryptedCachedDiskStringsTable extends SharedStringsTable implemen
 	public EncryptedCachedDiskStringsTable(PackagePart part, int cacheSize, boolean compressTempFile,
 			CipherAlgorithm ca, ChainingMode cm) throws IOException {
 		this.cacheSize = cacheSize;
+		this.count=0;
 		if (this.cacheSize > 0) {
 
 			this.cache = new LRUCache<>(((int) Math.ceil(this.cacheSize / 0.75)) + 1); // based on recommendations of
@@ -140,8 +142,11 @@ public class EncryptedCachedDiskStringsTable extends SharedStringsTable implemen
 			SecretKeySpec skeySpec = new SecretKeySpec(key, ca.jceId);
 			this.ca = ca;
 			this.cm = cm;
-			this.ciEncrypt = CryptoFunctions.getCipher(skeySpec, ca, cm, iv, Cipher.ENCRYPT_MODE, "PKCS5Padding");
-			this.ciDecrypt = CryptoFunctions.getCipher(skeySpec, ca, cm, iv, Cipher.DECRYPT_MODE, "PKCS5Padding");
+			if (this.cm.jceId.equals(ChainingMode.ecb.jceId)) { // does not work with Crpyto Functions since it does not require IV
+				this.cm=ChainingMode.cbc;
+			}
+			this.ciEncrypt = CryptoFunctions.getCipher(skeySpec, this.ca, this.cm, iv, Cipher.ENCRYPT_MODE, "PKCS5Padding");
+			this.ciDecrypt = CryptoFunctions.getCipher(skeySpec, this.ca, this.cm, iv, Cipher.DECRYPT_MODE, "PKCS5Padding");
 		}
 		this.originalIS = part.getInputStream();
 		this.readFrom(this.originalIS);
@@ -185,6 +190,7 @@ public class EncryptedCachedDiskStringsTable extends SharedStringsTable implemen
 					String siText = this.parseSIText(xer);
 					// add string to temp file
 					this.addString(siText, tempOS);
+					this.count++;
 				}
 			}
 			// close tempfile
@@ -423,4 +429,14 @@ public class EncryptedCachedDiskStringsTable extends SharedStringsTable implemen
 		}
 
 	}
+
+	/**
+	 * @return the count
+	 */
+	@Override
+	public int getCount() {
+		return count;
+	}
+
+
 }
