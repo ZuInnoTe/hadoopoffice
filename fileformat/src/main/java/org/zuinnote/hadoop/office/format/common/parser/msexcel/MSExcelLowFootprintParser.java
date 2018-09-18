@@ -486,6 +486,7 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 					try {
 						this.currentPullParser=new XSSFPullParser(this.pullSheetNameList.get(0),this.pullSheetInputList.get(0),this.pullSST,this.styles, this.useDataFormatter, this.isDate1904);
 						this.pullSheetNameList.remove(0);
+						this.pullSheetInputList.remove(0);
 					} catch (XMLStreamException e) {
 						LOG.error(e);
 
