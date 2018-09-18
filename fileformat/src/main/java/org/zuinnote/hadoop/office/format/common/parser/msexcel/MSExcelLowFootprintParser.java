@@ -193,8 +193,9 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 							EncryptionInfo info = new EncryptionInfo(poifs);
 							
 							Decryptor d = Decryptor.getInstance(info);
-							this.ca = info.getHeader().getCipherAlgorithm();
-							this.cm = info.getHeader().getChainingMode();
+						
+							this.ca = d.getEncryptionInfo().getHeader().getCipherAlgorithm();
+							this.cm = d.getEncryptionInfo().getHeader().getChainingMode();
 							try {
 								if (!d.verifyPassword(this.hocr.getPassword())) {
 									throw new FormatNotUnderstoodException("Error: Cannot decrypt new Excel file (.xlsx) in low footprint mode: wrong password");
@@ -343,8 +344,9 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 				this.pushSST = new ReadOnlySharedStringsTable(pkg);
 			} else if (HadoopOfficeReadConfiguration.OPTION_LOWFOOTPRINT_PARSER_STAX.equalsIgnoreCase(this.hocr.getLowFootprintParser())) {
 				List<PackagePart> pkgParts = pkg.getPartsByContentType(XSSFRelation.SHARED_STRINGS.getContentType());
-				
-				this.pullSST = new EncryptedCachedDiskStringsTable(pkgParts.get(0), this.hocr.getSstCacheSize(), this.hocr.getCompressSST(), this.ca, this.cm);			
+				if (pkgParts.size()>0) {
+					this.pullSST = new EncryptedCachedDiskStringsTable(pkgParts.get(0), this.hocr.getSstCacheSize(), this.hocr.getCompressSST(), this.ca, this.cm);			
+				}
 			}
 			this.styles = r.getStylesTable();
 			XSSFReader.SheetIterator iter = (XSSFReader.SheetIterator)r.getSheetsData();

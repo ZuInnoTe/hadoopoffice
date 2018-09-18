@@ -690,7 +690,7 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 
 	public void setIgnoreLineBreaks(boolean ignoreLineBreaks) {
 		this.ignoreLineBreaks = ignoreLineBreaks;
-		if (this.ignoreLineBreaks) {
+		if ((this.ignoreLineBreaks) && (this.getSigKeystoreFile()!=null) && (!"".equals(this.getSigKeystoreFile()))) {
 			System.setProperty("org.apache.xml.security.ignoreLineBreaks", "true");
 		}
 	}
