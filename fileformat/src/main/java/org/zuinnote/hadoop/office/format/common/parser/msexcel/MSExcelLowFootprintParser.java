@@ -124,6 +124,7 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 	private ChainingMode cm;
 	private StylesTable styles;
 	private boolean isDate1904;
+	private boolean headerParsed;
 	
 	public MSExcelLowFootprintParser(HadoopOfficeReadConfiguration hocr) {
 		this(hocr, null);
@@ -154,6 +155,7 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 		this.currentSheet=0;
 		this.pullSheetInputList=new ArrayList<>();
 		this.pullSheetNameList=new ArrayList<>();
+		this.headerParsed=false;
 		// check not supported things and log
 		if ((this.hocr.getReadLinkedWorkbooks()) || (this.hocr.getIgnoreMissingLinkedWorkbooks())) {
 			LOG.warn("Linked workbooks not supported in low footprint parsing mode");
@@ -431,6 +433,7 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 				 this.header=new String[0];
 			 }
 		 }
+		 this.headerParsed=true;
 		
 	}
 	
@@ -487,6 +490,22 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 						this.currentPullParser=new XSSFPullParser(this.pullSheetNameList.get(0),this.pullSheetInputList.get(0),this.pullSST,this.styles, this.useDataFormatter, this.isDate1904);
 						this.pullSheetNameList.remove(0);
 						this.pullSheetInputList.remove(0);
+						// check if we need to skip lines
+						if ((this.hocr.getSkipLinesAllSheets()) && (this.headerParsed)) {
+							for (int i=0;i<this.hocr.getSkipLines();i++) {
+								if (this.currentPullParser.hasNext()) {
+									this.currentPullParser.getNext(); // skip line
+								}
+								this.currentRow++;
+							}
+						}
+						// check if we need to skip header
+						if ((this.hocr.getIgnoreHeaderInAllSheets()) && (this.headerParsed)) {
+							if (this.currentPullParser.hasNext()) {
+								this.currentPullParser.getNext(); // skip header
+							}
+							this.currentRow++;
+						}
 					} catch (XMLStreamException e) {
 						LOG.error(e);
 
