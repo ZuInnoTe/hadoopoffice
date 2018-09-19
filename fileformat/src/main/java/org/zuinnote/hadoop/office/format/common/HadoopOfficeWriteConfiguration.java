@@ -27,6 +27,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.hadoop.conf.Configuration;
+import org.mortbay.log.Log;
 
 /**
  * read the configuration for writing office files from a Hadoop configuration
@@ -690,7 +691,10 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 
 	public void setIgnoreLineBreaks(boolean ignoreLineBreaks) {
 		this.ignoreLineBreaks = ignoreLineBreaks;
+	
+
 		if ((this.ignoreLineBreaks) && (this.getSigKeystoreFile()!=null) && (!"".equals(this.getSigKeystoreFile()))) {
+	
 			System.setProperty("org.apache.xml.security.ignoreLineBreaks", "true");
 		}
 	}

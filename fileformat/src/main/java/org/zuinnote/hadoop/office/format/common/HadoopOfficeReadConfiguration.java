@@ -101,7 +101,7 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 	public static final boolean DEFAULT_LOWFOOTPRINT = false;
 
 	public static final String DEFAULT_CRYKEYSTOREFILE = "";
-	public static final String DEFAULT_LOWFOOTPRINT_PARSER = HadoopOfficeReadConfiguration.OPTION_LOWFOOTPRINT_PARSER_SAX;
+	public static final String DEFAULT_LOWFOOTPRINT_PARSER = HadoopOfficeReadConfiguration.OPTION_LOWFOOTPRINT_PARSER_STAX;
 	public static final int DEFAULT_LOWFOOTPRINT_STAX_CACHE = 10000;
 	public static final boolean DEFAULT_LOWFOOTPRINT_STAX_COMPRESS = false;
 	
@@ -189,8 +189,6 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 		this.ignoreMissingLinkedWorkbooks = HadoopOfficeReadConfiguration.DEFAULT_IGNOREMISSINGLINKEDWB;
 		this.password = null; // null if no password is set
 
-		this.lowFootprint = HadoopOfficeReadConfiguration.DEFAULT_LOWFOOTPRINT;
-		this.setLowFootprintParser(HadoopOfficeReadConfiguration.DEFAULT_LOWFOOTPRINT_PARSER);
 		this.setCryptKeystoreFile(HadoopOfficeReadConfiguration.DEFAULT_CRYKEYSTOREFILE);
 		this.setCryptKeystoreType(HadoopOfficeReadConfiguration.DEFAULT_CRYKEYSTORETYPE);
 		this.setCryptKeystorePassword(HadoopOfficeReadConfiguration.DEFAULT_CRYKEYSTOREPW);
@@ -207,7 +205,10 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 	    this.setSkipLinesAllSheets(HadoopOfficeReadConfiguration.DEFAULT_SKIPLINESALLSHEETS);
 	    this.setColumnNameRegex(HadoopOfficeReadConfiguration.DEFAULT_COLUMNNAMESREGEX);
 	    this.setColumnNameReplace(HadoopOfficeReadConfiguration.DEFAULT_COLUMNNAMESREPLACE);
+		this.lowFootprint = HadoopOfficeReadConfiguration.DEFAULT_LOWFOOTPRINT;
 
+		this.setLowFootprintParser(HadoopOfficeReadConfiguration.DEFAULT_LOWFOOTPRINT_PARSER);
+		
 		// set date for simple format
 		Locale dateLocale = Locale.getDefault();
 		if (!("".equals(HadoopOfficeReadConfiguration.DEFAULT_SIMPLEDATEFORMAT))) { // create locale
@@ -335,8 +336,7 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 				HadoopOfficeReadConfiguration.CONF_DECRYPTLINKEDWBBASE);
 		this.lowFootprint = conf.getBoolean(HadoopOfficeReadConfiguration.CONF_LOWFOOTPRINT,
 				HadoopOfficeReadConfiguration.DEFAULT_LOWFOOTPRINT);
-		this.setLowFootprintParser(conf.get(HadoopOfficeReadConfiguration.CONF_LOWFOOTPRINT_PARSER,HadoopOfficeReadConfiguration.DEFAULT_LOWFOOTPRINT_PARSER));
-		
+	
 		this.setCryptKeystoreFile(conf.get(HadoopOfficeReadConfiguration.CONF_CRYKEYSTOREFILE,
 				HadoopOfficeReadConfiguration.DEFAULT_CRYKEYSTOREFILE));
 		this.setCryptKeystoreType(conf.get(HadoopOfficeReadConfiguration.CONF_CRYKEYSTORETYPE,
@@ -355,7 +355,9 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 				HadoopOfficeReadConfiguration.DEFAULT_SIGTRUSTTYPE));
 		this.setSigTruststorePassword(conf.get(HadoopOfficeReadConfiguration.CONF_SIGTRUSTPW,
 				HadoopOfficeReadConfiguration.DEFAULT_SIGTRUSTPW));
-		
+
+		this.setLowFootprintParser(conf.get(HadoopOfficeReadConfiguration.CONF_LOWFOOTPRINT_PARSER,HadoopOfficeReadConfiguration.DEFAULT_LOWFOOTPRINT_PARSER));
+
 		this.setReadHeader(conf.getBoolean(HadoopOfficeReadConfiguration.CONF_READHEADER, HadoopOfficeReadConfiguration.DEFAULT_READHEADER));
 		this.setIgnoreHeaderInAllSheets(conf.getBoolean(HadoopOfficeReadConfiguration.CONF_HEADERIGNOREHEADERALLSHEETS, HadoopOfficeReadConfiguration.DEFAULT_HEADERIGNOREHEADERALLSHEETS));
 		this.setSkipLines(conf.getInt(HadoopOfficeReadConfiguration.CONF_SKIPLINES, HadoopOfficeReadConfiguration.DEFAULT_SKIPLINES));
