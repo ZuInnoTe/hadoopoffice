@@ -84,7 +84,7 @@ public class XSSFPullParser {
 		if (this.finalized) { // we finished already - no more to read
 			return false;
 		}
-		if ((this.currentRow>1) && (this.currentRow<=this.nextRow)) { // we still have to process an empty row
+		if ((this.currentRow > 1) && (this.currentRow <= this.nextRow)) { // we still have to process an empty row
 			return true;
 		}
 		// search for the next row
@@ -145,15 +145,17 @@ public class XSSFPullParser {
 						String cellFormattedValue = "";
 						String cellFormula = "";
 						String cellAddress = cellAddressAT.getValue();
-						
+
 						String cellComment = "";
 						String cellSheetName = this.sheetName;
 
-						while ((!xe.isEndElement()) || !((xe.isEndElement()) && (xe.asEndElement().getName().getLocalPart().equalsIgnoreCase("c")))) {
+						while ((!xe.isEndElement()) || !((xe.isEndElement())
+								&& (xe.asEndElement().getName().getLocalPart().equalsIgnoreCase("c")))) {
 							xe = xer.nextEvent();
-							if ((xe.isStartElement()) && (xe.asStartElement().getName().getLocalPart().equalsIgnoreCase("v"))) {
-								// if a cell data type is set (e.g. b boolean, d date in ISO8601 format, e
-								// error, inlineStr, n number, s shared string, str formula string
+							if ((xe.isStartElement())
+									&& (xe.asStartElement().getName().getLocalPart().equalsIgnoreCase("v"))) {
+								// if a cell data type is set (e.g. b boolean (covered?), d date in ISO8601 format, e
+								// error, inlineStr (covered), n number (covered), s shared string (covered), str formula string (covered)
 								// we return as string
 								if (cellTypeTAT != null) {
 									XMLEvent xeSubCharacters = xer.nextEvent();
@@ -170,7 +172,7 @@ public class XSSFPullParser {
 																												// String
 																												// Table
 											int strIdx = Integer.valueOf(cellFormattedValue);
-											if ((this.sst!=null) && (this.sst.getCount()>strIdx)) {
+											if ((this.sst != null) && (this.sst.getCount() > strIdx)) {
 												cellFormattedValue = this.sst.getItemAt(strIdx).getString();
 											} else {
 												cellFormattedValue = "";
@@ -189,7 +191,8 @@ public class XSSFPullParser {
 								} else {
 									LOG.error("Cannot read celltype");
 								}
-							} else if ((xe.isStartElement()) && (xe.asStartElement().getName().getLocalPart().equalsIgnoreCase("f"))) {
+							} else if ((xe.isStartElement())
+									&& (xe.asStartElement().getName().getLocalPart().equalsIgnoreCase("f"))) {
 								// read formula
 								XMLEvent xeSubCharacters = xer.nextEvent();
 
@@ -199,9 +202,10 @@ public class XSSFPullParser {
 								} else {
 									cellFormula = xeSubCharacters.asCharacters().getData();
 								}
-							} else if ((xe.isStartElement()) && (xe.asStartElement().getName().getLocalPart().equalsIgnoreCase("is"))) {
+							} else if ((xe.isStartElement())
+									&& (xe.asStartElement().getName().getLocalPart().equalsIgnoreCase("is"))) {
 								// read inline string
-								cellFormattedValue=this.parseCellInlineStringText(xer);
+								cellFormattedValue = this.parseCellInlineStringText(xer);
 							}
 						}
 						cells.add(new SpreadSheetCellDAO(cellFormattedValue, cellComment, cellFormula, cellAddress,
@@ -221,17 +225,18 @@ public class XSSFPullParser {
 		this.currentRow++;
 		return result;
 	}
-	
-	
+
 	/**
 	 * Parses an inline string from cell in XML format
 	 * 
 	 * @param xer XMLEventReader from which to read the inline string content
 	 * @throws XMLStreamException           in case the string item cannot be
 	 *                                      correctly read from the XML file
-	 * @throws FormatNotUnderstoodException in case a string cannot be identified in cell
+	 * @throws FormatNotUnderstoodException in case a string cannot be identified in
+	 *                                      cell
 	 */
-	private String parseCellInlineStringText(XMLEventReader xer) throws XMLStreamException, FormatNotUnderstoodException {
+	private String parseCellInlineStringText(XMLEventReader xer)
+			throws XMLStreamException, FormatNotUnderstoodException {
 		String result = "";
 		XMLEvent xe;
 		while ((xe = xer.nextTag()).isStartElement()) {
@@ -265,7 +270,8 @@ public class XSSFPullParser {
 	 * @throws FormatNotUnderstoodException
 	 * @throws XMLStreamException
 	 */
-	private String parseCellInlineStringRichText(XMLEventReader xer) throws XMLStreamException, FormatNotUnderstoodException {
+	private String parseCellInlineStringRichText(XMLEventReader xer)
+			throws XMLStreamException, FormatNotUnderstoodException {
 		String result = "";
 		XMLEvent xe;
 		while ((xe = xer.nextTag()).isStartElement()) {
@@ -277,8 +283,7 @@ public class XSSFPullParser {
 			case "RPR": // run properties (ignored)
 			default:
 				LOG.error("Unknown rich text inline string tag: " + elementName);
-				throw new FormatNotUnderstoodException(
-						"Unknown rich text inline string tag: " + elementName);
+				throw new FormatNotUnderstoodException("Unknown rich text inline string tag: " + elementName);
 
 			}
 		}
