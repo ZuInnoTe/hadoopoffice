@@ -39,6 +39,10 @@ import org.zuinnote.hadoop.office.format.common.writer.OfficeWriterException;
 **/
 
 public class ExcelRecordWriter<NullWritable,SpreadSheetCellDAO>  extends AbstractSpreadSheetDocumentRecordWriter<NullWritable,SpreadSheetCellDAO>  implements Serializable {
+/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7453526005720106119L;
 private static final Log LOGRW = LogFactory.getLog(ExcelRecordWriter.class.getName());
 
 /*
