@@ -95,6 +95,8 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 				}
 			}
 		}));
+		// workaround for Apache POI 4.0
+		System.setProperty("org.apache.xml.security.ignoreLineBreaks", "true");
 	}
 
 	@AfterAll
@@ -124,6 +126,8 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		job.set("hadoopoffice.read.header.skipheaderinallsheets", "true");
 		job.set("hadoopoffice.read.lowFootprint", "true");
 
+		job.set("hadoopoffice.read.lowFootprint.parser", "sax");
+	
 		ExcelFileInputFormat format = new ExcelFileInputFormat();
 		format.configure(job);
 		InputSplit[] inputSplits = format.getSplits(job, 1);
@@ -261,6 +265,7 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 				"Input Split for Excel file contains no further row");
 	}
 
+
 	@Test
 	public void readExcelInputFormatExcel2013MultiSheetHeaderRegExLowFootprint() throws IOException {
 		JobConf job = new JobConf(defaultConf);
@@ -277,6 +282,7 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		job.set("hadoopoffice.read.header.column.names.replace", "spalte");
 		job.set("hadoopoffice.read.lowFootprint", "true");
 
+		job.set("hadoopoffice.read.lowFootprint.parser", "sax");
 		ExcelFileInputFormat format = new ExcelFileInputFormat();
 		format.configure(job);
 		InputSplit[] inputSplits = format.getSplits(job, 1);
@@ -307,6 +313,8 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		job.set("hadoopoffice.read.sheet.skiplines.num", "5");
 		job.set("hadoopoffice.read.sheet.skiplines.allsheets", "true");
 		job.set("hadoopoffice.read.lowFootprint", "true");
+
+		job.set("hadoopoffice.read.lowFootprint.parser", "sax");
 		ExcelFileInputFormat format = new ExcelFileInputFormat();
 		format.configure(job);
 		InputSplit[] inputSplits = format.getSplits(job, 1);
@@ -454,9 +462,9 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		SpreadSheetCellDAO c1 = new SpreadSheetCellDAO("test3", "", "", "C1", "Sheet1");
 		// empty row => nothing todo
 		// one row numbers (1,2,3)
-		SpreadSheetCellDAO a3 = new SpreadSheetCellDAO("", "", "1", "A3", "Sheet1");
-		SpreadSheetCellDAO b3 = new SpreadSheetCellDAO("", "", "2", "B3", "Sheet1");
-		SpreadSheetCellDAO c3 = new SpreadSheetCellDAO("", "", "3", "C3", "Sheet1");
+		SpreadSheetCellDAO a3 = new SpreadSheetCellDAO("1", "", "1", "A3", "Sheet1");
+		SpreadSheetCellDAO b3 = new SpreadSheetCellDAO("2", "", "2", "B3", "Sheet1");
+		SpreadSheetCellDAO c3 = new SpreadSheetCellDAO("3", "", "3", "C3", "Sheet1");
 		// one row formulas (=A3+B3)
 		SpreadSheetCellDAO a4 = new SpreadSheetCellDAO("", "", "A3+B3", "A4", "Sheet1");
 		// write
@@ -509,8 +517,6 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		FileInputFormat.setInputPaths(job, inputFile);
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
-
-		// low footprint
 		job.set("hadoopoffice.read.security.sign.verifysignature", "true");
 		ExcelFileInputFormat inputFormat = new ExcelFileInputFormat();
 		inputFormat.configure(job);
@@ -672,6 +678,8 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		// low footprint
 
 		job.set("hadoopoffice.read.lowFootprint", "true");
+
+		job.set("hadoopoffice.read.lowFootprint.parser", "sax");
 		job.set("hadoopoffice.read.security.sign.verifysignature", "true");
 		ExcelFileInputFormat inputFormat = new ExcelFileInputFormat();
 		inputFormat.configure(job);
@@ -744,6 +752,8 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		// low footprint
 
 		job.set("hadoopoffice.read.lowFootprint", "true");
+
+		job.set("hadoopoffice.read.lowFootprint.parser", "sax");
 		job.set("hadoopoffice.read.security.sign.verifysignature", "true"); // will fail no signature provided
 		ExcelFileInputFormat inputFormat = new ExcelFileInputFormat();
 		inputFormat.configure(job);
@@ -1112,6 +1122,8 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 
 		// low footprint
 		job.set("hadoopoffice.read.lowFootprint", "true");
+
+		job.set("hadoopoffice.read.lowFootprint.parser", "sax");
 		ExcelFileInputFormat format = new ExcelFileInputFormat();
 		format.configure(job);
 		InputSplit[] inputSplits = format.getSplits(job, 1);
@@ -1433,6 +1445,8 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		job.set("hadoopoffice.read.locale.bcp47", "de");
 		// low footprint
 		job.set("hadoopoffice.read.lowFootprint", "true");
+
+		job.set("hadoopoffice.read.lowFootprint.parser", "sax");
 		ExcelFileInputFormat format = new ExcelFileInputFormat();
 		format.configure(job);
 		InputSplit[] inputSplits = format.getSplits(job, 1);
@@ -1569,6 +1583,8 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		job.set("hadoopoffice.read.locale.bcp47", "de");
 		// low footprint
 		job.set("hadoopoffice.read.lowFootprint", "true");
+
+		job.set("hadoopoffice.read.lowFootprint.parser", "sax");
 		// for decryption simply set the password
 		job.set("hadoopoffice.read.security.crypt.password", "test");
 		ExcelFileInputFormat format = new ExcelFileInputFormat();
@@ -1607,7 +1623,10 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		job.set("hadoopoffice.read.locale.bcp47", "de");
 		// low footprint
 		job.set("hadoopoffice.read.lowFootprint", "true");
+
+		job.set("hadoopoffice.read.lowFootprint.parser", "sax");
 		// for decryption simply set the password
+
 		job.set("hadoopoffice.read.security.crypt.password", "test2");
 		ExcelFileInputFormat format = new ExcelFileInputFormat();
 		format.configure(job);
@@ -1617,6 +1636,7 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		assertNull(reader, "Null record reader implies invalid password");
 	}
 
+	
 	@Test
 	public void readExcelInputFormatExcel2003SingleSheetEncryptedNegativeLowFootprint() throws IOException {
 		JobConf job = new JobConf(defaultConf);
@@ -1653,6 +1673,8 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 
 		// low footprint
 		job.set("hadoopoffice.read.lowFootprint", "true");
+
+		job.set("hadoopoffice.read.lowFootprint.parser", "sax");
 		ExcelFileInputFormat format = new ExcelFileInputFormat();
 		format.configure(job);
 		InputSplit[] inputSplits = format.getSplits(job, 1);
@@ -1710,6 +1732,7 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 
 		// low footprint
 		job.set("hadoopoffice.read.lowFootprint", "true");
+		
 		ExcelFileInputFormat format = new ExcelFileInputFormat();
 		format.configure(job);
 		InputSplit[] inputSplits = format.getSplits(job, 1);

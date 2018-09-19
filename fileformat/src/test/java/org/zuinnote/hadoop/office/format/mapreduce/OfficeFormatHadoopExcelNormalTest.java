@@ -109,6 +109,8 @@ public class OfficeFormatHadoopExcelNormalTest {
 				}
 			}
 		}));
+		// workaround for Apache POI 4.0
+		System.setProperty("org.apache.xml.security.ignoreLineBreaks", "true");
 	}
 
 	@AfterAll
