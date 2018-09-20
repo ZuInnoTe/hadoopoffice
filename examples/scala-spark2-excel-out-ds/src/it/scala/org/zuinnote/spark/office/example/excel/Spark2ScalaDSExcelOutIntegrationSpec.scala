@@ -141,7 +141,7 @@ Given("In-memory data input")
   SparkScalaExcelOutDataSource.saveAsExcelFile(sc,dfsCluster.getFileSystem().getUri().toString()+DFS_OUTPUT_DIR_NAME)
 	Then("stored Excel file on DFS can be read correctly")
 	// fetch results
-  val dfIn = sqlContext.read.format("org.zuinnote.spark.office.excel").option("read.locale.bcp47", "us").load(dfsCluster.getFileSystem().getUri().toString()+DFS_OUTPUT_DIR_NAME)
+  val dfIn = sqlContext.read.format("org.zuinnote.spark.office.excel").option("hadoopoffice.read.locale.bcp47", "us").load(dfsCluster.getFileSystem().getUri().toString()+DFS_OUTPUT_DIR_NAME)
   assert(3==dfIn.count)
   val rowsDF=dfIn.select(explode(dfIn("rows")).alias("rows"))
   val formattedValues = rowsDF.select("rows.formattedValue").collect

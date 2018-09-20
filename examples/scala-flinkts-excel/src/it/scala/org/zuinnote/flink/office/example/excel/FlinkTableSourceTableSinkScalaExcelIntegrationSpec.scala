@@ -164,6 +164,8 @@ override def beforeAll(): Unit = {
     val decimalFormat: DecimalFormat = NumberFormat.getInstance(Locale.GERMANY).asInstanceOf[DecimalFormat]	
     hocr.setReadHeader(true)
     hocr.setLocale(Locale.GERMANY)
+    hocr.setSimpleDateFormat(dateFormat)
+    hocr.setSimpleDecimalFormat(decimalFormat)
 	val sourceReWritten: ExcelFlinkTableSource = ExcelFlinkTableSource.builder()
       .path(dfsCluster.getFileSystem().getUri().toString() + DFS_OUTPUT_DIR_NAME)
       .field("decimalsc1", Types.DECIMAL)
@@ -176,8 +178,6 @@ override def beforeAll(): Unit = {
       .field("intcolumn", Types.INT)
       .field("longcolumn", Types.LONG)
       .conf(hocr)
-      .dateFormat(dateFormat)
-      .decimalFormat(decimalFormat)
       .build()
     tableEnvironment.registerTableSource("testsimplerewritten", sourceReWritten)
 

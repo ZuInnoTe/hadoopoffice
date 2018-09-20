@@ -56,7 +56,7 @@ val sparkSession = SparkSession.builder.appName("Spark-Scala Excel Analytics (ha
       .format("org.zuinnote.spark.office.excel")
            /** note this sets the locale to us-english, which means that numbers might be displayed differently then you expect. Change this to the locale of the Excel file **/
      
-    .option("write.locale.bcp47", "us") 
+    .option("hadoopoffice.write.locale.bcp47", "us") 
     .save(outputFile)
 	 
     }

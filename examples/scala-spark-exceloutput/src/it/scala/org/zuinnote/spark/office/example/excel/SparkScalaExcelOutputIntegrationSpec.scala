@@ -51,7 +51,7 @@ import org.apache.hadoop.io.compress.SplitCompressionInputStream
 import org.zuinnote.hadoop.office.format.common.util._
 import org.zuinnote.hadoop.office.format.common.converter._
 import org.zuinnote.hadoop.office.format.common.dao._
-import org.zuinnote.hadoop.office.format.common.parser._
+import org.zuinnote.hadoop.office.format.common.parser.msexcel._
 import org.zuinnote.hadoop.office.format.common._
 
 import org.apache.spark.{SparkConf, SparkContext}

@@ -131,7 +131,7 @@ class FlinkScalaExcelTableSourceIntegrationSpec extends FlatSpec with BeforeAndA
     // create input directory
     dfsCluster.getFileSystem().delete(DFS_INPUT_DIR, true)
     dfsCluster.getFileSystem().mkdirs(DFS_INPUT_DIR)
-    // copy bitcoin blocks
+    // copy excel files
     val classLoader = getClass().getClassLoader()
     // put testdata on DFS
     val fileName: String = "testsimple.xlsx"
@@ -144,6 +144,9 @@ class FlinkScalaExcelTableSourceIntegrationSpec extends FlatSpec with BeforeAndA
     val decimalFormat: DecimalFormat = NumberFormat.getInstance(Locale.GERMANY).asInstanceOf[DecimalFormat]
     hocr.setReadHeader(true)
     hocr.setLocale(Locale.GERMANY)
+    
+    hocr.setSimpleDateFormat(dateFormat)
+    hocr.setSimpleDecimalFormat(decimalFormat)
     val source: ExcelFlinkTableSource = ExcelFlinkTableSource.builder()
       .path(dfsCluster.getFileSystem().getUri().toString() + DFS_INPUT_DIR_NAME)
       .field("decimalsc1", Types.DECIMAL)
@@ -156,8 +159,6 @@ class FlinkScalaExcelTableSourceIntegrationSpec extends FlatSpec with BeforeAndA
       .field("intcolumn", Types.INT)
       .field("longcolumn", Types.LONG)
       .conf(hocr)
-      .dateFormat(dateFormat)
-      .decimalFormat(decimalFormat)
       .build()
     tableEnvironment.registerTableSource("testsimple", source)
     Then("all cells should be read correctly")

@@ -88,10 +88,8 @@ public class ExcelTextSerdeTest {
 		ExcelSerde testSerde = new ExcelSerde();
 		Configuration conf = new Configuration();
 		Properties tblProperties = new Properties();
-		tblProperties.setProperty(ExcelSerde.CONF_DATEFORMAT, "de");
-		tblProperties.setProperty(ExcelSerde.CONF_DECIMALFORMAT, "de");
 		tblProperties.setProperty(ExcelSerde.CONF_DEFAULTSHEETNAME, "Sheet2");
-		tblProperties.setProperty(ExcelSerde.CONF_WRITEHEADER, "true");
+		tblProperties.setProperty("hadoopoffice.write.header.write", "true");
 		tblProperties.setProperty("hadoopoffice.read.locale.bcp47", "de");
 		tblProperties.setProperty("hadoopoffice.read.linkedworkbooks", "true");
 		tblProperties.setProperty(serdeConstants.LIST_COLUMNS, "column1,column2");
@@ -113,10 +111,12 @@ public class ExcelTextSerdeTest {
 		ExcelSerde testSerde = new ExcelSerde();
 		Configuration hadoopConf = new Configuration();
 		Properties tblProperties = new Properties();
-		tblProperties.setProperty(ExcelSerde.CONF_DATEFORMAT, "us");
-		tblProperties.setProperty(ExcelSerde.CONF_DECIMALFORMAT, "de");
+		
+		
+		tblProperties.setProperty("hadoopoffice.read.simple.dateFormat", "us");
+		tblProperties.setProperty("hadoopoffice.read.simple.decimalFormat", "de");
 		tblProperties.setProperty(ExcelSerde.CONF_DEFAULTSHEETNAME, "Sheet1");
-		tblProperties.setProperty(ExcelSerde.CONF_WRITEHEADER, "false");
+		tblProperties.setProperty("hadoopoffice.write.header.write", "false");
 		tblProperties.setProperty("hadoopoffice.read.locale.bcp47", "de");
 		tblProperties.setProperty(serdeConstants.LIST_COLUMNS,
 				"decimalsc1,booleancolumn,datecolumn,stringcolumn,decimalp8sc3,bytecolumn,shortcolumn,intcolumn,longcolumn");
@@ -233,10 +233,10 @@ public class ExcelTextSerdeTest {
 		ExcelSerde testSerde = new ExcelSerde();
 		Configuration hadoopConf = new Configuration();
 		Properties tblProperties = new Properties();
-		tblProperties.setProperty(ExcelSerde.CONF_DATEFORMAT, "us");
-		tblProperties.setProperty(ExcelSerde.CONF_DECIMALFORMAT, "de");
+		tblProperties.setProperty("hadoopoffice.read.simple.dateFormat", "us");
+		tblProperties.setProperty("hadoopoffice.read.simple.decimalFormat", "de");
 		tblProperties.setProperty(ExcelSerde.CONF_DEFAULTSHEETNAME, "Sheet1");
-		tblProperties.setProperty(ExcelSerde.CONF_WRITEHEADER, "false");
+		tblProperties.setProperty("hadoopoffice.write.header.write", "false");
 		tblProperties.setProperty("hadoopoffice.read.locale.bcp47", "de");
 		tblProperties.setProperty(serdeConstants.LIST_COLUMNS,
 				"decimalsc1,booleancolumn,datecolumn,stringcolumn,decimalp8sc3,bytecolumn,shortcolumn,intcolumn,longcolumn");
@@ -244,6 +244,8 @@ public class ExcelTextSerdeTest {
 				"decimal(3,2),boolean,date,string,decimal(8,3),tinyint,smallint,int,bigint");
 		testSerde.initialize(hadoopConf, tblProperties);
 
+		
+		
 		// 1) prepare data (=deserialize)
 
 		FileInputStream documentInputStream = new FileInputStream(new File(fileNameSpreadSheet));
@@ -805,10 +807,10 @@ public class ExcelTextSerdeTest {
 		ExcelSerde testSerde = new ExcelSerde();
 		Configuration hadoopConf = new Configuration();
 		Properties tblProperties = new Properties();
-		tblProperties.setProperty(ExcelSerde.CONF_DATEFORMAT, "us");
-		tblProperties.setProperty(ExcelSerde.CONF_DECIMALFORMAT, "de");
+		tblProperties.setProperty("hadoopoffice.read.simple.dateFormat", "us");
+		tblProperties.setProperty("hadoopoffice.read.simple.decimalFormat", "de");
 		tblProperties.setProperty(ExcelSerde.CONF_DEFAULTSHEETNAME, "Sheet1");
-		tblProperties.setProperty(ExcelSerde.CONF_WRITEHEADER, "true");
+		tblProperties.setProperty("hadoopoffice.write.header.write", "true");
 		tblProperties.setProperty("hadoopoffice.read.locale.bcp47", "de");
 		tblProperties.setProperty(serdeConstants.LIST_COLUMNS,
 				"decimalsc1,booleancolumn,datecolumn,stringcolumn,decimalp8sc3,bytecolumn,shortcolumn,intcolumn,longcolumn");

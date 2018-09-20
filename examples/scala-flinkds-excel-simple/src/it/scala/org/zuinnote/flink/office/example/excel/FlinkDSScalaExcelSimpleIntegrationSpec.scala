@@ -156,8 +156,10 @@ override def beforeAll(): Unit = {
     val dateFormat: SimpleDateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.US).asInstanceOf[SimpleDateFormat] //important: even for non-US excel files US must be used most of the time, because this is how Excel stores them internally
 	val decimalFormat: DecimalFormat = NumberFormat.getInstance(Locale.GERMAN).asInstanceOf[DecimalFormat] 
 	hocr.setReadHeader(false) // the Excel file does not contain header in first line
+	hocr.setSimpleDateFormat(dateFormat)
+	hocr.setSimpleDecimalFormat(decimalFormat)
 	// we have maxInferRows = -1 , which means we read the Excel file first to infer the underlying schema
-	val inputFormat = new SimpleExcelFlinkFileInputFormat(hocr, -1, dateFormat, decimalFormat)
+	val inputFormat = new SimpleExcelFlinkFileInputFormat(hocr, -1)
     val excelInData = flinkEnvironment.readFile(inputFormat, dfsCluster.getFileSystem().getUri().toString()+DFS_OUTPUT_DIR_NAME)
  
     val allRows = excelInData.collect()

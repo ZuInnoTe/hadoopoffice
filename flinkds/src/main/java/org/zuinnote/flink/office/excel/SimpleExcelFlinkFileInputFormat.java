@@ -53,15 +53,12 @@ public class SimpleExcelFlinkFileInputFormat extends AbstractSpreadSheetFlinkFil
 	 * 
 	 * @param hocr
 	 * @param maxInferRows
-	 * @param dateFormat
-	 * @param decimalFormat
 	 */
-	public SimpleExcelFlinkFileInputFormat(HadoopOfficeReadConfiguration hocr, long maxInferRows, 
-			SimpleDateFormat dateFormat, DecimalFormat decimalFormat) {
+	public SimpleExcelFlinkFileInputFormat(HadoopOfficeReadConfiguration hocr, long maxInferRows) {
 		super(hocr);
 		this.maxInferRows = maxInferRows;
 	
-		this.converter = new ExcelConverterSimpleSpreadSheetCellDAO(dateFormat, decimalFormat);
+		this.converter = new ExcelConverterSimpleSpreadSheetCellDAO(hocr.getSimpleDateFormat(),hocr.getSimpleDecimalFormat(),hocr.getSimpleDateTimeFormat());
 		this.shocr = hocr;
 		hocr.setMimeType(AbstractSpreadSheetFlinkFileInputFormat.MIMETYPE_EXCEL);
 

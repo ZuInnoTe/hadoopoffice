@@ -55,6 +55,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.IntObjectInspecto
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.LongObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.ShortObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.StringObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.primitive.TimestampObjectInspector;
 import org.apache.hadoop.hive.serde2.typeinfo.CharTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.DecimalTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
@@ -64,6 +65,8 @@ import org.apache.hadoop.hive.serde2.typeinfo.VarcharTypeInfo;
 import org.apache.hadoop.io.ArrayWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Writable;
+import org.zuinnote.hadoop.office.format.common.HadoopOfficeReadConfiguration;
+import org.zuinnote.hadoop.office.format.common.HadoopOfficeWriteConfiguration;
 import org.zuinnote.hadoop.office.format.common.converter.ExcelConverterSimpleSpreadSheetCellDAO;
 import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericBigDecimalDataType;
 import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericBooleanDataType;
@@ -76,9 +79,10 @@ import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericInteg
 import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericLongDataType;
 import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericShortDataType;
 import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericStringDataType;
+import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericTimestampDataType;
 import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAOArrayWritable;
-import org.zuinnote.hadoop.office.format.common.util.MSExcelUtil;
+import org.zuinnote.hadoop.office.format.common.util.msexcel.MSExcelUtil;
 
 /**
  * SerDe for Excel files (.xls,.xlsx) to retrieve them as rows and store them in Excel.  Note: you need to specify a schema according to which the data in the Excel should be converted.
@@ -86,25 +90,23 @@ import org.zuinnote.hadoop.office.format.common.util.MSExcelUtil;
  */
 
 public class ExcelSerde extends AbstractSerDe {
-	public static final String CONF_DATEFORMAT = "office.hive.dateFormat";
-	public static final String CONF_DECIMALFORMAT = "office.hive.decimalFormat";
-	public static final String CONF_WRITEHEADER = "office.hive.write.header";
+	
 	public static final String CONF_DEFAULTSHEETNAME = "office.hive.write.defaultSheetName";
-	public static final Boolean DEFAULT_WRITEHEADER = false;
-	public static final String DEFAULT_DATEFORMAT = "US";
-	public static final String DEFAULT_DECIMALFORMAT = "";
+	
+	
 	public static final String DEFAULT_DEFAULTSHEETNAME = "Sheet1";
 	public static final String HOSUFFIX = "hadoopoffice.";
 	private static final Log LOG = LogFactory.getLog(ExcelSerde.class.getName());
 	private ObjectInspector oi;
-	private boolean writeHeader = ExcelSerde.DEFAULT_WRITEHEADER;
 	private String defaultSheetName = ExcelSerde.CONF_DEFAULTSHEETNAME;
 	private List<String> columnNames;
 	private List<TypeInfo> columnTypes;
 	private Object[] nullRow;
 	private Object[] outputRow;
 	private int currentWriteRow;
-	private ExcelConverterSimpleSpreadSheetCellDAO converter;
+	private ExcelConverterSimpleSpreadSheetCellDAO readConverter;
+	private ExcelConverterSimpleSpreadSheetCellDAO writeConverter;
+	private boolean writeHeader;
 
 	/**
 	 * Initializes the Serde
@@ -139,33 +141,12 @@ public class ExcelSerde extends AbstractSerDe {
 		LOG.debug("Initializing Excel Hive Serde");
 		LOG.debug("Configuring Hive-only options");
 		// configure hadoopoffice specific hive options
-		String writeHeaderStr = prop.getProperty(ExcelSerde.CONF_WRITEHEADER);
-		if (writeHeaderStr != null) {
-			this.writeHeader = Boolean.valueOf(writeHeaderStr);
-		}
+
 		String defaultSheetNameStr = prop.getProperty(ExcelSerde.CONF_DEFAULTSHEETNAME);
 		if (defaultSheetNameStr != null) {
 			this.defaultSheetName = defaultSheetNameStr;
 		}
-		String dateFormatStr = prop.getProperty(ExcelSerde.CONF_DATEFORMAT);
-		if (dateFormatStr == null) {
-			dateFormatStr = ExcelSerde.DEFAULT_DATEFORMAT;
-		}
-		Locale datelocale = Locale.getDefault();
-		if (!"".equals(dateFormatStr)) {
-			datelocale = new Locale.Builder().setLanguageTag(dateFormatStr).build();
-		}
-		SimpleDateFormat dateFormat = (SimpleDateFormat) DateFormat.getDateInstance(DateFormat.SHORT, datelocale);
-		String decimalFormatString = prop.getProperty(ExcelSerde.CONF_DECIMALFORMAT);
-		if (decimalFormatString == null) {
-			decimalFormatString = ExcelSerde.DEFAULT_DECIMALFORMAT;
-		}
-		Locale decimallocale = Locale.getDefault();
-		if (!"".equals(decimalFormatString)) {
-			decimallocale = new Locale.Builder().setLanguageTag(decimalFormatString).build();
-		}
-		DecimalFormat decimalFormat = (DecimalFormat) NumberFormat.getInstance(decimallocale);
-		// copy hadoopoffice options
+	// copy hadoopoffice options
 		LOG.debug("Configuring HadoopOffice Format");
 		Set<Entry<Object, Object>> entries = prop.entrySet();
 		for (Entry<Object, Object> entry : entries) {
@@ -178,6 +159,7 @@ public class ExcelSerde extends AbstractSerDe {
 				}
 			}
 		}
+
 		// create object inspector (always a struct = row)
 		LOG.debug("Creating object inspector");
 		this.columnNames = Arrays.asList(prop.getProperty(serdeConstants.LIST_COLUMNS).split(","));
@@ -189,7 +171,12 @@ public class ExcelSerde extends AbstractSerDe {
 		this.oi = ObjectInspectorFactory.getStandardStructObjectInspector(columnNames, columnOIs);
 		// create converter
 		LOG.debug("Creating converter");
-		this.converter = new ExcelConverterSimpleSpreadSheetCellDAO(dateFormat, decimalFormat);
+		HadoopOfficeReadConfiguration hocr = new HadoopOfficeReadConfiguration(conf);
+		this.readConverter = new ExcelConverterSimpleSpreadSheetCellDAO(hocr.getSimpleDateFormat(), hocr.getSimpleDecimalFormat(), hocr.getSimpleDateTimeFormat());
+		HadoopOfficeWriteConfiguration howc = new HadoopOfficeWriteConfiguration(conf,"");
+		this.writeConverter = new ExcelConverterSimpleSpreadSheetCellDAO(howc.getSimpleDateFormat(), howc.getSimpleDecimalFormat(), howc.getSimpleDateTimeFormat());
+		// configure writing of header
+		this.writeHeader=howc.getWriteHeader();
 		GenericDataType[] columnsGD = new GenericDataType[columnNames.size()];
 		for (int i = 0; i < columnOIs.size(); i++) {
 			ObjectInspector currentOI = columnOIs.get(i);
@@ -197,7 +184,10 @@ public class ExcelSerde extends AbstractSerDe {
 				columnsGD[i] = new GenericBooleanDataType();
 			} else if (currentOI instanceof DateObjectInspector) {
 				columnsGD[i] = new GenericDateDataType();
-			} else if (currentOI instanceof ByteObjectInspector) {
+			} else if (currentOI instanceof TimestampObjectInspector) {
+				columnsGD[i] = new GenericTimestampDataType();
+			}
+			else if (currentOI instanceof ByteObjectInspector) {
 				columnsGD[i] = new GenericByteDataType();
 			} else if (currentOI instanceof ShortObjectInspector) {
 				columnsGD[i] = new GenericShortDataType();
@@ -221,7 +211,8 @@ public class ExcelSerde extends AbstractSerDe {
 				columnsGD[i] = new GenericStringDataType();
 			}
 		}
-		this.converter.setSchemaRow(columnsGD);
+		this.readConverter.setSchemaRow(columnsGD);
+		this.writeConverter.setSchemaRow(columnsGD);
 		// create nullrow
 		this.nullRow = new Object[this.columnNames.size()];
 		// set writerow
@@ -276,7 +267,7 @@ public class ExcelSerde extends AbstractSerDe {
 		if ((arg0 == null) || (arg0 instanceof NullWritable)) {
 			return this.nullRow;
 		}
-		Object[] primitiveRow = this.converter
+		Object[] primitiveRow = this.readConverter
 				.getDataAccordingToSchema((SpreadSheetCellDAO[]) ((ArrayWritable) arg0).get());
 		// check if supported type and convert to hive type, if necessary
 		for (int i = 0; i < primitiveRow.length; i++) {
@@ -307,9 +298,7 @@ public class ExcelSerde extends AbstractSerDe {
 				primitiveRow[i] = primitiveRow[i];
 				break;
 			case TIMESTAMP:
-				if (primitiveRow[i] != null) {
-					primitiveRow[i] = Timestamp.valueOf((String) primitiveRow[i]);
-				}
+				primitiveRow[i] = primitiveRow[i];
 				break;
 			case DATE:
 				if (primitiveRow[i] != null) {
@@ -334,6 +323,13 @@ public class ExcelSerde extends AbstractSerDe {
 			default:
 				throw new SerDeException("Unsupported type " + ti);
 			}
+		}
+		if (this.columnNames.size()>primitiveRow.length) { // can happen in rare cases where a row does not contain all columns
+			Object[] tempRow = new Object[this.columnNames.size()];
+			for (int i=0;i<primitiveRow.length;i++) {
+				tempRow[i]=primitiveRow[i];
+			}
+			primitiveRow=tempRow;
 		}
 		return primitiveRow;
 	}
@@ -444,7 +440,7 @@ public class ExcelSerde extends AbstractSerDe {
 			}
 		}
 		// convert to spreadsheetcell
-		SpreadSheetCellDAO[] convertedRow = this.converter.getSpreadSheetCellDAOfromSimpleDataType(this.outputRow,
+		SpreadSheetCellDAO[] convertedRow = this.writeConverter.getSpreadSheetCellDAOfromSimpleDataType(this.outputRow,
 				this.defaultSheetName, this.currentWriteRow);
 		// write into result
 		for (int i = 0; i < convertedRow.length; i++) {

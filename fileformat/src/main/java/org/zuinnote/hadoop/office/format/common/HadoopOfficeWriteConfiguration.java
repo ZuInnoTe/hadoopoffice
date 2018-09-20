@@ -111,7 +111,7 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 	public static final String DEFAULT_SIGKEYSTOREPW = "";
 	public static final String DEFAULT_SIGKEYSTOREALIAS = "";
 	public static final String DEFAULT_SIGHASH = "sha512";
-	public static final boolean DEFAULT_IGNORELINEBREAKS = true;
+	public static final boolean DEFAULT_IGNORELINEBREAKS = false;
 	public static final boolean DEFAULT_WRITEHEADER = false;
 	
 	public static final String DEFAULT_SIMPLEDATEFORMAT = "US";
@@ -693,7 +693,7 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 		this.ignoreLineBreaks = ignoreLineBreaks;
 	
 
-		if ((this.ignoreLineBreaks) && (this.getSigKeystoreFile()!=null) && (!"".equals(this.getSigKeystoreFile()))) {
+		if (this.ignoreLineBreaks) {
 	
 			System.setProperty("org.apache.xml.security.ignoreLineBreaks", "true");
 		}

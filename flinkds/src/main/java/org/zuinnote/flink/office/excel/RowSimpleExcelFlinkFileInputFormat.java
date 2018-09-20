@@ -54,11 +54,12 @@ implements CheckpointableInputFormat<FileInputSplit, Tuple3<Long, Long, GenericD
 	private TypeInformation[] fieldTypeInfos;
 	
 	public RowSimpleExcelFlinkFileInputFormat(HadoopOfficeReadConfiguration hocr, long maxInferRows,
-			SimpleDateFormat dateFormat, DecimalFormat decimalFormat, TypeInformation[] fieldTypeInfos) {
+			TypeInformation[] fieldTypeInfos) {
 		super(hocr);
 		this.maxInferRows = maxInferRows;
-		this.converter = new ExcelConverterSimpleSpreadSheetCellDAO(dateFormat, decimalFormat);
 		this.shocr = hocr;
+
+		this.converter = new ExcelConverterSimpleSpreadSheetCellDAO(this.shocr.getSimpleDateFormat(), this.shocr.getSimpleDecimalFormat(),this.shocr.getSimpleDateTimeFormat());
 		hocr.setMimeType(AbstractSpreadSheetFlinkFileInputFormat.MIMETYPE_EXCEL);
 		this.fieldTypeInfos=fieldTypeInfos;
 	}

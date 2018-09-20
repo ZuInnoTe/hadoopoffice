@@ -71,10 +71,12 @@ object FlinkDSScalaExcelSimple {
       // load Excel file, in order to do the conversion correctly, we need to define the format for date and decimal
 	   val dateFormat: SimpleDateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.US).asInstanceOf[SimpleDateFormat] //important: even for non-US excel files US must be used most of the time, because this is how Excel stores them internally
 	   val decimalFormat: DecimalFormat = NumberFormat.getInstance(Locale.GERMAN).asInstanceOf[DecimalFormat] 
+	  hocr.setSimpleDateFormat(dateFormat)
+	  hocr.setSimpleDecimalFormat(decimalFormat)
 	  hocr.setReadHeader(true) // the Excel file contains in the first line the header
 	  // we have maxInferRows = -1 , which means we read the full Excel file first to infer the underlying schema
 	  val maxInferRows = -1
-	  val inputFormat = new SimpleExcelFlinkFileInputFormat(hocr, maxInferRows, dateFormat, decimalFormat)
+	  val inputFormat = new SimpleExcelFlinkFileInputFormat(hocr, maxInferRows)
       val excelInData = env.readFile(inputFormat, inputFile)
       // create dataset
 	  val excelData = excelInData.map{ // note that each row is just an Array of Objects (Array[AnyRef]) of simple datatypes, e.g. int, long, string etc.
@@ -90,9 +92,11 @@ object FlinkDSScalaExcelSimple {
 	  val howc = new HadoopOfficeWriteConfiguration(new Path(outputFile).getName())
 	  howc.setMimeType(MIMETYPE_XLSX)
 	  howc.setLocale(new Locale.Builder().setLanguageTag("de").build())
+	  howc.setSimpleDateFormat(dateFormat)
+	  howc.setSimpleDecimalFormat(decimalFormat)
 	  val defaultSheetName = "Sheet2"
 	  val header = null // is an Array of Strings, if null then no header line is written
-	  val outputFormat = new SimpleExcelFlinkFileOutputFormat(howc, header,defaultSheetName, dateFormat, decimalFormat)
+	  val outputFormat = new SimpleExcelFlinkFileOutputFormat(howc, header,defaultSheetName)
 	  excelData.write(outputFormat, outputFile)
     }
 }

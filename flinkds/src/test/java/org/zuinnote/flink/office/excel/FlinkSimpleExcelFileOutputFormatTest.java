@@ -119,8 +119,9 @@ public class FlinkSimpleExcelFileOutputFormatTest {
 		HadoopOfficeReadConfiguration hocr = new HadoopOfficeReadConfiguration();
 		hocr.setLocale(Locale.GERMAN);
 		hocr.setReadHeader(true);
-		SimpleExcelFlinkFileInputFormat inputFormat = new SimpleExcelFlinkFileInputFormat(hocr, -1,
-				dateFormat, decimalFormat);
+		hocr.setSimpleDateFormat(dateFormat);
+		hocr.setSimpleDecimalFormat(decimalFormat);
+		SimpleExcelFlinkFileInputFormat inputFormat = new SimpleExcelFlinkFileInputFormat(hocr, -1);
 		inputFormat.open(spreadSheetInputSplit);
 		// write
 		String fileNameOut = "excel2003singlesheetoutsimple.xls";
@@ -128,11 +129,13 @@ public class FlinkSimpleExcelFileOutputFormatTest {
 		HadoopOfficeWriteConfiguration howc = new HadoopOfficeWriteConfiguration("1");
 		howc.setMimeType(FlinkExcelFileOutputFormatTest.MIMETYPE_XLS);
 		howc.setLocale(Locale.GERMAN);
+		howc.setSimpleDateFormat(dateFormat);
+		howc.setSimpleDecimalFormat(decimalFormat);
 		String[] header = inputFormat.getHeader();
 		String defaultSheetName = "Sheet1";
-
+		
 		SimpleExcelFlinkFileOutputFormat outputFormat = new SimpleExcelFlinkFileOutputFormat(howc, header,
-				defaultSheetName, dateFormat, decimalFormat);
+				defaultSheetName);
 		outputFormat.setOutputFilePath(fileOut);
 		outputFormat.setWriteMode(FileSystem.WriteMode.OVERWRITE);
 		outputFormat.initializeGlobal(1);
@@ -154,8 +157,9 @@ public class FlinkSimpleExcelFileOutputFormatTest {
 		DecimalFormat decimalFormatOut = (DecimalFormat) DecimalFormat.getInstance(Locale.GERMAN);
 		hocrOut.setReadHeader(true);
 		hocrOut.setLocale(Locale.GERMAN);
-		SimpleExcelFlinkFileInputFormat inputFormatOut = new SimpleExcelFlinkFileInputFormat(hocrOut, -1,
-				dateFormatOut, decimalFormatOut);
+		hocrOut.setSimpleDateFormat(dateFormatOut);
+		hocrOut.setSimpleDecimalFormat(decimalFormatOut);
+		SimpleExcelFlinkFileInputFormat inputFormatOut = new SimpleExcelFlinkFileInputFormat(hocrOut, -1);
 		inputFormatOut.open(spreadSheetInputSplitOut);
 		assertFalse(inputFormatOut.reachedEnd(), "End not reached");
 
@@ -271,8 +275,9 @@ public class FlinkSimpleExcelFileOutputFormatTest {
 		HadoopOfficeReadConfiguration hocr = new HadoopOfficeReadConfiguration();
 		hocr.setLocale(Locale.GERMAN);
 		hocr.setReadHeader(true);
-		SimpleExcelFlinkFileInputFormat inputFormat = new SimpleExcelFlinkFileInputFormat(hocr, -1,
-				dateFormat, decimalFormat);
+		hocr.setSimpleDateFormat(dateFormat);
+		hocr.setSimpleDecimalFormat(decimalFormat);
+		SimpleExcelFlinkFileInputFormat inputFormat = new SimpleExcelFlinkFileInputFormat(hocr, -1);
 		inputFormat.open(spreadSheetInputSplit);
 		// write
 		String fileNameOut = "excel2013singlesheetoutsimple.xlsx";
@@ -280,11 +285,13 @@ public class FlinkSimpleExcelFileOutputFormatTest {
 		HadoopOfficeWriteConfiguration howc = new HadoopOfficeWriteConfiguration("1");
 		howc.setLocale(Locale.GERMAN);
 		howc.setMimeType(FlinkExcelFileOutputFormatTest.MIMETYPE_XLSX);
+		howc.setSimpleDateFormat(dateFormat);
+		howc.setSimpleDecimalFormat(decimalFormat);
 		String[] header = inputFormat.getHeader();
 		String defaultSheetName = "Sheet1";
-
+	
 		SimpleExcelFlinkFileOutputFormat outputFormat = new SimpleExcelFlinkFileOutputFormat(howc, header,
-				defaultSheetName, dateFormat, decimalFormat);
+				defaultSheetName);
 		outputFormat.setOutputFilePath(fileOut);
 		outputFormat.setWriteMode(FileSystem.WriteMode.OVERWRITE);
 		outputFormat.initializeGlobal(1);
@@ -306,8 +313,9 @@ public class FlinkSimpleExcelFileOutputFormatTest {
 		DecimalFormat decimalFormatOut = (DecimalFormat) DecimalFormat.getInstance(Locale.GERMAN);
 		hocrOut.setReadHeader(true);
 		hocrOut.setLocale(Locale.GERMAN);
-		SimpleExcelFlinkFileInputFormat inputFormatOut = new SimpleExcelFlinkFileInputFormat(hocrOut, -1,
-				dateFormatOut, decimalFormatOut);
+		hocrOut.setSimpleDateFormat(dateFormatOut);
+		hocrOut.setSimpleDecimalFormat(decimalFormatOut);
+		SimpleExcelFlinkFileInputFormat inputFormatOut = new SimpleExcelFlinkFileInputFormat(hocrOut, -1);
 		inputFormatOut.open(spreadSheetInputSplitOut);
 		assertFalse(inputFormatOut.reachedEnd(), "End not reached");
 

@@ -36,7 +36,7 @@ import org.zuinnote.flink.office.common.FlinkKeyStoreManager;
 import org.zuinnote.hadoop.office.format.common.HadoopOfficeWriteConfiguration;
 import org.zuinnote.hadoop.office.format.common.OfficeWriter;
 import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
-import org.zuinnote.hadoop.office.format.common.util.MSExcelUtil;
+import org.zuinnote.hadoop.office.format.common.util.msexcel.MSExcelUtil;
 import org.zuinnote.hadoop.office.format.common.writer.InvalidWriterConfigurationException;
 import org.zuinnote.hadoop.office.format.common.writer.OfficeWriterException;
 

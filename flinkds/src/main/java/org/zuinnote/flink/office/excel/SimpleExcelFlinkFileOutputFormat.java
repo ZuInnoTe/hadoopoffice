@@ -44,9 +44,9 @@ public class SimpleExcelFlinkFileOutputFormat extends AbstractSpreadSheetFlinkFi
 	private String defaultSheetName;
 	private int rowNumSimple;
 	
-	public SimpleExcelFlinkFileOutputFormat(HadoopOfficeWriteConfiguration howc, String[] header, String defaultSheetName, SimpleDateFormat dateFormat, DecimalFormat decimalFormat) {
+	public SimpleExcelFlinkFileOutputFormat(HadoopOfficeWriteConfiguration howc, String[] header, String defaultSheetName) {
 		super(howc,header,defaultSheetName);
-		this.converter=new ExcelConverterSimpleSpreadSheetCellDAO(dateFormat,decimalFormat);
+		this.converter=new ExcelConverterSimpleSpreadSheetCellDAO(howc.getSimpleDateFormat(),howc.getSimpleDecimalFormat(),howc.getSimpleDateTimeFormat());
 		this.defaultSheetName=defaultSheetName;
 		this.rowNumSimple=0;
 		if ((header!=null) && (header.length>0)) {

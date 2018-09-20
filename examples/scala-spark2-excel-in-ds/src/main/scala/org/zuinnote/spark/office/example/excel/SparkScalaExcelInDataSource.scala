@@ -56,7 +56,7 @@ object SparkScalaExcelInDataSource {
     .format("org.zuinnote.spark.office.excel")
          /** note this sets the locale to us-english, which means that numbers might be displayed differently then you expect. Change this to the locale of the Excel file **/
 
-    .option("read.locale.bcp47", "us")  
+    .option("hadoopoffice.read.locale.bcp47", "us")  
     .load(inputFile)
      val rowsDF=df.select(explode(df("rows")).alias("rows"))
      df.select("rows.formattedValue").rdd.map(formattedValueRow => {

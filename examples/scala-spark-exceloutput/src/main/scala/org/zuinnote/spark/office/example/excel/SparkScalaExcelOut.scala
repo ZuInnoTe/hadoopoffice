@@ -28,7 +28,7 @@ import org.apache.hadoop.conf._
 import org.apache.hadoop.mapreduce._
 import org.apache.hadoop.io._
 
-import org.zuinnote.hadoop.office.format.common.util._
+import org.zuinnote.hadoop.office.format.common.util.msexcel._
 import org.zuinnote.hadoop.office.format.common.converter._
 import org.zuinnote.hadoop.office.format.common.dao._
 import org.zuinnote.hadoop.office.format.mapreduce._

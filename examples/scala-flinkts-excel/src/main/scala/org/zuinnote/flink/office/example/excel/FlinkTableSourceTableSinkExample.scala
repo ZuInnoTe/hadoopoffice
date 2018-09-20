@@ -77,6 +77,8 @@ object FlinkTableSourceTableSinkExample {
     val decimalFormat: DecimalFormat = NumberFormat.getInstance(Locale.GERMANY).asInstanceOf[DecimalFormat]
     hocr.setReadHeader(true)
     hocr.setLocale(Locale.GERMANY)
+    hocr.setSimpleDateFormat(dateFormat)
+    hocr.setSimpleDecimalFormat(decimalFormat)
     val source: ExcelFlinkTableSource = ExcelFlinkTableSource.builder()
       .path(inputFile)
       .field("decimalsc1", Types.DECIMAL)
@@ -89,8 +91,6 @@ object FlinkTableSourceTableSinkExample {
       .field("intcolumn", Types.INT)
       .field("longcolumn", Types.LONG)
       .conf(hocr)
-      .dateFormat(dateFormat)
-      .decimalFormat(decimalFormat)
       .build()
    	  tableEnv.registerTableSource("testsimple", source)
       val testSimpleScan = tableEnv.scan("testsimple")
@@ -98,8 +98,10 @@ object FlinkTableSourceTableSinkExample {
       // write file using TableSink
     	  val howc = new HadoopOfficeWriteConfiguration(new Path(outputFile).getName())
       howc.setMimeType(MIMETYPE_XLSX)
-      howc.setLocale(Locale.GERMANY)
-      val sink = new ExcelFlinkTableSink(outputFile, true, howc, "Sheet2", dateFormat, decimalFormat, Some(WriteMode.NO_OVERWRITE))
+      howc.setLocale(Locale.GERMANY) 
+      howc.setSimpleDateFormat(dateFormat)
+      howc.setSimpleDecimalFormat(decimalFormat)
+      val sink = new ExcelFlinkTableSink(outputFile, true, howc, "Sheet2", Some(WriteMode.NO_OVERWRITE))
     	  testSimpleResult.writeToSink(sink)
 }
 

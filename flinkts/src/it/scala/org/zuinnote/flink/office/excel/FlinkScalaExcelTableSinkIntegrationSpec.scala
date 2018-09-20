@@ -134,7 +134,7 @@ class FlinkScalaExcelTableSinkIntegrationSpec extends FlatSpec with BeforeAndAft
     // create input directory
     dfsCluster.getFileSystem().delete(DFS_INPUT_DIR, true)
     dfsCluster.getFileSystem().mkdirs(DFS_INPUT_DIR)
-    // copy bitcoin blocks
+    // copy excel files
     val classLoader = getClass().getClassLoader()
     // put testdata on DFS
     val fileName: String = "testsimple.xlsx"
@@ -147,6 +147,8 @@ class FlinkScalaExcelTableSinkIntegrationSpec extends FlatSpec with BeforeAndAft
     val decimalFormat: DecimalFormat = NumberFormat.getInstance(Locale.GERMANY).asInstanceOf[DecimalFormat]
     hocr.setLocale(Locale.GERMANY)
     hocr.setReadHeader(true)
+    hocr.setSimpleDateFormat(dateFormat)
+    hocr.setSimpleDecimalFormat(decimalFormat)
     val source: ExcelFlinkTableSource = ExcelFlinkTableSource.builder()
       .path(dfsCluster.getFileSystem().getUri().toString() + DFS_INPUT_DIR_NAME)
       .field("decimalsc1", Types.DECIMAL)
@@ -159,8 +161,6 @@ class FlinkScalaExcelTableSinkIntegrationSpec extends FlatSpec with BeforeAndAft
       .field("intcolumn", Types.INT)
       .field("longcolumn", Types.LONG)
       .conf(hocr)
-      .dateFormat(dateFormat)
-      .decimalFormat(decimalFormat)
       .build()
     tableEnvironment.registerTableSource("testsimple", source)
     val testSimpleScan = tableEnvironment.scan("testsimple")
@@ -169,12 +169,16 @@ class FlinkScalaExcelTableSinkIntegrationSpec extends FlatSpec with BeforeAndAft
     val howc = new HadoopOfficeWriteConfiguration(DFS_OUTPUT_DIR_NAME)
     howc.setMimeType(MIMETYPE_XLSX)
     howc.setLocale(Locale.GERMANY)
-    val sink = new ExcelFlinkTableSink(dfsCluster.getFileSystem().getUri().toString() + DFS_OUTPUT_DIR_NAME, true, howc, "Sheet1", dateFormat, decimalFormat, Some(WriteMode.NO_OVERWRITE))
+    howc.setSimpleDateFormat(dateFormat)
+    howc.setSimpleDecimalFormat(decimalFormat)
+    val sink = new ExcelFlinkTableSink(dfsCluster.getFileSystem().getUri().toString() + DFS_OUTPUT_DIR_NAME, true, howc, "Sheet1", Some(WriteMode.NO_OVERWRITE))
     testSimpleResult.writeToSink(sink)
     flinkEnvironment.execute() // trigger writing of the file on HSDFS
     // reread written table
     hocr.setReadHeader(true)
     hocr.setLocale(Locale.GERMANY)
+    hocr.setSimpleDateFormat(dateFormat)
+    hocr.setSimpleDecimalFormat(decimalFormat)
     val sourceReWritten: ExcelFlinkTableSource = ExcelFlinkTableSource.builder()
       .path(dfsCluster.getFileSystem().getUri().toString() + DFS_OUTPUT_DIR_NAME)
       .field("decimalsc1", Types.DECIMAL)
@@ -187,8 +191,6 @@ class FlinkScalaExcelTableSinkIntegrationSpec extends FlatSpec with BeforeAndAft
       .field("intcolumn", Types.INT)
       .field("longcolumn", Types.LONG)
       .conf(hocr)
-      .dateFormat(dateFormat)
-      .decimalFormat(decimalFormat)
       .build()
     tableEnvironment.registerTableSource("testsimplerewritten", sourceReWritten)
 

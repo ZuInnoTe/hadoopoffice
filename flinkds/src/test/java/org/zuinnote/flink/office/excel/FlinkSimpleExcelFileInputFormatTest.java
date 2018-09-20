@@ -120,8 +120,9 @@ public class FlinkSimpleExcelFileInputFormatTest {
 		DecimalFormat decimalFormat = (DecimalFormat) DecimalFormat.getInstance(Locale.GERMAN);
 		hocr.setLocale(Locale.GERMAN);
 		hocr.setReadHeader(true);
-		SimpleExcelFlinkFileInputFormat inputFormat = new SimpleExcelFlinkFileInputFormat(hocr, -1,
-				dateFormat, decimalFormat);
+		hocr.setSimpleDateFormat(dateFormat);
+		hocr.setSimpleDecimalFormat(decimalFormat);
+		SimpleExcelFlinkFileInputFormat inputFormat = new SimpleExcelFlinkFileInputFormat(hocr, -1);
 		inputFormat.open(spreadSheetInputSplit);
 		assertFalse(inputFormat.reachedEnd(), "End not reached");
 		Object[] reuse = new Object[0];
@@ -218,8 +219,9 @@ public class FlinkSimpleExcelFileInputFormatTest {
 		DecimalFormat decimalFormat = (DecimalFormat) DecimalFormat.getInstance(Locale.GERMAN);
 		hocr.setReadHeader(true);
 		hocr.setLocale(Locale.GERMAN);
-		SimpleExcelFlinkFileInputFormat inputFormat = new SimpleExcelFlinkFileInputFormat(hocr, -1,
-				dateFormat, decimalFormat);
+		hocr.setSimpleDateFormat(dateFormat);
+		hocr.setSimpleDecimalFormat(decimalFormat);
+		SimpleExcelFlinkFileInputFormat inputFormat = new SimpleExcelFlinkFileInputFormat(hocr, -1);
 		inputFormat.open(spreadSheetInputSplit);
 
 		
