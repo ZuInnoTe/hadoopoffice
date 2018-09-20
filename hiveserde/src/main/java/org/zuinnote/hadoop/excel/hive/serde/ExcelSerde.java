@@ -126,9 +126,6 @@ public class ExcelSerde extends AbstractSerDe {
 	/**
 	 * Initializes the SerDe \n
 	 * You can define in the table properties (additionally to the standard Hive properties) the following options \n
-	 * office.hive.dateFormat: formats of dates in BCP47 (@see <a href="https://tools.ietf.org/html/bcp47">https://tools.ietf.org/html/bcp47</a>) notation. The default is: US. Usually even for other countries the US format should be used as default because Excel stores internally the dates in US formats and converts them only in the Excel GUI to the right locale.  \n
-	 * office.hive.decimalFormat: decimal format in BCP47 notation. The default is empty string, which means the systems locale is used. Important if you have decimal numbers to detect the separator \n
-	 * office.hive.write.header: true if the column names should be written in the first line of the Excel, false if not. Default: false\n
 	 * office.hive.write.defaultSheetName: The sheetname to which data should be written (note: as an input any sheets can be read or selected sheets according to HadoopOffice configuration values) \n
 	 * Any of the HadoopOffice options (hadoopoffice.*), such as encryption, signing, low footprint mode, linked workbooks, can be defined in the table properties @see <a href="https://github.com/ZuInnoTe/hadoopoffice/wiki/Hadoop-File-Format">HadoopOffice configuration</a>\n
 	 * @param conf Hadoop Configuration
