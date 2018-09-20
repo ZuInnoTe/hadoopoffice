@@ -13,9 +13,9 @@ lazy val root = (project in file("."))
   .enablePlugins(JacocoItPlugin)
 
 
-crossScalaVersions := Seq("2.10.5", "2.11.7")
+crossScalaVersions := Seq("2.11.12")
 
-scalacOptions += "-target:jvm-1.7"
+scalacOptions += "-target:jvm-1.8"
 
 resolvers += Resolver.mavenLocal
 
@@ -29,13 +29,13 @@ assemblyMergeStrategy in assembly := {
  case x => MergeStrategy.first
 }
 
-libraryDependencies += "com.github.zuinnote" %% "spark-hadoopoffice-ds" % "1.1.1" % "compile"
+libraryDependencies += "com.github.zuinnote" %% "spark-hadoopoffice-ds" % "1.2.0" % "compile"
 
-libraryDependencies += "org.apache.spark" %% "spark-core" % "2.0.0" % "provided"
+libraryDependencies += "org.apache.spark" %% "spark-core" % "2.3.0" % "provided"
 
-libraryDependencies += "org.apache.spark" %% "spark-sql" % "2.0.0" % "provided"
+libraryDependencies += "org.apache.spark" %% "spark-sql" % "2.3.0" % "provided"
 
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.1" % "test,it"
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test,it"
 
 libraryDependencies += "javax.servlet" % "javax.servlet-api" % "3.0.1" % "it"
 

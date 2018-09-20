@@ -13,9 +13,9 @@ lazy val root = (project in file("."))
   .enablePlugins(JacocoItPlugin)
 
 
-crossScalaVersions := Seq("2.10.5", "2.11.7")
+crossScalaVersions := Seq("2.11.12")
 
-scalacOptions += "-target:jvm-1.7"
+scalacOptions += "-target:jvm-1.8"
 
 resolvers += Resolver.mavenLocal
 
@@ -29,18 +29,18 @@ assemblyMergeStrategy in assembly := {
  case x => MergeStrategy.first
 }
 
-libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.1.1" % "compile"
+libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.2.0" % "compile"
 
 // following three libraries are only needed for digital signatures
-libraryDependencies += "org.bouncycastle" % "bcprov-ext-jdk15on" % "1.58" % "compile"
-libraryDependencies += "org.bouncycastle" % "bcpkix-jdk15on" % "1.58" % "compile"
-libraryDependencies += "org.apache.santuario" % "xmlsec" % "2.1.0" % "compile"
+libraryDependencies += "org.bouncycastle" % "bcprov-ext-jdk15on" % "1.60" % "compile"
+libraryDependencies += "org.bouncycastle" % "bcpkix-jdk15on" % "1.60" % "compile"
+libraryDependencies += "org.apache.santuario" % "xmlsec" % "2.1.2" % "compile"
 
-libraryDependencies += "org.apache.spark" %% "spark-core" % "1.5.0" % "provided"
+libraryDependencies += "org.apache.spark" %% "spark-core" % "1.6.0" % "provided"
 
-libraryDependencies += "org.apache.spark" %% "spark-sql" % "1.5.0" % "provided"
+libraryDependencies += "org.apache.spark" %% "spark-sql" % "1.6.0" % "provided"
 
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.1" % "test,it"
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test,it"
 
 libraryDependencies += "javax.servlet" % "javax.servlet-api" % "3.0.1" % "it"
 

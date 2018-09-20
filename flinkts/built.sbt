@@ -25,13 +25,13 @@ crossScalaVersions := Seq("2.11.12")
 
 scalacOptions += "-target:jvm-1.8"
 
-libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.1.1" % "compile"
+libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.2.0" % "compile"
 
-libraryDependencies += "com.github.zuinnote" % "hadoopoffice-flinkds" % "1.1.1" % "compile"
+libraryDependencies += "com.github.zuinnote" % "hadoopoffice-flinkds" % "1.2.0" % "compile"
 // following three libraries are only needed for digital signatures
-libraryDependencies += "org.bouncycastle" % "bcprov-ext-jdk15on" % "1.59" % "provided"
-libraryDependencies += "org.bouncycastle" % "bcpkix-jdk15on" % "1.59" % "provided"
-libraryDependencies += "org.apache.santuario" % "xmlsec" % "2.1.0" % "provided"
+libraryDependencies += "org.bouncycastle" % "bcprov-ext-jdk15on" % "1.60" % "provided"
+libraryDependencies += "org.bouncycastle" % "bcpkix-jdk15on" % "1.60" % "provided"
+libraryDependencies += "org.apache.santuario" % "xmlsec" % "2.1.2" % "provided"
 
 libraryDependencies += "org.apache.flink" %% "flink-scala" % "1.5.0" % "provided" 
 
