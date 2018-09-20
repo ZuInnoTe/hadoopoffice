@@ -54,9 +54,7 @@ class ExcelFlinkTableSource(
   val path:          String,
   val fieldNames:    Array[String],
   val fieldTypes:    Array[TypeInformation[_]],
-  val hocr:          HadoopOfficeReadConfiguration,
-  val dateFormat:    SimpleDateFormat,
-  val decimalFormat: DecimalFormat)
+  val hocr:          HadoopOfficeReadConfiguration)
   extends BatchTableSource[Row] {
 
   private val returnType: RowTypeInfo = new RowTypeInfo(fieldTypes, fieldNames)
@@ -70,7 +68,7 @@ class ExcelFlinkTableSource(
   override def getDataSet(execEnv: ExecutionEnvironment): DataSet[Row] = {
     // we do not infer any data, because fieldnames and types are given
 
-    val inputFormat = new RowSimpleExcelFlinkFileInputFormat(hocr, 0, dateFormat, decimalFormat, fieldTypes)
+    val inputFormat = new RowSimpleExcelFlinkFileInputFormat(hocr, 0, fieldTypes)
     // set custom schema (= automated inference is deactivated)
     val customSchema: Array[GenericDataType] = new Array[GenericDataType](fieldTypes.length)
     var i = 0
@@ -148,8 +146,7 @@ object ExcelFlinkTableSource {
       mutable.LinkedHashMap[String, TypeInformation[_]]()
     private var path: String = _
     private var hocr: HadoopOfficeReadConfiguration = _
-    private var dateFormat: SimpleDateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.US).asInstanceOf[SimpleDateFormat]
-    private var decimalFormat: DecimalFormat = NumberFormat.getInstance().asInstanceOf[DecimalFormat]
+
 
     /**
      * Sets the path to the CSV file. Required.
@@ -190,25 +187,7 @@ object ExcelFlinkTableSource {
       this
     }
 
-    /**
-     * Defines the dateFormat to use when reading office files. Note: for some office files, such as Excel the default "US" makes sense, because even for other regions they store it internally as US
-     *
-     * @param dateFormat DateFormat
-     */
-    def dateFormat(dateFormat: SimpleDateFormat): Builder = {
-      this.dateFormat = dateFormat
-      this
-    }
 
-/***
-     * Defines the decimalFormat when reading office files. 
-     * 
-     * @param decimalFormat decimal format to use
-     */
-    def decimalFormat(decimalFormat: DecimalFormat): Builder = {
-      this.decimalFormat = decimalFormat
-      this
-    }
 
     /**
      * Apply the current values and constructs a newly-created [[CsvTableSource]].
@@ -229,9 +208,7 @@ object ExcelFlinkTableSource {
         path,
         schema.keys.toArray,
         schema.values.toArray,
-        hocr,
-        dateFormat,
-        decimalFormat)
+        hocr)
     }
 
   }
@@ -246,7 +223,6 @@ object ExcelFlinkTableSource {
    *     .field("column1", Types.STRING)
    *     .field("column2", Types.SQL_DATE)
    *     .hocr(new HadoopOfficeReadConfiguration())
-   *     .decimalFormat(NumberFormat.getInstance(Locale.US))
    *     .build()
    * }}}
    * @return a new builder to build a [[ExcelFLinkTableSource]]

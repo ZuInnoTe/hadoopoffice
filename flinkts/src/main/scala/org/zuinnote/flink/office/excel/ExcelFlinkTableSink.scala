@@ -36,8 +36,6 @@ class ExcelFlinkTableSink(
   useHeader:        Boolean,
   howc:             HadoopOfficeWriteConfiguration,
   defaultSheetName: String                         = "Sheet1",
-  dateFormat:       SimpleDateFormat               = DateFormat.getDateInstance(DateFormat.SHORT, Locale.US).asInstanceOf[SimpleDateFormat],
-  decimalFormat:    DecimalFormat                  = NumberFormat.getInstance().asInstanceOf[DecimalFormat],
   writeMode:        Option[WriteMode]              = Some(WriteMode.NO_OVERWRITE)) extends TableSinkBase[Row] with BatchTableSink[Row] {
 
 /***
@@ -50,9 +48,9 @@ class ExcelFlinkTableSink(
 
     var outputFormat: RowSimpleExcelFlinkFileOutputFormat = null;
     if (useHeader) {
-      outputFormat = new RowSimpleExcelFlinkFileOutputFormat(howc, this.getFieldNames, defaultSheetName, dateFormat, decimalFormat)
+      outputFormat = new RowSimpleExcelFlinkFileOutputFormat(howc, this.getFieldNames, defaultSheetName)
     } else {
-      outputFormat = new RowSimpleExcelFlinkFileOutputFormat(howc, null, defaultSheetName, dateFormat, decimalFormat)
+      outputFormat = new RowSimpleExcelFlinkFileOutputFormat(howc, null, defaultSheetName)
     }
     outputFormat.setOutputFilePath(new Path(path))
     outputFormat.setWriteMode(writeMode.get)
@@ -61,7 +59,7 @@ class ExcelFlinkTableSink(
   }
 
   override protected def copy: TableSinkBase[Row] = {
-    new ExcelFlinkTableSink(path, useHeader, howc, defaultSheetName, dateFormat, decimalFormat, writeMode)
+    new ExcelFlinkTableSink(path, useHeader, howc, defaultSheetName,writeMode)
   }
 
   override def getOutputType: TypeInformation[Row] = {
