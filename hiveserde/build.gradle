@@ -1,8 +1,22 @@
+
+
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:4.0.0'
+    }
+}
+
+apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'java'
 apply plugin: 'maven-publish'
 apply plugin: 'maven'
 apply plugin: 'signing'
 apply plugin: 'jacoco'
+
 
 sourceCompatibility = 1.8
 compileJava.options.encoding = 'UTF-8'
@@ -12,16 +26,18 @@ archivesBaseName = "hadoopoffice-hiveserde"
 version = "1.2.0"
 
 
-jar {
-    manifest {
+
+shadowJar {
+   relocate 'org.apache.commons.compress', 'hadoopoffice.shade.org.apache.commons.compress'
+     manifest {
         attributes 'Implementation-Title': 'ZuInnoTe - Hadoop Office Analytics Library - Serde', 'Implementation-Version': version
     }
 
-    baseName = 'hadoopoffice-hiveserde'
+    classifier = ''
     // note this builds one fat jar. This is needed for Hive, otherwise Apache POI cannot load its classes properly in Hive
- doFirst {
+/* doFirst {
         from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    }
+    }*/
     exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA' // remove signature digests of other libraries
 }
 
@@ -78,9 +94,14 @@ sourceSets {
         }
         resources.srcDir file('src/integration-test/resources')
     }
+    
+    
 }
 
+
+
 dependencies {
+
    // hadoop lib for driver
     provided("org.apache.hadoop:hadoop-client:2.7.0")
     
@@ -129,5 +150,5 @@ task sourcesJar(type: Jar) {
 }
 
 artifacts {
-    archives hadoopOfficeJavaDocs, sourcesJar
+    archives shadowJar, hadoopOfficeJavaDocs, sourcesJar
 }
