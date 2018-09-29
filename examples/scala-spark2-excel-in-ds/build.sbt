@@ -13,7 +13,7 @@ lazy val root = (project in file("."))
   .enablePlugins(JacocoItPlugin)
 
 
-crossScalaVersions := Seq("2.11.12")
+crossScalaVersions := Seq("2.11.8")
 
 scalacOptions += "-target:jvm-1.8"
 
@@ -29,7 +29,7 @@ assemblyMergeStrategy in assembly := {
  case x => MergeStrategy.first
 }
 
-libraryDependencies += "com.github.zuinnote" %% "spark-hadoopoffice-ds" % "1.2.0" % "compile"
+libraryDependencies += "com.github.zuinnote" %% "spark-hadoopoffice-ds" % "1.1.1" % "compile"
 
 libraryDependencies += "org.apache.spark" %% "spark-core" % "2.3.0" % "provided"
 
