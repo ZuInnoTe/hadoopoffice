@@ -17,6 +17,10 @@ assemblyMergeStrategy in assembly := {
  case x => MergeStrategy.first
 }
 
+assemblyShadeRules in assembly := Seq(
+   ShadeRule.rename("org.apache.commons.compress.**" -> "hadoopoffice.shade.org.apache.commons.compress.@1").inAll
+)
+
 crossScalaVersions := Seq("2.11.12")
 
 scalacOptions += "-target:jvm-1.8"
@@ -30,9 +34,9 @@ fork  := true
 
 
 
-libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.1.1" % "compile"
+libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.2.0" % "compile"
 
-libraryDependencies += "com.github.zuinnote" % "hadoopoffice-flinkds" % "1.1.1" % "compile"
+libraryDependencies += "com.github.zuinnote" % "hadoopoffice-flinkds" % "1.2.0" % "compile"
 
 libraryDependencies += "org.apache.flink" %% "flink-scala" % "1.5.0" % "provided" 
 

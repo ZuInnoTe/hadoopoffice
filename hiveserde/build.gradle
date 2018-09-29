@@ -34,10 +34,7 @@ shadowJar {
     }
 
     classifier = ''
-    // note this builds one fat jar. This is needed for Hive, otherwise Apache POI cannot load its classes properly in Hive
-/* doFirst {
-        from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    }*/
+
     exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA' // remove signature digests of other libraries
 }
 

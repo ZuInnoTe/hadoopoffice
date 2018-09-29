@@ -29,7 +29,12 @@ assemblyMergeStrategy in assembly := {
  case x => MergeStrategy.first
 }
 
-libraryDependencies += "com.github.zuinnote" %% "spark-hadoopoffice-ds" % "1.1.1" % "compile"
+assemblyShadeRules in assembly := Seq(
+   ShadeRule.rename("org.apache.commons.compress.**" -> "hadoopoffice.shade.org.apache.commons.compress.@1").inAll
+)
+
+
+libraryDependencies += "com.github.zuinnote" %% "spark-hadoopoffice-ds" % "1.2.0" % "compile"
 
 libraryDependencies += "org.apache.spark" %% "spark-core" % "2.3.0" % "provided"
 

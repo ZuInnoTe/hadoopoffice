@@ -28,9 +28,14 @@ assemblyMergeStrategy in assembly := {
  case x => MergeStrategy.first
 }
 
-libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.1.1" % "compile"
+assemblyShadeRules in assembly := Seq(
+   ShadeRule.rename("org.apache.commons.compress.**" -> "hadoopoffice.shade.org.apache.commons.compress.@1").inAll
+)
 
-libraryDependencies += "com.github.zuinnote" %% "hadoopoffice-flinkts" % "1.1.1" % "compile"
+
+libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.2.0" % "compile"
+
+libraryDependencies += "com.github.zuinnote" %% "hadoopoffice-flinkts" % "1.2.0" % "compile"
 
 libraryDependencies += "org.apache.flink" %% "flink-scala" % "1.5.0" % "provided" 
 

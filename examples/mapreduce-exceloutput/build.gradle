@@ -1,3 +1,14 @@
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:4.0.0'
+    }
+}
+
+apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'application'
@@ -6,20 +17,21 @@ apply plugin: 'jacoco'
 mainClassName = "org.zuinnote.hadoop.office.example.driver.CSV2ExcelDriver"
 compileJava.options.encoding = 'UTF-8'
 sourceCompatibility = 1.8
-version = '1.0'
-jar {
-    manifest {
-        attributes 'Implementation-Title': 'Example - MR job (ExcelOutput) for writing Excel files using hadoopoffice', 'Implementation-Version': version
-    }
+version = '0.1.0'
 
-    baseName = 'example-ho-mr-exceloutput'
-    version = '0.1.0'
-   // note this builds one fat jar and it is not recommended for production use - just for illustration purpose
- doFirst {
-        from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    }
+
+
+shadowJar {
+   relocate 'org.apache.commons.compress', 'hadoopoffice.shade.org.apache.commons.compress'
+     manifest {
+       attributes 'Implementation-Title': 'Example - MR job (ExcelInput) for reading Excel files using hadoopoffice', 'Implementation-Version': version
+     }
+
+    classifier = ''
+
     exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA' // remove signature digests of other libraries
 }
+
 
 repositories {
     mavenCentral()
@@ -75,7 +87,7 @@ dependencies {
    // hadoop lib for driver
      provided("org.apache.hadoop:hadoop-client:2.7.0")
      // hadoopoffice library
-   compile("com.github.zuinnote:hadoopoffice-fileformat:1.1.1")
+   compile("com.github.zuinnote:hadoopoffice-fileformat:1.2.0")
 
        testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.3.0'
  
@@ -110,3 +122,7 @@ task testIntegration(type: Test) {
 	
 check.dependsOn testIntegration
 testIntegration.mustRunAfter test
+
+artifacts {
+    archives shadowJar
+}
