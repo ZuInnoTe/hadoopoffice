@@ -594,33 +594,4 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 		return result;
 	}
 
-	/**
-	 * Determines if a date contains a time component. This is only needed for
-	 * automatically inferring the schema of an Excel for those systems that have
-	 * date-only data types. It is a heuristic and should be used with care (be
-	 * careful, e.g., with time zones etc.) . Basically it just checks if hour,
-	 * minute, second,millisecond are set to something else than 0.
-	 * 
-	 * @param theDate
-	 * @return true, if it hour, minute, second, millisecond are !=0, otherwise
-	 *         false
-	 */
-	private boolean containsTimeComponent(Date theDate) {
-		LOG.info("##DateTimeComponent");
-		boolean result = true;
-
-		this.converterCalendar.setTime(theDate);
-		int hour = this.converterCalendar.get(Calendar.HOUR);
-		int minute = this.converterCalendar.get(Calendar.MINUTE);
-		int second = this.converterCalendar.get(Calendar.SECOND);
-		int millisecond = this.converterCalendar.get(Calendar.MILLISECOND);
-		LOG.info(this.converterCalendar.get(Calendar.YEAR) + "." + this.converterCalendar.get(Calendar.MONTH) + "."
-				+ this.converterCalendar.get(Calendar.DAY_OF_MONTH) + " " + hour + "-" + minute + "-" + second + "-"
-				+ millisecond);
-		if ((hour == 0) && (minute == 0) && (second == 0) && (millisecond == 0)) {
-			result = false;
-		}
-		return result;
-	}
-
 }
