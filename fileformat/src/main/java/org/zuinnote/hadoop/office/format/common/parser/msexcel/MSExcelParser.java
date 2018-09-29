@@ -465,7 +465,7 @@ private int currentSkipLine=0;
 	}
 	
 	private boolean nextAllSheets() {
-		while (this.currentRow>this.currentWorkbook.getSheetAt(this.currentSheet).getLastRowNum()) { // end of row reached? => next sheet
+		while ((this.currentWorkbook.getSheetAt(this.currentSheet)!=null) && (this.currentRow>this.currentWorkbook.getSheetAt(this.currentSheet).getLastRowNum())) { // end of row reached? => next sheet
 			this.currentSheet++;
 			this.currentRow=0;
 			// check if we need to skip lines
