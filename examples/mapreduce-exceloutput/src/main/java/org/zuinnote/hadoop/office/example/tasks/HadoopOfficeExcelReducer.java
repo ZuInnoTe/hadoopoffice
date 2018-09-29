@@ -31,7 +31,7 @@ import java.util.*;
 
 import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 import org.zuinnote.hadoop.office.format.common.dao.TextArrayWritable;
-import org.zuinnote.hadoop.office.format.common.util.msexcel.MSExcelUtil;
+import org.zuinnote.hadoop.office.format.common.util.MSExcelUtil;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 
