@@ -8,13 +8,15 @@ buildscript {
     }
 }
 
+
+mainClassName = "org.zuinnote.hadoop.office.example.driver.CSV2ExcelDriver"
+
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'application'
 apply plugin: 'jacoco'
 
-mainClassName = "org.zuinnote.hadoop.office.example.driver.CSV2ExcelDriver"
 compileJava.options.encoding = 'UTF-8'
 sourceCompatibility = 1.8
 version = '0.1.0'
