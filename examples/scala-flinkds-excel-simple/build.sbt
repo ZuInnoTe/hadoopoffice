@@ -32,6 +32,11 @@ libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.2.
 
 libraryDependencies += "com.github.zuinnote" % "hadoopoffice-flinkds" % "1.2.0" % "compile"
 
+// woodstox core (needed for Flink to find the XMLParser)
+
+libraryDependencies += "com.fasterxml.woodstox" % "woodstox-core" % "5.0.3" % "compile"
+
+
 // following three libraries are only needed for digital signatures
 libraryDependencies += "org.bouncycastle" % "bcprov-ext-jdk15on" % "1.60" % "provided"
 libraryDependencies += "org.bouncycastle" % "bcpkix-jdk15on" % "1.60" % "provided"

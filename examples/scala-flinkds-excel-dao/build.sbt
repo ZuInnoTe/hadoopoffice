@@ -35,6 +35,11 @@ libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.2.
 
 libraryDependencies += "com.github.zuinnote" % "hadoopoffice-flinkds" % "1.2.0" % "compile"
 
+// woodstox core (needed for Flink to find the XMLParser)
+
+libraryDependencies += "com.fasterxml.woodstox" % "woodstox-core" % "5.0.3" % "compile"
+
+
 libraryDependencies += "org.apache.flink" %% "flink-scala" % "1.5.0" % "provided" 
 
 libraryDependencies += "org.apache.flink" % "flink-shaded-hadoop2" % "1.5.0" % "provided"  
