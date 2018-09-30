@@ -26,7 +26,7 @@ shadowJar {
      manifest {
        attributes 'Implementation-Title': 'Example - MR job (ExcelInput) for reading Excel files using hadoopoffice', 'Implementation-Version': version
      }
-
+	baseName = 'example-ho-mr-excelinput'
     classifier = ''
 
     exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA' // remove signature digests of other libraries
