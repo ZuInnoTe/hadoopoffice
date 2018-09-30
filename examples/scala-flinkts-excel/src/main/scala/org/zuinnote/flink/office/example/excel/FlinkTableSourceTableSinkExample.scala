@@ -72,7 +72,7 @@ object FlinkTableSourceTableSinkExample {
    
    def readwriteExcelTableAPI(env: ExecutionEnvironment, tableEnv: BatchTableEnvironment,inputFile: String, outputFile: String): Unit = {
 
-    	  // read using table source API
+    // read using table source API
     val hocr: HadoopOfficeReadConfiguration = new HadoopOfficeReadConfiguration()
     val dateFormat: SimpleDateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.US).asInstanceOf[SimpleDateFormat]
     val decimalFormat: DecimalFormat = NumberFormat.getInstance(Locale.GERMANY).asInstanceOf[DecimalFormat]
@@ -103,6 +103,7 @@ object FlinkTableSourceTableSinkExample {
       howc.setSimpleDateFormat(dateFormat)
       howc.setSimpleDecimalFormat(decimalFormat)
       val sink = new ExcelFlinkTableSink(outputFile, true, howc, "Sheet2", Some(WriteMode.NO_OVERWRITE))
+
     	  testSimpleResult.writeToSink(sink)
 }
 

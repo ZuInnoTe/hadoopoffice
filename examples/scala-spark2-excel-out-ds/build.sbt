@@ -24,10 +24,6 @@ assemblyJarName in assembly := "example-ho-spark-scala-ds-excelout.jar"
 
 fork  := true
 
-assemblyMergeStrategy in assembly := {
- case PathList("META-INF", xs @ _*) => MergeStrategy.discard
- case x => MergeStrategy.first
-}
 
 assemblyShadeRules in assembly := Seq(
    ShadeRule.rename("org.apache.commons.compress.**" -> "hadoopoffice.shade.org.apache.commons.compress.@1").inAll

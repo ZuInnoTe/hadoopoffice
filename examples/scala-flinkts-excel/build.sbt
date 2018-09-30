@@ -15,7 +15,6 @@ lazy val root = (project in file("."))
 
 crossScalaVersions := Seq("2.11.12")
 
-scalacOptions += "-target:jvm-1.8"
 
 resolvers += Resolver.mavenLocal
 
@@ -23,10 +22,7 @@ assemblyJarName in assembly := "example-ho-flink-ts-scala-excel.jar"
 
 fork  := true
 
-assemblyMergeStrategy in assembly := {
- case PathList("META-INF", xs @ _*) => MergeStrategy.discard
- case x => MergeStrategy.first
-}
+
 
 assemblyShadeRules in assembly := Seq(
    ShadeRule.rename("org.apache.commons.compress.**" -> "hadoopoffice.shade.org.apache.commons.compress.@1").inAll
@@ -39,6 +35,9 @@ libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.2.
 
 libraryDependencies += "com.github.zuinnote" %% "hadoopoffice-flinkts" % "1.2.0" % "compile"
 
+// woodstox core (needed for Flink to find the XMLParser)
+
+libraryDependencies += "com.fasterxml.woodstox" % "woodstox-core" % "5.0.3" % "compile"
 
 //flink
 

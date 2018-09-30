@@ -15,7 +15,6 @@ lazy val root = (project in file("."))
 
 crossScalaVersions := Seq("2.11.12")
 
-scalacOptions += "-target:jvm-1.8"
 
 resolvers += Resolver.mavenLocal
 
@@ -23,10 +22,6 @@ assemblyJarName in assembly := "example-ho-flinkds-scala-excel-simple.jar"
 
 fork  := true
 
-assemblyMergeStrategy in assembly := {
- case PathList("META-INF", xs @ _*) => MergeStrategy.discard
- case x => MergeStrategy.first
-}
 
 assemblyShadeRules in assembly := Seq(
    ShadeRule.rename("org.apache.commons.compress.**" -> "hadoopoffice.shade.org.apache.commons.compress.@1").inAll
