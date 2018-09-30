@@ -21,9 +21,7 @@ import org.zuinnote.hadoop.office.example.driver.CSV2ExcelDriver;
 import org.zuinnote.hadoop.office.format.common.HadoopOfficeReadConfiguration;
 import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 import org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodException;
-import org.zuinnote.hadoop.office.format.common.parser.MSExcelParser;
-
-import java.lang.InterruptedException;
+import org.zuinnote.hadoop.office.format.common.parser.msexcel.MSExcelParser;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
