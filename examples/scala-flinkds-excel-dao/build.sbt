@@ -43,6 +43,8 @@ libraryDependencies += "com.fasterxml.woodstox" % "woodstox-core" % "5.0.3" % "c
 libraryDependencies += "org.apache.flink" %% "flink-scala" % "1.5.0" % "provided" 
 
 libraryDependencies += "org.apache.flink" % "flink-shaded-hadoop2" % "1.5.0" % "provided"  
+// needed for writable serializer 
+libraryDependencies += "org.apache.flink" %% "flink-hadoop-compatibility" % "1.5.0" % "compile" 
 
 // following three libraries are only needed for digital signatures
 libraryDependencies += "org.bouncycastle" % "bcprov-ext-jdk15on" % "1.60" % "compile"
