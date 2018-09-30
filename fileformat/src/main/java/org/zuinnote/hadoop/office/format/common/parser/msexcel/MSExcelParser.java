@@ -141,6 +141,7 @@ private int currentSkipLine=0;
 		this.addedWorkbooks = new ArrayList<>();
 	}
 
+
 	/*
 	*
 	* Parses the given InputStream containing Excel data. The type of InputStream (e.g. FileInputStream, BufferedInputStream etc.) does not matter here, but it is recommended to use an appropriate
@@ -465,6 +466,9 @@ private int currentSkipLine=0;
 	}
 	
 	private boolean nextAllSheets() {
+		if (this.currentWorkbook==null) {
+			return false;
+		}
 		while ((this.currentWorkbook.getSheetAt(this.currentSheet)!=null) && (this.currentRow>this.currentWorkbook.getSheetAt(this.currentSheet).getLastRowNum())) { // end of row reached? => next sheet
 			this.currentSheet++;
 			this.currentRow=0;
@@ -486,9 +490,12 @@ private int currentSkipLine=0;
 	}
 	
 	private boolean nextSpecificSheets() {
+		if (this.currentWorkbook==null) {
+			return false;
+		}
 		// go through sheets specified until one found
 					while (this.sheetsIndex!=this.sheets.length) {
-						if (this.currentWorkbook.getSheet(this.sheets[this.sheetsIndex])==null) { // log only if sheet not found
+						if ((this.currentWorkbook.getSheet(this.sheets[this.sheetsIndex])==null)) { // log only if sheet not found
 							LOG.warn("Sheet \""+this.sheets[this.sheetsIndex]+"\" not found");
 						} else { // sheet found, check number of rows
 						   if (this.currentRow<=this.currentWorkbook.getSheet(this.sheets[this.sheetsIndex]).getLastRowNum()) {
@@ -498,7 +505,7 @@ private int currentSkipLine=0;
 							break;
 						   }
 						}
-						while (this.currentRow>this.currentWorkbook.getSheet(this.sheets[this.sheetsIndex]).getLastRowNum()) {
+						while ((this.currentWorkbook!=null) && (this.currentWorkbook.getSheetAt(this.currentSheet)!=null) &&  (this.currentRow>this.currentWorkbook.getSheet(this.sheets[this.sheetsIndex]).getLastRowNum())) {
 							this.sheetsIndex++;
 							if (this.sheetsIndex==this.sheets.length) {
 								LOG.info("No further sheets found");

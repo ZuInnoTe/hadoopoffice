@@ -124,7 +124,7 @@ private OfficeReaderParserInterface currentParser=null;
 	public Object[] getNext() {
 	
 		if (currentParser==null) {
-				return new Object[0];
+				return null;
 		}
 		return currentParser.getNext();
 	}
