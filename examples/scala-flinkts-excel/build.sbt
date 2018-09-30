@@ -33,9 +33,14 @@ assemblyShadeRules in assembly := Seq(
 )
 
 
+
+// hadoopoffice
 libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.2.0" % "compile"
 
 libraryDependencies += "com.github.zuinnote" %% "hadoopoffice-flinkts" % "1.2.0" % "compile"
+
+
+//flink
 
 libraryDependencies += "org.apache.flink" %% "flink-scala" % "1.5.0" % "provided" 
 
@@ -44,7 +49,7 @@ libraryDependencies += "org.apache.flink" %% "flink-table" % "1.5.0" % "compile"
 // following is needed for flink-table
 libraryDependencies += "org.apache.flink" %% "flink-streaming-scala" % "1.5.0" % "provided" 
 
-libraryDependencies += "org.apache.flink" % "flink-shaded-hadoop2" % "1.5.0" % "provided"  
+libraryDependencies += "org.apache.flink" % "flink-shaded-hadoop2" % "1.5.0" % "provided" 
 
 // needed for writable serializer 
 libraryDependencies += "org.apache.flink" %% "flink-hadoop-compatibility" % "1.5.0" % "compile" 

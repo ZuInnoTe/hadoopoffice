@@ -71,6 +71,7 @@ object FlinkTableSourceTableSinkExample {
    
    
    def readwriteExcelTableAPI(env: ExecutionEnvironment, tableEnv: BatchTableEnvironment,inputFile: String, outputFile: String): Unit = {
+
     	  // read using table source API
     val hocr: HadoopOfficeReadConfiguration = new HadoopOfficeReadConfiguration()
     val dateFormat: SimpleDateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.US).asInstanceOf[SimpleDateFormat]
