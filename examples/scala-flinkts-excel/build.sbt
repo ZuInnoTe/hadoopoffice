@@ -39,6 +39,11 @@ libraryDependencies += "com.github.zuinnote" %% "hadoopoffice-flinkts" % "1.2.0"
 
 libraryDependencies += "com.fasterxml.woodstox" % "woodstox-core" % "5.0.3" % "compile"
 
+// following three libraries are only needed for digital signatures
+libraryDependencies += "org.bouncycastle" % "bcprov-ext-jdk15on" % "1.60" % "compile"
+libraryDependencies += "org.bouncycastle" % "bcpkix-jdk15on" % "1.60" % "compile"
+libraryDependencies += "org.apache.santuario" % "xmlsec" % "2.1.2" % "compile"
+
 //flink
 
 libraryDependencies += "org.apache.flink" %% "flink-scala" % "1.5.0" % "provided" 
