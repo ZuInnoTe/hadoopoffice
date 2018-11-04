@@ -449,7 +449,9 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 							if (!"".equals(currentCell.getFormattedValue())) {
 								// check scientific notation
 								if (currentCell.getFormattedValue().toUpperCase().contains("E")) { // parse scientific notation
-									bd = new BigDecimal(currentCell.getFormattedValue());
+									// remove any characters that could cause issues
+									String sanitizedCellContent = currentCell.getFormattedValue().replace(",", ".");
+									bd = new BigDecimal(sanitizedCellContent);
 								} else {
 									bd = (BigDecimal) this.decimalFormat.parse(currentCell.getFormattedValue());
 								}

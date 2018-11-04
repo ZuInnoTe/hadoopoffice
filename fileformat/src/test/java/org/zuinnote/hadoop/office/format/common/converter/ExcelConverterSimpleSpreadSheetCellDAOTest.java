@@ -348,5 +348,35 @@ public class ExcelConverterSimpleSpreadSheetCellDAOTest {
 	    		assertEquals("L1",actual[11].getAddress(),"Address is correct");
 	    		assertNull(actual[12],"Null values stay null");
 	    }
+	    
+	    
+	    /**
+	     * https://github.com/ZuInnoTe/hadoopoffice/issues/42
+	     * 
+	     * Numbers in scientific notations are converted correctly
+	     * 
+	     */
+	    @Test
+	    public void testScientificNotation() {
+	
+	    	// configure converter
+    		SimpleDateFormat dateFormat = (SimpleDateFormat)DateFormat.getDateInstance(DateFormat.SHORT, Locale.US);
+    		SimpleDateFormat timeStampFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+    		
+    		DecimalFormat decimalFormat = (DecimalFormat) DecimalFormat.getInstance(Locale.GERMAN);
+    		ExcelConverterSimpleSpreadSheetCellDAO converter = new ExcelConverterSimpleSpreadSheetCellDAO(dateFormat,decimalFormat,timeStampFormat);
+    		GenericDataType[] schema = new GenericDataType[2];
+    		// create schema
+    		schema[0] = new GenericBigDecimalDataType(38,19);
+    		schema[1] = new GenericBigDecimalDataType(38,19);
+    		converter.setSchemaRow(schema);
+    		// create SpreadSheetCellDAOs
+    		SpreadSheetCellDAO[] data = new SpreadSheetCellDAO[2];
+    		data[0] = new SpreadSheetCellDAO("4.03578E+14","","","A1","Sheet1");
+    		data[1] = new SpreadSheetCellDAO("1,23457E+20","","","B1","Sheet1");
+    		Object[] primitiveData = converter.getDataAccordingToSchema(data);
+    		assertEquals("403578000000000",((BigDecimal)primitiveData[0]).toPlainString(),"Scientific notation (UK) is correctly converted");
+    		assertEquals("123457000000000000000",((BigDecimal)primitiveData[1]).toPlainString(),"Scientific notation (DE) is correctly converted");
+	    }
 
 }
