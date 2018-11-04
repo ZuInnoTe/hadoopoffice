@@ -74,7 +74,7 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 	public static final String CONF_SKIPLINESALLSHEETS = "hadoopoffice.read.sheet.skiplines.allsheets";
 	public static final String CONF_COLUMNNAMESREGEX = "hadoopoffice.read.header.column.names.regex";
 	public static final String CONF_COLUMNNAMESREPLACE = "hadoopoffice.read.header.column.names.replace";
-
+	public static final String CONF_IGNORENUMBERFORMATTING = "hadoopoffice.read.ignoreSpeadSheetNumberFormatting";
 	
 	public static final String CONF_SIMPLEDATEFORMAT = "hadoopoffice.read.simple.dateFormat";
 
@@ -135,7 +135,7 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 	public static final String DEFAULT_SIMPLEDATETIMEPATTERN = "";
 	
 	public static final String DEFAULT_SIMPLEDECIMALFORMAT = "";
-	
+	public static final boolean DEFAULT_IGNORENUMBERFORMATTING = true;
 	
 	
 	
@@ -171,12 +171,13 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 	private DecimalFormat simpleDecimalFormat;
 	private int sstCacheSize;
 	private boolean compressSST;
-
+	private boolean ignoreNumberFormatting;
 	/*
 	 * Create an empty configuration
 	 * 
 	 */
 	public HadoopOfficeReadConfiguration() {
+		// create an empty configuration
 		this.mimeType = HadoopOfficeReadConfiguration.DEFAULT_MIMETYPE;
 		this.sheets = HadoopOfficeReadConfiguration.DEFAULT_SHEETS;
 		this.localeStrBCP47 = HadoopOfficeReadConfiguration.DEFAULT_LOCALE;
@@ -208,7 +209,7 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 		this.lowFootprint = HadoopOfficeReadConfiguration.DEFAULT_LOWFOOTPRINT;
 
 		this.setLowFootprintParser(HadoopOfficeReadConfiguration.DEFAULT_LOWFOOTPRINT_PARSER);
-		
+		this.setIgnoreNumberFormatting(HadoopOfficeReadConfiguration.DEFAULT_IGNORENUMBERFORMATTING);
 		// set date for simple format
 		Locale dateLocale = Locale.getDefault();
 		if (!("".equals(HadoopOfficeReadConfiguration.DEFAULT_SIMPLEDATEFORMAT))) { // create locale
@@ -234,11 +235,11 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 			decimallocale = new Locale.Builder().setLanguageTag(HadoopOfficeReadConfiguration.DEFAULT_SIMPLEDECIMALFORMAT).build();
 		}
 		this.setSimpleDecimalFormat((DecimalFormat) NumberFormat.getInstance(decimallocale));
-		// create an empty configuration
+		
 		this.setX509CertificateChain(new HashSet<>());
 		this.setSstCacheSize(HadoopOfficeReadConfiguration.DEFAULT_LOWFOOTPRINT_STAX_CACHE);
 		this.setCompressSST(HadoopOfficeReadConfiguration.DEFAULT_LOWFOOTPRINT_STAX_COMPRESS);
-		
+	
 	}
 
 	/**
@@ -285,6 +286,9 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 	 *            passwords, for reading secured office documents. Note that the
 	 *            alias in the keystore needs to correspond to the filename (without
 	 *            the path)</li>
+	 *            <li> hadoopoffice.read.lowfootprint.parser: Only valid for new Excel files. Parser to be used for low footprint: stax or sax. SAX consumes more memory, but can be faster in case of encrypted files. Default: stax</li>
+	 *            <li> hadoopoffice.read.lowFootprint.stax.sst.cache: if stax parser is used a cache size can be defined for the so-called sharedstringtable (an Excel concept where it stores all unique strings, this can save space, but is not very memory efficient for large files). The cache can be -1 (everything in-memory), 0 (nothing in memory), n>0 (n entries in cache). All that does not fit in the cache will be swapped to disk and read from disk when needed. This might be slow (especially if source file is encrypted, because the sst table is stored in this case on disk as well encrypted). Generally the strategy should be that if you have a lot of entries repeating at various positions in the document then you should have a rather large cache in-memory. If you have entries that appear in a sequential manner and ideally do not repeat then you can have a smaller cache. You may need to experiment in case of large Excel files if you want to save memory. Alternatively, provide enough memory and put everything in-memory (can be potentially large!)
+	 *            <li> hadoopoffice.read.lowFootprint.stax.sst.compress: compress (gzip) swapped Excel sst items to disk (if stax parser is used). true if should be compressed, false if not. Note: Compression can significantly reduce performance. Default:False
 	 *            <li> hadoopoffice.read.security.crypt.credential.keystore.alias: alias
 	 *            for the password if different from filename</li>
 	 *            <li> hadoopoffice.read.security.crypt.credential.keystore.type:
@@ -313,9 +317,11 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 	 *            <li>hadoopoffice.read.simple.dateTimeFormat: applies only to HadoopOffice components that use the Converter to convert SpreadSheetCellDAOs into simple Java objects. Describes the date/time format to interpret date/timestamps using the BCP47 notation. Leave it empty for using the systems locale. Default: "US". </li>
 	 *            <li>hadoopoffice.read.simple.dateTimePattern: applies only to HadoopOffice components that use the Converter to convert SpreadSheetCellDAOs into simple Java objects. Overrides "hadoopoffice.read.simple.dateTimeFormat" - describes a date/time pattern according to the pattern in SimpleDateFormat - you can define any pattern that date/time have. Defaults to java.sql.Timestamp, if not specified</li>
 	 *            <li>hadoopoffice.read.simple.decimalFormat: applies only to HadoopOffice components that use the Converter to convert SpreadSheetCellDAOs into simple Java objects. Describes the decimal format to interpret decimal numbers using the BCP47 notation. Leave it empty for using the systems locale. Default: "".</li>
+     *            <li>hadoopoffice.read.ignoreSpeadSheetNumberFormatting (since 1.2.1): Excel allows to introduce format for numbering for representation purposes (e.g. scientific notation). This may alter the number that it is less exact, which may cause issues when using Excel as a data exchange format (in this case we recommend to fix the formatting in the underlying Excel file in any case). You should set this option to false if you format special numbers (e.g. phone numbers). True if Excel number formatting should be ignored, false if not. Default: false</li>
 	 *            </ul>
 	 * 
 	 */
+	
 	public HadoopOfficeReadConfiguration(Configuration conf) {
 		this.mimeType = conf.get(HadoopOfficeReadConfiguration.CONF_MIMETYPE,
 				HadoopOfficeReadConfiguration.DEFAULT_MIMETYPE);
@@ -767,6 +773,20 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 
 	public void setCompressSST(boolean compressSST) {
 		this.compressSST = compressSST;
+	}
+
+	/**
+	 * @return the ignoreNumberFormatting
+	 */
+	public boolean getIgnoreNumberFormatting() {
+		return ignoreNumberFormatting;
+	}
+
+	/**
+	 * @param ignoreNumberFormatting the ignoreNumberFormatting to set
+	 */
+	public void setIgnoreNumberFormatting(boolean ignoreNumberFormatting) {
+		this.ignoreNumberFormatting = ignoreNumberFormatting;
 	}
 	
 
