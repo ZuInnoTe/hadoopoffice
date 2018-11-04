@@ -132,9 +132,17 @@ private int currentSkipLine=0;
 		this.sheets=sheets;
 		this.hocr=hocr;
 		if (hocr.getLocale()==null)  {
-			useDataFormatter=new DataFormatter(); // use default locale
+			if (!this.hocr.getEmulateCSV()) {
+				useDataFormatter=new DataFormatter(); // use default locale
+			} else {
+				useDataFormatter=new DataFormatter(true); // use default locale, emulateCSV
+			}
 		} else {
-			useDataFormatter=new DataFormatter(hocr.getLocale());
+			if (!this.hocr.getEmulateCSV()) {
+				useDataFormatter=new DataFormatter(hocr.getLocale());
+			} else {
+				useDataFormatter=new DataFormatter(hocr.getLocale(),true);
+			}
 		}
 		
 		this.addedFormulaEvaluators = new HashMap<>();

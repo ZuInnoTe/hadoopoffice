@@ -74,7 +74,7 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 	public static final String CONF_SKIPLINESALLSHEETS = "hadoopoffice.read.sheet.skiplines.allsheets";
 	public static final String CONF_COLUMNNAMESREGEX = "hadoopoffice.read.header.column.names.regex";
 	public static final String CONF_COLUMNNAMESREPLACE = "hadoopoffice.read.header.column.names.replace";
-	public static final String CONF_IGNORENUMBERFORMATTING = "hadoopoffice.read.ignoreSpeadSheetNumberFormatting";
+	public static final String CONF_EMULATECSV = "hadoopoffice.read.emulateCSV";
 	
 	public static final String CONF_SIMPLEDATEFORMAT = "hadoopoffice.read.simple.dateFormat";
 
@@ -135,7 +135,7 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 	public static final String DEFAULT_SIMPLEDATETIMEPATTERN = "";
 	
 	public static final String DEFAULT_SIMPLEDECIMALFORMAT = "";
-	public static final boolean DEFAULT_IGNORENUMBERFORMATTING = true;
+	public static final boolean DEFAULT_EMULATECSV = false;
 	
 	
 	
@@ -171,7 +171,7 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 	private DecimalFormat simpleDecimalFormat;
 	private int sstCacheSize;
 	private boolean compressSST;
-	private boolean ignoreNumberFormatting;
+	private boolean emulateCSV;
 	/*
 	 * Create an empty configuration
 	 * 
@@ -209,7 +209,7 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 		this.lowFootprint = HadoopOfficeReadConfiguration.DEFAULT_LOWFOOTPRINT;
 
 		this.setLowFootprintParser(HadoopOfficeReadConfiguration.DEFAULT_LOWFOOTPRINT_PARSER);
-		this.setIgnoreNumberFormatting(HadoopOfficeReadConfiguration.DEFAULT_IGNORENUMBERFORMATTING);
+		this.setEmulateCSV(HadoopOfficeReadConfiguration.DEFAULT_EMULATECSV);
 		// set date for simple format
 		Locale dateLocale = Locale.getDefault();
 		if (!("".equals(HadoopOfficeReadConfiguration.DEFAULT_SIMPLEDATEFORMAT))) { // create locale
@@ -317,7 +317,7 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 	 *            <li>hadoopoffice.read.simple.dateTimeFormat: applies only to HadoopOffice components that use the Converter to convert SpreadSheetCellDAOs into simple Java objects. Describes the date/time format to interpret date/timestamps using the BCP47 notation. Leave it empty for using the systems locale. Default: "US". </li>
 	 *            <li>hadoopoffice.read.simple.dateTimePattern: applies only to HadoopOffice components that use the Converter to convert SpreadSheetCellDAOs into simple Java objects. Overrides "hadoopoffice.read.simple.dateTimeFormat" - describes a date/time pattern according to the pattern in SimpleDateFormat - you can define any pattern that date/time have. Defaults to java.sql.Timestamp, if not specified</li>
 	 *            <li>hadoopoffice.read.simple.decimalFormat: applies only to HadoopOffice components that use the Converter to convert SpreadSheetCellDAOs into simple Java objects. Describes the decimal format to interpret decimal numbers using the BCP47 notation. Leave it empty for using the systems locale. Default: "".</li>
-     *            <li>hadoopoffice.read.ignoreSpeadSheetNumberFormatting (since 1.2.1): Excel allows to introduce format for numbering for representation purposes (e.g. scientific notation). This may alter the number that it is less exact, which may cause issues when using Excel as a data exchange format (in this case we recommend to fix the formatting in the underlying Excel file in any case). You should set this option to false if you format special numbers (e.g. phone numbers). True if Excel number formatting should be ignored, false if not. Default: false</li>
+     *            <li>hadoopoffice.read.emulateCSV (since 1.2.1): Simulates when reading Excel to interpret content as if the Excel would have been saved as CSV. Technically it is based on the [emulateCSV option of the DataFormatter](https://poi.apache.org/apidocs/dev/org/apache/poi/ss/usermodel/DataFormatter.html#DataFormatter-java.util.Locale-boolean-) in Apache POI. Default: false</li>
 	 *            </ul>
 	 * 
 	 */
@@ -395,7 +395,7 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 			decimallocale = new Locale.Builder().setLanguageTag(decimaleStr).build();
 		}
 		this.setSimpleDecimalFormat((DecimalFormat) NumberFormat.getInstance(decimallocale));
-
+		this.setEmulateCSV(conf.getBoolean(HadoopOfficeReadConfiguration.CONF_EMULATECSV,HadoopOfficeReadConfiguration.DEFAULT_EMULATECSV));
 	    
 	    this.setX509CertificateChain(new HashSet<>());
 	    this.setSstCacheSize(conf.getInt(HadoopOfficeReadConfiguration.CONF_LOWFOOTPRINT_STAX_CACHE, HadoopOfficeReadConfiguration.DEFAULT_LOWFOOTPRINT_STAX_CACHE));
@@ -775,18 +775,20 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 		this.compressSST = compressSST;
 	}
 
+
+
 	/**
-	 * @return the ignoreNumberFormatting
+	 * @return the emulateCSV
 	 */
-	public boolean getIgnoreNumberFormatting() {
-		return ignoreNumberFormatting;
+	public boolean getEmulateCSV() {
+		return emulateCSV;
 	}
 
 	/**
-	 * @param ignoreNumberFormatting the ignoreNumberFormatting to set
+	 * @param emulateCSV the emulateCSV to set
 	 */
-	public void setIgnoreNumberFormatting(boolean ignoreNumberFormatting) {
-		this.ignoreNumberFormatting = ignoreNumberFormatting;
+	public void setEmulateCSV(boolean emulateCSV) {
+		this.emulateCSV = emulateCSV;
 	}
 	
 
