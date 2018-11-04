@@ -447,7 +447,12 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 						BigDecimal bd = null;
 						try {
 							if (!"".equals(currentCell.getFormattedValue())) {
-								bd = (BigDecimal) this.decimalFormat.parse(currentCell.getFormattedValue());
+								// check scientific notation
+								if (currentCell.getFormattedValue().toUpperCase().contains("E")) { // parse scientific notation
+									bd = new BigDecimal(currentCell.getFormattedValue());
+								} else {
+									bd = (BigDecimal) this.decimalFormat.parse(currentCell.getFormattedValue());
+								}
 							}
 						} catch (ParseException p) {
 							LOG.warn(
