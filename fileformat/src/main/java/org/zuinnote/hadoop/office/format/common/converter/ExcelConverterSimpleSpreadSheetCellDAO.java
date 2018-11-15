@@ -67,7 +67,6 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 	private SimpleDateFormat dateTimeFormat;
 	private DecimalFormat decimalFormat;
 
-	private Calendar converterCalendar;
 
 	/***
 	 * Create a new converter
@@ -89,11 +88,12 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 	public ExcelConverterSimpleSpreadSheetCellDAO(SimpleDateFormat dateFormat, DecimalFormat decimalFormat,
 			SimpleDateFormat dateTimeFormat) {
 		this.schemaRow = new ArrayList<>();
-		this.dateFormat = dateFormat;
-		this.decimalFormat = decimalFormat;
+		this.dateFormat = (SimpleDateFormat) dateFormat.clone();
+		this.decimalFormat = (DecimalFormat) decimalFormat.clone();
 		this.decimalFormat.setParseBigDecimal(true);
-		this.dateTimeFormat = dateTimeFormat;
-		this.converterCalendar = Calendar.getInstance(this.dateFormat.getTimeZone());
+		if (dateTimeFormat!=null) {
+			this.dateTimeFormat = (SimpleDateFormat) dateTimeFormat.clone();
+		}
 	}
 
 	/***
