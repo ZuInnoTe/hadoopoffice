@@ -51,7 +51,8 @@ import org.zuinnote.hadoop.office.format.common.util.msexcel.MSExcelUtil;
 
 /**
  * This class allows to infer the Java datatypes underlying a SpreadSheet and
- * the corresponding data as Java objects
+ * the corresponding data as Java objects. Note: it is not thread-safe, because depending on the Big Data platform different mechanisms need to be applied (e.g. ThreadLocal does not work in all cases).
+ * The main reason why it is not thread safe is is due to to the lack of thread-safeness in SimpleDateFormat and DecimalFormat (which especially since JDK8 has impacts).
  *
  */
 public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
@@ -71,8 +72,8 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 	/***
 	 * Create a new converter
 	 * 
-	 * @param dateFormat    format of the dates in the Excel
-	 * @param decimalFormat format of the decimals in the Excel
+	 * @param dateFormat    format of the dates in the Excel. This format is cloned in the constructor to avoid inferences.
+	 * @param decimalFormat format of the decimals in the Excel. This format is cloned in the constructor to avoid inferences.
 	 */
 	public ExcelConverterSimpleSpreadSheetCellDAO(SimpleDateFormat dateFormat, DecimalFormat decimalFormat) {
 		this(dateFormat,decimalFormat,null);
@@ -81,9 +82,9 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 	/***
 	 * Create a new converter
 	 * 
-	 * @param dateFormat     format of the dates in the Excel
-	 * @param decimalFormat  format of the decimals in the Excel
-	 * @param dateTimeFormat format of date time cells in the Excel
+	 * @param dateFormat     format of the dates in the Excel. This format is cloned in the constructor to avoid inferences.
+	 * @param decimalFormat  format of the decimals in the Excel. This format is cloned in the constructor to avoid inferences.
+	 * @param dateTimeFormat format of date time cells in the Excel. This format is cloned in the constructor to avoid inferences.
 	 */
 	public ExcelConverterSimpleSpreadSheetCellDAO(SimpleDateFormat dateFormat, DecimalFormat decimalFormat,
 			SimpleDateFormat dateTimeFormat) {
