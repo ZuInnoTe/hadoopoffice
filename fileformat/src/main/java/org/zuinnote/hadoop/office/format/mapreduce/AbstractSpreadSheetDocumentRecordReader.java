@@ -141,6 +141,10 @@ try {
 	// get current path
 	Path currentPath = fSplit.getPath();
 	Path parentPath = currentPath.getParent();
+	if (!"".equals(this.hocr.getLinkedWorkbookLocation())) {
+		// use a custom location for linked workbooks
+		parentPath = new Path(this.hocr.getLinkedWorkbookLocation());
+	}
 	// read linked workbook filenames
 	List<String> linkedWorkbookList=this.officeReader.getCurrentParser().getLinkedWorkbooks();
 	LOG.debug(linkedWorkbookList.size());

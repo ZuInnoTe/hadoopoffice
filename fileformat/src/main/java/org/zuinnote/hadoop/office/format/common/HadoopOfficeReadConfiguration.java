@@ -47,6 +47,7 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 	public static final String CONF_SHEETS = "hadoopoffice.read.sheets";
 	public static final String CONF_LOCALE = "hadoopoffice.read.locale.bcp47";
 	public static final String CONF_LINKEDWB = "hadoopoffice.read.linkedworkbooks";
+	public static final String CONF_LINKEDWB_LOCATION = "hadoopoffice.read.linkedworkbooks.location";
 	public static final String CONF_IGNOREMISSINGWB = "hadoopoffice.read.ignoremissinglinkedworkbooks";
 	public static final String CONF_DECRYPT = "hadoopoffice.read.security.crypt.password";
 	public static final String CONF_DECRYPTLINKEDWBBASE = "hadoopoffice.read.security.crypt.linkedworkbooks.";
@@ -96,6 +97,7 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 	public static final String DEFAULT_LOCALE = "";
 	public static final String DEFAULT_SHEETS = "";
 	public static final boolean DEFAULT_LINKEDWB = false;
+	public static final String DEFAULT_LINKEDWB_LOCATION = "";
 	public static final boolean DEFAULT_IGNOREMISSINGLINKEDWB = false;
 
 	public static final boolean DEFAULT_LOWFOOTPRINT = false;
@@ -145,6 +147,7 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 	private String sheets = null;
 	private Locale locale = null;
 	private boolean readLinkedWorkbooks = false;
+	private String linkedWorkbookLocation;
 	private boolean ignoreMissingLinkedWorkbooks = false;
 	private String password = null;
 	private Map<String, String> metadataFilter;
@@ -188,6 +191,7 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 		}
 		this.readLinkedWorkbooks = HadoopOfficeReadConfiguration.DEFAULT_LINKEDWB;
 		this.ignoreMissingLinkedWorkbooks = HadoopOfficeReadConfiguration.DEFAULT_IGNOREMISSINGLINKEDWB;
+		this.setLinkedWorkbookLocation(HadoopOfficeReadConfiguration.DEFAULT_LINKEDWB_LOCATION);
 		this.password = null; // null if no password is set
 
 		this.setCryptKeystoreFile(HadoopOfficeReadConfiguration.DEFAULT_CRYKEYSTOREFILE);
@@ -335,6 +339,8 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 				HadoopOfficeReadConfiguration.DEFAULT_LINKEDWB);
 		this.ignoreMissingLinkedWorkbooks = conf.getBoolean(HadoopOfficeReadConfiguration.CONF_IGNOREMISSINGWB,
 				HadoopOfficeReadConfiguration.DEFAULT_IGNOREMISSINGLINKEDWB);
+		this.linkedWorkbookLocation = conf.get(HadoopOfficeReadConfiguration.CONF_LINKEDWB_LOCATION,
+				HadoopOfficeReadConfiguration.DEFAULT_LINKEDWB_LOCATION);
 		this.password = conf.get(HadoopOfficeReadConfiguration.CONF_DECRYPT); // null if no password is set
 		this.metadataFilter = HadoopUtil.parsePropertiesFromBase(conf,
 				HadoopOfficeReadConfiguration.CONF_FILTERMETADATA);
@@ -789,6 +795,20 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 	 */
 	public void setEmulateCSV(boolean emulateCSV) {
 		this.emulateCSV = emulateCSV;
+	}
+
+	/**
+	 * @return the linkedWorkbookLocation
+	 */
+	public String getLinkedWorkbookLocation() {
+		return linkedWorkbookLocation;
+	}
+
+	/**
+	 * @param linkedWorkbookLocation the linkedWorkbookLocation to set
+	 */
+	public void setLinkedWorkbookLocation(String linkedWorkbookLocation) {
+		this.linkedWorkbookLocation = linkedWorkbookLocation;
 	}
 	
 

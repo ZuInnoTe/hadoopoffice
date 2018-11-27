@@ -927,6 +927,60 @@ public class OfficeFormatHadoopExcelNormalTest {
 				"Input Split for Excel file contains row 1 with cell 2 == \"5\"");
 
 	}
+	
+	@Test
+	public void readExcelInputFormatExcel2013LinkedWorkbookAlternativeLocation() throws IOException, InterruptedException {
+		Configuration conf = new Configuration(defaultConf);
+		ClassLoader classLoader = getClass().getClassLoader();
+		String fileName = "excel2013linkedworkbooks.xlsx";
+		String fileNameSpreadSheet = classLoader.getResource(fileName).getFile();
+		Path file = new Path(fileNameSpreadSheet);
+		// alternativeLocation
+		String resourcePath = new File(classLoader.getResource(fileName).getFile()).getParent();
+		String alternativeLocation = resourcePath+File.separator+"alternatelocationlinkedwb";
+		// set locale to the one of the test data
+		conf.set("hadoopoffice.read.locale.bcp47", "de");
+		// enable option to read linked workbooks
+		conf.setBoolean("hadoopoffice.read.linkedworkbooks", true);
+		conf.setBoolean("hadoopoffice.read.ignoremissinglinkedworkbooks", false);
+		conf.set("hadoopoffice.read.linkedworkbooks.location", alternativeLocation);
+		Job job = Job.getInstance(conf);
+		FileInputFormat.setInputPaths(job, file);
+		TaskAttemptContext context = new TaskAttemptContextImpl(conf, new TaskAttemptID());
+		ExcelFileInputFormat format = new ExcelFileInputFormat();
+		List<InputSplit> splits = format.getSplits(job);
+		assertEquals(1, splits.size(), "Only one split generated for Excel file");
+		RecordReader<Text, ArrayWritable> reader = format.createRecordReader(splits.get(0), context);
+		assertNotNull(reader, "Format returned  null RecordReader");
+		reader.initialize(splits.get(0), context);
+		Text spreadSheetKey = new Text();
+		ArrayWritable spreadSheetValue = new ArrayWritable(SpreadSheetCellDAO.class);
+		assertTrue(reader.nextKeyValue(), "Input Split for Excel file contains row 1");
+		spreadSheetKey = reader.getCurrentKey();
+		spreadSheetValue = reader.getCurrentValue();
+		assertEquals("[excel2013linkedworkbooks.xlsx]Sheet1!A1", spreadSheetKey.toString(),
+				"Input Split for Excel file has keyname == \"[excel2013linkedworkbooks.xlsx]Sheet1!A1\"");
+		assertEquals(3, spreadSheetValue.get().length, "Input Split for Excel file contains row 1 with 3 columns");
+		assertEquals("test1", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getFormattedValue(),
+				"Input Split for Excel file contains row 1 with cell 1 == \"test1\"");
+		assertEquals("Sheet1", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getSheetName(),
+				"Input Split for Excel file contains row 1 with cell 1 sheetname == \"Sheet1\"");
+		assertEquals("A1", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getAddress(),
+				"Input Split for Excel file contains row 1 with cell 1 address == \"A1\"");
+		assertEquals("test2", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getFormattedValue(),
+				"Input Split for Excel file contains row 1 with cell 2 == \"test2\"");
+		assertEquals("test3", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormattedValue(),
+				"Input Split for Excel file contains row 1 with cell 3 == \"test3\"");
+		assertTrue(reader.nextKeyValue(), "Input Split for Excel file contains row 2");
+		spreadSheetKey = reader.getCurrentKey();
+		spreadSheetValue = reader.getCurrentValue();
+		assertEquals(2, spreadSheetValue.get().length, "Input Split for Excel file contains row 1 with 2 columns");
+		assertEquals("3", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getFormattedValue(),
+				"Input Split for Excel file contains row 1 with cell 1 == \"3\" (this tests also if the cached value of 6 is ignored)");
+		assertEquals("5", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getFormattedValue(),
+				"Input Split for Excel file contains row 1 with cell 2 == \"5\"");
+
+	}
 
 	@Test
 	public void readExcelInputFormatExcel2003LinkedWorkbook() throws IOException, InterruptedException {
@@ -941,6 +995,61 @@ public class OfficeFormatHadoopExcelNormalTest {
 		// enable option to read linked workbooks
 		conf.setBoolean("hadoopoffice.read.linkedworkbooks", true);
 		conf.setBoolean("hadoopoffice.read.ignoremissinglinkedworkbooks", false);
+		Job job = Job.getInstance(conf);
+		TaskAttemptContext context = new TaskAttemptContextImpl(conf, new TaskAttemptID());
+		FileInputFormat.setInputPaths(job, file);
+		ExcelFileInputFormat format = new ExcelFileInputFormat();
+		List<InputSplit> splits = format.getSplits(job);
+		assertEquals(1, splits.size(), "Only one split generated for Excel file");
+		RecordReader<Text, ArrayWritable> reader = format.createRecordReader(splits.get(0), context);
+		assertNotNull(reader, "Format returned  null RecordReader");
+		reader.initialize(splits.get(0), context);
+		Text spreadSheetKey = new Text();
+		ArrayWritable spreadSheetValue = new ArrayWritable(SpreadSheetCellDAO.class);
+		assertTrue(reader.nextKeyValue(), "Input Split for Excel file contains row 1");
+		spreadSheetKey = reader.getCurrentKey();
+		spreadSheetValue = reader.getCurrentValue();
+		assertEquals("[excel2003linkedworkbooks.xls]Sheet1!A1", spreadSheetKey.toString(),
+				"Input Split for Excel file has keyname == \"[excel2003linkedworkbooks.xls]Sheet1!A1\"");
+		assertEquals(3, spreadSheetValue.get().length, "Input Split for Excel file contains row 1 with 3 columns");
+		assertEquals("test1", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getFormattedValue(),
+				"Input Split for Excel file contains row 1 with cell 1 == \"test1\"");
+		assertEquals("Sheet1", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getSheetName(),
+				"Input Split for Excel file contains row 1 with cell 1 sheetname == \"Sheet1\"");
+		assertEquals("A1", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getAddress(),
+				"Input Split for Excel file contains row 1 with cell 1 address == \"A1\"");
+		assertEquals("test2", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getFormattedValue(),
+				"Input Split for Excel file contains row 1 with cell 2 == \"test2\"");
+		assertEquals("test3", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormattedValue(),
+				"Input Split for Excel file contains row 1 with cell 3 == \"test3\"");
+		assertTrue(reader.nextKeyValue(), "Input Split for Excel file contains row 2");
+		spreadSheetKey = reader.getCurrentKey();
+		spreadSheetValue = reader.getCurrentValue();
+		assertEquals(2, spreadSheetValue.get().length, "Input Split for Excel file contains row 1 with 2 columns");
+		assertEquals("3", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getFormattedValue(),
+				"Input Split for Excel file contains row 1 with cell 1 == \"3\" (this tests also if the cached value of 6 is ignored)");
+		assertEquals("5", ((SpreadSheetCellDAO) spreadSheetValue.get()[1]).getFormattedValue(),
+				"Input Split for Excel file contains row 1 with cell 2 == \"5\"");
+
+	}
+	
+	@Test
+	public void readExcelInputFormatExcel2003LinkedWorkbookAlternativeLocation() throws IOException, InterruptedException {
+		Configuration conf = new Configuration(defaultConf);
+		ClassLoader classLoader = getClass().getClassLoader();
+		String fileName = "excel2003linkedworkbooks.xls";
+		String fileNameSpreadSheet = classLoader.getResource(fileName).getFile();
+		Path file = new Path(fileNameSpreadSheet);
+		// alternativeLocation
+		String resourcePath = new File(classLoader.getResource(fileName).getFile()).getParent();
+		String alternativeLocation = resourcePath+File.separator+"alternatelocationlinkedwb";
+		// set locale to the one of the test data
+		conf.set("hadoopoffice.read.locale.bcp47", "de");
+		// enable option to read linked workbooks
+		conf.setBoolean("hadoopoffice.read.linkedworkbooks", true);
+		conf.setBoolean("hadoopoffice.read.ignoremissinglinkedworkbooks", false);
+
+		conf.set("hadoopoffice.read.linkedworkbooks.location", alternativeLocation);
 		Job job = Job.getInstance(conf);
 		TaskAttemptContext context = new TaskAttemptContextImpl(conf, new TaskAttemptID());
 		FileInputFormat.setInputPaths(job, file);

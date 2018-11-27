@@ -141,6 +141,11 @@ public AbstractSpreadSheetDocumentRecordReader(FileSplit split, JobConf job, Rep
 	// get current path
 	Path currentPath = split.getPath();
 	Path parentPath = currentPath.getParent();
+	if (!"".equals(this.hocr.getLinkedWorkbookLocation())) {
+		// use a custom location for linked workbooks
+		parentPath = new Path(this.hocr.getLinkedWorkbookLocation());
+	}
+	
 	// read linked workbook filenames
 	List<String> linkedWorkbookList=this.officeReader.getCurrentParser().getLinkedWorkbooks();
 	this.currentHFR = new HadoopFileReader(job);
