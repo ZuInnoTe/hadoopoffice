@@ -13,25 +13,25 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 **/
-package org.zuinnote.hadoop.excel.hive.serde;
+package org.zuinnote.hadoop.excel.hive.daoserde;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.hadoop.hive.ql.io.AbstractStorageFormatDescriptor;
+import org.zuinnote.hadoop.excel.hive.outputformat.HiveExcelCellFileOutputFormat;
 import org.zuinnote.hadoop.office.format.mapred.ExcelFileInputFormat;
-import org.zuinnote.hadoop.excel.hive.outputformat.HiveExcelRowFileOutputFormat;
 
 /**
- *
+ * @author jornfranke
  *
  */
-public class ExcelStorageFormatDescriptor extends AbstractStorageFormatDescriptor  {
+public class ExcelSpreadSheetCellDAOStorageFormatDescriptor  extends AbstractStorageFormatDescriptor  {
 
 	@Override
 	public Set<String> getNames() {
 		HashSet<String> result = new HashSet<>();
-	    result.add("EXCELFILE");
+	    result.add("EXCELSPREADSHEETCELLDAOFILE");
 	    return result;
 	}
 
@@ -42,12 +42,12 @@ public class ExcelStorageFormatDescriptor extends AbstractStorageFormatDescripto
 
 	@Override
 	public String getOutputFormat() {
-		return HiveExcelRowFileOutputFormat.class.getName();
+		return HiveExcelCellFileOutputFormat.class.getName();
 	}
 	
 	@Override
 	public String getSerde() {
-		return ExcelSerde.class.getName();
+		return ExcelSpreadSheetCellDAOSerde.class.getName();
 	}
 
 }
