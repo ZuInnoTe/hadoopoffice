@@ -266,6 +266,7 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 	 *            directly linked to the main workbook. Default: false</li>
 	 *            <li> hadoopoffice.read.ignoremissinglinkedworkbooks: true if missing
 	 *            linked workbooks should be ignored. Default: false</li>
+	 *            <li> hadoopoffice.read.linkedworkbooks.location (as of 1.2.3): location of linked workbooks (only one folder). If set to empty String then the same folder as the main excel file is used. Default: set to emptyString</li>
 	 *            <li> hadoopoffice.read.security.crypt.password: if set then</li>
 	 *            <li> hadoopoffice will try to decrypt the file</li>
 	 *            <li> hadoopoffice.read.security.crypt.linkedworkbooks.*: if set then
