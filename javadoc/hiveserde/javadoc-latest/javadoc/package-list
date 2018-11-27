@@ -1,2 +1,3 @@
+org.zuinnote.hadoop.excel.hive.daoserde
 org.zuinnote.hadoop.excel.hive.outputformat
 org.zuinnote.hadoop.excel.hive.serde
