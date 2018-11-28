@@ -37,10 +37,10 @@ import org.apache.hadoop.mapred.Reporter;
 
 /* The input format will return an array of strings that it reads per "row" from the source formats */
 
-public abstract class AbstractSpreadSheetDocumentFileInputFormat  extends FileInputFormat<Text,ArrayWritable> {
+public abstract class AbstractSpreadSheetDocumentFileInputFormat<K>  extends FileInputFormat<Text,K> {
 
 	@Override
-	public abstract RecordReader<Text,ArrayWritable> getRecordReader(InputSplit split, JobConf job, Reporter reporter) throws IOException;
+	public abstract RecordReader<Text,K> getRecordReader(InputSplit split, JobConf job, Reporter reporter) throws IOException;
 	@Override
 	protected abstract boolean isSplitable(FileSystem fs, Path file);
 

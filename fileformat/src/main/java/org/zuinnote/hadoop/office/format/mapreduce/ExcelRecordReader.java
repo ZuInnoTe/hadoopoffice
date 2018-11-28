@@ -46,7 +46,7 @@ private FileSplit split;
 private Text currentKey=new Text("");
 private ArrayWritable currentValue=new ArrayWritable(SpreadSheetCellDAO.class);
 
-public ExcelRecordReader(Configuration conf, FileSplit split) throws IOException,FormatNotUnderstoodException,GeneralSecurityException {
+public ExcelRecordReader(Configuration conf, FileSplit split)  {
  super(conf);
  LOG.debug("Initalizing ExcelRecordReader");
  this.split=split;

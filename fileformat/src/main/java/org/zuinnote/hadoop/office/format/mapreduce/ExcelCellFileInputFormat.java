@@ -1,5 +1,5 @@
 /**
-* Copyright 2016 ZuInnoTe (Jörn Franke) <zuinnote@gmail.com>
+* Copyright 2018 ZuInnoTe (Jörn Franke) <zuinnote@gmail.com>
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -16,46 +16,29 @@
 
 package org.zuinnote.hadoop.office.format.mapreduce;
 
-import java.io.IOException;
 
-
-import org.apache.hadoop.conf.Configuration;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.mapreduce.JobContext;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.InputSplit;
+import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
-
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.io.ArrayWritable;
-
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
-
-import java.security.GeneralSecurityException;
-
 import org.zuinnote.hadoop.office.format.common.HadoopOfficeReadConfiguration;
-import org.zuinnote.hadoop.office.format.common.parser.*;
+import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
 
-public class ExcelFileInputFormat extends AbstractSpreadSheetDocumentFileInputFormat<ArrayWritable> {
+public class ExcelCellFileInputFormat extends AbstractSpreadSheetDocumentFileInputFormat<SpreadSheetCellDAO>  {
 
-private static final Log LOG = LogFactory.getLog(ExcelFileInputFormat.class.getName());
+private static final Log LOG = LogFactory.getLog(ExcelCellFileInputFormat.class.getName());
 
-@Override
-public  RecordReader<Text,ArrayWritable> createRecordReader(InputSplit split, TaskAttemptContext ctx)  {
-/** Create reader **/
-		 // send configuration option to ms excel. The format of the Excel (old vs new) is detected automaitcally
- 		ctx.getConfiguration().set(HadoopOfficeReadConfiguration.CONF_MIMETYPE,"ms-excel");
-		return new ExcelRecordReader(ctx.getConfiguration(), (FileSplit) split);
-
-}
-	
-public void configure (Configuration conf) {
-		// nothing here
-} 
-
-	
+	@Override
+	public RecordReader<Text, SpreadSheetCellDAO> createRecordReader(InputSplit split, TaskAttemptContext ctx) {
+	// send configuration option to ms excel. The format of the Excel (old vs new) is detected automaitcally
+	ctx.getConfiguration().set(HadoopOfficeReadConfiguration.CONF_MIMETYPE,"ms-excel");
+	return new ExcelCellRecordReader(ctx.getConfiguration(), (FileSplit) split);
+	}
 
 	/**
 	 * Unfortunately, we cannot split Excel documents correctly. Apache POI/library requires full documents.
@@ -64,9 +47,8 @@ public void configure (Configuration conf) {
 	 *
 	*/
 	@Override
-  	protected boolean isSplitable(JobContext context, Path file) {
+	protected boolean isSplitable(JobContext context, Path file) {
 		return false;
-  	}	
-
+	}
 
 }

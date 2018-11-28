@@ -39,7 +39,7 @@ import java.security.GeneralSecurityException;
 import org.zuinnote.hadoop.office.format.common.HadoopOfficeReadConfiguration;
 import org.zuinnote.hadoop.office.format.common.parser.*;
 
-public class ExcelFileInputFormat extends AbstractSpreadSheetDocumentFileInputFormat {
+public class ExcelFileInputFormat extends AbstractSpreadSheetDocumentFileInputFormat<ArrayWritable> {
 
 private static final Log LOGIF = LogFactory.getLog(ExcelFileInputFormat.class.getName());
 
