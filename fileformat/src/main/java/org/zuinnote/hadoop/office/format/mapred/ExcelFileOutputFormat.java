@@ -65,10 +65,14 @@ public RecordWriter<NullWritable,SpreadSheetCellDAO> getRecordWriter(FileSystem 
 	
 	String defaultConf=conf.get(HadoopOfficeWriteConfiguration.CONF_MIMETYPE,ExcelFileOutputFormat.DEFAULT_MIMETYPE);
 	conf.set(HadoopOfficeWriteConfiguration.CONF_MIMETYPE,defaultConf);
-	
-	Path file = getTaskOutputPath(conf, name);
-	// add suffix
-	file=file.suffix(ExcelFileOutputFormat.getSuffix(conf.get(HadoopOfficeWriteConfiguration.CONF_MIMETYPE)));
+	Path file;
+	if (name!=null) {
+		file = getTaskOutputPath(conf, name);
+		// add suffix
+		file = file.suffix(ExcelFileOutputFormat.getSuffix(conf.get(HadoopOfficeWriteConfiguration.CONF_MIMETYPE)));
+	} else {
+		file = getOutputPath(conf);
+	}
 	 	try {
 			return new ExcelRecordWriter<>(HadoopUtil.getDataOutputStream(conf,file,progress,getCompressOutput(conf),getOutputCompressorClass(conf, ExcelFileOutputFormat.defaultCompressorClass)),file.getName(),conf);
 		} catch (InvalidWriterConfigurationException | OfficeWriterException e) {
