@@ -31,7 +31,7 @@ assemblyShadeRules in assembly := Seq(
 )
 
 
-libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.2.3" % "compile"
+libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.2.4" % "compile"
 
 // following three libraries are only needed for digital signatures
 libraryDependencies += "org.bouncycastle" % "bcprov-ext-jdk15on" % "1.60" % "compile"
