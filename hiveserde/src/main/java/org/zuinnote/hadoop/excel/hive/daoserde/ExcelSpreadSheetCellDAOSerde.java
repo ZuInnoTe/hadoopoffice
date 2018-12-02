@@ -167,7 +167,7 @@ public class ExcelSpreadSheetCellDAOSerde extends AbstractSerDe {
 			return null;
 		}
 		if (!(arg0 instanceof SpreadSheetCellDAO)) {
-			throw new SerDeException("Table does not contain objects of type SpreadSheetCellDAO. Did you use the ExcelInputFormat of HadoopOffice?");
+			throw new SerDeException("Table does not contain objects of type SpreadSheetCellDAO. Did you use the ExcelCellInputFormat of HadoopOffice?");
 		}
 		String[] spreadSheetCellRow = new String[5];
 		SpreadSheetCellDAO obj = (SpreadSheetCellDAO)arg0;
