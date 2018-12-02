@@ -23,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.Properties;
 
@@ -33,7 +32,6 @@ import org.apache.hadoop.hive.serde2.SerDeException;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.junit.jupiter.api.Test;
 import org.zuinnote.hadoop.excel.hive.daoserde.ExcelSpreadSheetCellDAOSerde;
-import org.zuinnote.hadoop.excel.hive.serde.ExcelSerde;
 import org.zuinnote.hadoop.office.format.common.HadoopOfficeReadConfiguration;
 import org.zuinnote.hadoop.office.format.common.OfficeReader;
 import org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO;
@@ -340,7 +338,6 @@ public class ExcelSpreadSheetCellDAOSerdeTest {
 	@Test
 	public void serialize() throws SerDeException {
 		// initialize Serde
-		ClassLoader classLoader = getClass().getClassLoader();
 		ExcelSpreadSheetCellDAOSerde testSerde = new ExcelSpreadSheetCellDAOSerde();
 		Configuration hadoopConf = new Configuration();
 		Properties tblProperties = new Properties();
