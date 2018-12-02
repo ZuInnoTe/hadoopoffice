@@ -23,3 +23,10 @@ select count(*) from ExcelTable;
 
 -- display the first 10 rows (ie cells)
 select * from ExcelTable LIMIT 10;
+
+
+-- store data as Excel
+-- copies the cells from ExcelDAOTable. Note: it expects as source a table with 5 columns (formattedValue, comment, formula, address, sheetname) where each row corresponds to one Excel cell 
+create  table ExcelDAOOut ROW FORMAT SERDE 'org.zuinnote.hadoop.excel.hive.daoserde.ExcelSpreadSheetCellDAOSerde' STORED AS INPUTFORMAT 'org.zuinnote.hadoop.office.format.mapred.ExcelCellFileInputFormat' OUTPUTFORMAT 'org.zuinnote.hadoop.excel.hive.outputformat.HiveExcelCellFileOutputFormat' LOCATION '/user/office/output' TBLPROPERTIES("hadoopoffice.write.mimeType"="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "hadoopoffice.read.locale.bcp47"="DE","hadoopoffice.write.locale.bcp47"="DE")
+AS 
+select * from ExcelDAOTable;
