@@ -30,7 +30,7 @@ assemblyShadeRules in assembly := Seq(
 )
 
 
-libraryDependencies += "com.github.zuinnote" %% "spark-hadoopoffice-ds" % "1.2.2" % "compile"
+libraryDependencies += "com.github.zuinnote" %% "spark-hadoopoffice-ds" % "1.2.3" % "compile"
 
 libraryDependencies += "org.apache.spark" %% "spark-core" % "2.3.0" % "provided"
 

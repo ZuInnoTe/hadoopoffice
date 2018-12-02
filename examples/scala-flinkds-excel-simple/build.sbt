@@ -28,9 +28,9 @@ assemblyShadeRules in assembly := Seq(
 )
 
 
-libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.2.2" % "compile"
+libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.2.3" % "compile"
 
-libraryDependencies += "com.github.zuinnote" % "hadoopoffice-flinkds" % "1.2.2" % "compile"
+libraryDependencies += "com.github.zuinnote" % "hadoopoffice-flinkds" % "1.2.3" % "compile"
 
 // woodstox core (needed for Flink to find the XMLParser)
 
