@@ -547,6 +547,111 @@ public class OfficeFormatHadoopExcelNormalTest {
 		assertEquals("15", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormattedValue(),
 				"Input Split for Excel file contains row 6 with cell 3== \"15\"");
 	}
+	
+	@Test
+	public void readExcelCellInputFormatExcel2013SingleSheet() throws IOException, InterruptedException {
+		Configuration conf = new Configuration(defaultConf);
+		ClassLoader classLoader = getClass().getClassLoader();
+		String fileName = "excel2013test.xlsx";
+		String fileNameSpreadSheet = classLoader.getResource(fileName).getFile();
+		Path file = new Path(fileNameSpreadSheet);
+
+		// set locale to the one of the test data
+		conf.set("hadoopoffice.read.locale.bcp47", "de");
+		Job job = Job.getInstance(conf);
+		FileInputFormat.setInputPaths(job, file);
+		TaskAttemptContext context = new TaskAttemptContextImpl(conf, new TaskAttemptID());
+		ExcelCellFileInputFormat format = new ExcelCellFileInputFormat();
+		List<InputSplit> splits = format.getSplits(job);
+		assertEquals(1, splits.size(), "Only one split generated for Excel file");
+		RecordReader<Text, SpreadSheetCellDAO> reader = format.createRecordReader(splits.get(0), context);
+		assertNotNull(reader, "Format returned  null RecordReader");
+		reader.initialize(splits.get(0), context);
+		Text spreadSheetKey = new Text();
+		SpreadSheetCellDAO spreadSheetValue = new SpreadSheetCellDAO();
+		assertTrue(reader.nextKeyValue(), "Input Split for Excel file contains cell");
+		spreadSheetKey = reader.getCurrentKey();
+		spreadSheetValue = reader.getCurrentValue();
+		assertEquals("[excel2013test.xlsx]Sheet1!A1", spreadSheetKey.toString(),
+				"Input Split for Excel file has keyname == \"[excel2013test.xlsx]Sheet1!A1\"");
+		assertEquals("test1", ((SpreadSheetCellDAO) spreadSheetValue).getFormattedValue(),
+				"Input Split for Excel file contains row 1 with cell 1 == \"test1\"");
+		assertEquals("Sheet1", ((SpreadSheetCellDAO) spreadSheetValue).getSheetName(),
+				"Input Split for Excel file contains row 1 with cell 1 sheetname == \"Sheet1\"");
+		assertEquals("A1", ((SpreadSheetCellDAO) spreadSheetValue).getAddress(),
+				"Input Split for Excel file contains row 1 with cell 1 address == \"A1\"");
+		assertTrue(reader.nextKeyValue(), "Input Split for Excel file contains cell");
+		spreadSheetKey = reader.getCurrentKey();
+		spreadSheetValue = reader.getCurrentValue();
+		assertEquals("test2", ((SpreadSheetCellDAO) spreadSheetValue).getFormattedValue(),
+				"Input Split for Excel file contains row 1 with cell 2 == \"test2\"");
+		assertTrue(reader.nextKeyValue(), "Input Split for Excel file contains cell");
+		spreadSheetKey = reader.getCurrentKey();
+		spreadSheetValue = reader.getCurrentValue();
+		assertEquals("test3", ((SpreadSheetCellDAO) spreadSheetValue).getFormattedValue(),
+				"Input Split for Excel file contains row 1 with cell 3 == \"test3\"");
+		assertTrue(reader.nextKeyValue(), "Input Split for Excel file contains cell");
+		spreadSheetKey = reader.getCurrentKey();
+		spreadSheetValue = reader.getCurrentValue();
+		assertEquals("test4", ((SpreadSheetCellDAO) spreadSheetValue).getFormattedValue(),
+				"Input Split for Excel file contains row 1 with cell 4 == \"test4\"");
+		assertTrue(reader.nextKeyValue(), "Input Split for Excel file contains cell");
+		spreadSheetKey = reader.getCurrentKey();
+		spreadSheetValue = reader.getCurrentValue();
+		assertEquals("4", ((SpreadSheetCellDAO) spreadSheetValue).getFormattedValue(),
+				"Input Split for Excel file contains row 2 with cell 1 == \"4\"");
+		assertTrue(reader.nextKeyValue(), "Input Split for Excel file contains cell");
+		spreadSheetKey = reader.getCurrentKey();
+		spreadSheetValue = reader.getCurrentValue();
+		assertEquals("31/12/99", ((SpreadSheetCellDAO) spreadSheetValue).getFormattedValue(),
+				"Input Split for Excel file contains row 3 with cell 1 == \"31/12/99\"");
+		assertTrue(reader.nextKeyValue(), "Input Split for Excel file contains cell");
+		spreadSheetKey = reader.getCurrentKey();
+		spreadSheetValue = reader.getCurrentValue();
+		assertEquals("5", ((SpreadSheetCellDAO) spreadSheetValue).getFormattedValue(),
+				"Input Split for Excel file contains row 3 with cell 2 == \"5\"");
+		assertTrue(reader.nextKeyValue(), "Input Split for Excel file contains cell");
+		spreadSheetKey = reader.getCurrentKey();
+		spreadSheetValue = reader.getCurrentValue();
+		assertEquals("null", ((SpreadSheetCellDAO) spreadSheetValue).getFormattedValue(),
+				"Input Split for Excel file contains row 3 with cell 5 == \"null\"");
+		assertTrue(reader.nextKeyValue(), "Input Split for Excel file contains cell");
+		spreadSheetKey = reader.getCurrentKey();
+		spreadSheetValue = reader.getCurrentValue();
+		assertEquals("1", ((SpreadSheetCellDAO) spreadSheetValue).getFormattedValue(),
+				"Input Split for Excel file contains row 4 with cell 1 == \"1\"");
+		assertTrue(reader.nextKeyValue(), "Input Split for Excel file contains cell");
+		spreadSheetKey = reader.getCurrentKey();
+		spreadSheetValue = reader.getCurrentValue();
+		assertEquals("2", ((SpreadSheetCellDAO) spreadSheetValue).getFormattedValue(),
+				"Input Split for Excel file contains row 5 with cell 1 == \"2\"");
+		assertTrue(reader.nextKeyValue(), "Input Split for Excel file contains cell");
+		spreadSheetKey = reader.getCurrentKey();
+		spreadSheetValue = reader.getCurrentValue();
+		assertEquals("6", ((SpreadSheetCellDAO) spreadSheetValue).getFormattedValue(),
+				"Input Split for Excel file contains row 5 with cell 2== \"6\"");
+		assertTrue(reader.nextKeyValue(), "Input Split for Excel file contains cell");
+		spreadSheetKey = reader.getCurrentKey();
+		spreadSheetValue = reader.getCurrentValue();
+		assertEquals("10", ((SpreadSheetCellDAO) spreadSheetValue).getFormattedValue(),
+				"Input Split for Excel file contains row 5 with cell 3== \"10\"");
+		assertTrue(reader.nextKeyValue(), "Input Split for Excel file contains cell");
+		spreadSheetKey = reader.getCurrentKey();
+		spreadSheetValue = reader.getCurrentValue();
+		assertEquals("3", ((SpreadSheetCellDAO) spreadSheetValue).getFormattedValue(),
+				"Input Split for Excel file contains row 6 with cell 1 == \"3\"");
+		assertTrue(reader.nextKeyValue(), "Input Split for Excel file contains cell");
+		spreadSheetKey = reader.getCurrentKey();
+		spreadSheetValue = reader.getCurrentValue();
+		assertEquals("4", ((SpreadSheetCellDAO) spreadSheetValue).getFormattedValue(),
+				"Input Split for Excel file contains row 6 with cell 2== \"4\"");
+		assertTrue(reader.nextKeyValue(), "Input Split for Excel file contains cell");
+		spreadSheetKey = reader.getCurrentKey();
+		spreadSheetValue = reader.getCurrentValue();
+		assertEquals("15", ((SpreadSheetCellDAO) spreadSheetValue).getFormattedValue(),
+				"Input Split for Excel file contains row 6 with cell 3== \"15\"");
+		assertFalse(reader.nextKeyValue(), "No more cells");
+	}
 
 	@Test
 	public void readExcelInputFormatExcel2013MultiSheetAll() throws IOException, InterruptedException {

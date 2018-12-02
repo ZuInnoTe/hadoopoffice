@@ -54,11 +54,17 @@ public class ExcelCellRecordReader extends AbstractSpreadSheetDocumentRecordRead
 		if (!(this.getOfficeReader().getFiltered())) {
 			return false;
 		}
-		while ((this.objectArray==null) || (this.objectArray.length==0) || (this.objectArrayPos==this.objectArray.length)) {
-			this.objectArray = this.getOfficeReader().getNext();
-			this.objectArrayPos=0;
-			if (objectArray==null) {
-				return false; // no more to read
+		while ((this.objectArray==null) || (this.objectArray.length==0) || (this.objectArrayPos==this.objectArray.length) || (this.objectArray[this.objectArrayPos]==null)) {
+			// check if we need to skip non-existing cells
+			if ((this.objectArray!=null) && (this.objectArrayPos<this.objectArray.length) && (this.objectArray[this.objectArrayPos]==null)) {
+				this.objectArrayPos++;
+			}
+			else { // we need to load a  new row
+				this.objectArray = this.getOfficeReader().getNext();
+				this.objectArrayPos=0;
+				if (objectArray==null) {
+					return false; // no more to read
+				}
 			}
 		}
 		SpreadSheetCellDAO currentCell = (SpreadSheetCellDAO) this.objectArray[this.objectArrayPos++];
