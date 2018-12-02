@@ -16,13 +16,13 @@ https://github.com/ZuInnoTe/hadoopoffice/blob/master/fileformat/src/main/java/or
 create external table ExcelDAOTable ROW FORMAT SERDE 'org.zuinnote.hadoop.excel.hive.daoserde.ExcelSpreadSheetCellDAOSerde' STORED AS INPUTFORMAT 'org.zuinnote.hadoop.office.format.mapred.ExcelCellFileInputFormat' OUTPUTFORMAT 'org.zuinnote.hadoop.excel.hive.outputformat.HiveExcelCellFileOutputFormat' LOCATION '/user/office/files' TBLPROPERTIES("hadoopoffice.read.locale.bcp47"="DE","hadoopoffice.write.locale.bcp47"="DE");
 
 -- show schema 
-describe ExcelTable;
+describe ExcelDAOTable;
 
 -- get number of rows
-select count(*) from ExcelTable;
+select count(*) from ExcelDAOTable;
 
 -- display the first 10 rows (ie cells)
-select * from ExcelTable LIMIT 10;
+select * from ExcelDAOTable LIMIT 10;
 
 
 -- store data as Excel
