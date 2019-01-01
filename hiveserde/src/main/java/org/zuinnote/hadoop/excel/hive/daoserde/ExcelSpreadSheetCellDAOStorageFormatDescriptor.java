@@ -20,7 +20,7 @@ import java.util.Set;
 
 import org.apache.hadoop.hive.ql.io.AbstractStorageFormatDescriptor;
 import org.zuinnote.hadoop.excel.hive.outputformat.HiveExcelCellFileOutputFormat;
-import org.zuinnote.hadoop.office.format.mapred.ExcelFileInputFormat;
+import org.zuinnote.hadoop.office.format.mapred.ExcelCellFileInputFormat;
 
 /**
  * @author jornfranke
@@ -37,7 +37,7 @@ public class ExcelSpreadSheetCellDAOStorageFormatDescriptor  extends AbstractSto
 
 	@Override
 	public String getInputFormat() {
-		return ExcelFileInputFormat.class.getName();
+		return ExcelCellFileInputFormat.class.getName();
 	}
 
 	@Override
