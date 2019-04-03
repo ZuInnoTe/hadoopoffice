@@ -61,6 +61,7 @@ import org.apache.poi.poifs.crypt.HashAlgorithm;
 import org.apache.poi.poifs.crypt.dsig.SignatureConfig;
 import org.apache.poi.poifs.crypt.dsig.SignatureInfo;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.ClientAnchor;
 import org.apache.poi.ss.usermodel.Comment;
 import org.apache.poi.ss.usermodel.Drawing;
@@ -170,6 +171,7 @@ public MSExcelLowFootprintWriter(String excelFormat, HadoopOfficeWriteConfigurat
 				currentCell=currentRow.createCell(currentCA.getColumn());		
 			// set the values accordingly
 			if (!("".equals(sscd.getFormula()))) { // if formula exists then use formula
+
 				currentCell.setCellFormula(sscd.getFormula());
 				
 			} else {	

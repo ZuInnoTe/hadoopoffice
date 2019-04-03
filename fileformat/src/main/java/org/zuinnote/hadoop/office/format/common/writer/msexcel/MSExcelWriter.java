@@ -44,6 +44,7 @@ import org.apache.poi.ss.usermodel.ClientAnchor;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Comment;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -272,11 +273,13 @@ public void write(Object newDAO) throws OfficeWriterException {
 		}
 		// set the values accordingly
 		if (!("".equals(sscd.getFormula()))) { // if formula exists then use formula
+	
 			currentCell.setCellFormula(sscd.getFormula());
 			
 		} else {	
 		// else use formattedValue
 			currentCell.setCellValue(sscd.getFormattedValue());
+
 		}
 		// set comment
 		if ((sscd.getComment()!=null) && (!("".equals(sscd.getComment())))) {
