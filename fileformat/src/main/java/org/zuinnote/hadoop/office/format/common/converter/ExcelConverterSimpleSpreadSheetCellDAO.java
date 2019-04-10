@@ -521,7 +521,7 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 					if (x instanceof Boolean) {
 						formattedValue = "";
 						comment = "";
-						formula = String.valueOf(x).toUpperCase();
+						formula = String.valueOf(x);
 						address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
 					} else if (x instanceof Byte) {
 						formattedValue = "";

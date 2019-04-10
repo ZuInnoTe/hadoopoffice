@@ -300,7 +300,7 @@ public class ExcelConverterSimpleSpreadSheetCellDAOTest {
 	    		SpreadSheetCellDAO[] actual = converter.getSpreadSheetCellDAOfromSimpleDataType(rowA, "testsheet", 0);
 	    		assertEquals("",actual[0].getFormattedValue(),"Formatted Value is empty");
 	    		assertEquals("",actual[0].getComment(),"Comment is empty");
-	    		assertEquals("TRUE",actual[0].getFormula(),"Formula contains data type");
+	    		assertEquals("true",actual[0].getFormula(),"Formula contains data type");
 	    		assertEquals("A1",actual[0].getAddress(),"Address is correct");
 	    		assertEquals("",actual[1].getFormattedValue(),"Formatted Value is empty");
 	    		assertEquals("",actual[1].getComment(),"Comment is empty");
