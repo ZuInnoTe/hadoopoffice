@@ -31,17 +31,17 @@ assemblyShadeRules in assembly := Seq(
 
 
 // hadoopoffice
-libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.2.4" % "compile"
+libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.3.0" % "compile"
 
-libraryDependencies += "com.github.zuinnote" %% "hadoopoffice-flinkts" % "1.2.4" % "compile"
+libraryDependencies += "com.github.zuinnote" %% "hadoopoffice-flinkts" % "1.3.0" % "compile"
 
 // woodstox core (needed for Flink to find the XMLParser)
 
 libraryDependencies += "com.fasterxml.woodstox" % "woodstox-core" % "5.0.3" % "compile"
 
 // following three libraries are only needed for digital signatures
-libraryDependencies += "org.bouncycastle" % "bcprov-ext-jdk15on" % "1.60" % "compile"
-libraryDependencies += "org.bouncycastle" % "bcpkix-jdk15on" % "1.60" % "compile"
+libraryDependencies += "org.bouncycastle" % "bcprov-ext-jdk15on" % "1.61" % "compile"
+libraryDependencies += "org.bouncycastle" % "bcpkix-jdk15on" % "1.61" % "compile"
 libraryDependencies += "org.apache.santuario" % "xmlsec" % "2.1.2" % "compile"
 
 //flink
