@@ -519,45 +519,45 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 					result[currentColumnNum] = (SpreadSheetCellDAO) x;
 				} else {
 					if (x instanceof Boolean) {
-						formattedValue = String.valueOf(x).toUpperCase();
+						formattedValue = "";
 						comment = "";
-						formula = "";
+						formula = String.valueOf(x).toUpperCase();
 						address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
 					} else if (x instanceof Byte) {
-						formattedValue = String.valueOf(x);
+						formattedValue = "";
 						comment = "";
-						formula = "";
+						formula = String.valueOf(x);
 						address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
 					} else if (x instanceof Short) {
-						formattedValue = String.valueOf(x);
+						formattedValue ="";
 						comment = "";
 						formula = "";
-						formula = "";
+						formula = String.valueOf(x);
 						address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
 					} else if (x instanceof Integer) {
-						formattedValue = String.valueOf(x);
+						formattedValue = "";
 						comment = "";
-						formula = "";
+						formula = String.valueOf(x);
 						address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
 					} else if (x instanceof Long) {
-						formattedValue = String.valueOf(x);
+						formattedValue = "";
 						comment = "";
-						formula = "";
+						formula = String.valueOf(x);
 						address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
 					} else if (x instanceof Double) {
-						formattedValue = String.valueOf(x);
+						formattedValue = "";
 						comment = "";
-						formula = "";
+						formula = String.valueOf(x);
 						address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
 					} else if (x instanceof Float) {
-						formattedValue = String.valueOf(x);
+						formattedValue = "";
 						comment = "";
-						formula = "";
+						formula = String.valueOf(x);
 						address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
 					} else if (x instanceof BigDecimal) {
-						formattedValue = ((BigDecimal) x).toString();
+						formattedValue = "";
 						comment = "";
-						formula = "";
+						formula = ((BigDecimal) x).toString();
 						address = MSExcelUtil.getCellAddressA1Format(rowNum, currentColumnNum);
 					} else if (x instanceof Timestamp) {
 						if (this.dateTimeFormat==null) {
