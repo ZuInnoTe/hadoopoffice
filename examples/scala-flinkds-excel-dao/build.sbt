@@ -19,6 +19,11 @@ assemblyShadeRules in assembly := Seq(
 )
 
 
+assemblyMergeStrategy in assembly :=  {
+    case PathList("META-INF/*.RSA", "META-INF/*.SF","META-INF/*.DSA") => MergeStrategy.discard
+    case x => MergeStrategy.first
+}
+
 crossScalaVersions := Seq("2.11.12")
 
 

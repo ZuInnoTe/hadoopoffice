@@ -31,6 +31,11 @@ assemblyShadeRules in assembly := Seq(
 )
 
 
+assemblyMergeStrategy in assembly :=  {
+    case PathList("META-INF/*.RSA", "META-INF/*.SF","META-INF/*.DSA") => MergeStrategy.discard
+    case x => MergeStrategy.first
+}
+
 libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.3.0" % "compile"
 
 // following three libraries are only needed for digital signatures

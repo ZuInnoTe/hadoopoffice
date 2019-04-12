@@ -28,7 +28,10 @@ assemblyShadeRules in assembly := Seq(
    ShadeRule.rename("org.apache.commons.compress.**" -> "hadoopoffice.shade.org.apache.commons.compress.@1").inAll
 )
 
-
+assemblyMergeStrategy in assembly :=  {
+    case PathList("META-INF/*.RSA", "META-INF/*.SF","META-INF/*.DSA") => MergeStrategy.discard
+    case x => MergeStrategy.first
+}
 
 // hadoopoffice
 libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.3.0" % "compile"
