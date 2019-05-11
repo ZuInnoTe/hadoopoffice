@@ -9,7 +9,7 @@ compileJava.options.encoding = 'UTF-8'
 
 group = "com.github.zuinnote"
 archivesBaseName = "hadoopoffice-fileformat"
-version = "1.3.0"
+version = "1.3.1"
 
 jar {
     manifest {
@@ -76,7 +76,7 @@ publishing {
         mavenJava(MavenPublication) {
 		groupId 'com.github.zuinnote'
             artifactId 'hadoopoffice-fileformat'
-            version '1.3.0'
+            version '1.3.1'
             from components.java
         }
     }
