@@ -33,18 +33,18 @@ libraryDependencies += "org.bouncycastle" % "bcprov-ext-jdk15on" % "1.61" % "pro
 libraryDependencies += "org.bouncycastle" % "bcpkix-jdk15on" % "1.61" % "provided"
 libraryDependencies += "org.apache.santuario" % "xmlsec" % "2.1.2" % "provided"
 
-libraryDependencies += "org.apache.flink" %% "flink-scala" % "1.7.2" % "provided" 
+libraryDependencies += "org.apache.flink" %% "flink-scala" % "1.7.0" % "provided" 
 
-libraryDependencies += "org.apache.flink" %% "flink-table" % "1.7.2" % "provided" 
+libraryDependencies += "org.apache.flink" %% "flink-table" % "1.7.0" % "provided" 
 // needed for table environment 
-libraryDependencies += "org.apache.flink" %% "flink-streaming-scala" % "1.7.2" % "provided" 
+libraryDependencies += "org.apache.flink" %% "flink-streaming-scala" % "1.7.0" % "provided" 
 
-libraryDependencies += "org.apache.flink" % "flink-shaded-hadoop2" % "1.7.2" % "provided"  
+libraryDependencies += "org.apache.flink" % "flink-shaded-hadoop2" % "1.7.0" % "provided"  
 
 // needed for writable serializer 
-libraryDependencies += "org.apache.flink" %% "flink-hadoop-compatibility" % "1.7.2" % "provided" 
+libraryDependencies += "org.apache.flink" %% "flink-hadoop-compatibility" % "1.7.0" % "provided" 
 
-libraryDependencies += "org.apache.flink" %% "flink-clients" % "1.7.2" % "it" 
+libraryDependencies += "org.apache.flink" %% "flink-clients" % "1.7.0" % "it" 
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test,it"
 
