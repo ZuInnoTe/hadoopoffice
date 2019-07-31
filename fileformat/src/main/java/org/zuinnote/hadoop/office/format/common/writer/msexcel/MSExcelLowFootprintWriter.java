@@ -65,6 +65,7 @@ import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.ClientAnchor;
 import org.apache.poi.ss.usermodel.Comment;
 import org.apache.poi.ss.usermodel.Drawing;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.util.TempFile;
@@ -101,7 +102,8 @@ public class MSExcelLowFootprintWriter implements OfficeSpreadSheetWriterInterfa
 	private Map<String,Drawing> mappedDrawings;
 
 	private MSExcelOOXMLSignUtil signUtil;
-
+	private FormulaEvaluator currentFormulaEvaluator;
+	
 public MSExcelLowFootprintWriter(String excelFormat, HadoopOfficeWriteConfiguration howc) throws InvalidWriterConfigurationException {
 	boolean formatFound=MSExcelWriter.isSupportedFormat(excelFormat);
 	if (!(formatFound)) {
@@ -130,6 +132,7 @@ public MSExcelLowFootprintWriter(String excelFormat, HadoopOfficeWriteConfigurat
 		}
 		this.osStream=osStream;
 		this.currentWorkbook=new SecureSXSSFWorkbook(this.howc.getLowFootprintCacheRows(),this.encryptAlgorithmCipher,this.chainModeCipher);
+		this.currentFormulaEvaluator=this.currentWorkbook.getCreationHelper().createFormulaEvaluator();
 		this.mappedDrawings=new HashMap<>();	
 		if (this.howc.getSigKey()!=null) { // create temp file
 			LOG.info("Creating tempfile for signing");
@@ -173,6 +176,7 @@ public MSExcelLowFootprintWriter(String excelFormat, HadoopOfficeWriteConfigurat
 			if (!("".equals(sscd.getFormula()))) { // if formula exists then use formula
 
 				currentCell.setCellFormula(sscd.getFormula());
+				this.currentFormulaEvaluator.evaluateFormulaCell(currentCell);
 				
 			} else {	
 			// else use formattedValue

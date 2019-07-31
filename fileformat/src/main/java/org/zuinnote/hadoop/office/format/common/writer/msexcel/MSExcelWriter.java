@@ -92,8 +92,7 @@ private EncryptionMode encryptionModeCipher;
 private ChainingMode chainModeCipher;
 private boolean hasTemplate;
 private MSExcelOOXMLSignUtil signUtil;
-
-
+private FormulaEvaluator currentFormulaEvaluator;
 
 /**
 *
@@ -185,7 +184,7 @@ public void create(OutputStream oStream, Map<String,InputStream> linkedWorkbooks
 			((HSSFWorkbook)this.currentWorkbook).createInformationProperties();
 		} 
 	}
-	FormulaEvaluator currentFormulaEvaluator=this.currentWorkbook.getCreationHelper().createFormulaEvaluator();
+	this.currentFormulaEvaluator=this.currentWorkbook.getCreationHelper().createFormulaEvaluator();
 	HashMap<String,FormulaEvaluator> linkedFormulaEvaluators=new HashMap<>();
 	linkedFormulaEvaluators.put(this.howc.getFileName(),currentFormulaEvaluator);
 	this.mappedDrawings=new HashMap<>();
@@ -275,6 +274,7 @@ public void write(Object newDAO) throws OfficeWriterException {
 		if (!("".equals(sscd.getFormula()))) { // if formula exists then use formula
 	
 			currentCell.setCellFormula(sscd.getFormula());
+			this.currentFormulaEvaluator.evaluateFormulaCell(currentCell);
 			
 		} else {	
 		// else use formattedValue
