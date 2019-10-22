@@ -112,7 +112,7 @@ class FlinkScalaExcelTableSourceIntegrationSpec extends FlatSpec with BeforeAndA
     conf.set("fs.defaultFS", dfsCluster.getFileSystem().getUri().toString())
     // create local Flink cluster
     flinkEnvironment = ExecutionEnvironment.createLocalEnvironment(1)
-    tableEnvironment = TableEnvironment.getTableEnvironment(flinkEnvironment)
+    tableEnvironment = BatchTableEnvironment.create(flinkEnvironment)
   }
 
   override def afterAll(): Unit = {

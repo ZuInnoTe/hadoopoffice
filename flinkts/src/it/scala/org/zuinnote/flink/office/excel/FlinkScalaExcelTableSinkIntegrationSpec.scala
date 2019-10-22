@@ -115,7 +115,7 @@ class FlinkScalaExcelTableSinkIntegrationSpec extends FlatSpec with BeforeAndAft
     conf.set("fs.defaultFS", dfsCluster.getFileSystem().getUri().toString())
     // create local Flink cluster
     flinkEnvironment = ExecutionEnvironment.createLocalEnvironment(1)
-    tableEnvironment = TableEnvironment.getTableEnvironment(flinkEnvironment)
+    tableEnvironment = BatchTableEnvironment.create(flinkEnvironment)
   }
 
   override def afterAll(): Unit = {
@@ -165,14 +165,15 @@ class FlinkScalaExcelTableSinkIntegrationSpec extends FlatSpec with BeforeAndAft
     tableEnvironment.registerTableSource("testsimple", source)
     val testSimpleScan = tableEnvironment.scan("testsimple")
     val testSimpleResult = testSimpleScan.select("*")
-    // write table using sink
+    // write table using sink 
     val howc = new HadoopOfficeWriteConfiguration(DFS_OUTPUT_DIR_NAME)
     howc.setMimeType(MIMETYPE_XLSX)
     howc.setLocale(Locale.GERMANY)
     howc.setSimpleDateFormat(dateFormat)
     howc.setSimpleDecimalFormat(decimalFormat)
     val sink = new ExcelFlinkTableSink(dfsCluster.getFileSystem().getUri().toString() + DFS_OUTPUT_DIR_NAME, true, howc, "Sheet1", Some(WriteMode.NO_OVERWRITE))
-    testSimpleResult.writeToSink(sink)
+    tableEnvironment.registerTableSink("testsink",source.getTableSchema().getFieldNames(),source.getTableSchema().getFieldTypes(), sink);
+    tableEnvironment.insertInto(testSimpleResult,"testsink");
     flinkEnvironment.execute() // trigger writing of the file on HSDFS
     // reread written table
     hocr.setReadHeader(true)
