@@ -1,5 +1,5 @@
-addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.5.1")
+addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.6.0")
 
-addSbtPlugin("com.codacy" % "sbt-codacy-coverage" % "1.3.11")
+addSbtPlugin("com.codacy" % "sbt-codacy-coverage" % "3.0.3")
 
-addSbtPlugin("com.github.sbt" % "sbt-jacoco" % "3.0.3")
+addSbtPlugin("com.github.sbt" % "sbt-jacoco" % "3.1.0")

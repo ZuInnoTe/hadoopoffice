@@ -36,11 +36,11 @@ assemblyMergeStrategy in assembly :=  {
     case x => MergeStrategy.first
 }
 
-libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.3.3" % "compile"
+libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.3.4" % "compile"
 
 // following three libraries are only needed for digital signatures
-libraryDependencies += "org.bouncycastle" % "bcprov-ext-jdk15on" % "1.61" % "compile"
-libraryDependencies += "org.bouncycastle" % "bcpkix-jdk15on" % "1.61" % "compile"
+libraryDependencies += "org.bouncycastle" % "bcprov-ext-jdk15on" % "1.62" % "compile"
+libraryDependencies += "org.bouncycastle" % "bcpkix-jdk15on" % "1.62" % "compile"
 libraryDependencies += "org.apache.santuario" % "xmlsec" % "2.1.2" % "compile"
 
 libraryDependencies += "org.apache.spark" %% "spark-core" % "1.6.3" % "provided"
