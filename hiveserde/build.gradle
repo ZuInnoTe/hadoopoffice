@@ -23,7 +23,7 @@ compileJava.options.encoding = 'UTF-8'
 
 group = "com.github.zuinnote"
 archivesBaseName = "hadoopoffice-hiveserde"
-version = "1.3.3"
+version = "1.3.4"
 
 
 
@@ -108,11 +108,11 @@ dependencies {
     provided("org.apache.hadoop:hadoop-client:2.7.0")
     
        // hadoopoffice library
-   compile("com.github.zuinnote:hadoopoffice-fileformat:1.3.3")
+   compile("com.github.zuinnote:hadoopoffice-fileformat:1.3.4")
    // bouncy castle (for signing etc.)
    // for signing and verification of signatures
-    provided("org.bouncycastle:bcprov-ext-jdk15on:1.61")
-    provided("org.bouncycastle:bcpkix-jdk15on:1.61")
+    provided("org.bouncycastle:bcprov-ext-jdk15on:1.62")
+    provided("org.bouncycastle:bcpkix-jdk15on:1.62")
     provided("org.apache.santuario:xmlsec:2.1.2")
     // hive serde API
    provided("org.apache.hive:hive-serde:2.1.1")
@@ -131,7 +131,7 @@ publishing {
         maven(MavenPublication) {
             groupId 'com.github.zuinnote'
             artifactId 'hadoopoffice-hiveserde'
-            version '1.3.3'
+            version '1.3.4'
 
             from components.java
         }
