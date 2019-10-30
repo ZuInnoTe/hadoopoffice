@@ -346,8 +346,12 @@ public class MSExcelLowFootprintParser implements OfficeReaderParserInterface  {
 			// read date format
 			InputStream workbookDataXML = r.getWorkbookData();
 			WorkbookDocument wd = WorkbookDocument.Factory.parse(workbookDataXML);
-			this.isDate1904 = wd.getWorkbook().getWorkbookPr().getDate1904();
-
+			CTWorkbookPr prefix =wd.getWorkbook().getWorkbookPr();
+			if (prefix!=null) {
+				this.isDate1904 = prefix.getDate1904();
+			} else {
+				this.isDate1904 = false;
+			}
 			
 			// read shared string tables
 			if (HadoopOfficeReadConfiguration.OPTION_LOWFOOTPRINT_PARSER_SAX.equalsIgnoreCase(this.hocr.getLowFootprintParser())) {
