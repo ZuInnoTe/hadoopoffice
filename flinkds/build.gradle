@@ -84,7 +84,7 @@ publishing {
         maven(MavenPublication) {
             groupId 'com.github.zuinnote'
             artifactId 'hadoopoffice-flinkds'
-            version '1.3.4'
+            version '1.3.5'
 
             from components.java
         }
