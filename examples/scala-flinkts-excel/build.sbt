@@ -34,9 +34,9 @@ assemblyMergeStrategy in assembly :=  {
 }
 
 // hadoopoffice
-libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.3.5" % "compile"
+libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.3.6" % "compile"
 
-libraryDependencies += "com.github.zuinnote" %% "hadoopoffice-flinkts" % "1.3.5" % "compile"
+libraryDependencies += "com.github.zuinnote" %% "hadoopoffice-flinkts" % "1.3.6" % "compile"
 
 // woodstox core (needed for Flink to find the XMLParser)
 
