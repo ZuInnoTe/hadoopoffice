@@ -154,17 +154,19 @@ public class XSSFPullParser {
 							xe = xer.nextEvent();
 							if ((xe.isStartElement())
 									&& (xe.asStartElement().getName().getLocalPart().equalsIgnoreCase("v"))) {
-								// if a cell data type is set (e.g. b boolean (covered?), d date in ISO8601 format, e
-								// error, inlineStr (covered), n number (covered), s shared string (covered), str formula string (covered)
+								// if a cell data type is set (e.g. b boolean (covered?), d date in ISO8601
+								// format, e
+								// error, inlineStr (covered), n number (covered), s shared string (covered),
+								// str formula string (covered)
 								// we return as string
-								if (cellTypeTAT != null) {
-									XMLEvent xeSubCharacters = xer.nextEvent();
-									if (!xeSubCharacters.isCharacters()) {
-										LOG.error(
-												"Error parsing excel file. Value attribute (v) of cell does not contains characters");
-									} else {
-										cellFormattedValue = xeSubCharacters.asCharacters().getData();
 
+								XMLEvent xeSubCharacters = xer.nextEvent();
+								if (!xeSubCharacters.isCharacters()) {
+									LOG.error(
+											"Error parsing excel file. Value attribute (v) of cell does not contains characters");
+								} else {
+									cellFormattedValue = xeSubCharacters.asCharacters().getData();
+									if (cellTypeTAT != null) {
 										if (XSSFPullParser.CELLTYPE_STRING.equals(cellTypeTAT.getValue())) { // need to
 																												// read
 																												// from
@@ -187,9 +189,9 @@ public class XSSFPullParser {
 													cellStyle.getDataFormatString(), this.isDate1904);
 										}
 
+									} else {
+										LOG.warn("Cannot read celltype. Interpreting value as String");
 									}
-								} else {
-									LOG.error("Cannot read celltype");
 								}
 							} else if ((xe.isStartElement())
 									&& (xe.asStartElement().getName().getLocalPart().equalsIgnoreCase("f"))) {
