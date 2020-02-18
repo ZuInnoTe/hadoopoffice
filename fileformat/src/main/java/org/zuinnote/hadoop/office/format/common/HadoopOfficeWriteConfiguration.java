@@ -398,7 +398,7 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 		}
 		String dateTimePattern=conf.get(HadoopOfficeWriteConfiguration.CONF_SIMPLEDATETIMEPATTERN,HadoopOfficeWriteConfiguration.DEFAULT_SIMPLEDATETIMEPATTERN);
 		if (!"".equals(dateTimePattern)) {
-			this.setSimpleDateFormat(new SimpleDateFormat(dateTimePattern));
+			this.setSimpleDateTimeFormat(new SimpleDateFormat(dateTimePattern));
 		}
 		// set decimal for simple format
 		String decimaleStr = conf.get(HadoopOfficeWriteConfiguration.CONF_SIMPLEDECIMALFORMAT,HadoopOfficeWriteConfiguration.DEFAULT_SIMPLEDECIMALFORMAT);
