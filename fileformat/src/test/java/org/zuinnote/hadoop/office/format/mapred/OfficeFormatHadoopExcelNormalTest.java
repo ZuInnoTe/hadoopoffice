@@ -76,7 +76,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		tmpPath = Files.createTempDirectory(tmpPrefix);
 		// create shutdown hook to remove temp files after shutdown, may need to rethink
 		// to avoid many threads are created
-	/**	Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
 			@Override
 			public void run() {
 				try {
@@ -104,7 +104,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 							"Error temporary files in following path could not be deleted " + tmpPath, e);
 				}
 			}
-		})); **/
+		})); 
 		// workaround for Apache POI 4.0
 		System.setProperty("org.apache.xml.security.ignoreLineBreaks", "true");
 	}
@@ -140,10 +140,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		assertNotNull(reader, "Format returned  null RecordReader");
 		Text spreadSheetKey = new Text();
 		ArrayWritable spreadSheetValue = new ArrayWritable(SpreadSheetCellDAO.class);
-		assertTrue(reader.next(spreadSheetKey, spreadSheetValue), "Input Split for Excel file contains row 1");
-		assertEquals(0, spreadSheetValue.get().length, "Input Split for Excel file contain row 1 and is empty");
-		assertFalse(reader.next(spreadSheetKey, spreadSheetValue),
-				"Input Split for Excel file contains no further row");
+		assertFalse(reader.next(spreadSheetKey, spreadSheetValue), "Input Split for Excel file contains no row");
 	}
 
 	@Test
@@ -164,10 +161,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		assertNotNull(reader, "Format returned  null RecordReader");
 		Text spreadSheetKey = new Text();
 		ArrayWritable spreadSheetValue = new ArrayWritable(SpreadSheetCellDAO.class);
-		assertTrue(reader.next(spreadSheetKey, spreadSheetValue), "Input Split for Excel file contains row 1");
-		assertEquals(0, spreadSheetValue.get().length, "Input Split for Excel file contain row 1 and is empty");
-		assertFalse(reader.next(spreadSheetKey, spreadSheetValue),
-				"Input Split for Excel file contains no further row");
+		assertFalse(reader.next(spreadSheetKey, spreadSheetValue), "Input Split for Excel file contains no row");
 	}
 
 	@Test

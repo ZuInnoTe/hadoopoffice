@@ -149,11 +149,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		reader.initialize(splits.get(0), context);
 		Text spreadSheetKey = new Text();
 		ArrayWritable spreadSheetValue = new ArrayWritable(SpreadSheetCellDAO.class);
-		assertTrue(reader.nextKeyValue(), "Input Split for Excel file contains row 1");
-		spreadSheetKey = reader.getCurrentKey();
-		spreadSheetValue = reader.getCurrentValue();
-		assertEquals(0, spreadSheetValue.get().length, "Input Split for Excel file contain row 1 and is empty");
-		assertFalse(reader.nextKeyValue(), "Input Split for Excel file contains no further row");
+		assertFalse(reader.nextKeyValue(), "Input Split for Excel file contains no row");
 	}
 
 	@Test
@@ -176,11 +172,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		reader.initialize(splits.get(0), context);
 		Text spreadSheetKey = new Text();
 		ArrayWritable spreadSheetValue = new ArrayWritable(SpreadSheetCellDAO.class);
-		assertTrue(reader.nextKeyValue(), "Input Split for Excel file contains row 1");
-		spreadSheetKey = reader.getCurrentKey();
-		spreadSheetValue = reader.getCurrentValue();
-		assertEquals(0, spreadSheetValue.get().length, "Input Split for Excel file contain row 1 and is empty");
-		assertFalse(reader.nextKeyValue(), "Input Split for Excel file contains no further row");
+		assertFalse(reader.nextKeyValue(), "Input Split for Excel file contains no row");
 	}
 
 	@Test
