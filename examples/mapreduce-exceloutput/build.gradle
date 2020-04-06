@@ -88,16 +88,16 @@ sourceSets {
 
 dependencies {
    // hadoop lib for driver
-     provided("org.apache.hadoop:hadoop-client:2.7.0")
+     provided("org.apache.hadoop:hadoop-client:2.7.5")
      // hadoopoffice library
-   compile("com.github.zuinnote:hadoopoffice-fileformat:1.3.7")
+   compile("com.github.zuinnote:hadoopoffice-fileformat:1.3.8")
 
-       testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.5.2'
+       testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.6.1'
  
-   testRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.5.2'
-    testIntegrationRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.5.2'
-    testIntegrationRuntime group: 'org.junit.platform', name: 'junit-platform-console', version: '1.5.2'
-     testIntegrationCompile group: 'org.apache.hadoop', name: 'hadoop-minicluster', version: '2.7.0'
+   testRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.6.1'
+    testIntegrationRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.6.1'
+    testIntegrationRuntime group: 'org.junit.platform', name: 'junit-platform-console', version: '1.6.1'
+     testIntegrationCompile group: 'org.apache.hadoop', name: 'hadoop-minicluster', version: '2.7.5'
 }
 
 
