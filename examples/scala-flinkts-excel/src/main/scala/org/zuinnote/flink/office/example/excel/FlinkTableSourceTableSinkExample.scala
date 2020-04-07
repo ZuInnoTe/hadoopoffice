@@ -67,7 +67,7 @@ object FlinkTableSourceTableSinkExample {
    def main(args: Array[String]): Unit = {
  		val  env = ExecutionEnvironment.getExecutionEnvironment
         val params: ParameterTool = ParameterTool.fromArgs(args)
-        readwriteExcelTableAPI(env,TableEnvironment.getTableEnvironment(env),params.get("input"),params.get("output"))
+        readwriteExcelTableAPI(env,BatchTableEnvironment.create(env),params.get("input"),params.get("output"))
 		env.execute("Flink Scala HadoopOffice TableSource TableSink Demonstration")
    }
    
@@ -105,8 +105,8 @@ object FlinkTableSourceTableSinkExample {
       howc.setSimpleDateFormat(dateFormat)
       howc.setSimpleDecimalFormat(decimalFormat)
       val sink = new ExcelFlinkTableSink(outputFile, true, howc, "Sheet2", Some(WriteMode.NO_OVERWRITE))
-
-    	  testSimpleResult.writeToSink(sink)
-}
+    tableEnv.registerTableSink("testsink",source.getTableSchema().getFieldNames(),source.getTableSchema().getFieldTypes(), sink);
+    	tableEnv.insertInto(testSimpleResult,"testsink");
+ }
 
 }
