@@ -85,6 +85,9 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 	public static final String CONF_SIMPLEDATETIMEPATTERN = "hadoopoffice.write.simple.dateTimePattern";
 	
 	public static final String CONF_SIMPLEDECIMALFORMAT = "hadoopoffice.write.simple.decimalFormat";
+	
+
+	public static final String CONF_SIMPLESPILLOVER = "hadoopoffice.write.simple.spillOverSheet";
 
 
 	public static final String DEFAULT_MIMETYPE = "";
@@ -123,6 +126,7 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 	public static final String DEFAULT_SIMPLEDATETIMEPATTERN = "";
 	
 	public static final String DEFAULT_SIMPLEDECIMALFORMAT = "";
+	public static final boolean DEFAULT_SIMPLESPILLOVER = true;
 
 	
 	private String[] linkedWorkbooksName;
@@ -161,6 +165,7 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 	private SimpleDateFormat simpleDateFormat;
 	private SimpleDateFormat simpleDateTimeFormat;
 	private DecimalFormat simpleDecimalFormat;
+	private boolean simpleSpillOver;
 	
 	
 	public HadoopOfficeWriteConfiguration(String fileName) {
@@ -226,7 +231,7 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 		this.setSimpleDecimalFormat((DecimalFormat) NumberFormat.getInstance(decimallocale));
 		this.setWriteHeader(HadoopOfficeWriteConfiguration.DEFAULT_WRITEHEADER);
 		this.setIgnoreLineBreaks(HadoopOfficeWriteConfiguration.DEFAULT_IGNORELINEBREAKS);
-		
+		this.setSimpleSpillOver(HadoopOfficeWriteConfiguration.DEFAULT_SIMPLESPILLOVER);
 		
 	}
 
@@ -409,7 +414,8 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 		}
 		this.setSimpleDecimalFormat((DecimalFormat) NumberFormat.getInstance(decimallocale));
 		this.setWriteHeader(conf.getBoolean(HadoopOfficeWriteConfiguration.CONF_WRITEHEADER, HadoopOfficeWriteConfiguration.DEFAULT_WRITEHEADER));
-	    
+
+		this.setSimpleSpillOver(conf.getBoolean(HadoopOfficeWriteConfiguration.CONF_SIMPLESPILLOVER, HadoopOfficeWriteConfiguration.DEFAULT_SIMPLESPILLOVER));
 		
 	}
 
@@ -697,6 +703,20 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 	
 			System.setProperty("org.apache.xml.security.ignoreLineBreaks", "true");
 		}
+	}
+
+	/**
+	 * @return the simpleSpillOver
+	 */
+	public boolean getSimpleSpillOver() {
+		return simpleSpillOver;
+	}
+
+	/**
+	 * @param simpleSpillOver the simpleSpillOver to set
+	 */
+	public void setSimpleSpillOver(boolean simpleSpillOver) {
+		this.simpleSpillOver = simpleSpillOver;
 	}
 
 }

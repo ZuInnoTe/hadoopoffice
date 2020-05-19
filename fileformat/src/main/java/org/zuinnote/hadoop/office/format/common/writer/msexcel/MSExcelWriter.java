@@ -43,6 +43,7 @@ import org.apache.poi.ss.usermodel.Drawing;
 import org.apache.poi.ss.usermodel.ClientAnchor;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Comment;
@@ -258,6 +259,43 @@ public void write(Object newDAO) throws OfficeWriterException {
 		}
 		// check if cell exist
 		CellAddress currentCA = new CellAddress(sscd.getAddress());
+		// spill over check 
+			// if we need to do spillover
+			if (this.howc.getSimpleSpillOver()) {
+				long maxRows=-1;
+				switch (this.format) {
+				case MSExcelWriter.FORMAT_OOXML:
+					maxRows=SpreadsheetVersion.EXCEL2007.getLastRowIndex();
+					break;
+				case MSExcelWriter.FORMAT_OLD:
+					maxRows=SpreadsheetVersion.EXCEL97.getLastRowIndex();
+					break;
+				default: 
+					LOG.warn("Could not detect maximum number of rows / sheet");
+					break;
+				}
+				
+				if (maxRows>-1) {
+					if (currentCA.getRow()>maxRows) {
+						LOG.info("Maximum number of rows reached. Spilling over to additional sheet");
+						// get the sheet number
+						int sheetNum=(int) (currentCA.getRow()/maxRows);
+						// get the row in the destination sheet
+						int newRowNum=(int) (currentCA.getRow()%maxRows);
+						// create sheet if not exist
+						String spillOverSheetName=WorkbookUtil.createSafeSheetName(sscd.getSheetName()+String.valueOf(sheetNum));
+						currentSheet=this.currentWorkbook.getSheet(spillOverSheetName);
+						if (currentSheet==null) {// create sheet if it does not exist yet
+							currentSheet=this.currentWorkbook.createSheet(spillOverSheetName);
+							// create drawing anchor (needed for comments...)
+							this.mappedDrawings.put(spillOverSheetName,currentSheet.createDrawingPatriarch());
+						}
+						// fix address
+						currentCA = new CellAddress(newRowNum,currentCA.getColumn());
+						
+					}
+				}
+			}
 		Row currentRow = currentSheet.getRow(currentCA.getRow());
 		if (currentRow==null) { // row does not exist? => create it
 			currentRow=currentSheet.createRow(currentCA.getRow());
