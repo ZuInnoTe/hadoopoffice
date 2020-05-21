@@ -36,7 +36,7 @@ assemblyMergeStrategy in assembly :=  {
     case x => MergeStrategy.first
 }
 
-libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.3.8" % "compile"
+libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.3.9" % "compile"
 
 // following three libraries are only needed for digital signatures
 libraryDependencies += "org.bouncycastle" % "bcprov-ext-jdk15on" % "1.62" % "compile"
@@ -47,7 +47,7 @@ libraryDependencies += "org.apache.spark" %% "spark-core" % "1.6.3" % "provided"
 
 libraryDependencies += "org.apache.spark" %% "spark-sql" % "1.6.3" % "provided"
 
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.1.1" % "test,it"
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.1.2" % "test,it"
 
 libraryDependencies += "javax.servlet" % "javax.servlet-api" % "3.0.1" % "it"
 
