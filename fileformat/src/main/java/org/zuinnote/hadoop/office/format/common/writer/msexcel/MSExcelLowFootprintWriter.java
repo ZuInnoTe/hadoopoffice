@@ -181,7 +181,6 @@ public MSExcelLowFootprintWriter(String excelFormat, HadoopOfficeWriteConfigurat
 							
 							if (maxRows>-1) {
 								if (currentCA.getRow()>maxRows) {
-									LOG.info("Maximum number of rows reached. Spilling over to additional sheet");
 									// get the sheet number
 									int sheetNum=(int) (currentCA.getRow()/maxRows) + 1;
 									// get the row in the destination sheet
