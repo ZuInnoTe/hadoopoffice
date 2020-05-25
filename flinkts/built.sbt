@@ -8,7 +8,7 @@ lazy val root = (project in file("."))
 .settings(
 organization := "com.github.zuinnote",
 name := "hadoopoffice-flinkts",
-version := "1.3.9"
+version := "1.3.10"
 )
  .configs( IntegrationTest )
   .settings( Defaults.itSettings : _*)
@@ -51,9 +51,9 @@ assemblyMergeStrategy in assembly :=  {
 
 }
 
-libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.3.9" % "compile"
+libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.3.10" % "compile"
 
-libraryDependencies += "com.github.zuinnote" % "hadoopoffice-flinkds" % "1.3.9" % "compile"
+libraryDependencies += "com.github.zuinnote" % "hadoopoffice-flinkds" % "1.3.10" % "compile"
 // following three libraries are only needed for digital signatures
 libraryDependencies += "org.bouncycastle" % "bcprov-ext-jdk15on" % "1.65" % "provided"
 libraryDependencies += "org.bouncycastle" % "bcpkix-jdk15on" % "1.65" % "provided"
