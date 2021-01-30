@@ -53,8 +53,8 @@ libraryDependencies += "org.apache.flink" %% "flink-hadoop-compatibility" % "1.1
 libraryDependencies += "org.apache.flink" % "flink-shaded-hadoop2" % "2.7.5-10.0" % "provided"
 
 // following three libraries are only needed for digital signatures
-libraryDependencies += "org.bouncycastle" % "bcprov-ext-jdk15on" % "1.67" % "compile"
-libraryDependencies += "org.bouncycastle" % "bcpkix-jdk15on" % "1.67" % "compile"
+libraryDependencies += "org.bouncycastle" % "bcprov-ext-jdk15on" % "1.68" % "compile"
+libraryDependencies += "org.bouncycastle" % "bcpkix-jdk15on" % "1.68" % "compile"
 libraryDependencies += "org.apache.santuario" % "xmlsec" % "2.2.1" % "compile"
 
 

@@ -42,8 +42,8 @@ libraryDependencies += "com.fasterxml.woodstox" % "woodstox-core" % "5.0.3" % "c
 
 
 // following three libraries are only needed for digital signatures
-libraryDependencies += "org.bouncycastle" % "bcprov-ext-jdk15on" % "1.67" % "provided"
-libraryDependencies += "org.bouncycastle" % "bcpkix-jdk15on" % "1.67" % "provided"
+libraryDependencies += "org.bouncycastle" % "bcprov-ext-jdk15on" % "1.68" % "provided"
+libraryDependencies += "org.bouncycastle" % "bcpkix-jdk15on" % "1.68" % "provided"
 libraryDependencies += "org.apache.santuario" % "xmlsec" % "2.2.1" % "provided"
 
 libraryDependencies += "org.apache.flink" %% "flink-scala" % "1.10.3" % "provided"
