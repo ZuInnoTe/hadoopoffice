@@ -165,7 +165,7 @@ class FlinkScalaExcelTableSinkIntegrationSpec extends FlatSpec with BeforeAndAft
     tableEnvironment.registerTableSource("testsimple", source)
     val testSimpleScan = tableEnvironment.scan("testsimple")
     val testSimpleResult = testSimpleScan.select("*")
-    // write table using sink 
+    // write table using sink
     val howc = new HadoopOfficeWriteConfiguration(DFS_OUTPUT_DIR_NAME)
     howc.setMimeType(MIMETYPE_XLSX)
     howc.setLocale(Locale.GERMANY)

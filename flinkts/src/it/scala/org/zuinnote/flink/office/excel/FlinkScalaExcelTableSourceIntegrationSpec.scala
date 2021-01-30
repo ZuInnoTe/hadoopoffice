@@ -1,4 +1,3 @@
-
 /**
  * Copyright 2018 ZuInnoTe (Jörn Franke) <zuinnote@gmail.com>
  *
@@ -144,7 +143,7 @@ class FlinkScalaExcelTableSourceIntegrationSpec extends FlatSpec with BeforeAndA
     val decimalFormat: DecimalFormat = NumberFormat.getInstance(Locale.GERMANY).asInstanceOf[DecimalFormat]
     hocr.setReadHeader(true)
     hocr.setLocale(Locale.GERMANY)
-    
+
     hocr.setSimpleDateFormat(dateFormat)
     hocr.setSimpleDecimalFormat(decimalFormat)
     val source: ExcelFlinkTableSource = ExcelFlinkTableSource.builder()

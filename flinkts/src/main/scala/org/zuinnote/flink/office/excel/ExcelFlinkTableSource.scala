@@ -50,6 +50,7 @@ import org.apache.flink.table.api.{TableException, TableSchema}
 import scala.collection.mutable
 import java.util.Locale
 
+@deprecated
 class ExcelFlinkTableSource(
   val path:          String,
   val fieldNames:    Array[String],
@@ -61,9 +62,9 @@ class ExcelFlinkTableSource(
 
 /***
    * Returns the dataSet from the Excel file. Note: Currently only the types string, date, timestamp, decimal, byte,short,integer,long,double,float are supported
-   * 
-   * @param execEnv executionEnvironment 
-   * 
+   *
+   * @param execEnv executionEnvironment
+   *
    */
   override def getDataSet(execEnv: ExecutionEnvironment): DataSet[Row] = {
     // we do not infer any data, because fieldnames and types are given
@@ -114,7 +115,7 @@ class ExcelFlinkTableSource(
 
 /***
    * Explains the table source
-   * 
+   *
    */
   override def explainSource(): String = {
     s"ExcelFlinkTableSource(" +
