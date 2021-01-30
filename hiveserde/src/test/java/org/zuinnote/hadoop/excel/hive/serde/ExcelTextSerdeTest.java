@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 import java.util.Properties;
 
@@ -35,6 +36,10 @@ import org.apache.hadoop.hive.common.type.HiveDecimal;
 import org.apache.hadoop.hive.serde.serdeConstants;
 import org.apache.hadoop.hive.serde2.SerDeException;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.zuinnote.hadoop.office.format.common.HadoopOfficeReadConfiguration;
 import org.zuinnote.hadoop.office.format.common.OfficeReader;
@@ -47,6 +52,32 @@ import org.zuinnote.hadoop.office.format.common.parser.FormatNotUnderstoodExcept
  *
  */
 public class ExcelTextSerdeTest {
+	private static	boolean hiveNewDateClass=true;
+
+	@BeforeAll
+	 public static void oneTimeSetUp() throws IOException {
+		 // one-time initialization code
+		 try {
+	 		Class.forName("org.apache.hadoop.hive.common.type.Date");
+	 	} catch(ClassNotFoundException e) {
+	 		ExcelTextSerdeTest.hiveNewDateClass=false;
+	 	}
+	 }
+
+	 @AfterAll
+	 public static void oneTimeTearDown() {
+			 // one-time cleanup code
+		 }
+
+	 @BeforeEach
+	 public void setUp() {
+	 }
+
+	 @AfterEach
+	 public void tearDown() {
+
+	 }
+
 
 	@Test
 	public void checkTestExcel2003SingleSheetAvailable() {
@@ -109,8 +140,8 @@ public class ExcelTextSerdeTest {
 		ExcelSerde testSerde = new ExcelSerde();
 		Configuration hadoopConf = new Configuration();
 		Properties tblProperties = new Properties();
-		
-		
+
+
 		tblProperties.setProperty("hadoopoffice.read.simple.dateFormat", "us");
 		tblProperties.setProperty("hadoopoffice.read.simple.decimalFormat", "de");
 		tblProperties.setProperty(ExcelSerde.CONF_DEFAULTSHEETNAME, "Sheet1");
@@ -139,7 +170,14 @@ public class ExcelTextSerdeTest {
 		Object[] simpleRow1 = (Object[]) testSerde.deserialize(usableObject);
 		assertEquals(HiveDecimal.create(new BigDecimal("1.00")), simpleRow1[0], "A2 = 1.00");
 		assertTrue((Boolean) simpleRow1[1], "B2 = TRUE");
-		assertEquals(sdf.parse("2017-01-01"), simpleRow1[2], "C2 = 2017-01-01");
+
+		Date dateResult=null;
+		if (ExcelTextSerdeTest.hiveNewDateClass) {
+			dateResult=sdf.parse(simpleRow1[2].toString());
+		} else {
+			dateResult=(Date)simpleRow1[2];
+		}
+		assertEquals(0, sdf.parse("2017-01-01").compareTo(dateResult), "C2 = 2017-01-01");
 		assertEquals("This is a text", simpleRow1[3], "D2 = This is a text");
 		assertEquals(HiveDecimal.create(new BigDecimal("10.000")), simpleRow1[4], "E2 = 10.000");
 		assertEquals((byte) 3, simpleRow1[5], "F2 = 3");
@@ -149,10 +187,18 @@ public class ExcelTextSerdeTest {
 
 		SpreadSheetCellDAO[] row2 = (SpreadSheetCellDAO[]) reader.getNext();
 		usableObject.set(row2);
+
 		Object[] simpleRow2 = (Object[]) testSerde.deserialize(usableObject);
 		assertEquals(HiveDecimal.create(new BigDecimal("1.50")), simpleRow2[0], "A3 = 1.50");
 		assertFalse((Boolean) simpleRow2[1], "B3 = FALSE");
-		assertEquals(sdf.parse("2017-02-28"), simpleRow2[2], "C3 = 2017-02-28");
+
+		Date dateResult2=null;
+		if (ExcelTextSerdeTest.hiveNewDateClass) {
+			dateResult2=sdf.parse(simpleRow2[2].toString());
+		} else {
+			dateResult2=(Date)simpleRow2[2];
+		}
+		assertEquals(0,sdf.parse("2017-02-28").compareTo(dateResult2), "C3 = 2017-02-28");
 		assertEquals("Another String", simpleRow2[3], "D3 = Another String");
 		assertEquals(HiveDecimal.create(new BigDecimal("2.334")), simpleRow2[4], "E3 = 2.334");
 		assertEquals((byte) 5, simpleRow2[5], "F3 = 5");
@@ -165,7 +211,13 @@ public class ExcelTextSerdeTest {
 		Object[] simpleRow3 = (Object[]) testSerde.deserialize(usableObject);
 		assertEquals(HiveDecimal.create(new BigDecimal("3.40")), simpleRow3[0], "A4 = 3.40");
 		assertFalse((Boolean) simpleRow3[1], "B4 = FALSE");
-		assertEquals(sdf.parse("2000-02-29"), simpleRow3[2], "C4 = 2000-02-29");
+			Date dateResult3=null;
+		if (ExcelTextSerdeTest.hiveNewDateClass) {
+			dateResult3=sdf.parse(simpleRow3[2].toString());
+		} else {
+			dateResult3=(Date)simpleRow3[2];
+		}
+		assertEquals(sdf.parse("2000-02-29"), dateResult3, "C4 = 2000-02-29");
 		assertEquals("10", simpleRow3[3], "D4 = 10");
 		assertEquals(HiveDecimal.create(new BigDecimal("4.500")), simpleRow3[4], "E4 = 4.500");
 		assertEquals((byte) -100, simpleRow3[5], "F4 = -100");
@@ -178,7 +230,13 @@ public class ExcelTextSerdeTest {
 		Object[] simpleRow4 = (Object[]) testSerde.deserialize(usableObject);
 		assertEquals(HiveDecimal.create(new BigDecimal("5.50")), simpleRow4[0], "A5 = 5.50");
 		assertFalse((Boolean) simpleRow4[1], "B5 = FALSE");
-		assertEquals(sdf.parse("2017-03-01"), simpleRow4[2], "C5 = 2017-03-01");
+			Date dateResult4=null;
+		if (ExcelTextSerdeTest.hiveNewDateClass) {
+			dateResult4=sdf.parse(simpleRow4[2].toString());
+		} else {
+			dateResult4=(Date)simpleRow4[2];
+		}
+		assertEquals(sdf.parse("2017-03-01"),dateResult4, "C5 = 2017-03-01");
 		assertEquals("test3", simpleRow4[3], "D5 = test3");
 		assertEquals(HiveDecimal.create(new BigDecimal("11.000")), simpleRow4[4], "E5 = 11.000");
 		assertEquals((byte) 2, simpleRow4[5], "F5 = 2");
@@ -204,7 +262,13 @@ public class ExcelTextSerdeTest {
 		Object[] simpleRow6 = (Object[]) testSerde.deserialize(usableObject);
 		assertEquals(HiveDecimal.create(new BigDecimal("3.40")), simpleRow6[0], "A7 = 3.40");
 		assertTrue((Boolean) simpleRow6[1], "B7 = TRUE");
-		assertEquals(sdf.parse("2017-03-01"), simpleRow6[2], "C7 = 2017-03-01");
+			Date dateResult6=null;
+		if (ExcelTextSerdeTest.hiveNewDateClass) {
+			dateResult6=sdf.parse(simpleRow6[2].toString());
+		} else {
+			dateResult6=(Date)simpleRow6[2];
+		}
+		assertEquals(sdf.parse("2017-03-01"), dateResult6, "C7 = 2017-03-01");
 		assertEquals("test5", simpleRow6[3], "D7 = test5");
 		assertEquals(HiveDecimal.create(new BigDecimal("10000.500")), simpleRow6[4], "E6 = 10000.500");
 		assertEquals((byte) 120, simpleRow6[5], "F7 = 120");
@@ -242,8 +306,8 @@ public class ExcelTextSerdeTest {
 				"decimal(3,2),boolean,date,string,decimal(8,3),tinyint,smallint,int,bigint");
 		testSerde.initialize(hadoopConf, tblProperties);
 
-		
-		
+
+
 		// 1) prepare data (=deserialize)
 
 		FileInputStream documentInputStream = new FileInputStream(new File(fileNameSpreadSheet));
@@ -263,7 +327,13 @@ public class ExcelTextSerdeTest {
 		Object[] simpleRow1 = (Object[]) testSerde.deserialize(usableObject);
 		assertEquals(HiveDecimal.create(new BigDecimal("1.00")), simpleRow1[0], "A2 = 1.00");
 		assertTrue((Boolean) simpleRow1[1], "B2 = TRUE");
-		assertEquals(sdf.parse("2017-01-01"), simpleRow1[2], "C2 = 2017-01-01");
+		Date dateResult1=null;
+	if (ExcelTextSerdeTest.hiveNewDateClass) {
+		dateResult1=sdf.parse(simpleRow1[2].toString());
+	} else {
+		dateResult1=(Date)simpleRow1[2];
+	}
+		assertEquals(sdf.parse("2017-01-01"), dateResult1, "C2 = 2017-01-01");
 		assertEquals("This is a text", simpleRow1[3], "D2 = This is a text");
 		assertEquals(HiveDecimal.create(new BigDecimal("10.000")), simpleRow1[4], "E2 = 10.000");
 		assertEquals((byte) 3, simpleRow1[5], "F2 = 3");
@@ -276,7 +346,13 @@ public class ExcelTextSerdeTest {
 		Object[] simpleRow2 = (Object[]) testSerde.deserialize(usableObject);
 		assertEquals(HiveDecimal.create(new BigDecimal("1.50")), simpleRow2[0], "A3 = 1.50");
 		assertFalse((Boolean) simpleRow2[1], "B3 = FALSE");
-		assertEquals(sdf.parse("2017-02-28"), simpleRow2[2], "C3 = 2017-02-28");
+		Date dateResult2=null;
+	if (ExcelTextSerdeTest.hiveNewDateClass) {
+		dateResult2=sdf.parse(simpleRow2[2].toString());
+	} else {
+		dateResult2=(Date)simpleRow2[2];
+	}
+		assertEquals(sdf.parse("2017-02-28"), dateResult2, "C3 = 2017-02-28");
 		assertEquals("Another String", simpleRow2[3], "D3 = Another String");
 		assertEquals(HiveDecimal.create(new BigDecimal("2.334")), simpleRow2[4], "E3 = 2.334");
 		assertEquals((byte) 5, simpleRow2[5], "F3 = 5");
@@ -289,7 +365,13 @@ public class ExcelTextSerdeTest {
 		Object[] simpleRow3 = (Object[]) testSerde.deserialize(usableObject);
 		assertEquals(HiveDecimal.create(new BigDecimal("3.40")), simpleRow3[0], "A4 = 3.40");
 		assertFalse((Boolean) simpleRow3[1], "B4 = FALSE");
-		assertEquals(sdf.parse("2000-02-29"), simpleRow3[2], "C4 = 2000-02-29");
+		Date dateResult3=null;
+	if (ExcelTextSerdeTest.hiveNewDateClass) {
+		dateResult3=sdf.parse(simpleRow3[2].toString());
+	} else {
+		dateResult3=(Date)simpleRow3[2];
+	}
+		assertEquals(sdf.parse("2000-02-29"), dateResult3, "C4 = 2000-02-29");
 		assertEquals("10", simpleRow3[3], "D4 = 10");
 		assertEquals(HiveDecimal.create(new BigDecimal("4.500")), simpleRow3[4], "E4 = 4.500");
 		assertEquals((byte) -100, simpleRow3[5], "F4 = -100");
@@ -302,7 +384,13 @@ public class ExcelTextSerdeTest {
 		Object[] simpleRow4 = (Object[]) testSerde.deserialize(usableObject);
 		assertEquals(HiveDecimal.create(new BigDecimal("5.50")), simpleRow4[0], "A5 = 5.50");
 		assertFalse((Boolean) simpleRow4[1], "B5 = FALSE");
-		assertEquals(sdf.parse("2017-03-01"), simpleRow4[2], "C5 = 2017-03-01");
+		Date dateResult4=null;
+	if (ExcelTextSerdeTest.hiveNewDateClass) {
+		dateResult4=sdf.parse(simpleRow4[2].toString());
+	} else {
+		dateResult4=(Date)simpleRow4[2];
+	}
+		assertEquals(sdf.parse("2017-03-01"), dateResult4, "C5 = 2017-03-01");
 		assertEquals("test3", simpleRow4[3], "D5 = test3");
 		assertEquals(HiveDecimal.create(new BigDecimal("11.000")), simpleRow4[4], "E5 = 11.000");
 		assertEquals((byte) 2, simpleRow4[5], "F5 = 2");
@@ -328,7 +416,13 @@ public class ExcelTextSerdeTest {
 		Object[] simpleRow6 = (Object[]) testSerde.deserialize(usableObject);
 		assertEquals(HiveDecimal.create(new BigDecimal("3.40")), simpleRow6[0], "A7 = 3.40");
 		assertTrue((Boolean) simpleRow6[1], "B7 = TRUE");
-		assertEquals(sdf.parse("2017-03-01"), simpleRow6[2], "C7 = 2017-03-01");
+		Date dateResult6=null;
+	if (ExcelTextSerdeTest.hiveNewDateClass) {
+		dateResult6=sdf.parse(simpleRow6[2].toString());
+	} else {
+		dateResult6=(Date)simpleRow6[2];
+	}
+		assertEquals(sdf.parse("2017-03-01"), dateResult6, "C7 = 2017-03-01");
 		assertEquals("test5", simpleRow6[3], "D7 = test5");
 		assertEquals(HiveDecimal.create(new BigDecimal("10000.500")), simpleRow6[4], "E6 = 10000.500");
 		assertEquals((byte) 120, simpleRow6[5], "F7 = 120");
@@ -835,7 +929,13 @@ public class ExcelTextSerdeTest {
 		Object[] simpleRow1 = (Object[]) testSerde.deserialize(usableObject);
 		assertEquals(HiveDecimal.create(new BigDecimal("1.00")), simpleRow1[0], "A2 = 1.00");
 		assertTrue((Boolean) simpleRow1[1], "B2 = TRUE");
-		assertEquals(sdf.parse("2017-01-01"), simpleRow1[2], "C2 = 2017-01-01");
+		Date dateResult1=null;
+	if (ExcelTextSerdeTest.hiveNewDateClass) {
+		dateResult1=sdf.parse(simpleRow1[2].toString());
+	} else {
+		dateResult1=(Date)simpleRow1[2];
+	}
+		assertEquals(sdf.parse("2017-01-01"), dateResult1, "C2 = 2017-01-01");
 		assertEquals("This is a text", simpleRow1[3], "D2 = This is a text");
 		assertEquals(HiveDecimal.create(new BigDecimal("10.000")), simpleRow1[4], "E2 = 10.000");
 		assertEquals((byte) 3, simpleRow1[5], "F2 = 3");
@@ -848,7 +948,13 @@ public class ExcelTextSerdeTest {
 		Object[] simpleRow2 = (Object[]) testSerde.deserialize(usableObject);
 		assertEquals(HiveDecimal.create(new BigDecimal("1.50")), simpleRow2[0], "A3 = 1.50");
 		assertFalse((Boolean) simpleRow2[1], "B3 = FALSE");
-		assertEquals(sdf.parse("2017-02-28"), simpleRow2[2], "C3 = 2017-02-28");
+		Date dateResult2=null;
+	if (ExcelTextSerdeTest.hiveNewDateClass) {
+		dateResult2=sdf.parse(simpleRow2[2].toString());
+	} else {
+		dateResult2=(Date)simpleRow2[2];
+	}
+		assertEquals(sdf.parse("2017-02-28"), dateResult2, "C3 = 2017-02-28");
 		assertEquals("Another String", simpleRow2[3], "D3 = Another String");
 		assertEquals(HiveDecimal.create(new BigDecimal("2.334")), simpleRow2[4], "E3 = 2.334");
 		assertEquals((byte) 5, simpleRow2[5], "F3 = 5");
@@ -861,7 +967,13 @@ public class ExcelTextSerdeTest {
 		Object[] simpleRow3 = (Object[]) testSerde.deserialize(usableObject);
 		assertEquals(HiveDecimal.create(new BigDecimal("3.40")), simpleRow3[0], "A4 = 3.40");
 		assertFalse((Boolean) simpleRow3[1], "B4 = FALSE");
-		assertEquals(sdf.parse("2000-02-29"), simpleRow3[2], "C4 = 2000-02-29");
+		Date dateResult3=null;
+	if (ExcelTextSerdeTest.hiveNewDateClass) {
+		dateResult3=sdf.parse(simpleRow3[2].toString());
+	} else {
+		dateResult3=(Date)simpleRow3[2];
+	}
+		assertEquals(sdf.parse("2000-02-29"), dateResult3, "C4 = 2000-02-29");
 		assertEquals("10", simpleRow3[3], "D4 = 10");
 		assertEquals(HiveDecimal.create(new BigDecimal("4.500")), simpleRow3[4], "E4 = 4.500");
 		assertEquals((byte) -100, simpleRow3[5], "F4 = -100");
@@ -874,7 +986,13 @@ public class ExcelTextSerdeTest {
 		Object[] simpleRow4 = (Object[]) testSerde.deserialize(usableObject);
 		assertEquals(HiveDecimal.create(new BigDecimal("5.50")), simpleRow4[0], "A5 = 5.50");
 		assertFalse((Boolean) simpleRow4[1], "B5 = FALSE");
-		assertEquals(sdf.parse("2017-03-01"), simpleRow4[2], "C5 = 2017-03-01");
+		Date dateResult4=null;
+	if (ExcelTextSerdeTest.hiveNewDateClass) {
+		dateResult4=sdf.parse(simpleRow4[2].toString());
+	} else {
+		dateResult4=(Date)simpleRow4[2];
+	}
+		assertEquals(sdf.parse("2017-03-01"), dateResult4, "C5 = 2017-03-01");
 		assertEquals("test3", simpleRow4[3], "D5 = test3");
 		assertEquals(HiveDecimal.create(new BigDecimal("11.000")), simpleRow4[4], "E5 = 11.000");
 		assertEquals((byte) 2, simpleRow4[5], "F5 = 2");
@@ -900,7 +1018,13 @@ public class ExcelTextSerdeTest {
 		Object[] simpleRow6 = (Object[]) testSerde.deserialize(usableObject);
 		assertEquals(HiveDecimal.create(new BigDecimal("3.40")), simpleRow6[0], "A7 = 3.40");
 		assertTrue((Boolean) simpleRow6[1], "B7 = TRUE");
-		assertEquals(sdf.parse("2017-03-01"), simpleRow6[2], "C7 = 2017-03-01");
+		Date dateResult6=null;
+	if (ExcelTextSerdeTest.hiveNewDateClass) {
+		dateResult6=sdf.parse(simpleRow6[2].toString());
+	} else {
+		dateResult6=(Date)simpleRow6[2];
+	}
+		assertEquals(sdf.parse("2017-03-01"), dateResult6, "C7 = 2017-03-01");
 		assertEquals("test5", simpleRow6[3], "D7 = test5");
 		assertEquals(HiveDecimal.create(new BigDecimal("10000.500")), simpleRow6[4], "E6 = 10000.500");
 		assertEquals((byte) 120, simpleRow6[5], "F7 = 120");

@@ -20,9 +20,12 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -90,10 +93,10 @@ import org.zuinnote.hadoop.office.format.common.util.msexcel.MSExcelUtil;
  */
 
 public class ExcelSerde extends AbstractSerDe {
-	
+
 	public static final String CONF_DEFAULTSHEETNAME = "office.hive.write.defaultSheetName";
-	
-	
+
+
 	public static final String DEFAULT_DEFAULTSHEETNAME = "Sheet1";
 	public static final String HOSUFFIX = "hadoopoffice.";
 	private static final Log LOG = LogFactory.getLog(ExcelSerde.class.getName());
@@ -110,29 +113,29 @@ public class ExcelSerde extends AbstractSerDe {
 
 	/**
 	 * Initializes the Serde
-	 *  
+	 *
 	 * @see #initialize(Configuration, Properties, Properties)
-	 * 
+	 *
 	 * @param conf Hadoop Configuration
 	 * @param prop table properties
-	 * 
-	 * 
+	 *
+	 *
 	 */
 	@Override
 	public void initialize(Configuration conf, Properties prop) throws SerDeException {
 		this.initialize(conf, prop, null);
 	}
-	
+
 	/**
 	 * Initializes the SerDe \n
 	 * You can define in the table properties (additionally to the standard Hive properties) the following options \n
 	 * office.hive.write.defaultSheetName: The sheetname to which data should be written (note: as an input any sheets can be read or selected sheets according to HadoopOffice configuration values) \n
 	 * Any of the HadoopOffice options (hadoopoffice.*), such as encryption, signing, low footprint mode, linked workbooks, can be defined in the table properties @see <a href="https://github.com/ZuInnoTe/hadoopoffice/wiki/Hadoop-File-Format">HadoopOffice configuration</a>\n
 	 * @param conf Hadoop Configuration
-	 * @param prop table properties. 
+	 * @param prop table properties.
 	 * @param partitionProperties ignored. Partitions are not supported.
 	 */
-	
+
 	@Override
 	public void initialize(Configuration conf, Properties prop, Properties partitionProperties) throws SerDeException {
 		LOG.debug("Initializing Excel Hive Serde");
@@ -221,17 +224,17 @@ public class ExcelSerde extends AbstractSerDe {
 
 	/**
 	 * The object inspector returned is always of type StructObjectInspector
-	 * 
+	 *
 	 * @return StructObjectInspector
 	 */
 	@Override
 	public ObjectInspector getObjectInspector() throws SerDeException {
 		return this.oi;
 	}
-	
+
 	/**
 	 * Returns null because SerdeStata are not supported
-	 * 
+	 *
 	 * @return null
 	 */
 	@Override
@@ -239,11 +242,11 @@ public class ExcelSerde extends AbstractSerDe {
 		// no statistics supported
 		return null;
 	}
-	
+
 	/**
 	 * Returns the class in which information is serialized.
 	 * It is an ArrayWritable (@see org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAOArrayWritable) containing objects of type SpreadSheetCellDAO (@see org.zuinnote.hadoop.office.format.common.dao.SpreadSheetCellDAO)
-	 * 
+	 *
 	 * @return SpreadSheetCellDAOArrayWritable.class
 	 */
 	@Override
@@ -253,11 +256,11 @@ public class ExcelSerde extends AbstractSerDe {
 
 	/**
 	 * Deserializes an object of type @see #getSerializedClass()
-	 * Note: Some Java types, such as Decimal, are converted to Hive specific datatypes. 
-	 * 
+	 * Note: Some Java types, such as Decimal, are converted to Hive specific datatypes.
+	 *
 	 * @param arg0 object of type @see #getSerializedClass()
 	 * @return Array containing objects of type primitive Java (e.g. string, byte, integer)/Hive (e.g HiveDecimal, HiveVarChar)
-	 * 
+	 *
 	 */
 	@Override
 	public Object deserialize(Writable arg0) throws SerDeException {
@@ -299,7 +302,18 @@ public class ExcelSerde extends AbstractSerDe {
 				break;
 			case DATE:
 				if (primitiveRow[i] != null) {
-					primitiveRow[i] = new java.sql.Date(((Date) primitiveRow[i]).getTime());
+					boolean hiveNewDateClass=true;
+					try {
+						Class.forName("org.apache.hadoop.hive.common.type.Date");
+					} catch(ClassNotFoundException e) {
+						hiveNewDateClass=false;
+					}
+					if (hiveNewDateClass) {
+						SimpleDateFormat hiveDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+						primitiveRow[i]=org.apache.hadoop.hive.common.type.Date.valueOf(hiveDateFormat.format((Date) primitiveRow[i]));
+					} else 	{
+						primitiveRow[i] = new java.sql.Date(((Date) primitiveRow[i]).getTime());
+						}
 				}
 				break;
 			case DECIMAL:
@@ -331,16 +345,16 @@ public class ExcelSerde extends AbstractSerDe {
 		return primitiveRow;
 	}
 
-	
+
 /***
  *  Serializes an array of primitive (Hive) data types to a objects of type @see #getSerializedClass()
  *  Note: For HiveDecimals we add trailing zeros
- *  
- *  @param arg0 Array of objects of primitive (Hive) data types. 
+ *
+ *  @param arg0 Array of objects of primitive (Hive) data types.
  *  @param arg1 ObjectInspector to be able to parse the object given in arg0
- *  
+ *
  *  @return object of type @see #getSerializedClass()
- *  
+ *
  */
 	@Override
 	public Writable serialize(Object arg0, ObjectInspector arg1) throws SerDeException {
@@ -414,7 +428,26 @@ public class ExcelSerde extends AbstractSerDe {
 				outputRow[i] = outputRow[i];
 				break;
 			case DATE:
-				outputRow[i] = outputRow[i];
+			boolean hiveNewDateClass=true;
+			try {
+				Class.forName("org.apache.hadoop.hive.common.type.Date");
+			} catch(ClassNotFoundException e) {
+				hiveNewDateClass=false;
+			}
+			if (hiveNewDateClass) {
+				SimpleDateFormat hiveDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+				try {
+				if (outputRow[i]!=null) {
+				outputRow[i]=hiveDateFormat.parse(((org.apache.hadoop.hive.common.type.Date)outputRow[i]).toString());
+				}
+			} catch (ParseException e) {
+				this.LOG.error ("Internal Error converting Hive Date to Date");
+				this.LOG.error(e);
+			}
+			}
+			else {
+				 outputRow[i] = outputRow[i];
+			 }
 				break;
 			case DECIMAL:
 				if (outputRow[i] != null) {
