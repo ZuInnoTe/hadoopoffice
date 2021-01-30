@@ -67,3 +67,4 @@ libraryDependencies += "javax.servlet" % "javax.servlet-api" % "3.0.1" % "it"
 libraryDependencies += "org.apache.hadoop" % "hadoop-common" % "3.3.0" % "it" classifier "" classifier "tests"
 
 libraryDependencies += "org.apache.hadoop" % "hadoop-hdfs" % "3.3.0" % "it" classifier "" classifier "tests"
+libraryDependencies += "org.apache.hadoop" % "hadoop-hdfs-client" % "3.3.0" % "it" classifier "" classifier "tests"
