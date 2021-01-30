@@ -57,8 +57,8 @@ libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.4.
 libraryDependencies += "com.github.zuinnote" % "hadoopoffice-flinkds" % "1.4.0" % "compile" exclude("org.apache.xmlgraphics","batik-all")
 
 // following three libraries are only needed for digital signatures
-libraryDependencies += "org.bouncycastle" % "bcprov-ext-jdk15on" % "1.68" % "provided"
-libraryDependencies += "org.bouncycastle" % "bcpkix-jdk15on" % "1.68" % "provided"
+libraryDependencies += "org.bouncycastle" % "bcprov-ext-jdk15to18" % "1.68" % "provided"
+libraryDependencies += "org.bouncycastle" % "bcpkix-jdk15to18" % "1.68" % "provided"
 libraryDependencies += "org.apache.santuario" % "xmlsec" % "2.2.1" % "provided"
 
 libraryDependencies += "org.apache.flink" %% "flink-scala" % "1.10.3" % "provided"
