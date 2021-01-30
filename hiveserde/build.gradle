@@ -110,8 +110,8 @@ dependencies {
    compile("com.github.zuinnote:hadoopoffice-fileformat:1.4.0")
    // bouncy castle (for signing etc.)
    // for signing and verification of signatures
-    provided("org.bouncycastle:bcprov-ext-jdk15on:1.67")
-    provided("org.bouncycastle:bcpkix-jdk15on:1.67")
+    provided("org.bouncycastle:bcprov-ext-jdk15on:1.68")
+    provided("org.bouncycastle:bcpkix-jdk15on:1.68")
     provided("org.apache.santuario:xmlsec:2.2.1")
     // hive serde API
    provided("org.apache.hive:hive-serde:3.1.2")
