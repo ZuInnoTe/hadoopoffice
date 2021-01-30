@@ -35,12 +35,12 @@ assemblyMergeStrategy in assembly :=  {
 }
 
 
-libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.3.10" % "compile"
+libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.4.0" % "compile"
 
 // following three libraries are only needed for digital signatures
-libraryDependencies += "org.bouncycastle" % "bcprov-ext-jdk15on" % "1.62" % "compile"
-libraryDependencies += "org.bouncycastle" % "bcpkix-jdk15on" % "1.62" % "compile"
-libraryDependencies += "org.apache.santuario" % "xmlsec" % "2.1.2" % "compile"
+libraryDependencies += "org.bouncycastle" % "bcprov-ext-jdk15on" % "1.67" % "compile"
+libraryDependencies += "org.bouncycastle" % "bcpkix-jdk15on" % "1.67" % "compile"
+libraryDependencies += "org.apache.santuario" % "xmlsec" % "2.2.1" % "compile"
 
 
 // Spark dependencies
@@ -58,4 +58,3 @@ libraryDependencies += "org.apache.hadoop" % "hadoop-common" % "2.7.5" % "it" cl
 libraryDependencies += "org.apache.hadoop" % "hadoop-hdfs" % "2.7.5" % "it" classifier "" classifier "tests"
 
 libraryDependencies += "org.apache.hadoop" % "hadoop-minicluster" % "2.7.5" % "it"
-
