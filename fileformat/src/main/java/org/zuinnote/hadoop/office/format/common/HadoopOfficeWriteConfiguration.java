@@ -27,17 +27,17 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.hadoop.conf.Configuration;
-import org.mortbay.log.Log;
+
 
 /**
  * read the configuration for writing office files from a Hadoop configuration
- * 
+ *
  * @author Jörn Franke (zuinnote@gmail.com)
  *
  */
 public class HadoopOfficeWriteConfiguration implements Serializable {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 4125629762320597440L;
 	public static final String CONF_MIMETYPE = "hadoopoffice.write.mimeType";
@@ -72,10 +72,10 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 	public static final String CONF_SIGKEYSTOREPW = "hadoopoffice.write.security.sign.keystore.password";
 	public static final String CONF_SIGKEYSTOREALIAS = "hadoopoffice.write.security.sign.keystore.alias";
 	public static final String CONF_SIGHASH = "hadoopoffice.write.security.sign.hash.algorithm";
-	public static final String CONF_IGNORELINEBREAKS = "hadoopoffice.write.security.sign.ignoreLineBreaks"; 
+	public static final String CONF_IGNORELINEBREAKS = "hadoopoffice.write.security.sign.ignoreLineBreaks";
 	public static final String CONF_WRITEHEADER = "hadoopoffice.write.header.write";
-	
-	
+
+
 	public static final String CONF_SIMPLEDATEFORMAT = "hadoopoffice.write.simple.dateFormat";
 
 	public static final String CONF_SIMPLEDATEPATTERN = "hadoopoffice.write.simple.datePattern";
@@ -83,9 +83,9 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 	public static final String CONF_SIMPLEDATETIMEFORMAT = "hadoopoffice.write.simple.dateTimeFormat";
 
 	public static final String CONF_SIMPLEDATETIMEPATTERN = "hadoopoffice.write.simple.dateTimePattern";
-	
+
 	public static final String CONF_SIMPLEDECIMALFORMAT = "hadoopoffice.write.simple.decimalFormat";
-	
+
 
 	public static final String CONF_SIMPLESPILLOVER = "hadoopoffice.write.simple.spillOverSheet";
 
@@ -116,7 +116,7 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 	public static final String DEFAULT_SIGHASH = "sha512";
 	public static final boolean DEFAULT_IGNORELINEBREAKS = false;
 	public static final boolean DEFAULT_WRITEHEADER = false;
-	
+
 	public static final String DEFAULT_SIMPLEDATEFORMAT = "US";
 
 	public static final String DEFAULT_SIMPLEDATEPATTERN = "";
@@ -124,11 +124,11 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 	public static final String DEFAULT_SIMPLEDATETIMEFORMAT = "US";
 
 	public static final String DEFAULT_SIMPLEDATETIMEPATTERN = "";
-	
+
 	public static final String DEFAULT_SIMPLEDECIMALFORMAT = "";
 	public static final boolean DEFAULT_SIMPLESPILLOVER = true;
 
-	
+
 	private String[] linkedWorkbooksName;
 	private String fileName;
 	private String mimeType;
@@ -166,8 +166,8 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 	private SimpleDateFormat simpleDateTimeFormat;
 	private DecimalFormat simpleDecimalFormat;
 	private boolean simpleSpillOver;
-	
-	
+
+
 	public HadoopOfficeWriteConfiguration(String fileName) {
 
 		this.linkedWorkbooksName = new String[0];
@@ -232,20 +232,20 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 		this.setWriteHeader(HadoopOfficeWriteConfiguration.DEFAULT_WRITEHEADER);
 		this.setIgnoreLineBreaks(HadoopOfficeWriteConfiguration.DEFAULT_IGNORELINEBREAKS);
 		this.setSimpleSpillOver(HadoopOfficeWriteConfiguration.DEFAULT_SIMPLESPILLOVER);
-		
+
 	}
 
 	/*
 	 * Read the configuration for writing office files from a Hadoop configuration
-	 * 
-	 * @conf Hadoop configuration 
-	 * 
+	 *
+	 * @conf Hadoop configuration
+	 *
 	 * <ul>
 	 * <li>hadoopoffice.write.mimeType: Mimetype of the document </li>
 	 * <li> hadoopoffice.write.locale: Locale of the document (e.g. needed for
 	 * interpreting spreadsheets) in the BCP47 format (cf.
 	 * https://tools.ietf.org/html/bcp47). If not specified then default system
-	 * locale will be used. </li> 
+	 * locale will be used. </li>
 	 * <li> hadoopoffice.write.linkedworkbooks a []: separated list
 	 * of existing linked workbooks. Example:
 	 * [hdfs:///home/user/excel/linkedworkbook1.xls]:[hdfs:///home/user/excel/
@@ -282,7 +282,7 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 	 * "linkedworkbook1.xlsx" is
 	 * "hadoopoffice.read.security.crypt.linkedworkbooks.linkedworkbook1.xslx".
 	 * Value is the password. You must not include path or protocol information in
-	 * the filename</li> 
+	 * the filename</li>
 	 * <li>hadoopoffice.write.metadata.*: Write metadata properties of the
 	 * document. All properties belonging to the base (e.g.
 	 * hadoopoffice.write.metadata.author for author) will be handed over to the
@@ -325,11 +325,11 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 	 *
 	 *
 	 *
-	
 
-	 * 
+
+	 *
 	 * @param fileName filename to write
-	 * 
+	 *
 	 */
 	public HadoopOfficeWriteConfiguration(Configuration conf, String fileName) {
 		this.setMimeType(conf.get(HadoopOfficeWriteConfiguration.CONF_MIMETYPE,
@@ -390,7 +390,7 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 				conf.get(HadoopOfficeWriteConfiguration.CONF_SIGHASH, HadoopOfficeWriteConfiguration.DEFAULT_SIGHASH));
 		this.setIgnoreLineBreaks(conf.getBoolean(HadoopOfficeWriteConfiguration.CONF_IGNORELINEBREAKS,HadoopOfficeWriteConfiguration.DEFAULT_IGNORELINEBREAKS));
 		// set date for simple format
-		Locale dateLocale = new Locale.Builder().setLanguageTag(conf.get(HadoopOfficeWriteConfiguration.CONF_SIMPLEDATEFORMAT,HadoopOfficeWriteConfiguration.DEFAULT_SIMPLEDATEFORMAT)).build();	
+		Locale dateLocale = new Locale.Builder().setLanguageTag(conf.get(HadoopOfficeWriteConfiguration.CONF_SIMPLEDATEFORMAT,HadoopOfficeWriteConfiguration.DEFAULT_SIMPLEDATEFORMAT)).build();
 		this.setSimpleDateFormat((SimpleDateFormat) DateFormat.getDateInstance(DateFormat.SHORT, dateLocale));
 		// set dateTime for simple format
 
@@ -416,7 +416,7 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 		this.setWriteHeader(conf.getBoolean(HadoopOfficeWriteConfiguration.CONF_WRITEHEADER, HadoopOfficeWriteConfiguration.DEFAULT_WRITEHEADER));
 
 		this.setSimpleSpillOver(conf.getBoolean(HadoopOfficeWriteConfiguration.CONF_SIMPLESPILLOVER, HadoopOfficeWriteConfiguration.DEFAULT_SIMPLESPILLOVER));
-		
+
 	}
 
 	public String[] getLinkedWorkbooksName() {
@@ -697,10 +697,10 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 
 	public void setIgnoreLineBreaks(boolean ignoreLineBreaks) {
 		this.ignoreLineBreaks = ignoreLineBreaks;
-	
+
 
 		if (this.ignoreLineBreaks) {
-	
+
 			System.setProperty("org.apache.xml.security.ignoreLineBreaks", "true");
 		}
 	}

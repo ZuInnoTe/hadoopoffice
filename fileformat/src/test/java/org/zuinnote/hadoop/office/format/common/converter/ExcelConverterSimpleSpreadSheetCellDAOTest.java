@@ -39,7 +39,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mortbay.log.Log;
+
 import org.zuinnote.hadoop.office.format.common.HadoopOfficeReadConfiguration;
 import org.zuinnote.hadoop.office.format.common.OfficeReader;
 import org.zuinnote.hadoop.office.format.common.converter.datatypes.GenericBigDecimalDataType;
@@ -63,7 +63,7 @@ public class ExcelConverterSimpleSpreadSheetCellDAOTest {
 
 	   @BeforeAll
 	    public static void oneTimeSetUp() throws IOException {
-	      // one-time initialization code   
+	      // one-time initialization code
 
 	    }
 
@@ -77,43 +77,43 @@ public class ExcelConverterSimpleSpreadSheetCellDAOTest {
 	    }
 
 	    @AfterEach
-	    public void tearDown() {  
+	    public void tearDown() {
 	    }
-	    
+
 	    @Test
 	    public void checkTestExcelSimpleSheetAvailable() {
 			ClassLoader classLoader = getClass().getClassLoader();
 			String fileName="testsimple.xlsx";
-			String fileNameSpreadSheet=classLoader.getResource(fileName).getFile();	
+			String fileNameSpreadSheet=classLoader.getResource(fileName).getFile();
 			assertNotNull(fileNameSpreadSheet,"Test Data File \""+fileName+"\" is not null in resource path");
 			File file = new File(fileNameSpreadSheet);
 			assertTrue(file.exists(),"Test Data File \""+fileName+"\" exists");
 			assertFalse(file.isDirectory(),"Test Data File \""+fileName+"\" is not a directory");
 	    }
-	    
+
 
 	    @Test
 	    public void convertCaseTestSimple() throws FileNotFoundException, ParseException, FormatNotUnderstoodException {
 			ClassLoader classLoader = getClass().getClassLoader();
 			String fileName="testsimple.xlsx";
-			String fileNameSpreadSheet=classLoader.getResource(fileName).getFile();	
+			String fileNameSpreadSheet=classLoader.getResource(fileName).getFile();
     			File file = new File(fileNameSpreadSheet);
 	    		HadoopOfficeReadConfiguration hocr = new HadoopOfficeReadConfiguration();
 	    		hocr.setFileName(fileName);
 	    		hocr.setMimeType("ms-excel");
 	    		hocr.setLocale(Locale.GERMAN);
-	    		OfficeReader officeReader = new OfficeReader(new FileInputStream(file), hocr);  
+	    		OfficeReader officeReader = new OfficeReader(new FileInputStream(file), hocr);
 	    		officeReader.parse();
 	    		// read excel file
 	    		ArrayList<SpreadSheetCellDAO[]> excelContent = new ArrayList<>();
 	    		SpreadSheetCellDAO[] currentRow =(SpreadSheetCellDAO[]) officeReader.getNext();
-	   
+
 	    		while (currentRow!=null) {
 	    			excelContent.add(currentRow);
 	    			currentRow = (SpreadSheetCellDAO[]) officeReader.getNext();
-	    		
+
 	    		}
-	    		
+
 	    		assertEquals(7,excelContent.size(),"7 rows (including header) read");
 	    		// configure converter
 	    		SimpleDateFormat dateFormat = (SimpleDateFormat)DateFormat.getDateInstance(DateFormat.SHORT, Locale.US);
@@ -202,35 +202,35 @@ public class ExcelConverterSimpleSpreadSheetCellDAOTest {
 	    		assertEquals((int)10000,simpleRow6[7], "H7 = 10000");
 	    		assertEquals(10L,simpleRow6[8], "I6 = 10");
 	    }
-	    
-	    
+
+
 	    @Test
 	    public void convertCaseTestDateTimeStamp() throws FileNotFoundException, FormatNotUnderstoodException, ParseException {
 	    	ClassLoader classLoader = getClass().getClassLoader();
 			String fileName="datetimestamp.xlsx";
-			String fileNameSpreadSheet=classLoader.getResource(fileName).getFile();	
+			String fileNameSpreadSheet=classLoader.getResource(fileName).getFile();
     			File file = new File(fileNameSpreadSheet);
 	    		HadoopOfficeReadConfiguration hocr = new HadoopOfficeReadConfiguration();
 	    		hocr.setFileName(fileName);
 	    		hocr.setMimeType("ms-excel");
 	    		hocr.setLocale(Locale.GERMAN);
-	    		OfficeReader officeReader = new OfficeReader(new FileInputStream(file), hocr);  
+	    		OfficeReader officeReader = new OfficeReader(new FileInputStream(file), hocr);
 	    		officeReader.parse();
 	    		// read excel file
 	    		ArrayList<SpreadSheetCellDAO[]> excelContent = new ArrayList<>();
 	    		SpreadSheetCellDAO[] currentRow =(SpreadSheetCellDAO[]) officeReader.getNext();
-	   
+
 	    		while (currentRow!=null) {
 	    			excelContent.add(currentRow);
 	    			currentRow = (SpreadSheetCellDAO[]) officeReader.getNext();
-	    		
+
 	    		}
-	    		
+
 	    		assertEquals(5,excelContent.size(),"5 rows (including header) read");
 	    		// configure converter
 	    		SimpleDateFormat dateFormat = (SimpleDateFormat)DateFormat.getDateInstance(DateFormat.SHORT, Locale.US);
 	    		SimpleDateFormat timeStampFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-	    		
+
 	    		DecimalFormat decimalFormat = (DecimalFormat) DecimalFormat.getInstance(Locale.GERMAN);
 	    		ExcelConverterSimpleSpreadSheetCellDAO converter = new ExcelConverterSimpleSpreadSheetCellDAO(dateFormat,decimalFormat,timeStampFormat);
 	    		///// auto detect schema (skip header)
@@ -239,7 +239,7 @@ public class ExcelConverterSimpleSpreadSheetCellDAOTest {
 	    		}
 	    		GenericDataType[] schema = converter.getSchemaRow();
 	    		// check schema
-	    		
+
 	    		assertEquals(3,schema.length,"File contains three columns");
 	    		assertTrue(schema[0] instanceof GenericDateDataType, "First column is a date");
 	    		//assertFalse(((GenericDateDataType)schema[0]).getIncludeTime(),"First column does not contain time data");
@@ -252,7 +252,7 @@ public class ExcelConverterSimpleSpreadSheetCellDAOTest {
 	    		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 	    		SimpleDateFormat sdfTime =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	    		// check data (skip row 0, because it contains header)
-	    
+
 	    		Object[] simpleRow1 = converter.getDataAccordingToSchema(excelContent.get(1));
 	    		assertEquals(sdf.parse("2018-08-07"),simpleRow1[0],"A2 = 2018-08-07");
 	    		assertEquals(sdfTime.parse("2018-08-07 12:00:00"),simpleRow1[1],"B2 = 2018-08-07 12:00:00");
@@ -271,11 +271,11 @@ public class ExcelConverterSimpleSpreadSheetCellDAOTest {
 	    		assertEquals(sdf.parse("1999-12-31"),simpleRow4[0],"A5 = 1999-12-31");
 	    		assertEquals(sdfTime.parse("1999-12-31 00:00:00"),simpleRow4[1],"B5 = 1999-12-31 00:00:00");
 	    		assertEquals(Timestamp.valueOf("1999-12-31 23:59:59.003"),simpleRow4[2],"C4 = 1999-12-31 23:59:59.003");
-	    		
-	    	
+
+
 	    }
-	    
-	    
+
+
 	    @Test
 	    public void getSpreadSheetCellDAOfromSimpleDataType() throws ParseException {
 		    	// configure converter
@@ -348,21 +348,21 @@ public class ExcelConverterSimpleSpreadSheetCellDAOTest {
 	    		assertEquals("L1",actual[11].getAddress(),"Address is correct");
 	    		assertNull(actual[12],"Null values stay null");
 	    }
-	    
-	    
+
+
 	    /**
 	     * https://github.com/ZuInnoTe/hadoopoffice/issues/42
-	     * 
+	     *
 	     * Numbers in scientific notations are converted correctly
-	     * 
+	     *
 	     */
 	    @Test
 	    public void testScientificNotation() {
-	
+
 	    	// configure converter
     		SimpleDateFormat dateFormat = (SimpleDateFormat)DateFormat.getDateInstance(DateFormat.SHORT, Locale.US);
     		SimpleDateFormat timeStampFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-    		
+
     		DecimalFormat decimalFormat = (DecimalFormat) DecimalFormat.getInstance(Locale.GERMAN);
     		ExcelConverterSimpleSpreadSheetCellDAO converter = new ExcelConverterSimpleSpreadSheetCellDAO(dateFormat,decimalFormat,timeStampFormat);
     		GenericDataType[] schema = new GenericDataType[2];
