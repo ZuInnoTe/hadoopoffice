@@ -53,7 +53,7 @@ libraryDependencies += "org.apache.flink" %% "flink-scala" % "1.10.3" % "provide
 libraryDependencies += "org.apache.flink" %% "flink-hadoop-compatibility" % "1.10.3" % "compile"
 
 
-libraryDependencies += "org.apache.flink" % "flink-shaded-hadoop2" % "2.7.5-10.0" % "provided"
+libraryDependencies += "org.apache.flink" % "flink-shaded-hadoop2" % "2.7.5-1.8.3" % "provided"
 libraryDependencies += "org.apache.flink" %% "flink-clients" % "1.10.3" % "it"
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.1.2" % "test,it"

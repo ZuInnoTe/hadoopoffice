@@ -50,7 +50,7 @@ libraryDependencies += "org.apache.flink" %% "flink-scala" % "1.10.3" % "provide
 // needed for writable serializer
 libraryDependencies += "org.apache.flink" %% "flink-hadoop-compatibility" % "1.10.3" % "compile"
 
-libraryDependencies += "org.apache.flink" % "flink-shaded-hadoop2" % "2.7.5-10.0" % "provided"
+libraryDependencies += "org.apache.flink" % "flink-shaded-hadoop2" % "2.7.5-1.8.3" % "provided"
 
 // following three libraries are only needed for digital signatures
 libraryDependencies += "org.bouncycastle" % "bcprov-ext-jdk15on" % "1.68" % "compile"
