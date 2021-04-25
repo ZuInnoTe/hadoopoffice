@@ -23,9 +23,11 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Locale.Builder;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,17 +35,17 @@ import org.apache.hadoop.conf.Configuration;
 
 /**
  * read the configuration for reading office files from a Hadoop configuration
- * 
+ *
  * @author Jörn Franke (zuinnote@gmail.com)
  *
  */
 public class HadoopOfficeReadConfiguration implements Serializable {
 	/**
-		 * 
+		 *
 		 */
 	private static final long serialVersionUID = 8028549445862365699L;
 	public static final String PREFIX_UNKNOWN_COL = "Col"; // only for reading headers, if a column does not have a name
-	public static final String CONF_MIMETYPE = "hadoopoffice.read.mimeType";
+	public static final String CONF_MIMETYPE = "hadoopoffice.read.mimetype";
 	public static final String CONF_SHEETS = "hadoopoffice.read.sheets";
 	public static final String CONF_LOCALE = "hadoopoffice.read.locale.bcp47";
 	public static final String CONF_LINKEDWB = "hadoopoffice.read.linkedworkbooks";
@@ -57,10 +59,10 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 																							// will be handed over to
 																							// the corresponding reader
 																							// which does the filtering!
-	public static final String CONF_LOWFOOTPRINT = "hadoopoffice.read.lowFootprint";
-	public static final String CONF_LOWFOOTPRINT_PARSER = "hadoopoffice.read.lowFootprint.parser";
-	public static final String CONF_LOWFOOTPRINT_STAX_CACHE = "hadoopoffice.read.lowFootprint.stax.sst.cache";
-	public static final String CONF_LOWFOOTPRINT_STAX_COMPRESS = "hadoopoffice.read.lowFootprint.stax.sst.compress";
+	public static final String CONF_LOWFOOTPRINT = "hadoopoffice.read.lowfootprint";
+	public static final String CONF_LOWFOOTPRINT_PARSER = "hadoopoffice.read.lowfootprint.parser";
+	public static final String CONF_LOWFOOTPRINT_STAX_CACHE = "hadoopoffice.read.lowfootprint.stax.sst.cache";
+	public static final String CONF_LOWFOOTPRINT_STAX_COMPRESS = "hadoopoffice.read.lowfootprint.stax.sst.compress";
 	public static final String CONF_CRYKEYSTOREFILE = "hadoopoffice.read.security.crypt.credential.keystore.file";
 	public static final String CONF_CRYKEYSTORETYPE = "hadoopoffice.read.security.crypt.credential.keystore.type";
 	public static final String CONF_CRYKEYSTOREPW = "hadoopoffice.read.security.crypt.credential.keystore.password";
@@ -75,24 +77,24 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 	public static final String CONF_SKIPLINESALLSHEETS = "hadoopoffice.read.sheet.skiplines.allsheets";
 	public static final String CONF_COLUMNNAMESREGEX = "hadoopoffice.read.header.column.names.regex";
 	public static final String CONF_COLUMNNAMESREPLACE = "hadoopoffice.read.header.column.names.replace";
-	public static final String CONF_EMULATECSV = "hadoopoffice.read.emulateCSV";
-	
-	public static final String CONF_SIMPLEDATEFORMAT = "hadoopoffice.read.simple.dateFormat";
+	public static final String CONF_EMULATECSV = "hadoopoffice.read.emulatecsv";
 
-	public static final String CONF_SIMPLEDATEPATTERN = "hadoopoffice.read.simple.datePattern";
+	public static final String CONF_SIMPLEDATEFORMAT = "hadoopoffice.read.simple.dateformat";
 
-	public static final String CONF_SIMPLEDATETIMEFORMAT = "hadoopoffice.read.simple.dateTimeFormat";
+	public static final String CONF_SIMPLEDATEPATTERN = "hadoopoffice.read.simple.datepattern";
 
-	public static final String CONF_SIMPLEDATETIMEPATTERN = "hadoopoffice.read.simple.dateTimePattern";
-	
-	public static final String CONF_SIMPLEDECIMALFORMAT = "hadoopoffice.read.simple.decimalFormat";
-	
-	
-	
-	
+	public static final String CONF_SIMPLEDATETIMEFORMAT = "hadoopoffice.read.simple.datetimeformat";
+
+	public static final String CONF_SIMPLEDATETIMEPATTERN = "hadoopoffice.read.simple.datetimepattern";
+
+	public static final String CONF_SIMPLEDECIMALFORMAT = "hadoopoffice.read.simple.decimalformat";
+
+
+
+
 	public static final String OPTION_LOWFOOTPRINT_PARSER_STAX = "stax"; // STAX parser uses pull mode meaning a real improvement for reading XML-based spreadsheet formats in low footprint mode
 	public static final String OPTION_LOWFOOTPRINT_PARSER_SAX = "sax"; // SAX parser uses push mode meaning despite low footprint mode a significant amount of data needs to be kept in memory
-	
+
 	public static final String DEFAULT_MIMETYPE = "";
 	public static final String DEFAULT_LOCALE = "";
 	public static final String DEFAULT_SHEETS = "";
@@ -106,7 +108,7 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 	public static final String DEFAULT_LOWFOOTPRINT_PARSER = HadoopOfficeReadConfiguration.OPTION_LOWFOOTPRINT_PARSER_STAX;
 	public static final int DEFAULT_LOWFOOTPRINT_STAX_CACHE = 10000;
 	public static final boolean DEFAULT_LOWFOOTPRINT_STAX_COMPRESS = false;
-	
+
 	public static final String DEFAULT_CRYKEYSTORETYPE = "JCEKS";
 	public static final String DEFAULT_CRYKEYSTOREPW = "";
 	public static final String DEFAULT_CRYKEYSTOREALIAS = "";
@@ -116,18 +118,18 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 	public static final String DEFAULT_SIGTRUSTFILE = "";
 	public static final String DEFAULT_SIGTRUSTTYPE = "JKS";
 	public static final String DEFAULT_SIGTRUSTPW = "";
-	
-	
-	
+
+
+
 	public static final boolean DEFAULT_READHEADER = false;
 	public static final boolean DEFAULT_HEADERIGNOREHEADERALLSHEETS = false;
 	public static final Integer DEFAULT_SKIPLINES = 0;
 	public static final boolean DEFAULT_SKIPLINESALLSHEETS = false;
-	
+
 	public static final String DEFAULT_COLUMNNAMESREGEX = "";
 	public static final String DEFAULT_COLUMNNAMESREPLACE = "";
 
-	
+
 	public static final String DEFAULT_SIMPLEDATEFORMAT = "US";
 
 	public static final String DEFAULT_SIMPLEDATEPATTERN = "";
@@ -135,12 +137,12 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 	public static final String DEFAULT_SIMPLEDATETIMEFORMAT = "US";
 
 	public static final String DEFAULT_SIMPLEDATETIMEPATTERN = "";
-	
+
 	public static final String DEFAULT_SIMPLEDECIMALFORMAT = "";
 	public static final boolean DEFAULT_EMULATECSV = false;
-	
-	
-	
+
+
+
 	private String fileName;
 	private String mimeType = null;
 	private String localeStrBCP47 = null;
@@ -177,7 +179,7 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 	private boolean emulateCSV;
 	/*
 	 * Create an empty configuration
-	 * 
+	 *
 	 */
 	public HadoopOfficeReadConfiguration() {
 		// create an empty configuration
@@ -239,16 +241,16 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 			decimallocale = new Locale.Builder().setLanguageTag(HadoopOfficeReadConfiguration.DEFAULT_SIMPLEDECIMALFORMAT).build();
 		}
 		this.setSimpleDecimalFormat((DecimalFormat) NumberFormat.getInstance(decimallocale));
-		
+
 		this.setX509CertificateChain(new HashSet<>());
 		this.setSstCacheSize(HadoopOfficeReadConfiguration.DEFAULT_LOWFOOTPRINT_STAX_CACHE);
 		this.setCompressSST(HadoopOfficeReadConfiguration.DEFAULT_LOWFOOTPRINT_STAX_COMPRESS);
-	
+
 	}
 
 	/**
 	 * Reasd HadoopOffice configuration from Hadoop configuration
-	 * 
+	 *
 	 * @param conf <ul>
 	 *            <li> hadoopoffice.read.mimeType: Mimetype of the document </li>
 	 *            <li> hadoopoffice.read.locale: Locale of the document (e.g. needed for
@@ -324,9 +326,9 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 	 *            <li>hadoopoffice.read.simple.decimalFormat: applies only to HadoopOffice components that use the Converter to convert SpreadSheetCellDAOs into simple Java objects. Describes the decimal format to interpret decimal numbers using the BCP47 notation. Leave it empty for using the systems locale. Default: "".</li>
      *            <li>hadoopoffice.read.emulateCSV (since 1.2.1): Simulates when reading Excel to interpret content as if the Excel would have been saved as CSV. Technically it is based on the [emulateCSV option of the DataFormatter](https://poi.apache.org/apidocs/dev/org/apache/poi/ss/usermodel/DataFormatter.html#DataFormatter-java.util.Locale-boolean-) in Apache POI. Default: false</li>
 	 *            </ul>
-	 * 
+	 *
 	 */
-	
+
 	public HadoopOfficeReadConfiguration(Configuration conf) {
 		this.mimeType = conf.get(HadoopOfficeReadConfiguration.CONF_MIMETYPE,
 				HadoopOfficeReadConfiguration.DEFAULT_MIMETYPE);
@@ -349,7 +351,7 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 				HadoopOfficeReadConfiguration.CONF_DECRYPTLINKEDWBBASE);
 		this.lowFootprint = conf.getBoolean(HadoopOfficeReadConfiguration.CONF_LOWFOOTPRINT,
 				HadoopOfficeReadConfiguration.DEFAULT_LOWFOOTPRINT);
-	
+
 		this.setCryptKeystoreFile(conf.get(HadoopOfficeReadConfiguration.CONF_CRYKEYSTOREFILE,
 				HadoopOfficeReadConfiguration.DEFAULT_CRYKEYSTOREFILE));
 		this.setCryptKeystoreType(conf.get(HadoopOfficeReadConfiguration.CONF_CRYKEYSTORETYPE,
@@ -375,12 +377,12 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 		this.setIgnoreHeaderInAllSheets(conf.getBoolean(HadoopOfficeReadConfiguration.CONF_HEADERIGNOREHEADERALLSHEETS, HadoopOfficeReadConfiguration.DEFAULT_HEADERIGNOREHEADERALLSHEETS));
 		this.setSkipLines(conf.getInt(HadoopOfficeReadConfiguration.CONF_SKIPLINES, HadoopOfficeReadConfiguration.DEFAULT_SKIPLINES));
 	    this.setSkipLinesAllSheets(conf.getBoolean(HadoopOfficeReadConfiguration.CONF_SKIPLINESALLSHEETS, HadoopOfficeReadConfiguration.DEFAULT_SKIPLINESALLSHEETS));
-		
+
 	    this.setColumnNameRegex(conf.get(HadoopOfficeReadConfiguration.CONF_COLUMNNAMESREGEX,HadoopOfficeReadConfiguration.DEFAULT_COLUMNNAMESREGEX));
 	    this.setColumnNameReplace(conf.get(HadoopOfficeReadConfiguration.CONF_COLUMNNAMESREPLACE,HadoopOfficeReadConfiguration.DEFAULT_COLUMNNAMESREPLACE));
 
 		// set date for simple format
-		Locale dateLocale = new Locale.Builder().setLanguageTag(conf.get(HadoopOfficeReadConfiguration.CONF_SIMPLEDATEFORMAT,HadoopOfficeReadConfiguration.DEFAULT_SIMPLEDATEFORMAT)).build();	
+		Locale dateLocale =   new Builder().setLanguageTag(conf.get(HadoopOfficeReadConfiguration.CONF_SIMPLEDATEFORMAT,HadoopOfficeReadConfiguration.DEFAULT_SIMPLEDATEFORMAT)).build();
 		this.setSimpleDateFormat((SimpleDateFormat) DateFormat.getDateInstance(DateFormat.SHORT, dateLocale));
 		// set dateTime for simple format
 
@@ -399,11 +401,11 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 		String decimaleStr = conf.get(HadoopOfficeReadConfiguration.CONF_SIMPLEDECIMALFORMAT,HadoopOfficeReadConfiguration.DEFAULT_SIMPLEDECIMALFORMAT);
 		Locale decimallocale = Locale.getDefault();
 		if (!"".equals(decimaleStr)){
-			decimallocale = new Locale.Builder().setLanguageTag(decimaleStr).build();
+			decimallocale = new Builder().setLanguageTag(decimaleStr).build();
 		}
 		this.setSimpleDecimalFormat((DecimalFormat) NumberFormat.getInstance(decimallocale));
 		this.setEmulateCSV(conf.getBoolean(HadoopOfficeReadConfiguration.CONF_EMULATECSV,HadoopOfficeReadConfiguration.DEFAULT_EMULATECSV));
-	    
+
 	    this.setX509CertificateChain(new HashSet<>());
 	    this.setSstCacheSize(conf.getInt(HadoopOfficeReadConfiguration.CONF_LOWFOOTPRINT_STAX_CACHE, HadoopOfficeReadConfiguration.DEFAULT_LOWFOOTPRINT_STAX_CACHE));
 	    this.setCompressSST(conf.getBoolean(HadoopOfficeReadConfiguration.CONF_LOWFOOTPRINT_STAX_COMPRESS, HadoopOfficeReadConfiguration.DEFAULT_LOWFOOTPRINT_STAX_COMPRESS));
@@ -418,10 +420,10 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 
 	/*
 	 * Set sheets
-	 * 
+	 *
 	 * @param sheets comma-separated list of sheets to take into account for
 	 * parsing, null if all should be taken into account
-	 * 
+	 *
 	 */
 	public void setSheets(String sheets) {
 		this.sheets = sheets;
@@ -429,7 +431,7 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 
 	/*
 	 * Returns the configured mimetype
-	 * 
+	 *
 	 */
 	public String getMimeType() {
 		return this.mimeType;
@@ -437,10 +439,10 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 
 	/*
 	 * Sets the configured mimetype
-	 * 
+	 *
 	 * @param mimetype MimeType
-	 * 
-	 * 
+	 *
+	 *
 	 */
 
 	public void setMimeType(String mimeType) {
@@ -449,9 +451,9 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 
 	/*
 	 * Locale used for interpreting values
-	 * 
+	 *
 	 * @return locale or null if the default locale should be used
-	 * 
+	 *
 	 */
 	public Locale getLocale() {
 		return this.locale;
@@ -459,9 +461,9 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 
 	/*
 	 * Set locale used for interpreting values
-	 * 
+	 *
 	 * @param locale locale or null if default locale should be used
-	 * 
+	 *
 	 */
 	public void setLocale(Locale locale) {
 		this.locale = locale;
@@ -469,7 +471,7 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 
 	/*
 	 * should linked workbooks be read
-	 * 
+	 *
 	 * @return true, if yes, false if not
 	 */
 	public boolean getReadLinkedWorkbooks() {
@@ -478,7 +480,7 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 
 	/**
 	 * Set if linked workbooks should be read
-	 * 
+	 *
 	 * @param readLinkedWorkbooks
 	 *            true if yes, false if not
 	 */
@@ -489,9 +491,9 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 
 	/*
 	 * Should missed linked workbooks be ignored or not
-	 * 
+	 *
 	 * @return true, if yes, false if not
-	 * 
+	 *
 	 */
 	public boolean getIgnoreMissingLinkedWorkbooks() {
 		return this.ignoreMissingLinkedWorkbooks;
@@ -499,10 +501,10 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 
 	/**
 	 * Set if missed linked workbooks should be ignored
-	 * 
+	 *
 	 * @param ignoreMissingLinkedWorkbooks
 	 *            true, if yes, false, if not
-	 * 
+	 *
 	 */
 
 	public void setIgnoreMissingLinkedWorkbooks(boolean ignoreMissingLinkedWorkbooks) {
@@ -511,9 +513,9 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 
 	/*
 	 * Password for file, if any
-	 * 
+	 *
 	 * @return password, or null if no password
-	 * 
+	 *
 	 */
 
 	public String getPassword() {
@@ -522,9 +524,9 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 
 	/*
 	 * Set the password
-	 * 
+	 *
 	 * @param password password
-	 * 
+	 *
 	 */
 	public void setPassword(String password) {
 		this.password = password;
@@ -532,7 +534,7 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 
 	/**
 	 * Meta data filter for filtering documents not part of the filter
-	 * 
+	 *
 	 * @return key/value map with filter values
 	 */
 	public Map<String, String> getMetaDataFilter() {
@@ -541,9 +543,9 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 
 	/*
 	 * Set meta data filer for filtering documents not part of the filter
-	 * 
+	 *
 	 * @param metadataFilter key/value map for filtering metadata
-	 * 
+	 *
 	 */
 
 	public void setMetaDataFilter(Map<String, String> metadataFilter) {
@@ -552,9 +554,9 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 
 	/*
 	 * Get credential map for linked workbooks
-	 * 
+	 *
 	 * @return credential map for linked workbooks
-	 * 
+	 *
 	 */
 
 	public Map<String, String> getLinkedWBCredentialMap() {
@@ -563,10 +565,10 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 
 	/*
 	 * Set the credential map for linked workbooks
-	 * 
-	 * 
+	 *
+	 *
 	 * @param linkedWBCredentialMap new credential map for linked workboooks
-	 * 
+	 *
 	 */
 
 	public void setLinkedWBCredentialMap(Map<String, String> linkedWBCredentialMap) {
@@ -576,7 +578,7 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 
 	/*
 	 * returns filename of the document to which the configuration belongs
-	 * 
+	 *
 	 * @return filename
 	 */
 	public String getFileName() {
@@ -585,8 +587,8 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 
 	/*
 	 * Sets the filename of the document to which this configuration belongs
-	 * 
-	 * 
+	 *
+	 *
 	 */
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
@@ -594,9 +596,9 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 
 	/*
 	 * Should files be read in low footprint mode or not
-	 * 
+	 *
 	 * @return true, if yes, false if not
-	 * 
+	 *
 	 */
 	public boolean getLowFootprint() {
 		return this.lowFootprint;
@@ -604,10 +606,10 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 
 	/**
 	 * Set if files should be read in low footprint mode or not
-	 * 
+	 *
 	 * @param lowFootprint
 	 *            true, if yes, false, if not
-	 * 
+	 *
 	 */
 
 	public void setLowFootprint(boolean lowFootprint) {
@@ -811,7 +813,7 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 	public void setLinkedWorkbookLocation(String linkedWorkbookLocation) {
 		this.linkedWorkbookLocation = linkedWorkbookLocation;
 	}
-	
+
 
 
 }

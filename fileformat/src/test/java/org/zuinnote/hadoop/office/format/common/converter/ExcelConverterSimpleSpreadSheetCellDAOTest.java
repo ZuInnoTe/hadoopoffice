@@ -126,8 +126,8 @@ public class ExcelConverterSimpleSpreadSheetCellDAOTest {
 	    		GenericDataType[] schema = converter.getSchemaRow();
 	    		// check schema
 	    		assertTrue(schema[0] instanceof GenericBigDecimalDataType, "First column is a decimal");
-	    		assertEquals(2,((GenericBigDecimalDataType)schema[0]).getPrecision(), "First column decimal has precision 2");
-	    		assertEquals(1,((GenericBigDecimalDataType)schema[0]).getScale(), "First column decimal has scale 1");
+	    		assertEquals(3,((GenericBigDecimalDataType)schema[0]).getPrecision(), "First column decimal has precision 2");
+	    		assertEquals(2,((GenericBigDecimalDataType)schema[0]).getScale(), "First column decimal has scale 1");
 	    		assertTrue(schema[1] instanceof GenericBooleanDataType, "Second column is a boolean");
 	    		assertTrue(schema[2] instanceof GenericDateDataType, "Third column is a date");
 	    		assertTrue(schema[3] instanceof GenericStringDataType, "Fourth column is a String");

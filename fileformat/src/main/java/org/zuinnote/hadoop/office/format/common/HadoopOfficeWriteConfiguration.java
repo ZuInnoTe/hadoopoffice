@@ -23,6 +23,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 
@@ -40,7 +41,7 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 	 *
 	 */
 	private static final long serialVersionUID = 4125629762320597440L;
-	public static final String CONF_MIMETYPE = "hadoopoffice.write.mimeType";
+	public static final String CONF_MIMETYPE = "hadoopoffice.write.mimetype";
 	public static final String CONF_LOCALE = "hadoopoffice.write.locale.bcp47";
 	public static final String CONF_LINKEDWB = "hadoopoffice.write.linkedworkbooks";
 	public static final String CONF_IGNOREMISSINGWB = "hadoopoffice.write.ignoremissinglinkedworkbooks";
@@ -60,8 +61,8 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 	public static final String CONF_TEMPLATE = "hadoopoffice.write.template.file";
 	public static final String CONF_TEMPLATEPW = "hadoopoffice.write.template.password";
 
-	public static final String CONF_LOWFOOTPRINT = "hadoopoffice.write.lowFootprint";
-	public static final String CONF_LOWFOOTPRINT_CACHEROWS = "hadoopoffice.write.lowFootprint.cacherows";
+	public static final String CONF_LOWFOOTPRINT = "hadoopoffice.write.lowfootprint";
+	public static final String CONF_LOWFOOTPRINT_CACHEROWS = "hadoopoffice.write.lowfootprint.cacherows";
 	public static final String CONF_CRYKEYSTOREFILE = "hadoopoffice.write.security.crypt.credential.keystore.file";
 	public static final String CONF_CRYKEYSTORETYPE = "hadoopoffice.write.security.crypt.credential.keystore.type";
 	public static final String CONF_CRYKEYSTOREPW = "hadoopoffice.write.security.crypt.credential.keystore.password";
@@ -72,22 +73,22 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 	public static final String CONF_SIGKEYSTOREPW = "hadoopoffice.write.security.sign.keystore.password";
 	public static final String CONF_SIGKEYSTOREALIAS = "hadoopoffice.write.security.sign.keystore.alias";
 	public static final String CONF_SIGHASH = "hadoopoffice.write.security.sign.hash.algorithm";
-	public static final String CONF_IGNORELINEBREAKS = "hadoopoffice.write.security.sign.ignoreLineBreaks";
+	public static final String CONF_IGNORELINEBREAKS = "hadoopoffice.write.security.sign.ignorelinebreaks";
 	public static final String CONF_WRITEHEADER = "hadoopoffice.write.header.write";
 
 
-	public static final String CONF_SIMPLEDATEFORMAT = "hadoopoffice.write.simple.dateFormat";
+	public static final String CONF_SIMPLEDATEFORMAT = "hadoopoffice.write.simple.dateformat";
 
-	public static final String CONF_SIMPLEDATEPATTERN = "hadoopoffice.write.simple.datePattern";
+	public static final String CONF_SIMPLEDATEPATTERN = "hadoopoffice.write.simple.datepattern";
 
-	public static final String CONF_SIMPLEDATETIMEFORMAT = "hadoopoffice.write.simple.dateTimeFormat";
+	public static final String CONF_SIMPLEDATETIMEFORMAT = "hadoopoffice.write.simple.datetimeformat";
 
-	public static final String CONF_SIMPLEDATETIMEPATTERN = "hadoopoffice.write.simple.dateTimePattern";
+	public static final String CONF_SIMPLEDATETIMEPATTERN = "hadoopoffice.write.simple.datetimepattern";
 
-	public static final String CONF_SIMPLEDECIMALFORMAT = "hadoopoffice.write.simple.decimalFormat";
+	public static final String CONF_SIMPLEDECIMALFORMAT = "hadoopoffice.write.simple.decimalformat";
 
 
-	public static final String CONF_SIMPLESPILLOVER = "hadoopoffice.write.simple.spillOverSheet";
+	public static final String CONF_SIMPLESPILLOVER = "hadoopoffice.write.simple.spilloversheet";
 
 
 	public static final String DEFAULT_MIMETYPE = "";

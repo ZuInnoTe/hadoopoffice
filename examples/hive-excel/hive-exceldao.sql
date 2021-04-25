@@ -6,7 +6,7 @@ use excel;
 
 -- create external table representing an Excel data stored in /user/office/files
 -- note: contrary to the normal Excel Serde each row in this Serde describes one cell in Excel, ie the table has 5 columns: formattedValue, comment, formula, address, sheetName
-(see: 
+(see:
 https://github.com/ZuInnoTe/hadoopoffice/blob/master/fileformat/src/main/java/org/zuinnote/hadoop/office/format/common/dao/SpreadSheetCellDAO.java)
 -- based on example file: https://github.com/ZuInnoTe/hadoopoffice/blob/master/fileformat/src/test/resources/excel2013test.xlsx?raw=true
 -- you can easily filter by any of the 5 characteristis of a cell
@@ -15,7 +15,7 @@ https://github.com/ZuInnoTe/hadoopoffice/blob/master/fileformat/src/main/java/or
 
 create external table ExcelDAOTable ROW FORMAT SERDE 'org.zuinnote.hadoop.excel.hive.daoserde.ExcelSpreadSheetCellDAOSerde' STORED AS INPUTFORMAT 'org.zuinnote.hadoop.office.format.mapred.ExcelCellFileInputFormat' OUTPUTFORMAT 'org.zuinnote.hadoop.excel.hive.outputformat.HiveExcelCellFileOutputFormat' LOCATION '/user/office/files' TBLPROPERTIES("hadoopoffice.read.locale.bcp47"="DE","hadoopoffice.write.locale.bcp47"="DE");
 
--- show schema 
+-- show schema
 describe ExcelDAOTable;
 
 -- get number of rows
@@ -26,7 +26,7 @@ select * from ExcelDAOTable LIMIT 10;
 
 
 -- store data as Excel
--- copies the cells from ExcelDAOTable. Note: it expects as source a table with 5 columns (formattedValue, comment, formula, address, sheetname) where each row corresponds to one Excel cell 
-create  table ExcelDAOOut ROW FORMAT SERDE 'org.zuinnote.hadoop.excel.hive.daoserde.ExcelSpreadSheetCellDAOSerde' STORED AS INPUTFORMAT 'org.zuinnote.hadoop.office.format.mapred.ExcelCellFileInputFormat' OUTPUTFORMAT 'org.zuinnote.hadoop.excel.hive.outputformat.HiveExcelCellFileOutputFormat' LOCATION '/user/office/output' TBLPROPERTIES("hadoopoffice.write.mimeType"="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "hadoopoffice.read.locale.bcp47"="DE","hadoopoffice.write.locale.bcp47"="DE")
-AS 
+-- copies the cells from ExcelDAOTable. Note: it expects as source a table with 5 columns (formattedValue, comment, formula, address, sheetname) where each row corresponds to one Excel cell
+create  table ExcelDAOOut ROW FORMAT SERDE 'org.zuinnote.hadoop.excel.hive.daoserde.ExcelSpreadSheetCellDAOSerde' STORED AS INPUTFORMAT 'org.zuinnote.hadoop.office.format.mapred.ExcelCellFileInputFormat' OUTPUTFORMAT 'org.zuinnote.hadoop.excel.hive.outputformat.HiveExcelCellFileOutputFormat' LOCATION '/user/office/output' TBLPROPERTIES("hadoopoffice.write.mimetype"="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "hadoopoffice.read.locale.bcp47"="DE","hadoopoffice.write.locale.bcp47"="DE")
+AS
 select * from ExcelDAOTable;

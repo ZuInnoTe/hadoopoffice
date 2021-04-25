@@ -126,7 +126,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 	public void tearDown() {
 	}
 
-	
+
 
 	@Test
 	public void readExcelInputFormatExcel2003Empty() throws IOException, InterruptedException {
@@ -539,7 +539,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		assertEquals("15", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormattedValue(),
 				"Input Split for Excel file contains row 6 with cell 3== \"15\"");
 	}
-	
+
 	@Test
 	public void readExcelCellInputFormatExcel2013SingleSheet() throws IOException, InterruptedException {
 		Configuration conf = new Configuration(defaultConf);
@@ -1024,7 +1024,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 				"Input Split for Excel file contains row 1 with cell 2 == \"5\"");
 
 	}
-	
+
 	@Test
 	public void readExcelInputFormatExcel2013LinkedWorkbookAlternativeLocation() throws IOException, InterruptedException {
 		Configuration conf = new Configuration(defaultConf);
@@ -1129,7 +1129,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 				"Input Split for Excel file contains row 1 with cell 2 == \"5\"");
 
 	}
-	
+
 	@Test
 	public void readExcelInputFormatExcel2003LinkedWorkbookAlternativeLocation() throws IOException, InterruptedException {
 		Configuration conf = new Configuration(defaultConf);
@@ -1450,7 +1450,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		assertEquals("Sheet2", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getSheetName(), "Correct sheet");
 		assertFalse(reader.nextKeyValue(), "Input Split for Excel file contains no further row");
 	}
-	
+
 	@Test
 	public void readExcelInputFormatExcel2013MultiSheetHeaderRegEx() throws IOException, InterruptedException {
 		Configuration conf = new Configuration(defaultConf);
@@ -1637,7 +1637,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		assertFalse(reader.nextKeyValue(), "Input Split for Excel file contains no further row");
 	}
 
-	
+
 
 	@Test
 	public void writeExcelOutputFormatExcel2013SingleSheet() throws IOException, InterruptedException {
@@ -1665,7 +1665,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -1778,7 +1778,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		// set generic outputformat settings
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// excel
 																														// format
 		// security
@@ -1891,7 +1891,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		conf.set("mapreduce.output.basename", fileName);
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// excel
 																														// format
 		// security
@@ -1969,7 +1969,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		conf.set("mapreduce.output.basename", fileName);
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.ms-excel"); // old excel format
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.ms-excel"); // old excel format
 		// security
 		// for the old Excel format you simply need to define only a password
 		conf.set("hadoopoffice.write.security.crypt.password", "test");
@@ -2074,7 +2074,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		conf.set("mapreduce.output.basename", fileName);
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.ms-excel"); // old excel format
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.ms-excel"); // old excel format
 		// security
 		// for the old Excel format you simply need to define only a password
 		conf.set("hadoopoffice.write.security.crypt.password", "test");
@@ -2138,7 +2138,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		conf.set("mapreduce.output.basename", fileName);
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -2258,7 +2258,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.ms-excel"); // old Excel format
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.ms-excel"); // old Excel format
 
 		// set all the meta data
 		conf.set("hadoopoffice.write.metadata.applicationname", "dummyapplicationname");
@@ -2370,7 +2370,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		conf.set("mapreduce.output.basename", fileName);
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -2478,7 +2478,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		conf.set("mapreduce.output.basename", fileName);
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.ms-excel"); // old Excel format
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.ms-excel"); // old Excel format
 
 		// set all the meta data
 		conf.set("hadoopoffice.write.metadata.applicationname", "dummyapplicationname");
@@ -2578,7 +2578,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		conf.set("mapreduce.output.basename", fileName);
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -2697,7 +2697,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		conf.set("mapreduce.output.basename", fileName);
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.ms-excel"); // old Excel format
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.ms-excel"); // old Excel format
 
 		// set all the meta data
 		conf.set("hadoopoffice.write.metadata.applicationname", "dummyapplicationname");
@@ -2808,7 +2808,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		conf.set("mapreduce.output.basename", fileName);
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -2917,7 +2917,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		conf.set("mapreduce.output.basename", fileName);
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.ms-excel"); // old Excel format
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.ms-excel"); // old Excel format
 
 		// set all the meta data
 		conf.set("hadoopoffice.write.metadata.applicationname", "dummyapplicationname");
@@ -3027,7 +3027,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		conf.set("mapreduce.output.fileoutputformat.compress.codec", "org.apache.hadoop.io.compress.GzipCodec");
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -3131,7 +3131,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		conf.set("mapreduce.output.basename", fileName);
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -3218,7 +3218,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		conf.set("mapreduce.output.basename", fileName);
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -3315,7 +3315,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		conf.set("mapreduce.output.basename", linkedWB1FileName);
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.ms-excel");
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.ms-excel");
 		conf.set(MRJobConfig.TASK_ATTEMPT_ID, attempt);
 		conf.setInt(MRJobConfig.APPLICATION_ATTEMPT_ID, 0);
 		conf.setInt(FileOutputCommitter.FILEOUTPUTCOMMITTER_ALGORITHM_VERSION, 1);
@@ -3351,7 +3351,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		conf.set("mapreduce.output.basename", mainWBfileName);
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.ms-excel");
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.ms-excel");
 		conf.set("hadoopoffice.write.linkedworkbooks", linkedWorkbookFilename);
 		conf.set(MRJobConfig.TASK_ATTEMPT_ID, attempt);
 		conf.setInt(MRJobConfig.APPLICATION_ATTEMPT_ID, 0);
@@ -3426,7 +3426,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		conf.set("mapreduce.output.basename", linkedWB1FileName);
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.ms-excel");
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.ms-excel");
 		conf.set(MRJobConfig.TASK_ATTEMPT_ID, attempt);
 		conf.setInt(MRJobConfig.APPLICATION_ATTEMPT_ID, 0);
 		conf.setInt(FileOutputCommitter.FILEOUTPUTCOMMITTER_ALGORITHM_VERSION, 1);
@@ -3463,7 +3463,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		conf.set("mapreduce.output.basename", linkedWB2FileName);
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.ms-excel");
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.ms-excel");
 		conf.set(MRJobConfig.TASK_ATTEMPT_ID, attempt);
 		conf.setInt(MRJobConfig.APPLICATION_ATTEMPT_ID, 0);
 		conf.setInt(FileOutputCommitter.FILEOUTPUTCOMMITTER_ALGORITHM_VERSION, 1);
@@ -3503,9 +3503,9 @@ public class OfficeFormatHadoopExcelNormalTest {
 		conf.set("mapreduce.output.basename", mainWBfileName);
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.ms-excel");
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.ms-excel");
 		conf.set("hadoopoffice.write.linkedworkbooks", linkedWorkbookFilename);
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.ms-excel");
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.ms-excel");
 		conf.set(MRJobConfig.TASK_ATTEMPT_ID, attempt);
 		conf.setInt(MRJobConfig.APPLICATION_ATTEMPT_ID, 0);
 		conf.setInt(FileOutputCommitter.FILEOUTPUTCOMMITTER_ALGORITHM_VERSION, 1);
@@ -3578,7 +3578,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		conf.set("mapreduce.output.basename", fileName);
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// excel
 																														// format
 		// template
@@ -3683,7 +3683,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		conf.set("mapreduce.output.basename", fileName);
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// excel
 																														// format
 		// template
@@ -3789,7 +3789,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// excel
 																														// format
 		// template
@@ -3936,7 +3936,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		// set generic outputformat settings
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// excel
 																														// format
 		// security
@@ -4057,7 +4057,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		// set generic outputformat settings
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// excel
 																														// format
 		// security
@@ -4152,7 +4152,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 				"Input Split for Excel file contains row 3 with cell 1 == \"3\"");
 	}
 
-	
+
 
 	@Disabled("We need to update the test certificate with certificate revocation lists (CRL)")
 	@Test
@@ -4182,7 +4182,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -4312,7 +4312,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -4396,7 +4396,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		// set generic outputformat settings
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// excel
 																														// format
 		// security
@@ -4523,7 +4523,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		// set generic outputformat settings
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// excel
 																														// format
 		// security
@@ -4604,7 +4604,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -4650,7 +4650,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		conf.set("mapreduce.output.basename", mainWBfileName);
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -4734,7 +4734,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		conf.set("mapreduce.output.basename", linkedWB1FileName);
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -4780,7 +4780,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		conf.set("mapreduce.output.basename", linkedWB2FileName);
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -4829,7 +4829,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		conf.set("mapreduce.output.basename", mainWBfileName);
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway

@@ -124,10 +124,10 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		job.set("hadoopoffice.read.locale.bcp47", "us");
 		job.set("hadoopoffice.read.header.read", "true");
 		job.set("hadoopoffice.read.header.skipheaderinallsheets", "true");
-		job.set("hadoopoffice.read.lowFootprint", "true");
+		job.set("hadoopoffice.read.lowfootprint", "true");
 
-		job.set("hadoopoffice.read.lowFootprint.parser", "sax");
-	
+		job.set("hadoopoffice.read.lowfootprint.parser", "sax");
+
 		ExcelFileInputFormat format = new ExcelFileInputFormat();
 		format.configure(job);
 		InputSplit[] inputSplits = format.getSplits(job, 1);
@@ -280,9 +280,9 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		job.set("hadoopoffice.read.header.skipheaderinallsheets", "true");
 		job.set("hadoopoffice.read.header.column.names.regex", "column");
 		job.set("hadoopoffice.read.header.column.names.replace", "spalte");
-		job.set("hadoopoffice.read.lowFootprint", "true");
+		job.set("hadoopoffice.read.lowfootprint", "true");
 
-		job.set("hadoopoffice.read.lowFootprint.parser", "sax");
+		job.set("hadoopoffice.read.lowfootprint.parser", "sax");
 		ExcelFileInputFormat format = new ExcelFileInputFormat();
 		format.configure(job);
 		InputSplit[] inputSplits = format.getSplits(job, 1);
@@ -312,9 +312,9 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		job.set("hadoopoffice.read.header.skipheaderinallsheets", "true");
 		job.set("hadoopoffice.read.sheet.skiplines.num", "5");
 		job.set("hadoopoffice.read.sheet.skiplines.allsheets", "true");
-		job.set("hadoopoffice.read.lowFootprint", "true");
+		job.set("hadoopoffice.read.lowfootprint", "true");
 
-		job.set("hadoopoffice.read.lowFootprint.parser", "sax");
+		job.set("hadoopoffice.read.lowfootprint.parser", "sax");
 		ExcelFileInputFormat format = new ExcelFileInputFormat();
 		format.configure(job);
 		InputSplit[] inputSplits = format.getSplits(job, 1);
@@ -478,8 +478,8 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
 		// low footprint
-		job.set("hadoopoffice.write.lowFootprint", "true");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		job.set("hadoopoffice.write.lowfootprint", "true");
+		job.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -578,8 +578,8 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
 		// low footprint
-		job.set("hadoopoffice.write.lowFootprint", "true");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		job.set("hadoopoffice.write.lowfootprint", "true");
+		job.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -639,8 +639,8 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
 		// low footprint
-		job.set("hadoopoffice.write.lowFootprint", "true");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		job.set("hadoopoffice.write.lowfootprint", "true");
+		job.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -677,9 +677,9 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 
 		// low footprint
 
-		job.set("hadoopoffice.read.lowFootprint", "true");
+		job.set("hadoopoffice.read.lowfootprint", "true");
 
-		job.set("hadoopoffice.read.lowFootprint.parser", "sax");
+		job.set("hadoopoffice.read.lowfootprint.parser", "sax");
 		job.set("hadoopoffice.read.security.sign.verifysignature", "true");
 		ExcelFileInputFormat inputFormat = new ExcelFileInputFormat();
 		inputFormat.configure(job);
@@ -723,8 +723,8 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
 		// low footprint
-		job.set("hadoopoffice.write.lowFootprint", "true");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		job.set("hadoopoffice.write.lowfootprint", "true");
+		job.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -751,9 +751,9 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 
 		// low footprint
 
-		job.set("hadoopoffice.read.lowFootprint", "true");
+		job.set("hadoopoffice.read.lowfootprint", "true");
 
-		job.set("hadoopoffice.read.lowFootprint.parser", "sax");
+		job.set("hadoopoffice.read.lowfootprint.parser", "sax");
 		job.set("hadoopoffice.read.security.sign.verifysignature", "true"); // will fail no signature provided
 		ExcelFileInputFormat inputFormat = new ExcelFileInputFormat();
 		inputFormat.configure(job);
@@ -792,8 +792,8 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		job.set("hadoopoffice.read.locale.bcp47", "de");
 
 		// low footprint
-		job.set("hadoopoffice.write.lowFootprint", "true");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		job.set("hadoopoffice.write.lowfootprint", "true");
+		job.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// excel
 																														// format
 		// security
@@ -897,8 +897,8 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		job.set("hadoopoffice.read.locale.bcp47", "de");
 
 		// low footprint
-		job.set("hadoopoffice.write.lowFootprint", "true");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		job.set("hadoopoffice.write.lowfootprint", "true");
+		job.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// excel
 																														// format
 		// security
@@ -950,7 +950,7 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
 		// low footprint
-		job.set("hadoopoffice.read.lowFootprint", "true");
+		job.set("hadoopoffice.read.lowfootprint", "true");
 		ExcelFileInputFormat format = new ExcelFileInputFormat();
 		format.configure(job);
 		InputSplit[] inputSplits = format.getSplits(job, 1);
@@ -1023,7 +1023,7 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		job.set("hadoopoffice.read.locale.bcp47", "de");
 
 		// low footprint
-		job.set("hadoopoffice.read.lowFootprint", "true");
+		job.set("hadoopoffice.read.lowfootprint", "true");
 		ExcelFileInputFormat format = new ExcelFileInputFormat();
 		format.configure(job);
 		InputSplit[] inputSplits = format.getSplits(job, 1);
@@ -1121,9 +1121,9 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		job.set("hadoopoffice.read.locale.bcp47", "de");
 
 		// low footprint
-		job.set("hadoopoffice.read.lowFootprint", "true");
+		job.set("hadoopoffice.read.lowfootprint", "true");
 
-		job.set("hadoopoffice.read.lowFootprint.parser", "sax");
+		job.set("hadoopoffice.read.lowfootprint.parser", "sax");
 		ExcelFileInputFormat format = new ExcelFileInputFormat();
 		format.configure(job);
 		InputSplit[] inputSplits = format.getSplits(job, 1);
@@ -1210,8 +1210,8 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
 		// low footprint
-		job.set("hadoopoffice.write.lowFootprint", "true");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		job.set("hadoopoffice.write.lowfootprint", "true");
+		job.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -1300,8 +1300,8 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		job.set("hadoopoffice.read.locale.bcp47", "de");
 
 		// low footprint
-		job.set("hadoopoffice.write.lowFootprint", "true");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		job.set("hadoopoffice.write.lowfootprint", "true");
+		job.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// excel
 																														// format
 		// security
@@ -1393,8 +1393,8 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		job.set("hadoopoffice.read.locale.bcp47", "de");
 
 		// low footprint
-		job.set("hadoopoffice.write.lowFootprint", "true");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		job.set("hadoopoffice.write.lowfootprint", "true");
+		job.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// excel
 																														// format
 		// security
@@ -1444,9 +1444,9 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
 		// low footprint
-		job.set("hadoopoffice.read.lowFootprint", "true");
+		job.set("hadoopoffice.read.lowfootprint", "true");
 
-		job.set("hadoopoffice.read.lowFootprint.parser", "sax");
+		job.set("hadoopoffice.read.lowfootprint.parser", "sax");
 		ExcelFileInputFormat format = new ExcelFileInputFormat();
 		format.configure(job);
 		InputSplit[] inputSplits = format.getSplits(job, 1);
@@ -1544,7 +1544,7 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		job.set("hadoopoffice.read.locale.bcp47", "de");
 
 		// low footprint
-		job.set("hadoopoffice.read.lowFootprint", "true");
+		job.set("hadoopoffice.read.lowfootprint", "true");
 		// for decryption simply set the password
 		job.set("hadoopoffice.read.security.crypt.password", "test");
 		ExcelFileInputFormat format = new ExcelFileInputFormat();
@@ -1582,9 +1582,9 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
 		// low footprint
-		job.set("hadoopoffice.read.lowFootprint", "true");
+		job.set("hadoopoffice.read.lowfootprint", "true");
 
-		job.set("hadoopoffice.read.lowFootprint.parser", "sax");
+		job.set("hadoopoffice.read.lowfootprint.parser", "sax");
 		// for decryption simply set the password
 		job.set("hadoopoffice.read.security.crypt.password", "test");
 		ExcelFileInputFormat format = new ExcelFileInputFormat();
@@ -1622,9 +1622,9 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
 		// low footprint
-		job.set("hadoopoffice.read.lowFootprint", "true");
+		job.set("hadoopoffice.read.lowfootprint", "true");
 
-		job.set("hadoopoffice.read.lowFootprint.parser", "sax");
+		job.set("hadoopoffice.read.lowfootprint.parser", "sax");
 		// for decryption simply set the password
 
 		job.set("hadoopoffice.read.security.crypt.password", "test2");
@@ -1636,7 +1636,7 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		assertNull(reader, "Null record reader implies invalid password");
 	}
 
-	
+
 	@Test
 	public void readExcelInputFormatExcel2003SingleSheetEncryptedNegativeLowFootprint() throws IOException {
 		JobConf job = new JobConf(defaultConf);
@@ -1649,7 +1649,7 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		job.set("hadoopoffice.read.locale.bcp47", "de");
 
 		// low footprint
-		job.set("hadoopoffice.read.lowFootprint", "true");
+		job.set("hadoopoffice.read.lowfootprint", "true");
 		// for decryption simply set the password
 		job.set("hadoopoffice.read.security.crypt.password", "test2");
 		ExcelFileInputFormat format = new ExcelFileInputFormat();
@@ -1672,9 +1672,9 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		job.set("hadoopoffice.read.locale.bcp47", "de");
 
 		// low footprint
-		job.set("hadoopoffice.read.lowFootprint", "true");
+		job.set("hadoopoffice.read.lowfootprint", "true");
 
-		job.set("hadoopoffice.read.lowFootprint.parser", "sax");
+		job.set("hadoopoffice.read.lowfootprint.parser", "sax");
 		ExcelFileInputFormat format = new ExcelFileInputFormat();
 		format.configure(job);
 		InputSplit[] inputSplits = format.getSplits(job, 1);
@@ -1731,8 +1731,8 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		job.set("hadoopoffice.read.locale.bcp47", "de");
 
 		// low footprint
-		job.set("hadoopoffice.read.lowFootprint", "true");
-		
+		job.set("hadoopoffice.read.lowfootprint", "true");
+
 		ExcelFileInputFormat format = new ExcelFileInputFormat();
 		format.configure(job);
 		InputSplit[] inputSplits = format.getSplits(job, 1);

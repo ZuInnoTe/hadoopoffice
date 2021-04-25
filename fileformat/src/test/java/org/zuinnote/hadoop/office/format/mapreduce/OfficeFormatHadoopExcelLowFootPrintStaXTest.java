@@ -121,7 +121,7 @@ public class OfficeFormatHadoopExcelLowFootPrintStaXTest {
 	@AfterEach
 	public void tearDown() {
 	}
-	
+
 	@Test
 	public void readExcelInputFormatExcel2013SingleSheetLowFootPrintStax() throws IOException, InterruptedException {
 		Configuration conf = new Configuration(defaultConf);
@@ -132,9 +132,9 @@ public class OfficeFormatHadoopExcelLowFootPrintStaXTest {
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
 		// low footprint
-		conf.set("hadoopoffice.read.lowFootprint", "true");
+		conf.set("hadoopoffice.read.lowfootprint", "true");
 		// stax parser
-		conf.set("hadoopoffice.read.lowFootprint.parser", "stax");
+		conf.set("hadoopoffice.read.lowfootprint.parser", "stax");
 		Job job = Job.getInstance(conf);
 		FileInputFormat.setInputPaths(job, file);
 		TaskAttemptContext context = new TaskAttemptContextImpl(conf, new TaskAttemptID());
@@ -209,7 +209,7 @@ public class OfficeFormatHadoopExcelLowFootPrintStaXTest {
 		assertEquals("15", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormattedValue(),
 				"Input Split for Excel file contains row 6 with cell 3== \"15\"");
 	}
-	
+
 	@Test
 	public void readExcelInputFormatExcel2013SingleSheetLowFootPrintStaxAllMemory() throws IOException, InterruptedException {
 		Configuration conf = new Configuration(defaultConf);
@@ -220,11 +220,11 @@ public class OfficeFormatHadoopExcelLowFootPrintStaXTest {
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
 		// low footprint
-		conf.set("hadoopoffice.read.lowFootprint", "true");
+		conf.set("hadoopoffice.read.lowfootprint", "true");
 		// stax parser
-		conf.set("hadoopoffice.read.lowFootprint.parser", "stax");
+		conf.set("hadoopoffice.read.lowfootprint.parser", "stax");
 		// all memory
-		conf.set("hadoopoffice.read.lowFootprint.stax.sst.cache", "-1");
+		conf.set("hadoopoffice.read.lowfootprint.stax.sst.cache", "-1");
 		Job job = Job.getInstance(conf);
 		FileInputFormat.setInputPaths(job, file);
 		TaskAttemptContext context = new TaskAttemptContextImpl(conf, new TaskAttemptID());
@@ -299,7 +299,7 @@ public class OfficeFormatHadoopExcelLowFootPrintStaXTest {
 		assertEquals("15", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormattedValue(),
 				"Input Split for Excel file contains row 6 with cell 3== \"15\"");
 	}
-	
+
 	@Test
 	public void readExcelInputFormatExcel2013SingleSheetLowFootPrintStaxNothingInMemory() throws IOException, InterruptedException {
 		Configuration conf = new Configuration(defaultConf);
@@ -310,11 +310,11 @@ public class OfficeFormatHadoopExcelLowFootPrintStaXTest {
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
 		// low footprint
-		conf.set("hadoopoffice.read.lowFootprint", "true");
+		conf.set("hadoopoffice.read.lowfootprint", "true");
 		// stax parser
-		conf.set("hadoopoffice.read.lowFootprint.parser", "stax");
+		conf.set("hadoopoffice.read.lowfootprint.parser", "stax");
 		// nothing memory
-		conf.set("hadoopoffice.read.lowFootprint.stax.sst.cache", "0");
+		conf.set("hadoopoffice.read.lowfootprint.stax.sst.cache", "0");
 		Job job = Job.getInstance(conf);
 		FileInputFormat.setInputPaths(job, file);
 		TaskAttemptContext context = new TaskAttemptContextImpl(conf, new TaskAttemptID());
@@ -389,7 +389,7 @@ public class OfficeFormatHadoopExcelLowFootPrintStaXTest {
 		assertEquals("15", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormattedValue(),
 				"Input Split for Excel file contains row 6 with cell 3== \"15\"");
 	}
-	
+
 	@Test
 	public void readExcelInputFormatExcel2013SingleSheetLowFootPrintStaxPartlyInMemory() throws IOException, InterruptedException {
 		Configuration conf = new Configuration(defaultConf);
@@ -400,11 +400,11 @@ public class OfficeFormatHadoopExcelLowFootPrintStaXTest {
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
 		// low footprint
-		conf.set("hadoopoffice.read.lowFootprint", "true");
+		conf.set("hadoopoffice.read.lowfootprint", "true");
 		// stax parser
-		conf.set("hadoopoffice.read.lowFootprint.parser", "stax");
-		// partly in memory 
-		conf.set("hadoopoffice.read.lowFootprint.stax.sst.cache", "2");
+		conf.set("hadoopoffice.read.lowfootprint.parser", "stax");
+		// partly in memory
+		conf.set("hadoopoffice.read.lowfootprint.stax.sst.cache", "2");
 		Job job = Job.getInstance(conf);
 		FileInputFormat.setInputPaths(job, file);
 		TaskAttemptContext context = new TaskAttemptContextImpl(conf, new TaskAttemptID());
@@ -479,7 +479,7 @@ public class OfficeFormatHadoopExcelLowFootPrintStaXTest {
 		assertEquals("15", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormattedValue(),
 				"Input Split for Excel file contains row 6 with cell 3== \"15\"");
 	}
-	
+
 	@Test
 	public void readExcelInputFormatExcel2013SingleSheetLowFootPrintStaxPartlyInMemoryCompressed() throws IOException, InterruptedException {
 		Configuration conf = new Configuration(defaultConf);
@@ -490,12 +490,12 @@ public class OfficeFormatHadoopExcelLowFootPrintStaXTest {
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
 		// low footprint
-		conf.set("hadoopoffice.read.lowFootprint", "true");
+		conf.set("hadoopoffice.read.lowfootprint", "true");
 		// stax parser
-		conf.set("hadoopoffice.read.lowFootprint.parser", "stax");
+		conf.set("hadoopoffice.read.lowfootprint.parser", "stax");
 		// partly in memory compressed
-		conf.set("hadoopoffice.read.lowFootprint.stax.sst.cache", "1");
-		conf.set("hadoopoffice.read.lowFootprint.stax.sst.compress", "true");
+		conf.set("hadoopoffice.read.lowfootprint.stax.sst.cache", "1");
+		conf.set("hadoopoffice.read.lowfootprint.stax.sst.compress", "true");
 		Job job = Job.getInstance(conf);
 		FileInputFormat.setInputPaths(job, file);
 		TaskAttemptContext context = new TaskAttemptContextImpl(conf, new TaskAttemptID());
@@ -570,7 +570,7 @@ public class OfficeFormatHadoopExcelLowFootPrintStaXTest {
 		assertEquals("15", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormattedValue(),
 				"Input Split for Excel file contains row 6 with cell 3== \"15\"");
 	}
-	
+
 	@Test
 	public void readExcelInputFormatExcel2013MultiSheetHeaderLowFootPrint() throws IOException, InterruptedException {
 		Configuration conf = new Configuration(defaultConf);
@@ -582,9 +582,9 @@ public class OfficeFormatHadoopExcelLowFootPrintStaXTest {
 		conf.set("hadoopoffice.locale.bcp47", "us");
 		conf.set("hadoopoffice.read.header.read", "true");
 		conf.set("hadoopoffice.read.header.skipheaderinallsheets", "true");
-		conf.set("hadoopoffice.read.lowFootprint", "true");
+		conf.set("hadoopoffice.read.lowfootprint", "true");
 
-		conf.set("hadoopoffice.read.lowFootprint.parser", "stax");
+		conf.set("hadoopoffice.read.lowfootprint.parser", "stax");
 		Job job = Job.getInstance(conf);
 		FileInputFormat.setInputPaths(job, file);
 		TaskAttemptContext context = new TaskAttemptContextImpl(conf, new TaskAttemptID());
@@ -730,7 +730,7 @@ public class OfficeFormatHadoopExcelLowFootPrintStaXTest {
 		assertEquals("Sheet2", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getSheetName(), "Correct sheet");
 		assertFalse(reader.nextKeyValue(), "Input Split for Excel file contains no further row");
 	}
-	
+
 	@Test
 	public void readExcelInputFormatExcel2013MultiSheetHeaderRegExLowFootprint() throws IOException, InterruptedException {
 		Configuration conf = new Configuration(defaultConf);
@@ -744,8 +744,8 @@ public class OfficeFormatHadoopExcelLowFootPrintStaXTest {
 		conf.set("hadoopoffice.read.header.skipheaderinallsheets", "true");
 		conf.set("hadoopoffice.read.header.column.names.regex","column");
 		conf.set("hadoopoffice.read.header.column.names.replace", "spalte");
-		conf.set("hadoopoffice.read.lowFootprint", "true");
-		conf.set("hadoopoffice.read.lowFootprint.parser", "stax");
+		conf.set("hadoopoffice.read.lowfootprint", "true");
+		conf.set("hadoopoffice.read.lowfootprint.parser", "stax");
 		Job job = Job.getInstance(conf);
 		FileInputFormat.setInputPaths(job, file);
 		TaskAttemptContext context = new TaskAttemptContextImpl(conf, new TaskAttemptID());
@@ -763,7 +763,7 @@ public class OfficeFormatHadoopExcelLowFootPrintStaXTest {
 		assertEquals("spalte3", ((ExcelRecordReader) reader).getOfficeReader().getCurrentParser().getHeader()[2],
 				" header column 3 correctly read");
 	}
-	
+
 	@Test
 	public void readExcelInputFormatExcel2013SingleSheetLowFootPrint() throws IOException, InterruptedException {
 		Configuration conf = new Configuration(defaultConf);
@@ -774,8 +774,8 @@ public class OfficeFormatHadoopExcelLowFootPrintStaXTest {
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
 		// low footprint
-		conf.set("hadoopoffice.read.lowFootprint", "true");
-		conf.set("hadoopoffice.read.lowFootprint.parser", "stax");
+		conf.set("hadoopoffice.read.lowfootprint", "true");
+		conf.set("hadoopoffice.read.lowfootprint.parser", "stax");
 		Job job = Job.getInstance(conf);
 		FileInputFormat.setInputPaths(job, file);
 		TaskAttemptContext context = new TaskAttemptContextImpl(conf, new TaskAttemptID());
@@ -850,7 +850,7 @@ public class OfficeFormatHadoopExcelLowFootPrintStaXTest {
 		assertEquals("15", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormattedValue(),
 				"Input Split for Excel file contains row 6 with cell 3== \"15\"");
 	}
-	
+
 	@Test
 	public void readExcelInputFormatExcel2013MultiSheetAllLowFootPrint() throws IOException, InterruptedException {
 		Configuration conf = new Configuration(defaultConf);
@@ -863,8 +863,8 @@ public class OfficeFormatHadoopExcelLowFootPrintStaXTest {
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
 
 		// low footprint
-		conf.set("hadoopoffice.read.lowFootprint", "true");
-		conf.set("hadoopoffice.read.lowFootprint.parser", "stax");
+		conf.set("hadoopoffice.read.lowfootprint", "true");
+		conf.set("hadoopoffice.read.lowfootprint.parser", "stax");
 		Job job = Job.getInstance(conf);
 		FileInputFormat.setInputPaths(job, file);
 		TaskAttemptContext context = new TaskAttemptContextImpl(conf, new TaskAttemptID());
@@ -961,7 +961,7 @@ public class OfficeFormatHadoopExcelLowFootPrintStaXTest {
 		assertEquals("seven", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormattedValue(),
 				"Input Split for Excel file contains row 9 with cell 3 == \"seven\"");
 	}
-	
+
 	@Test
 	public void readExcelInputFormatExcel2013SingleSheetEncryptedNegativeLowFootprint()
 			throws IOException, InterruptedException {
@@ -974,8 +974,8 @@ public class OfficeFormatHadoopExcelLowFootPrintStaXTest {
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
 
 		// low footprint
-		conf.set("hadoopoffice.read.lowFootprint", "true");
-		conf.set("hadoopoffice.read.lowFootprint.parser", "stax");
+		conf.set("hadoopoffice.read.lowfootprint", "true");
+		conf.set("hadoopoffice.read.lowfootprint.parser", "stax");
 		// for decryption simply set the password
 		conf.set("hadoopoffice.read.security.crypt.password", "test2");
 		Job job = Job.getInstance(conf);
@@ -1000,8 +1000,8 @@ public class OfficeFormatHadoopExcelLowFootPrintStaXTest {
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
 		// low footprint
-		conf.set("hadoopoffice.read.lowFootprint", "true");
-		conf.set("hadoopoffice.read.lowFootprint.parser", "stax");
+		conf.set("hadoopoffice.read.lowfootprint", "true");
+		conf.set("hadoopoffice.read.lowfootprint.parser", "stax");
 		// for decryption simply set the password
 		conf.set("hadoopoffice.read.security.crypt.password", "test");
 		Job job = Job.getInstance(conf);
@@ -1032,7 +1032,7 @@ public class OfficeFormatHadoopExcelLowFootPrintStaXTest {
 		assertEquals("test3", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormattedValue(),
 				"Input Split for Excel file contains row 1 with cell 3 == \"test3\"");
 	}
-	
+
 	@Test
 	public void readExcelInputFormatExcel2013EmptyRowsLowFootprint() throws IOException, InterruptedException {
 		Configuration conf = new Configuration(defaultConf);
@@ -1045,8 +1045,8 @@ public class OfficeFormatHadoopExcelLowFootPrintStaXTest {
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
 
 		// low footprint
-		conf.set("hadoopoffice.read.lowFootprint", "true");
-		conf.set("hadoopoffice.read.lowFootprint.parser", "stax");
+		conf.set("hadoopoffice.read.lowfootprint", "true");
+		conf.set("hadoopoffice.read.lowfootprint.parser", "stax");
 		Job job = Job.getInstance(conf);
 		FileInputFormat.setInputPaths(job, file);
 		TaskAttemptContext context = new TaskAttemptContextImpl(conf, new TaskAttemptID());
@@ -1105,7 +1105,7 @@ public class OfficeFormatHadoopExcelLowFootPrintStaXTest {
 		assertEquals("10", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormattedValue(),
 				"Input Split for Excel file contains row 6 with cell 3== \"10\"");
 	}
-	
+
 	@Test
 	public void writeExcelOutputFormatExcel2013SingleSheetLowFootprintSignedPositiveReadLowFootprint()
 			throws IOException, InterruptedException {
@@ -1129,8 +1129,8 @@ public class OfficeFormatHadoopExcelLowFootPrintStaXTest {
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
 
 		// low footprint
-		conf.set("hadoopoffice.write.lowFootprint", "true");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		conf.set("hadoopoffice.write.lowfootprint", "true");
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -1181,8 +1181,8 @@ public class OfficeFormatHadoopExcelLowFootPrintStaXTest {
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
 
 		// low footprint
-		conf.set("hadoopoffice.read.lowFootprint", "true");
-		conf.set("hadoopoffice.read.lowFootprint.parser", "stax");
+		conf.set("hadoopoffice.read.lowfootprint", "true");
+		conf.set("hadoopoffice.read.lowfootprint.parser", "stax");
 		conf.set("hadoopoffice.read.security.sign.verifysignature", "true");
 		ExcelFileInputFormat inputFormat = new ExcelFileInputFormat();
 		FileInputFormat.setInputPaths(job, inputFile);
@@ -1231,8 +1231,8 @@ public class OfficeFormatHadoopExcelLowFootPrintStaXTest {
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
 
 		// low footprint
-		conf.set("hadoopoffice.write.lowFootprint", "true");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		conf.set("hadoopoffice.write.lowfootprint", "true");
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -1274,8 +1274,8 @@ public class OfficeFormatHadoopExcelLowFootPrintStaXTest {
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
 
 		// low footprint
-		conf.set("hadoopoffice.read.lowFootprint", "true");
-		conf.set("hadoopoffice.read.lowFootprint.parser", "stax");
+		conf.set("hadoopoffice.read.lowfootprint", "true");
+		conf.set("hadoopoffice.read.lowfootprint.parser", "stax");
 		conf.set("hadoopoffice.read.security.sign.verifysignature", "true"); // will fail because no signature provided
 		ExcelFileInputFormat inputFormat = new ExcelFileInputFormat();
 		FileInputFormat.setInputPaths(job, inputFile);
@@ -1288,7 +1288,7 @@ public class OfficeFormatHadoopExcelLowFootPrintStaXTest {
 				"Exception is thrown in case signature cannot be verified");
 
 	}
-	
+
 	@Test
 	public void readExcelInputFormatExcel2013MultiSheetSkipWithHeaderLowFootprint()
 			throws IOException, InterruptedException {
@@ -1303,8 +1303,8 @@ public class OfficeFormatHadoopExcelLowFootPrintStaXTest {
 		conf.set("hadoopoffice.read.header.skipheaderinallsheets", "true");
 		conf.set("hadoopoffice.read.sheet.skiplines.num", "5");
 		conf.set("hadoopoffice.read.sheet.skiplines.allsheets", "true");
-		conf.set("hadoopoffice.read.lowFootprint", "true");
-		conf.set("hadoopoffice.read.lowFootprint.parser", "stax");
+		conf.set("hadoopoffice.read.lowfootprint", "true");
+		conf.set("hadoopoffice.read.lowfootprint.parser", "stax");
 		Job job = Job.getInstance(conf);
 		FileInputFormat.setInputPaths(job, file);
 		TaskAttemptContext context = new TaskAttemptContextImpl(conf, new TaskAttemptID());
@@ -1444,5 +1444,5 @@ public class OfficeFormatHadoopExcelLowFootPrintStaXTest {
 		// third sheet is skipped because it does not contain enough rows
 		assertFalse(reader.nextKeyValue(), "Input Split for Excel file contains no further row");
 	}
-	
+
 }

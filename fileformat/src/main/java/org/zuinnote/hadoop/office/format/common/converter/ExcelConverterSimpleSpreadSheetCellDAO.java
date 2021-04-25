@@ -57,7 +57,7 @@ import org.zuinnote.hadoop.office.format.common.util.msexcel.MSExcelUtil;
  */
 public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 3281344931609307423L;
 
@@ -71,7 +71,7 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 
 	/***
 	 * Create a new converter
-	 * 
+	 *
 	 * @param dateFormat    format of the dates in the Excel. This format is cloned in the constructor to avoid inferences.
 	 * @param decimalFormat format of the decimals in the Excel. This format is cloned in the constructor to avoid inferences.
 	 */
@@ -81,7 +81,7 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 
 	/***
 	 * Create a new converter
-	 * 
+	 *
 	 * @param dateFormat     format of the dates in the Excel. This format is cloned in the constructor to avoid inferences.
 	 * @param decimalFormat  format of the decimals in the Excel. This format is cloned in the constructor to avoid inferences.
 	 * @param dateTimeFormat format of date time cells in the Excel. This format is cloned in the constructor to avoid inferences.
@@ -101,7 +101,7 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 	 * This provides another sample to infer schema in form of simple datatypes
 	 * (e.g. boolean, byte etc.). You might add as many sample as necessary to get a
 	 * precise schema.
-	 * 
+	 *
 	 * @param dataRow
 	 */
 	public void updateSpreadSheetCellRowToInferSchemaInformation(SpreadSheetCellDAO[] dataRow) {
@@ -142,25 +142,25 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 						if (this.dateTimeFormat!=null) { // only if a format is specified
 							Date theDate = this.dateTimeFormat.parse(currentCellValue, new ParsePosition(0));
 							if (theDate !=null) { // we found indeed a date time
-								
+
 								dataTypeFound = true;
 								if (this.schemaRow.get(j) != null) { // check if previous assumption was date
 
 									if (!(this.schemaRow.get(j) instanceof GenericTimestampDataType)) {
 										// if not then the type needs to be set to string
 										this.schemaRow.set(j, new GenericStringDataType());
-									} 
+									}
 								} else { // we face this the first time
 									this.schemaRow.set(j, new GenericTimestampDataType());
-		
+
 								}
-								
+
 							}
 						}
 					}
 					 // check for timestamp using java.sql.Timestamp
 					if (!dataTypeFound) {
-						
+
 						try {
 							java.sql.Timestamp ts = java.sql.Timestamp.valueOf(currentCellValue);
 							dataTypeFound=true;
@@ -181,12 +181,12 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 								if (!(this.schemaRow.get(j) instanceof GenericDateDataType)) {
 									// if not then the type needs to be set to string
 									this.schemaRow.set(j, new GenericStringDataType());
-								} 
-								
+								}
+
 							} else { // we face this the first time
 								this.schemaRow.set(j, new GenericDateDataType());
 								// check if it has a time component
-								
+
 							}
 						}
 					}
@@ -194,7 +194,7 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 
 					BigDecimal bd = (BigDecimal) this.decimalFormat.parse(currentCellValue, new ParsePosition(0));
 					if ((!dataTypeFound) && (bd != null)) {
-						BigDecimal bdv = bd.stripTrailingZeros();
+						BigDecimal bdv = bd;
 
 						dataTypeFound = true;
 
@@ -216,7 +216,10 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 										// upgrade scale
 										GenericBigDecimalDataType gbd = ((GenericBigDecimalDataType) this.schemaRow
 												.get(j));
-										gbd.setScale(bdv.scale());
+										int newpre = gbd.getPrecision() + (bdv.scale()-gbd.getScale() );
+										
+								    gbd.setScale(bdv.scale());
+										gbd.setPrecision(newpre);
 										this.schemaRow.set(j, gbd);
 									} else if (bdv.precision() > ((GenericBigDecimalDataType) this.schemaRow.get(j))
 											.getPrecision()) {
@@ -224,8 +227,8 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 										// new precision is needed to extend to max scale
 										GenericBigDecimalDataType gbd = ((GenericBigDecimalDataType) this.schemaRow
 												.get(j));
-										int newpre = bdv.precision() + (gbd.getScale() - bdv.scale());
-										gbd.setPrecision(newpre);
+												int newpre = bdv.precision() + (gbd.getScale() - bdv.scale());
+												gbd.setPrecision(newpre);
 										this.schemaRow.set(j, gbd);
 									}
 								}
@@ -323,7 +326,7 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 
 	/**
 	 * Returns a list of objects corresponding to the schema.
-	 * 
+	 *
 	 * @return
 	 */
 	public GenericDataType[] getSchemaRow() {
@@ -336,7 +339,7 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 	 * Allows to set a custom schema. Note: the schema must have the the size of the
 	 * largest (expected) row in the Excel. In case you do not need a conversion set
 	 * the schema for the corresponding column to null
-	 * 
+	 *
 	 * @param schemaRow
 	 */
 	public void setSchemaRow(GenericDataType[] schemaRow) {
@@ -345,13 +348,13 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 
 	/**
 	 * Translate a data row according to the currently defined schema.
-	 * 
+	 *
 	 * @param dataRow cells containing data
 	 * @return an array of objects of primitive datatypes (boolean, int, byte, etc.)
 	 *         containing the data of datarow, null if dataRow does not fit into
 	 *         schema. Note: single elements can be null depending on the original
 	 *         Excel
-	 * 
+	 *
 	 */
 	public Object[] getDataAccordingToSchema(SpreadSheetCellDAO[] dataRow) {
 		if (dataRow == null) {
@@ -394,7 +397,7 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 							returnList.set(j, Boolean.valueOf(currentCell.getFormattedValue()));
 						}
 					}
-				} 
+				}
 				else if (applyDataType instanceof GenericTimestampDataType) {
 					if (!"".equals(currentCell.getFormattedValue())) {
 						boolean timestampFound=false;
@@ -407,7 +410,7 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 								returnList.set(j, null);
 								LOG.warn("Could not identify timestamp using Date.parse using provided dateTime format. Trying Timestamp.valueOf. Original value: "+currentCell.getFormattedValue());
 							}
-						} 
+						}
 						if (!timestampFound) {
 							try {
 								returnList.set(j, java.sql.Timestamp.valueOf(currentCell.getFormattedValue()));
@@ -421,19 +424,19 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 							Date theDate = this.dateFormat.parse(currentCell.getFormattedValue(), new ParsePosition(0));
 							if (theDate != null) {
 								returnList.set(j, new java.sql.Timestamp(theDate.getTime()));
-	
+
 							} else {
 								returnList.set(j, null);
 								LOG.warn("Could not identify timestamp using Date.parse using provided date format");
 							}
 						}
-					
+
 					}
 				}
 				else if (applyDataType instanceof GenericDateDataType) {
 					if (!"".equals(currentCell.getFormattedValue())) {
 						Date theDate = this.dateFormat.parse(currentCell.getFormattedValue(), new ParsePosition(0));
-						
+
 						if (theDate != null) {
 							returnList.set(j, theDate);
 
@@ -441,7 +444,7 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 							returnList.set(j, null);
 						}
 					}
-				} 
+				}
 
 				else if (applyDataType instanceof GenericNumericDataType) {
 					if (!"".equals(currentCell.getFormattedValue())) {
@@ -496,7 +499,7 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 	/***
 	 * Converts a row consisting of objects of simple data types (String, byte,
 	 * short, int, long, etc.) to a row of SpreadSheetCellDAO
-	 * 
+	 *
 	 * @param row
 	 * @param sheetName
 	 * @param rowNum

@@ -126,7 +126,7 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 	@AfterEach
 	public void tearDown() {
 	}
-	
+
 	@Test
 	public void readExcelInputFormatExcel2013MultiSheetHeaderLowFootPrint() throws IOException, InterruptedException {
 		Configuration conf = new Configuration(defaultConf);
@@ -138,9 +138,9 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		conf.set("hadoopoffice.locale.bcp47", "us");
 		conf.set("hadoopoffice.read.header.read", "true");
 		conf.set("hadoopoffice.read.header.skipheaderinallsheets", "true");
-		conf.set("hadoopoffice.read.lowFootprint", "true");
+		conf.set("hadoopoffice.read.lowfootprint", "true");
 
-		conf.set("hadoopoffice.read.lowFootprint.parser", "sax");
+		conf.set("hadoopoffice.read.lowfootprint.parser", "sax");
 		Job job = Job.getInstance(conf);
 		FileInputFormat.setInputPaths(job, file);
 		TaskAttemptContext context = new TaskAttemptContextImpl(conf, new TaskAttemptID());
@@ -286,7 +286,7 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		assertEquals("Sheet2", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getSheetName(), "Correct sheet");
 		assertFalse(reader.nextKeyValue(), "Input Split for Excel file contains no further row");
 	}
-	
+
 	@Test
 	public void readExcelInputFormatExcel2013MultiSheetHeaderRegExLowFootprint() throws IOException, InterruptedException {
 		Configuration conf = new Configuration(defaultConf);
@@ -300,8 +300,8 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		conf.set("hadoopoffice.read.header.skipheaderinallsheets", "true");
 		conf.set("hadoopoffice.read.header.column.names.regex","column");
 		conf.set("hadoopoffice.read.header.column.names.replace", "spalte");
-		conf.set("hadoopoffice.read.lowFootprint", "true");
-		conf.set("hadoopoffice.read.lowFootprint.parser", "sax");
+		conf.set("hadoopoffice.read.lowfootprint", "true");
+		conf.set("hadoopoffice.read.lowfootprint.parser", "sax");
 		Job job = Job.getInstance(conf);
 		FileInputFormat.setInputPaths(job, file);
 		TaskAttemptContext context = new TaskAttemptContextImpl(conf, new TaskAttemptID());
@@ -319,7 +319,7 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		assertEquals("spalte3", ((ExcelRecordReader) reader).getOfficeReader().getCurrentParser().getHeader()[2],
 				" header column 3 correctly read");
 	}
-	
+
 	@Test
 	public void readExcelInputFormatExcel2003SingleSheetLowFootPrint() throws IOException, InterruptedException {
 		Configuration conf = new Configuration(defaultConf);
@@ -330,7 +330,7 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
 		// low footprint
-		conf.set("hadoopoffice.read.lowFootprint", "true");
+		conf.set("hadoopoffice.read.lowfootprint", "true");
 		Job job = Job.getInstance(conf);
 		FileInputFormat.setInputPaths(job, file);
 		TaskAttemptContext context = new TaskAttemptContextImpl(conf, new TaskAttemptID());
@@ -418,7 +418,7 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
 
 		// low footprint
-		conf.set("hadoopoffice.read.lowFootprint", "true");
+		conf.set("hadoopoffice.read.lowfootprint", "true");
 		Job job = Job.getInstance(conf);
 		FileInputFormat.setInputPaths(job, file);
 		TaskAttemptContext context = new TaskAttemptContextImpl(conf, new TaskAttemptID());
@@ -526,8 +526,8 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
 		// low footprint
-		conf.set("hadoopoffice.read.lowFootprint", "true");
-		conf.set("hadoopoffice.read.lowFootprint.parser", "sax");
+		conf.set("hadoopoffice.read.lowfootprint", "true");
+		conf.set("hadoopoffice.read.lowfootprint.parser", "sax");
 		Job job = Job.getInstance(conf);
 		FileInputFormat.setInputPaths(job, file);
 		TaskAttemptContext context = new TaskAttemptContextImpl(conf, new TaskAttemptID());
@@ -615,8 +615,8 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
 
 		// low footprint
-		conf.set("hadoopoffice.read.lowFootprint", "true");
-		conf.set("hadoopoffice.read.lowFootprint.parser", "sax");
+		conf.set("hadoopoffice.read.lowfootprint", "true");
+		conf.set("hadoopoffice.read.lowfootprint.parser", "sax");
 		Job job = Job.getInstance(conf);
 		FileInputFormat.setInputPaths(job, file);
 		TaskAttemptContext context = new TaskAttemptContextImpl(conf, new TaskAttemptID());
@@ -727,8 +727,8 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
 
 		// low footprint
-		conf.set("hadoopoffice.read.lowFootprint", "true");
-		
+		conf.set("hadoopoffice.read.lowfootprint", "true");
+
 		// for decryption simply set the password
 		conf.set("hadoopoffice.read.security.crypt.password", "test");
 		Job job = Job.getInstance(conf);
@@ -772,7 +772,7 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
 
 		// low footprint
-		conf.set("hadoopoffice.read.lowFootprint", "true");
+		conf.set("hadoopoffice.read.lowfootprint", "true");
 		// for decryption simply set the password
 		conf.set("hadoopoffice.read.security.crypt.password", "test2");
 		Job job = Job.getInstance(conf);
@@ -799,8 +799,8 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
 
 		// low footprint
-		conf.set("hadoopoffice.read.lowFootprint", "true");
-		conf.set("hadoopoffice.read.lowFootprint.parser", "sax");
+		conf.set("hadoopoffice.read.lowfootprint", "true");
+		conf.set("hadoopoffice.read.lowfootprint.parser", "sax");
 		// for decryption simply set the password
 		conf.set("hadoopoffice.read.security.crypt.password", "test2");
 		Job job = Job.getInstance(conf);
@@ -826,8 +826,8 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
 		// low footprint
-		conf.set("hadoopoffice.read.lowFootprint", "true");
-		conf.set("hadoopoffice.read.lowFootprint.parser", "sax");
+		conf.set("hadoopoffice.read.lowfootprint", "true");
+		conf.set("hadoopoffice.read.lowfootprint.parser", "sax");
 		// for decryption simply set the password
 		conf.set("hadoopoffice.read.security.crypt.password", "test");
 		Job job = Job.getInstance(conf);
@@ -871,7 +871,7 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
 
 		// low footprint
-		conf.set("hadoopoffice.read.lowFootprint", "true");
+		conf.set("hadoopoffice.read.lowfootprint", "true");
 		Job job = Job.getInstance(conf);
 		FileInputFormat.setInputPaths(job, file);
 		TaskAttemptContext context = new TaskAttemptContextImpl(conf, new TaskAttemptID());
@@ -943,8 +943,8 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
 
 		// low footprint
-		conf.set("hadoopoffice.read.lowFootprint", "true");
-		conf.set("hadoopoffice.read.lowFootprint.parser", "sax");
+		conf.set("hadoopoffice.read.lowfootprint", "true");
+		conf.set("hadoopoffice.read.lowfootprint.parser", "sax");
 		Job job = Job.getInstance(conf);
 		FileInputFormat.setInputPaths(job, file);
 		TaskAttemptContext context = new TaskAttemptContextImpl(conf, new TaskAttemptID());
@@ -1032,8 +1032,8 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
 
 		// low footprint
-		conf.set("hadoopoffice.write.lowFootprint", "true");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		conf.set("hadoopoffice.write.lowfootprint", "true");
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -1149,8 +1149,8 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
 
 		// low footprint
-		conf.set("hadoopoffice.write.lowFootprint", "true");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		conf.set("hadoopoffice.write.lowfootprint", "true");
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// excel
 																														// format
 		// security
@@ -1266,8 +1266,8 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
 
 		// low footprint
-		conf.set("hadoopoffice.write.lowFootprint", "true");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		conf.set("hadoopoffice.write.lowfootprint", "true");
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// excel
 																														// format
 		// security
@@ -1322,7 +1322,7 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 				() -> reader.initialize(splits.get(0), context2), "Exception is thrown in case of wrong password");
 	}
 
-	
+
 
 	@Test
 	public void writeExcelOutputFormatExcel2013SingleSheetSignedPositive() throws IOException, InterruptedException {
@@ -1350,7 +1350,7 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 
 		// set locale to the one of the test data
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -1447,7 +1447,7 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		assertEquals("3", ((SpreadSheetCellDAO) spreadSheetValue.get()[0]).getFormattedValue(),
 				"Input Split for Excel file contains row 3 with cell 1 == \"3\"");
 	}
-	
+
 	@Test
 	public void writeExcelOutputFormatExcel2013SingleSheetLowFootprintSignedPositive()
 			throws IOException, InterruptedException {
@@ -1477,8 +1477,8 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
 
 		// low footprint
-		conf.set("hadoopoffice.write.lowFootprint", "true");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		conf.set("hadoopoffice.write.lowfootprint", "true");
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -1605,8 +1605,8 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
 
 		// low footprint
-		conf.set("hadoopoffice.write.lowFootprint", "true");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		conf.set("hadoopoffice.write.lowfootprint", "true");
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -1692,8 +1692,8 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
 
 		// low footprint
-		conf.set("hadoopoffice.write.lowFootprint", "true");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		conf.set("hadoopoffice.write.lowfootprint", "true");
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// excel
 																														// format
 		// security
@@ -1821,8 +1821,8 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
 
 		// low footprint
-		conf.set("hadoopoffice.write.lowFootprint", "true");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		conf.set("hadoopoffice.write.lowfootprint", "true");
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// excel
 																														// format
 		// security
@@ -1903,8 +1903,8 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
 
 		// low footprint
-		conf.set("hadoopoffice.write.lowFootprint", "true");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		conf.set("hadoopoffice.write.lowfootprint", "true");
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -1955,8 +1955,8 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
 
 		// low footprint
-		conf.set("hadoopoffice.read.lowFootprint", "true");
-		conf.set("hadoopoffice.read.lowFootprint.parser", "sax");
+		conf.set("hadoopoffice.read.lowfootprint", "true");
+		conf.set("hadoopoffice.read.lowfootprint.parser", "sax");
 		conf.set("hadoopoffice.read.security.sign.verifysignature", "true");
 		ExcelFileInputFormat inputFormat = new ExcelFileInputFormat();
 		FileInputFormat.setInputPaths(job, inputFile);
@@ -2006,8 +2006,8 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
 
 		// low footprint
-		conf.set("hadoopoffice.write.lowFootprint", "true");
-		conf.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		conf.set("hadoopoffice.write.lowfootprint", "true");
+		conf.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -2049,8 +2049,8 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		conf.set("hadoopoffice.read.locale.bcp47", "de");
 
 		// low footprint
-		conf.set("hadoopoffice.read.lowFootprint", "true");
-		conf.set("hadoopoffice.read.lowFootprint.parser", "sax");
+		conf.set("hadoopoffice.read.lowfootprint", "true");
+		conf.set("hadoopoffice.read.lowfootprint.parser", "sax");
 		conf.set("hadoopoffice.read.security.sign.verifysignature", "true"); // will fail because no signature provided
 		ExcelFileInputFormat inputFormat = new ExcelFileInputFormat();
 		FileInputFormat.setInputPaths(job, inputFile);
@@ -2063,7 +2063,7 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 				"Exception is thrown in case signature cannot be verified");
 
 	}
-	
+
 	@Test
 	public void readExcelInputFormatExcel2013MultiSheetSkipWithHeaderLowFootprint()
 			throws IOException, InterruptedException {
@@ -2078,8 +2078,8 @@ public class OfficeFormatHadoopExcelLowFootPrintSAXTest {
 		conf.set("hadoopoffice.read.header.skipheaderinallsheets", "true");
 		conf.set("hadoopoffice.read.sheet.skiplines.num", "5");
 		conf.set("hadoopoffice.read.sheet.skiplines.allsheets", "true");
-		conf.set("hadoopoffice.read.lowFootprint", "true");
-		conf.set("hadoopoffice.read.lowFootprint.parser", "sax");
+		conf.set("hadoopoffice.read.lowfootprint", "true");
+		conf.set("hadoopoffice.read.lowfootprint.parser", "sax");
 		Job job = Job.getInstance(conf);
 		FileInputFormat.setInputPaths(job, file);
 		TaskAttemptContext context = new TaskAttemptContextImpl(conf, new TaskAttemptID());

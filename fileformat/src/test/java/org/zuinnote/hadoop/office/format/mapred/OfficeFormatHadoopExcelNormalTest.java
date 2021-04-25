@@ -104,7 +104,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 							"Error temporary files in following path could not be deleted " + tmpPath, e);
 				}
 			}
-		})); 
+		}));
 		// workaround for Apache POI 4.0
 		System.setProperty("org.apache.xml.security.ignoreLineBreaks", "true");
 	}
@@ -469,7 +469,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		assertEquals("15", ((SpreadSheetCellDAO) spreadSheetValue.get()[2]).getFormattedValue(),
 				"Input Split for Excel file contains row 6 with cell 3== \"15\"");
 	}
-	
+
 	@Test
 	public void readExcelCellInputFormatExcel2013SingleSheet() throws IOException {
 		JobConf job = new JobConf(defaultConf);
@@ -541,7 +541,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 				"Input Split for Excel file contains row 6 with cell 3== \"15\"");
 		assertFalse(reader.next(spreadSheetKey, spreadSheetValue), "No further cells");
 
-	}		
+	}
 
 
 
@@ -876,7 +876,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 				"Input Split for Excel file contains row 1 with cell 2 == \"5\"");
 
 	}
-	
+
 	@Test
 	public void readExcelInputFormatExcel2013LinkedWorkbookAlternativeLocation() throws IOException {
 		JobConf job = new JobConf(defaultConf);
@@ -974,8 +974,8 @@ public class OfficeFormatHadoopExcelNormalTest {
 				"Input Split for Excel file contains row 1 with cell 2 == \"5\"");
 
 	}
-	
-	
+
+
 	@Test
 	public void readExcelInputFormatExcel2003LinkedWorkbook() throws IOException {
 		JobConf job = new JobConf(defaultConf);
@@ -1446,7 +1446,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		assertFalse(reader.next(spreadSheetKey, spreadSheetValue),
 				"Input Split for Excel file contains no further row");
 	}
-	
+
 
 
 	@Test
@@ -1474,7 +1474,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		job.set(JobContext.TASK_ATTEMPT_ID, attempt);
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		job.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -1561,7 +1561,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		job.set(JobContext.TASK_ATTEMPT_ID, attempt);
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		job.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// excel
 																														// format
 		// security
@@ -1651,7 +1651,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		job.set(JobContext.TASK_ATTEMPT_ID, attempt);
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		job.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// excel
 																														// format
 		// security
@@ -1715,7 +1715,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		job.set(JobContext.TASK_ATTEMPT_ID, attempt);
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.ms-excel"); // old excel format
+		job.set("hadoopoffice.write.mimetype", "application/vnd.ms-excel"); // old excel format
 		// security
 		// for the old Excel format you simply need to define only a password
 		job.set("hadoopoffice.write.security.crypt.password", "test");
@@ -1797,7 +1797,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		job.set(JobContext.TASK_ATTEMPT_ID, attempt);
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.ms-excel"); // old excel format
+		job.set("hadoopoffice.write.mimetype", "application/vnd.ms-excel"); // old excel format
 		// security
 		// for the old Excel format you simply need to define only a password
 		job.set("hadoopoffice.write.security.crypt.password", "test");
@@ -1845,7 +1845,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		job.set(JobContext.TASK_ATTEMPT_ID, attempt);
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		job.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -1946,7 +1946,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		job.set(JobContext.TASK_ATTEMPT_ID, attempt);
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.ms-excel"); // old Excel format
+		job.set("hadoopoffice.write.mimetype", "application/vnd.ms-excel"); // old Excel format
 
 		// set all the meta data
 		job.set("hadoopoffice.write.metadata.applicationname", "dummyapplicationname");
@@ -2039,7 +2039,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		job.set(JobContext.TASK_ATTEMPT_ID, attempt);
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		job.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -2131,7 +2131,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		job.set(JobContext.TASK_ATTEMPT_ID, attempt);
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.ms-excel"); // old Excel format
+		job.set("hadoopoffice.write.mimetype", "application/vnd.ms-excel"); // old Excel format
 
 		// set all the meta data
 		job.set("hadoopoffice.write.metadata.applicationname", "dummyapplicationname");
@@ -2215,7 +2215,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		job.set(JobContext.TASK_ATTEMPT_ID, attempt);
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		job.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -2316,7 +2316,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		job.set(JobContext.TASK_ATTEMPT_ID, attempt);
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.ms-excel"); // old Excel format
+		job.set("hadoopoffice.write.mimetype", "application/vnd.ms-excel"); // old Excel format
 
 		// set all the meta data
 		job.set("hadoopoffice.write.metadata.applicationname", "dummyapplicationname");
@@ -2409,7 +2409,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		job.set(JobContext.TASK_ATTEMPT_ID, attempt);
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		job.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -2501,7 +2501,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		job.set(JobContext.TASK_ATTEMPT_ID, attempt);
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.ms-excel"); // old Excel format
+		job.set("hadoopoffice.write.mimetype", "application/vnd.ms-excel"); // old Excel format
 
 		// set all the meta data
 		job.set("hadoopoffice.write.metadata.applicationname", "dummyapplicationname");
@@ -2676,7 +2676,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		job.set(JobContext.TASK_ATTEMPT_ID, attempt);
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		job.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// excel
 																														// format
 		// security
@@ -2772,7 +2772,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		job.set(JobContext.TASK_ATTEMPT_ID, attempt);
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		job.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// excel
 																														// format
 		// security
@@ -2870,7 +2870,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		job.set("mapreduce.output.fileoutputformat.compress.codec", "org.apache.hadoop.io.compress.GzipCodec");
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		job.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -2951,7 +2951,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		job.set(JobContext.TASK_ATTEMPT_ID, attempt);
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		job.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -3020,7 +3020,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		job.set(JobContext.TASK_ATTEMPT_ID, attempt);
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		job.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -3098,7 +3098,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		job.set(JobContext.TASK_ATTEMPT_ID, attempt);
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.ms-excel");
+		job.set("hadoopoffice.write.mimetype", "application/vnd.ms-excel");
 		ExcelFileOutputFormat outputFormat = new ExcelFileOutputFormat();
 		RecordWriter<NullWritable, SpreadSheetCellDAO> writer = outputFormat.getRecordWriter(null, job,
 				linkedWB1FileName, null);
@@ -3123,7 +3123,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		job.set(JobContext.TASK_ATTEMPT_ID, attempt);
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.ms-excel");
+		job.set("hadoopoffice.write.mimetype", "application/vnd.ms-excel");
 		job.set("hadoopoffice.write.linkedworkbooks", linkedWorkbookFilename);
 		outputFormat = new ExcelFileOutputFormat();
 		RecordWriter<NullWritable, SpreadSheetCellDAO> writerMain = outputFormat.getRecordWriter(null, job,
@@ -3181,7 +3181,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		job.set(JobContext.TASK_ATTEMPT_ID, attempt);
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.ms-excel");
+		job.set("hadoopoffice.write.mimetype", "application/vnd.ms-excel");
 		ExcelFileOutputFormat outputFormat = new ExcelFileOutputFormat();
 		RecordWriter<NullWritable, SpreadSheetCellDAO> writer = outputFormat.getRecordWriter(null, job,
 				linkedWB1FileName, null);
@@ -3206,7 +3206,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		job.set(JobContext.TASK_ATTEMPT_ID, attempt);
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.ms-excel");
+		job.set("hadoopoffice.write.mimetype", "application/vnd.ms-excel");
 		outputFormat = new ExcelFileOutputFormat();
 		writer = outputFormat.getRecordWriter(null, job, linkedWB2FileName, null);
 		assertNotNull(writer, "Format returned  null RecordWriter");
@@ -3233,7 +3233,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		job.set(JobContext.TASK_ATTEMPT_ID, attempt);
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.ms-excel");
+		job.set("hadoopoffice.write.mimetype", "application/vnd.ms-excel");
 		job.set("hadoopoffice.write.linkedworkbooks", linkedWorkbookFilename);
 		outputFormat = new ExcelFileOutputFormat();
 		RecordWriter<NullWritable, SpreadSheetCellDAO> writerMain = outputFormat.getRecordWriter(null, job,
@@ -3292,7 +3292,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		job.set(JobContext.TASK_ATTEMPT_ID, attempt);
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		job.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// excel
 																														// format
 		// template
@@ -3367,7 +3367,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		job.set(JobContext.TASK_ATTEMPT_ID, attempt);
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		job.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// excel
 																														// format
 		// template
@@ -3443,7 +3443,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		job.set(JobContext.TASK_ATTEMPT_ID, attempt);
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		job.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// excel
 																														// format
 		// template
@@ -3482,7 +3482,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		job.set(JobContext.TASK_ATTEMPT_ID, attempt);
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		job.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -3582,7 +3582,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		job.set(JobContext.TASK_ATTEMPT_ID, attempt);
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		job.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -3687,7 +3687,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		job.set(JobContext.TASK_ATTEMPT_ID, attempt);
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		job.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -3749,7 +3749,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		job.set(JobContext.TASK_ATTEMPT_ID, attempt);
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		job.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// excel
 																														// format
 		// security
@@ -3851,7 +3851,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		job.set(JobContext.TASK_ATTEMPT_ID, attempt);
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		job.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// excel
 																														// format
 		// security
@@ -3913,7 +3913,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		job.set(JobContext.TASK_ATTEMPT_ID, attempt);
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		job.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -3947,7 +3947,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		job.set(JobContext.TASK_ATTEMPT_ID, attempt);
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		job.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -4015,7 +4015,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		job.set(JobContext.TASK_ATTEMPT_ID, attempt);
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		job.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -4049,7 +4049,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		job.set(JobContext.TASK_ATTEMPT_ID, attempt);
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		job.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
@@ -4085,7 +4085,7 @@ public class OfficeFormatHadoopExcelNormalTest {
 		job.set(JobContext.TASK_ATTEMPT_ID, attempt);
 		// set locale to the one of the test data
 		job.set("hadoopoffice.read.locale.bcp47", "de");
-		job.set("hadoopoffice.write.mimeType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
+		job.set("hadoopoffice.write.mimetype", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); // new
 																														// Excel
 																														// format,
 																														// anyway
