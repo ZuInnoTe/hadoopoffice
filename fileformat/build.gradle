@@ -86,17 +86,17 @@ publishing {
 dependencies {
 
    // Apache POI (for Excel parsing)
-   compile("org.apache.poi:poi:5.0.0")
-   compile("org.apache.poi:poi-ooxml:5.0.0")
+   compile("org.apache.poi:poi:5.1.0")
+   compile("org.apache.poi:poi-ooxml:5.1.0")
    // for signing and verification of signatures
-    provided("org.bouncycastle:bcprov-ext-jdk15on:1.68")
-    provided("org.bouncycastle:bcpkix-jdk15on:1.68")
-    provided("org.apache.santuario:xmlsec:2.2.1")
+    provided("org.bouncycastle:bcprov-ext-jdk15on:1.69")
+    provided("org.bouncycastle:bcpkix-jdk15on:1.69")
+    provided("org.apache.santuario:xmlsec:2.2.3")
    // hadoop libraries
    provided("org.apache.hadoop:hadoop-common:3.3.0")
    provided("org.apache.hadoop:hadoop-mapreduce-client-common:3.3.0")
    // log4j2
-   provided("org.apache.logging.log4j:log4j-api:2.13.1")
+   provided("org.apache.logging.log4j:log4j-api:2.14.1")
    // test
    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.0'
 
