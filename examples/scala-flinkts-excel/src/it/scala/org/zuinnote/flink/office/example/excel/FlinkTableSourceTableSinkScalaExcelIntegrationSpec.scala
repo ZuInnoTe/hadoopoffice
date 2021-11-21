@@ -70,9 +70,12 @@ import org.zuinnote.hadoop.office.format.common._
 import org.zuinnote.flink.office.excel.ExcelFlinkTableSource
 
 import scala.collection.mutable.ArrayBuffer
-import org.scalatest.{FlatSpec, BeforeAndAfterAll, GivenWhenThen, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec;
+import org.scalatest._
+import matchers.should._
+import org.scalatest.{ BeforeAndAfterAll, GivenWhenThen }
 
-class FlinkTableSourceTableSinkScalaExcelIntegrationSpec extends FlatSpec with BeforeAndAfterAll with GivenWhenThen with Matchers {
+class FlinkTableSourceTableSinkScalaExcelIntegrationSpec extends AnyFlatSpec with BeforeAndAfterAll with GivenWhenThen with Matchers {
 private val appName: String = "example-flinktablesourcetablesink-integrationtest"
 private val tmpPrefix: String = "ho-integrationtest"
 private var tmpPath: java.nio.file.Path = _

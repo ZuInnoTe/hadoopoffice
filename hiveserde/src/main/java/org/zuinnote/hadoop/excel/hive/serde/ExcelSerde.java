@@ -267,6 +267,7 @@ public class ExcelSerde extends AbstractSerDe {
 		if ((arg0 == null) || (arg0 instanceof NullWritable)) {
 			return this.nullRow;
 		}
+
 		Object[] primitiveRow = this.readConverter
 				.getDataAccordingToSchema((SpreadSheetCellDAO[]) ((ArrayWritable) arg0).get());
 		// check if supported type and convert to hive type, if necessary
@@ -303,6 +304,7 @@ public class ExcelSerde extends AbstractSerDe {
 			case DATE:
 				if (primitiveRow[i] != null) {
 					boolean hiveNewDateClass=true;
+					
 					try {
 						Class.forName("org.apache.hadoop.hive.common.type.Date");
 					} catch(ClassNotFoundException e) {
@@ -314,7 +316,7 @@ public class ExcelSerde extends AbstractSerDe {
 					} else 	{
 						primitiveRow[i] = new java.sql.Date(((Date) primitiveRow[i]).getTime());
 						}
-				}
+				} 
 				break;
 			case DECIMAL:
 				if (primitiveRow[i] != null) {

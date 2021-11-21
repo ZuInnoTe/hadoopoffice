@@ -130,11 +130,11 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 	public static final String DEFAULT_COLUMNNAMESREPLACE = "";
 
 
-	public static final String DEFAULT_SIMPLEDATEFORMAT = "US";
+	public static final String DEFAULT_SIMPLEDATEFORMAT = "en";
 
 	public static final String DEFAULT_SIMPLEDATEPATTERN = "";
 
-	public static final String DEFAULT_SIMPLEDATETIMEFORMAT = "US";
+	public static final String DEFAULT_SIMPLEDATETIMEFORMAT = "en";
 
 	public static final String DEFAULT_SIMPLEDATETIMEPATTERN = "";
 
@@ -319,9 +319,9 @@ public class HadoopOfficeReadConfiguration implements Serializable {
 	 *            <li>hadoopoffice.read.sheet.skiplines.allsheets: skip number of rows configured using the previous option in all sheets.</li>
 	 *            <li>hadoopoffice.read.header.column.names.regex: regex to identify header names to be replaced (e.g. all dots in header names). Default: "" (no replacement)</li>
 	 *            <li>hadoopoffice.read.header.column.names.replace: string to replace all occurrences identified by hadoopoffice.read.header.column.names.regex in header names (e.g. replace by -). Default: "" (removal of identified occurrences)</li>
-	 *            <li>hadoopoffice.read.simple.dateFormat: applies only to HadoopOffice components that use the Converter to convert SpreadSheetCellDAOs into simple Java objects.  Describes the date format to interpret dates using the BCP47 notation. Note that even in non-US Excel versions Excel stores them most of the times internally in US format. Leave it empty for using the systems locale. Default: "US".</li>
+	 *            <li>hadoopoffice.read.simple.dateFormat: applies only to HadoopOffice components that use the Converter to convert SpreadSheetCellDAOs into simple Java objects.  Describes the date format to interpret dates using the BCP47 notation. Note that even in non-US Excel versions Excel stores them most of the times internally in US format. Leave it empty for using the systems locale. Default: "en".</li>
 	 *            <li>hadoopoffice.read.simple.datePattern: applies only to HadoopOffice components that use the Converter to convert SpreadSheetCellDAOs into simple Java objects. Overrides "hadoopoffice.read.simple.dateFormat" - describes a date pattern according to the pattern in SimpleDateFormat - you can define any pattern that dates have</li>
-	 *            <li>hadoopoffice.read.simple.dateTimeFormat: applies only to HadoopOffice components that use the Converter to convert SpreadSheetCellDAOs into simple Java objects. Describes the date/time format to interpret date/timestamps using the BCP47 notation. Leave it empty for using the systems locale. Default: "US". </li>
+	 *            <li>hadoopoffice.read.simple.dateTimeFormat: applies only to HadoopOffice components that use the Converter to convert SpreadSheetCellDAOs into simple Java objects. Describes the date/time format to interpret date/timestamps using the BCP47 notation. Leave it empty for using the systems locale. Default: "en". </li>
 	 *            <li>hadoopoffice.read.simple.dateTimePattern: applies only to HadoopOffice components that use the Converter to convert SpreadSheetCellDAOs into simple Java objects. Overrides "hadoopoffice.read.simple.dateTimeFormat" - describes a date/time pattern according to the pattern in SimpleDateFormat - you can define any pattern that date/time have. Defaults to java.sql.Timestamp, if not specified</li>
 	 *            <li>hadoopoffice.read.simple.decimalFormat: applies only to HadoopOffice components that use the Converter to convert SpreadSheetCellDAOs into simple Java objects. Describes the decimal format to interpret decimal numbers using the BCP47 notation. Leave it empty for using the systems locale. Default: "".</li>
      *            <li>hadoopoffice.read.emulateCSV (since 1.2.1): Simulates when reading Excel to interpret content as if the Excel would have been saved as CSV. Technically it is based on the [emulateCSV option of the DataFormatter](https://poi.apache.org/apidocs/dev/org/apache/poi/ss/usermodel/DataFormatter.html#DataFormatter-java.util.Locale-boolean-) in Apache POI. Default: false</li>

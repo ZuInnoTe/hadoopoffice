@@ -32,10 +32,10 @@ import org.zuinnote.hadoop.office.format.common.dao.*;
 
 
 import org.zuinnote.hadoop.office.format.common.dao.TextArrayWritable;
-
+import org.apache.log4j.Logger;
 public  class HadoopOfficeExcelMap  extends Mapper<Text, ArrayWritable, Text, TextArrayWritable> {
 private static final Text NULL = new Text(""); // ArrayWritable cannot handle nulls
-
+private Logger LOG = Logger.getLogger(HadoopOfficeExcelMap.class);
 
 
 @Override

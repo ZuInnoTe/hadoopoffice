@@ -47,7 +47,9 @@ public Excel2CSVDriver() {
 }
 
 public int run(String[] args) throws Exception {
-	 Job job = Job.getInstance(getConf(),"example-hadoopoffice-Excel2CSV-job");
+	 Job job = Job.getInstance();
+   job.setJobName("example-hadoopoffice-Excel2CSV-job");
+     
      job.setJarByClass(Excel2CSVDriver.class);     
      job.setMapOutputKeyClass(Text.class);
      job.setMapOutputValueClass(TextArrayWritable.class);
@@ -69,7 +71,7 @@ public int run(String[] args) throws Exception {
      Configuration conf = new Configuration();
    /** Set as an example some of the options to configure the HadoopOffice fileformat **/
      /** note this sets the locale to us-english, which means that numbers might be displayed differently then you expect. Change this to the locale of the Excel file **/
-     conf.set("hadoopoffice.read.locale.bcp47","us");
+     conf.set("hadoopoffice.read.locale.bcp47","en");
      int res = ToolRunner.run(conf, new Excel2CSVDriver(), args);
      System.exit(res);
  }

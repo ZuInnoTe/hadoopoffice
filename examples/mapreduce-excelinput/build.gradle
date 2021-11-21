@@ -41,6 +41,7 @@ repositories {
     mavenLocal()
 }
 
+
 jacocoTestReport {
     reports {
         xml.enabled true
@@ -88,28 +89,27 @@ sourceSets {
 
 dependencies {
    // hadoop lib for driver
-     provided("org.apache.hadoop:hadoop-client:3.3.0")
+     compileOnly("org.apache.hadoop:hadoop-client:3.3.0")
      // hadoopoffice library
-   compile("com.github.zuinnote:hadoopoffice-fileformat:1.5.0")
+   implementation("com.github.zuinnote:hadoopoffice-fileformat:1.6.0")
 
-       testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.0'
+       testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.8.1'
 
-   testRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.7.0'
-    testIntegrationRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.7.0'
-    testIntegrationRuntime group: 'org.junit.platform', name: 'junit-platform-console', version: '1.7.0'
-     testIntegrationCompile group: 'org.apache.hadoop', name: 'hadoop-minicluster', version: '3.3.0'
+   testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.8.1'
+testIntegrationImplementation("com.github.zuinnote:hadoopoffice-fileformat:1.6.0")
+// for integration testing we can only use 2.7.x, because higher versions of Hadoop have a bug in minidfs-cluster. Nevertheless, the library itself works also with higher Hadoop versions 
+// see https://issues.apache.org/jira/browse/HDFS-5328
+testIntegrationImplementation("org.apache.hadoop:hadoop-common:2.7.0")
+     testIntegrationImplementation("org.apache.hadoop:hadoop-client:2.7.0")
+       testIntegrationImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.8.1'
+    testIntegrationRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.8.1'
+    testIntegrationRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-console', version: '1.8.1'
+     testIntegrationImplementation group: 'org.apache.hadoop', name: 'hadoop-minicluster', version: '2.7.0'
 }
 
 
 
 
-uploadArchives {
-    repositories {
-       flatDir {
-           dirs 'repos'
-       }
-    }
-}
 
 test {
     testLogging.showStandardStreams = true
@@ -117,6 +117,7 @@ test {
 }
 
 task testIntegration(type: Test) {
+      testLogging.showStandardStreams = false
     testClassesDirs = sourceSets.testIntegration.output.classesDirs
     classpath = sourceSets.testIntegration.runtimeClasspath
     useJUnitPlatform()

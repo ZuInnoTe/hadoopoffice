@@ -434,6 +434,7 @@ public class ExcelConverterSimpleSpreadSheetCellDAO implements Serializable {
 					}
 				}
 				else if (applyDataType instanceof GenericDateDataType) {
+					LOG.info(currentCell.getFormattedValue());
 					if (!"".equals(currentCell.getFormattedValue())) {
 						Date theDate = this.dateFormat.parse(currentCell.getFormattedValue(), new ParsePosition(0));
 

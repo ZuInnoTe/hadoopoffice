@@ -118,11 +118,11 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 	public static final boolean DEFAULT_IGNORELINEBREAKS = false;
 	public static final boolean DEFAULT_WRITEHEADER = false;
 
-	public static final String DEFAULT_SIMPLEDATEFORMAT = "US";
+	public static final String DEFAULT_SIMPLEDATEFORMAT = "en";
 
 	public static final String DEFAULT_SIMPLEDATEPATTERN = "";
 
-	public static final String DEFAULT_SIMPLEDATETIMEFORMAT = "US";
+	public static final String DEFAULT_SIMPLEDATETIMEFORMAT = "en";
 
 	public static final String DEFAULT_SIMPLEDATETIMEPATTERN = "";
 
@@ -316,9 +316,9 @@ public class HadoopOfficeWriteConfiguration implements Serializable {
 	 * algorithm to hash. Note that some writers do not support all algorithms and
 	 * an exception will be thrown if the algorithm is not supported. See
 	 * corresponding writer documentation for supported algorithms.</li>
-	 *            <li>hadoopoffice.write.simple.dateFormat: applies only to HadoopOffice components that use the Converter to convert simple Java objects into SpreadSheetCellDAOs.  Describes the date format to interpret dates using the BCP47 notation. Note that even in non-US Excel versions Excel stores them most of the times internally in US format. Leave it empty for using the systems locale. Default: "US".</li>
+	 *            <li>hadoopoffice.write.simple.dateFormat: applies only to HadoopOffice components that use the Converter to convert simple Java objects into SpreadSheetCellDAOs.  Describes the date format to interpret dates using the BCP47 notation. Note that even in non-US Excel versions Excel stores them most of the times internally in US format. Leave it empty for using the systems locale. Default: "en".</li>
 	 *            <li>hadoopoffice.write.simple.datePattern: applies only to HadoopOffice components that use the Converter to convert simple Java objects into SpreadSheetCellDAOs. Overrides "hadoopoffice.write.simple.dateFormat" - describes a date pattern according to the pattern in SimpleDateFormat - you can define any pattern that dates have</li>
-	 *            <li>hadoopoffice.write.simple.dateTimeFormat: applies only to HadoopOffice components that use the Converter to convert simple Java objects into SpreadSheetCellDAOs. Describes the date/time format to interpret date/timestamps using the BCP47 notation. Leave it empty for using the systems locale. Default: "US". </li>
+	 *            <li>hadoopoffice.write.simple.dateTimeFormat: applies only to HadoopOffice components that use the Converter to convert simple Java objects into SpreadSheetCellDAOs. Describes the date/time format to interpret date/timestamps using the BCP47 notation. Leave it empty for using the systems locale. Default: "en". </li>
 	 *            <li>hadoopoffice.write.simple.dateTimePattern: applies only to HadoopOffice components that use the Converter to convert simple Java objects into SpreadSheetCellDAOs. Overrides "hadoopoffice.write.simple.dateTimeFormat" - describes a date/time pattern according to the pattern in SimpleDateFormat - you can define any pattern that date/time have. Defaults to java.sql.Timestamp, if not specified</li>
 	 *            <li>hadoopoffice.write.simple.decimalFormat: applies only to HadoopOffice components that use the Converter to convert simple Java objects into SpreadSheetCellDAOs. Describes the decimal format to interpret decimal numbers using the BCP47 notation. Leave it empty for using the systems locale. Default: "".</li>
 

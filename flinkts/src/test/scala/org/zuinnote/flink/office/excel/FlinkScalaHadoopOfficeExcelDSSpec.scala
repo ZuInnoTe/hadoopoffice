@@ -20,9 +20,13 @@
  */
 package org.zuinnote.flink.office.excel
 
-import org.scalatest.{ FlatSpec, BeforeAndAfterAll, GivenWhenThen, Matchers }
 
-class FlinkScalaHadoopOfficeExcelDSSpec extends FlatSpec with BeforeAndAfterAll with GivenWhenThen with Matchers {
+import org.scalatest.flatspec.AnyFlatSpec;
+import org.scalatest._
+import matchers.should._
+import org.scalatest.{ BeforeAndAfterAll, GivenWhenThen }
+
+class FlinkScalaHadoopOfficeExcelDSSpec extends AnyFlatSpec with BeforeAndAfterAll with GivenWhenThen with Matchers {
 
   override def beforeAll(): Unit = {
     super.beforeAll()
