@@ -36,24 +36,25 @@ assemblyMergeStrategy in assembly :=  {
     case x => MergeStrategy.first
 }
 
-libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.5.0" % "compile"
+libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.6.0" % "compile"
 
 // following three libraries are only needed for digital signatures
-libraryDependencies += "org.bouncycastle" % "bcprov-ext-jdk15on" % "1.68" % "compile"
-libraryDependencies += "org.bouncycastle" % "bcpkix-jdk15on" % "1.68" % "compile"
-libraryDependencies += "org.apache.santuario" % "xmlsec" % "2.2.1" % "compile"
+libraryDependencies += "org.bouncycastle" % "bcprov-ext-jdk15on" % "1.69" % "compile"
+libraryDependencies += "org.bouncycastle" % "bcpkix-jdk15on" % "1.69" % "compile"
+libraryDependencies += "org.apache.santuario" % "xmlsec" % "2.2.3" % "compile"
 
 libraryDependencies += "org.apache.spark" %% "spark-core" % "1.6.3" % "provided"
 
 libraryDependencies += "org.apache.spark" %% "spark-sql" % "1.6.3" % "provided"
 
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.1.2" % "test,it"
+
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.10" % "test,it"
 
 libraryDependencies += "javax.servlet" % "javax.servlet-api" % "3.0.1" % "it"
 
 
-libraryDependencies += "org.apache.hadoop" % "hadoop-common" % "2.7.5" % "it" classifier "" classifier "tests"
+libraryDependencies += "org.apache.hadoop" % "hadoop-common" % "2.7.0" % "it" classifier "" classifier "tests"
 
-libraryDependencies += "org.apache.hadoop" % "hadoop-hdfs" % "2.7.5" % "it" classifier "" classifier "tests"
+libraryDependencies += "org.apache.hadoop" % "hadoop-hdfs" % "2.7.0" % "it" classifier "" classifier "tests"
 
-libraryDependencies += "org.apache.hadoop" % "hadoop-minicluster" % "2.7.5" % "it"
+libraryDependencies += "org.apache.hadoop" % "hadoop-minicluster" % "2.7.0" % "it"
