@@ -29,11 +29,11 @@ assemblyShadeRules in assembly := Seq(
    ShadeRule.rename("org.apache.commons.compress.**" -> "hadoopoffice.shade.org.apache.commons.compress.@1").inAll
 )
 
-assemblyMergeStrategy in assembly :=  {
-    case PathList("META-INF/*.RSA", "META-INF/*.SF","META-INF/*.DSA") => MergeStrategy.discard
-    case "META-INF/services/org.apache.spark.sql.sources.DataSourceRegister" => MergeStrategy.concat
-    case x => MergeStrategy.first
 
+assemblyMergeStrategy in assembly := {
+  case PathList("META-INF","services",xs @ _*) => MergeStrategy.filterDistinctLines 
+  case PathList("META-INF",xs @ _*) => MergeStrategy.discard  
+  case _ => MergeStrategy.first
 }
 
 
