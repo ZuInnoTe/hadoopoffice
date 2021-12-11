@@ -82,8 +82,8 @@ publishing {
 dependencies {
 
    // Apache POI (for Excel parsing)
-   implementation("org.apache.poi:poi:5.1.0")
-   implementation("org.apache.poi:poi-ooxml:5.1.0")
+   implementation("org.apache.poi:poi:5.1.0")   exclude group: 'org.apache.logging.log4j' // exclude log4j2 until fixed
+   implementation("org.apache.poi:poi-ooxml:5.1.0")   exclude group: 'org.apache.logging.log4j' // exclude log4j2 until fixed
    // for signing and verification of signatures
     compileOnly("org.bouncycastle:bcprov-ext-jdk15on:1.69")
     compileOnly("org.bouncycastle:bcpkix-jdk15on:1.69")

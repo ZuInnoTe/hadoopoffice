@@ -53,7 +53,7 @@ assemblyMergeStrategy in assembly :=  {
 libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.6.1" % "compile" exclude("org.apache.xmlgraphics","batik-all")
 
 
-libraryDependencies += "com.github.zuinnote" % "hadoopoffice-flinkds" % "1.6.1" % "compile" exclude("org.apache.xmlgraphics","batik-all")
+libraryDependencies += "com.github.zuinnote" % "hadoopoffice-flinkds" % "1.6.1" % "compile" exclude("org.apache.xmlgraphics","batik-all") 
 
 // following three libraries are only needed for digital signatures
 libraryDependencies += "org.bouncycastle" % "bcprov-ext-jdk15to18" % "1.69" % "provided"

@@ -104,7 +104,7 @@ sourceSets {
 dependencies {
 
         // hadoopoffice library
-   implementation("com.github.zuinnote:hadoopoffice-fileformat:1.6.1")
+   implementation("com.github.zuinnote:hadoopoffice-fileformat:1.6.1") exclude group: 'org.apache.logging.log4j' // exclude log4j2 until fixed
     // hadoop lib for driver
     compileOnly("org.apache.hadoop:hadoop-client:3.3.0")
 
