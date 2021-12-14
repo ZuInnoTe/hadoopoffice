@@ -72,14 +72,14 @@ dependencies {
     // flink api
    compileOnly("org.apache.flink:flink-java:1.14.0")
    // log4j2
-   compileOnly("org.apache.logging.log4j:log4j-api:2.15.0")
+   compileOnly("org.apache.logging.log4j:log4j-api:2.16.0")
    // testing
     // hadoop lib for driver
      testImplementation("org.apache.hadoop:hadoop-client:3.3.0")
     // flink api
    testImplementation("org.apache.flink:flink-java:1.14.0")
    // log4j2
-   testImplementation("org.apache.logging.log4j:log4j-api:2.15.0")
+   testImplementation("org.apache.logging.log4j:log4j-api:2.16.0")
      testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.8.1'
  	 testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.8.1'
 }

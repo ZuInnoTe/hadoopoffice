@@ -92,7 +92,7 @@ dependencies {
    compileOnly("org.apache.hadoop:hadoop-common:3.3.0")
    compileOnly("org.apache.hadoop:hadoop-mapreduce-client-common:3.3.0")
    // log4j2
-   compileOnly("org.apache.logging.log4j:log4j-api:2.15.0")
+   compileOnly("org.apache.logging.log4j:log4j-api:2.16.0")
    // test
    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.8.1'
    // for signing and verification of signatures
@@ -103,7 +103,7 @@ dependencies {
    testImplementation("org.apache.hadoop:hadoop-common:3.3.0")
    testImplementation("org.apache.hadoop:hadoop-mapreduce-client-common:3.3.0")
    // log4j2
-   testImplementation("org.apache.logging.log4j:log4j-api:2.15.0")
+   testImplementation("org.apache.logging.log4j:log4j-api:2.16.0")
    testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.8.1'
    testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.8.1'
 }
