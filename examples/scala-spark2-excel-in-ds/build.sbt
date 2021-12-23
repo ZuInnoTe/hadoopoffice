@@ -34,7 +34,7 @@ assemblyMergeStrategy in assembly := {
 
 
 
-libraryDependencies += "com.github.zuinnote" %% "spark-hadoopoffice-ds" % "1.6.1" % "compile"
+libraryDependencies += "com.github.zuinnote" %% "spark-hadoopoffice-ds" % "1.6.2" % "compile"
 
 
 

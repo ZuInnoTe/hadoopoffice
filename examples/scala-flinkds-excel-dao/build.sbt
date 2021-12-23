@@ -36,9 +36,9 @@ fork  := true
 
 
 
-libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.6.1" % "compile"
+libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.6.2" % "compile"
 
-libraryDependencies += "com.github.zuinnote" % "hadoopoffice-flinkds" % "1.6.1" % "compile"
+libraryDependencies += "com.github.zuinnote" % "hadoopoffice-flinkds" % "1.6.2" % "compile"
 
 // woodstox core (needed for Flink to find the XMLParser)
 
