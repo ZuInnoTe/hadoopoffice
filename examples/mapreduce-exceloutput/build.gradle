@@ -114,6 +114,7 @@ testIntegrationImplementation("org.apache.hadoop:hadoop-common:2.7.0")
 
 
 test {
+    systemProperty "java.awt.headless", "true"
     testLogging.showStandardStreams = true
     useJUnitPlatform()
 }
