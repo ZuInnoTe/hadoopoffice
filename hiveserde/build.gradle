@@ -17,13 +17,13 @@ apply plugin: 'maven-publish'
 apply plugin: 'signing'
 apply plugin: 'jacoco'
 
-
+sourceCompatibility = 1.8
 compileJava.options.encoding = 'UTF-8'
 
 group = "com.github.zuinnote"
 archivesBaseName = "hadoopoffice-hiveserde"
 version = "1.6.2"
-
+ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
 
 shadowJar {
@@ -84,6 +84,30 @@ test {
     useJUnitPlatform()
 }
 
+
+javadoc.classpath += configurations.provided
+
+task hadoopOfficeJavaDocs(type: Jar) {
+  classifier = 'javadoc'
+  from javadoc
+}
+
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives shadowJar, hadoopOfficeJavaDocs, sourcesJar
+}
+
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
 sourceSets {
     main.compileClasspath += configurations.provided
     test.compileClasspath += configurations.provided
@@ -100,6 +124,18 @@ sourceSets {
 
 }
 
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId 'com.github.zuinnote'
+            artifactId 'hadoopoffice-hiveserde'
+            version '1.6.2'
+
+            from components.java
+        }
+    }
+}
 
 
 dependencies {
@@ -135,32 +171,3 @@ dependencies {
 	testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.8.1'
 }
 
-
-publishing {
-    publications {
-        maven(MavenPublication) {
-            groupId 'com.github.zuinnote'
-            artifactId 'hadoopoffice-hiveserde'
-            version '1.6.2'
-
-            from components.java
-        }
-    }
-}
-
-javadoc.classpath += configurations.provided
-
-task hadoopOfficeJavaDocs(type: Jar) {
-  classifier = 'javadoc'
-  from javadoc
-}
-
-
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-artifacts {
-    archives shadowJar, hadoopOfficeJavaDocs, sourcesJar
-}
