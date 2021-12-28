@@ -154,7 +154,7 @@ dependencies {
    compileOnly("org.apache.hive:hive-serde:3.1.2")
    compileOnly("org.apache.hive:hive-exec:3.1.2")
    // log4j2
-   compileOnly("org.apache.logging.log4j:log4j-api:2.17.0")
+   compileOnly("org.apache.logging.log4j:log4j-api:2.17.1")
    // test
    // bouncy castle (for signing etc.)
    // for signing and verification of signatures
@@ -165,7 +165,7 @@ dependencies {
    testImplementation("org.apache.hive:hive-serde:3.1.2")
    testImplementation("org.apache.hive:hive-exec:3.1.2")
    // log4j2
-   testImplementation("org.apache.logging.log4j:log4j-api:2.17.0")
+   testImplementation("org.apache.logging.log4j:log4j-api:2.17.1")
     testImplementation("org.apache.hive:hive-serde:3.1.2")
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.8.1'
 	testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.8.1'
