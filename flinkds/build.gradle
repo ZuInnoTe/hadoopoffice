@@ -9,7 +9,7 @@ compileJava.options.encoding = 'UTF-8'
 
 group = "com.github.zuinnote"
 archivesBaseName = "hadoopoffice-flinkds"
-version = "1.6.2"
+version = "1.6.3"
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
 jar {
@@ -97,7 +97,7 @@ publishing {
         maven(MavenPublication) {
             groupId 'com.github.zuinnote'
             artifactId 'hadoopoffice-flinkds'
-            version '1.6.2'
+            version '1.6.3'
 
             from components.java
         }
@@ -106,7 +106,7 @@ publishing {
 
 dependencies {
      // hadoopoffice library
-   implementation("com.github.zuinnote:hadoopoffice-fileformat:1.6.2") exclude group: 'org.apache.logging.log4j' // exclude log4j2 until fixed
+   implementation("com.github.zuinnote:hadoopoffice-fileformat:1.6.3")
    // hadoop lib for driver
      compileOnly("org.apache.hadoop:hadoop-client:3.3.0")
     // flink api

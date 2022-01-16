@@ -7,7 +7,7 @@ lazy val root = (project in file("."))
 .settings(
 organization := "com.github.zuinnote",
 name := "hadoopoffice-flinkts",
-version := "1.6.2"
+version := "1.6.3"
 )
  .configs( IntegrationTest )
   .settings( Defaults.itSettings : _*)
@@ -50,15 +50,15 @@ assemblyMergeStrategy in assembly :=  {
 
 }
 
-libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.6.2" % "compile" exclude("org.apache.xmlgraphics","batik-all")
+libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.6.3" % "compile" exclude("org.apache.xmlgraphics","batik-all")
 
 
-libraryDependencies += "com.github.zuinnote" % "hadoopoffice-flinkds" % "1.6.2" % "compile" exclude("org.apache.xmlgraphics","batik-all") 
+libraryDependencies += "com.github.zuinnote" % "hadoopoffice-flinkds" % "1.6.3" % "compile" exclude("org.apache.xmlgraphics","batik-all") 
 
 // following three libraries are only needed for digital signatures
-libraryDependencies += "org.bouncycastle" % "bcprov-ext-jdk15to18" % "1.69" % "provided"
-libraryDependencies += "org.bouncycastle" % "bcpkix-jdk15to18" % "1.69" % "provided"
-libraryDependencies += "org.apache.santuario" % "xmlsec" % "2.2.3" % "provided"
+libraryDependencies += "org.bouncycastle" % "bcprov-ext-jdk15to18" % "1.70" % "provided"
+libraryDependencies += "org.bouncycastle" % "bcpkix-jdk15to18" % "1.70" % "provided"
+libraryDependencies += "org.apache.santuario" % "xmlsec" % "2.3.0" % "provided"
 
 libraryDependencies += "org.apache.flink" %% "flink-scala" % "1.10.3" % "provided"
 

@@ -92,21 +92,18 @@ dependencies {
    // hadoop lib for driver
      compileOnly("org.apache.hadoop:hadoop-client:3.3.0")
      // hadoopoffice library
-   implementation("com.github.zuinnote:hadoopoffice-fileformat:1.6.2")
+   implementation("com.github.zuinnote:hadoopoffice-fileformat:1.6.3")
 
-       testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.8.1'
+       testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.8.2'
 
-   testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.8.1'
-testIntegrationImplementation("com.github.zuinnote:hadoopoffice-fileformat:1.6.2")
+testIntegrationImplementation("com.github.zuinnote:hadoopoffice-fileformat:1.6.3")
  testImplementation("org.apache.logging.log4j:log4j-api:2.17.1")
   testIntegrationImplementation("org.apache.logging.log4j:log4j-api:2.17.1")
 // for integration testing we can only use 2.7.x, because higher versions of Hadoop have a bug in minidfs-cluster. Nevertheless, the library itself works also with higher Hadoop versions 
 // see https://issues.apache.org/jira/browse/HDFS-5328
 testIntegrationImplementation("org.apache.hadoop:hadoop-common:2.7.0")
      testIntegrationImplementation("org.apache.hadoop:hadoop-client:2.7.0")
-       testIntegrationImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.8.1'
-    testIntegrationRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.8.1'
-    testIntegrationRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-console', version: '1.8.1'
+       testIntegrationImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.8.2'
      testIntegrationImplementation group: 'org.apache.hadoop', name: 'hadoop-minicluster', version: '2.7.0'
 }
 

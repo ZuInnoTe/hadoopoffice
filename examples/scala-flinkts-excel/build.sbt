@@ -36,18 +36,18 @@ assemblyMergeStrategy in assembly :=  {
 }
 
 // hadoopoffice
-libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.6.2" % "compile"
+libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.6.3" % "compile"
 
-libraryDependencies += "com.github.zuinnote" %% "hadoopoffice-flinkts" % "1.6.2" % "compile"
+libraryDependencies += "com.github.zuinnote" %% "hadoopoffice-flinkts" % "1.6.3" % "compile"
 
 // woodstox core (needed for Flink to find the XMLParser)
 
 libraryDependencies += "com.fasterxml.woodstox" % "woodstox-core" % "5.0.3" % "compile"
 
 // following three libraries are only needed for digital signatures
-libraryDependencies += "org.bouncycastle" % "bcprov-ext-jdk15on" % "1.69" % "compile"
-libraryDependencies += "org.bouncycastle" % "bcpkix-jdk15on" % "1.69" % "compile"
-libraryDependencies += "org.apache.santuario" % "xmlsec" % "2.2.3" % "compile"
+libraryDependencies += "org.bouncycastle" % "bcprov-ext-jdk15on" % "1.70" % "compile"
+libraryDependencies += "org.bouncycastle" % "bcpkix-jdk15on" % "1.70" % "compile"
+libraryDependencies += "org.apache.santuario" % "xmlsec" % "2.3.0" % "compile"
 
 //flink
 libraryDependencies += "org.apache.flink" %% "flink-scala" % "1.10.3" % "provided"

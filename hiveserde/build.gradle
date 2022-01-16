@@ -22,7 +22,7 @@ compileJava.options.encoding = 'UTF-8'
 
 group = "com.github.zuinnote"
 archivesBaseName = "hadoopoffice-hiveserde"
-version = "1.6.2"
+version = "1.6.3"
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
 
@@ -130,7 +130,7 @@ publishing {
         maven(MavenPublication) {
             groupId 'com.github.zuinnote'
             artifactId 'hadoopoffice-hiveserde'
-            version '1.6.2'
+            version '1.6.3'
 
             from components.java
         }
@@ -141,15 +141,15 @@ publishing {
 dependencies {
 
         // hadoopoffice library
-   implementation("com.github.zuinnote:hadoopoffice-fileformat:1.6.2") exclude group: 'org.apache.logging.log4j' // exclude log4j2 until fixed
+   implementation("com.github.zuinnote:hadoopoffice-fileformat:1.6.3")
     // hadoop lib for driver
     compileOnly("org.apache.hadoop:hadoop-client:3.3.0")
 
    // bouncy castle (for signing etc.)
    // for signing and verification of signatures
-    compileOnly("org.bouncycastle:bcprov-ext-jdk15on:1.69")
-    compileOnly("org.bouncycastle:bcpkix-jdk15on:1.69")
-    compileOnly("org.apache.santuario:xmlsec:2.2.3")
+    compileOnly("org.bouncycastle:bcprov-ext-jdk15on:1.70")
+    compileOnly("org.bouncycastle:bcpkix-jdk15on:1.70")
+    compileOnly("org.apache.santuario:xmlsec:2.3.0")
     // hive serde API
    compileOnly("org.apache.hive:hive-serde:3.1.2")
    compileOnly("org.apache.hive:hive-exec:3.1.2")
