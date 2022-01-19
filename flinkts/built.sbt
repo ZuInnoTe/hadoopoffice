@@ -81,8 +81,8 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.10" % "test"
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.10" % "it"
 
 
-libraryDependencies += "org.apache.logging.log4j" % "log4j-api" % "2.17.0" % "test"
-libraryDependencies += "org.apache.logging.log4j" % "log4j-api" % "2.17.0" % "it"
+libraryDependencies += "org.apache.logging.log4j" % "log4j-api" % "2.17.1" % "test"
+libraryDependencies += "org.apache.logging.log4j" % "log4j-api" % "2.17.1" % "it"
 
 libraryDependencies += "javax.servlet" % "javax.servlet-api" % "3.0.1" % "it"
 // for integration testing we can only use 2.7.x, because higher versions of Hadoop have a bug in minidfs-cluster. Nevertheless, the library itself works also with higher Hadoop versions 
