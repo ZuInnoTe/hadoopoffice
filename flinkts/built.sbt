@@ -7,7 +7,7 @@ lazy val root = (project in file("."))
 .settings(
 organization := "com.github.zuinnote",
 name := "hadoopoffice-flinkts",
-version := "1.6.3"
+version := "1.6.4"
 )
  .configs( IntegrationTest )
   .settings( Defaults.itSettings : _*)
@@ -50,10 +50,10 @@ assemblyMergeStrategy in assembly :=  {
 
 }
 
-libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.6.3" % "compile" exclude("org.apache.xmlgraphics","batik-all")
+libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.6.4" % "compile" exclude("org.apache.xmlgraphics","batik-all")
 
 
-libraryDependencies += "com.github.zuinnote" % "hadoopoffice-flinkds" % "1.6.3" % "compile" exclude("org.apache.xmlgraphics","batik-all") 
+libraryDependencies += "com.github.zuinnote" % "hadoopoffice-flinkds" % "1.6.4" % "compile" exclude("org.apache.xmlgraphics","batik-all") 
 
 // following three libraries are only needed for digital signatures
 libraryDependencies += "org.bouncycastle" % "bcprov-ext-jdk15to18" % "1.70" % "provided"
@@ -81,8 +81,8 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.10" % "test"
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.10" % "it"
 
 
-libraryDependencies += "org.apache.logging.log4j" % "log4j-api" % "2.17.1" % "test"
-libraryDependencies += "org.apache.logging.log4j" % "log4j-api" % "2.17.1" % "it"
+libraryDependencies += "org.apache.logging.log4j" % "log4j-api" % "2.17.2" % "test"
+libraryDependencies += "org.apache.logging.log4j" % "log4j-api" % "2.17.2" % "it"
 
 libraryDependencies += "javax.servlet" % "javax.servlet-api" % "3.0.1" % "it"
 // for integration testing we can only use 2.7.x, because higher versions of Hadoop have a bug in minidfs-cluster. Nevertheless, the library itself works also with higher Hadoop versions 

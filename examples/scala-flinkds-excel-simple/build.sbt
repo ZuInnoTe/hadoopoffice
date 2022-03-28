@@ -33,9 +33,9 @@ assemblyMergeStrategy in assembly :=  {
 }
 
 
-libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.6.3" % "compile"
+libraryDependencies += "com.github.zuinnote" % "hadoopoffice-fileformat" % "1.6.4" % "compile"
 
-libraryDependencies += "com.github.zuinnote" % "hadoopoffice-flinkds" % "1.6.3" % "compile"
+libraryDependencies += "com.github.zuinnote" % "hadoopoffice-flinkds" % "1.6.4" % "compile"
 
 // woodstox core (needed for Flink to find the XMLParser)
 
@@ -62,8 +62,8 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.10" % "test,it"
 
 libraryDependencies += "javax.servlet" % "javax.servlet-api" % "3.0.1" % "it"
 
-libraryDependencies += "org.apache.logging.log4j" % "log4j-api" % "2.17.1" % "test"
-libraryDependencies += "org.apache.logging.log4j" % "log4j-api" % "2.17.1" % "it"
+libraryDependencies += "org.apache.logging.log4j" % "log4j-api" % "2.17.2" % "test"
+libraryDependencies += "org.apache.logging.log4j" % "log4j-api" % "2.17.2" % "it"
 // for integration testing we can only use 2.7.x, because higher versions of Hadoop have a bug in minidfs-cluster. Nevertheless, the library itself works also with higher Hadoop versions 
 // see https://issues.apache.org/jira/browse/HDFS-5328
 libraryDependencies += "org.apache.hadoop" % "hadoop-common" % "2.7.0" % "it" classifier "" classifier "tests"
