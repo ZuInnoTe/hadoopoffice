@@ -24,7 +24,6 @@ crossScalaVersions := Seq("2.11.12","2.12.15")
 
 scalacOptions += "-target:jvm-1.8"
 
-
 artifact in (Compile, assembly) := {
   val art = (artifact in (Compile, assembly)).value
   art.withClassifier(Some(""))
