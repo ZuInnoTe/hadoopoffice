@@ -9,7 +9,7 @@ compileJava.options.encoding = 'UTF-8'
 
 group = "com.github.zuinnote"
 archivesBaseName = "hadoopoffice-fileformat"
-version = "1.6.4"
+version = "1.7.0"
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
 jar {
@@ -80,7 +80,7 @@ publishing {
         mavenJava(MavenPublication) {
 		groupId 'com.github.zuinnote'
             artifactId 'hadoopoffice-fileformat'
-            version '1.6.4'
+            version '1.7.0'
             from components.java
         }
     }
@@ -89,27 +89,27 @@ publishing {
 dependencies {
 
    // Apache POI (for Excel parsing)
-   implementation("org.apache.poi:poi:5.2.2")   
-   implementation("org.apache.poi:poi-ooxml:5.2.2")
+   implementation("org.apache.poi:poi:5.2.3")   
+   implementation("org.apache.poi:poi-ooxml:5.2.3")
    // for signing and verification of signatures
     compileOnly("org.bouncycastle:bcprov-ext-jdk15on:1.70")
     compileOnly("org.bouncycastle:bcpkix-jdk15on:1.70")
-    compileOnly("org.apache.santuario:xmlsec:2.3.0")
+    compileOnly("org.apache.santuario:xmlsec:3.0.0")
    // hadoop libraries
    compileOnly("org.apache.hadoop:hadoop-common:3.3.0")
    compileOnly("org.apache.hadoop:hadoop-mapreduce-client-common:3.3.0")
    // log4j2
-   compileOnly("org.apache.logging.log4j:log4j-api:2.17.2")
+   compileOnly("org.apache.logging.log4j:log4j-api:2.19.0")
    // test
-   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.8.2'
+   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.9.1'
    // for signing and verification of signatures
     testImplementation("org.bouncycastle:bcprov-ext-jdk15on:1.70")
     testImplementation("org.bouncycastle:bcpkix-jdk15on:1.70")
-    testImplementation("org.apache.santuario:xmlsec:2.3.0")
+    testImplementation("org.apache.santuario:xmlsec:3.0.0")
    // hadoop libraries
    testImplementation("org.apache.hadoop:hadoop-common:3.3.0")
    testImplementation("org.apache.hadoop:hadoop-mapreduce-client-common:3.3.0")
    // log4j2
-   testImplementation("org.apache.logging.log4j:log4j-api:2.17.2")
-   testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.8.2'
+   testImplementation("org.apache.logging.log4j:log4j-api:2.19.0")
+   testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.9.1'
 }

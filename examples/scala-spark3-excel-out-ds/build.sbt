@@ -13,7 +13,7 @@ lazy val root = (project in file("."))
   .enablePlugins(JacocoItPlugin)
 
 
-crossScalaVersions := Seq("2.11.12")
+crossScalaVersions := Seq("2.12.15")
 
 scalacOptions += "-target:jvm-1.8"
 
@@ -38,24 +38,19 @@ assemblyMergeStrategy in assembly := {
 
 
 
-libraryDependencies += "com.github.zuinnote" %% "spark-hadoopoffice-ds" % "1.6.4" % "compile"
+libraryDependencies += "com.github.zuinnote" %% "spark-hadoopoffice-ds" % "1.7.0" % "compile"
 
 
 
-libraryDependencies += "org.apache.spark" %% "spark-core" % "2.4.8" % "provided"   exclude("org.apache.xbean","xbean-asm6-shaded")
-libraryDependencies += "org.apache.spark" %% "spark-sql" % "2.4.8" % "provided" exclude("org.apache.xbean","xbean-asm6-shaded")
+libraryDependencies += "org.apache.spark" %% "spark-core" % "3.2.2" % "provided"   exclude("org.apache.xbean","xbean-asm6-shaded")
+libraryDependencies += "org.apache.spark" %% "spark-sql" % "3.2.2" % "provided" exclude("org.apache.xbean","xbean-asm6-shaded")
 
 libraryDependencies += "org.apache.xbean" % "xbean-asm6-shaded" % "4.10" % "provided"  
 
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.10" % "test,it"
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.14" % "test,it"
 
 libraryDependencies += "javax.servlet" % "javax.servlet-api" % "3.0.1" % "it"
 
 
-libraryDependencies += "org.apache.logging.log4j" % "log4j-api" % "2.17.2" % "test"
-libraryDependencies += "org.apache.logging.log4j" % "log4j-api" % "2.17.2" % "it"
-libraryDependencies += "org.apache.hadoop" % "hadoop-common" % "2.7.0" % "it" classifier "" classifier "tests"
-
-libraryDependencies += "org.apache.hadoop" % "hadoop-hdfs" % "2.7.0" % "it" classifier "" classifier "tests"
-
-libraryDependencies += "org.apache.hadoop" % "hadoop-minicluster" % "2.7.0" % "it"
+libraryDependencies += "org.apache.logging.log4j" % "log4j-api" % "2.19.0" % "test"
+libraryDependencies += "org.apache.logging.log4j" % "log4j-api" % "2.19.0" % "it"

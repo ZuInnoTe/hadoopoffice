@@ -23,13 +23,12 @@
 package org.zuinnote.spark.office.example.excel
 
 
-import org.apache.hadoop.hdfs.MiniDFSCluster
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.FSDataInputStream
 import org.apache.hadoop.fs.Path
 
 import java.io.BufferedReader
 import java.io.File
+import java.io.FileInputStream
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.io.IOException
@@ -40,13 +39,6 @@ import java.nio.file.SimpleFileVisitor
 import java.util.ArrayList
 import java.util.List
 
-
-import org.apache.hadoop.io.compress.CodecPool
-import org.apache.hadoop.io.compress.CompressionCodec
-import org.apache.hadoop.io.compress.CompressionCodecFactory
-import org.apache.hadoop.io.compress.Decompressor
-import org.apache.hadoop.io.compress.SplittableCompressionCodec
-import org.apache.hadoop.io.compress.SplitCompressionInputStream
 
 
 import org.apache.spark.{SparkConf, SparkContext}
@@ -59,31 +51,46 @@ import matchers.should._
 import org.scalatest.{ BeforeAndAfterAll, GivenWhenThen }
 
 
-class Spark2ScalaDSExcelOutIntegrationSpec extends AnyFlatSpec with BeforeAndAfterAll with GivenWhenThen with Matchers {
+class Spark2ScalaDSExcelOutIntegrationSpec extends AnyFlatSpec with BeforeAndAfterAll with BeforeAndAfterEach  with GivenWhenThen with Matchers {
  
 private var sc: SparkContext = _
+
 private val master: String = "local[2]"
-private val appName: String = "example-scalaspark2dsexceloutput-integrationtest"
+private val appName: String = "example-scalasparkexcelinput-integrationtest"
 private val tmpPrefix: String = "ho-integrationtest"
 private var tmpPath: java.nio.file.Path = _
-private val CLUSTERNAME: String ="hcl-minicluster"
 private val DFS_INPUT_DIR_NAME: String = "/input"
 private val DFS_OUTPUT_DIR_NAME: String = "/output"
+private var INPUT_DIR_FULLNAME: String = _
+private var OUTPUT_DIR_FULLNAME: String = _
+
 private val DEFAULT_OUTPUT_FILENAME: String = "part-00000"
-private val DFS_INPUT_DIR : Path = new Path(DFS_INPUT_DIR_NAME)
-private val DFS_OUTPUT_DIR : Path = new Path(DFS_OUTPUT_DIR_NAME)
-private val NOOFDATANODES: Int =4
-private var dfsCluster: MiniDFSCluster = _
+private val DEFAULT_OUTPUT_EXCEL_FILENAME: String = "part-00000.xlsx"
+private var DFS_INPUT_DIR : String = _
+private var DFS_OUTPUT_DIR : String = _
+private var DFS_INPUT_DIR_PATH : Path = _
+private var DFS_OUTPUT_DIR_PATH : Path = _
+
 private var conf: Configuration = _
-private var openDecompressors = ArrayBuffer[Decompressor]();
 
 override def beforeAll(): Unit = {
     super.beforeAll()
 
-		// Create temporary directory for HDFS base and shutdownhook 
+		// Create temporary directory for temporary files and shutdownhook
 	// create temp directory
-      tmpPath = Files.createTempDirectory(tmpPrefix)
-      // create shutdown hook to remove temp files (=HDFS MiniCluster) after shutdown, may need to rethink to avoid many threads are created
+      tmpPath = Files.createTempDirectory(tmpPrefix);
+      INPUT_DIR_FULLNAME = tmpPath+DFS_INPUT_DIR_NAME;
+      OUTPUT_DIR_FULLNAME = tmpPath+DFS_OUTPUT_DIR_NAME;
+      DFS_INPUT_DIR = "file://"+INPUT_DIR_FULLNAME;
+      DFS_OUTPUT_DIR= "file://"+OUTPUT_DIR_FULLNAME;
+      DFS_INPUT_DIR_PATH = new Path(DFS_INPUT_DIR);
+      DFS_OUTPUT_DIR_PATH= new Path(DFS_OUTPUT_DIR);
+      val inputDirFile: File = new File(INPUT_DIR_FULLNAME);
+      inputDirFile.mkdirs();
+      val outputDirFile: File = new File(OUTPUT_DIR_FULLNAME);
+      outputDirFile.mkdirs();
+      
+      // create shutdown hook to remove temp files after shutdown, may need to rethink to avoid many threads are created
 	Runtime.getRuntime.addShutdownHook(new Thread("remove temporary directory") {
       	 override def run(): Unit =  {
         	try {
@@ -103,39 +110,70 @@ override def beforeAll(): Unit = {
         			}
         	})
       	} catch {
-        case e: IOException => throw new RuntimeException("Error temporary files in following path could not be deleted "+tmpPath, e)
-    }}})
-	// create DFS mini cluster
-	 conf = new Configuration()
-	val baseDir = new File(tmpPath.toString()).getAbsoluteFile()
-	conf.set(MiniDFSCluster.HDFS_MINIDFS_BASEDIR, baseDir.getAbsolutePath())
-	val builder = new MiniDFSCluster.Builder(conf)
- 	 dfsCluster = builder.numDataNodes(NOOFDATANODES).build()
-	conf.set("fs.defaultFS", dfsCluster.getFileSystem().getUri().toString()) 
+        case e: IOException => throw new RuntimeException("Error temporary files in following path could not be deleted "+tmpPath, e);
+        }
+        }
+  }
+        )
 	// create local Spark cluster
  	val sparkConf = new SparkConf()
       .setMaster("local[2]")
       .setAppName(this.getClass.getSimpleName)
-	  .set( "spark.driver.host", "localhost" )
 	sc = new SparkContext(sparkConf)
  }
 
-  
+
+  override def beforeEach() {
+   // clean up folders
+  cleanFolder( java.nio.file.FileSystems.getDefault().getPath(INPUT_DIR_FULLNAME),false);
+
+  cleanFolder(java.nio.file.FileSystems.getDefault().getPath(OUTPUT_DIR_FULLNAME),true);
+    super.beforeEach(); // To be stackable, must call super.beforeEach
+  }
+
+  override def afterEach() {
+      super.afterEach(); // To be stackable, must call super.afterEach
+  }
+
+ // clean folders
+  def cleanFolder(path: java.nio.file.Path, rootFolder: Boolean) {
+    if (path.toFile().exists()) {
+ try {
+          		Files.walkFileTree(path, new SimpleFileVisitor[java.nio.file.Path]() {
+
+            		override def visitFile(file: java.nio.file.Path,attrs: BasicFileAttributes): FileVisitResult = {
+                
+                		Files.delete(file)
+                  
+             			return FileVisitResult.CONTINUE
+        			}
+
+        		override def postVisitDirectory(dir: java.nio.file.Path, e: IOException): FileVisitResult = {
+          			if (e == null) {
+                    if (rootFolder) {
+                      if (dir.toFile().exists) {
+            			      Files.delete(dir)
+                      }
+                    }
+            				return FileVisitResult.CONTINUE
+          			}
+          			throw e
+        			}
+        	})
+      	} catch {
+        case e: IOException => throw new RuntimeException("Error temporary files in following path could not be deleted "+tmpPath, e)
+    }
+    }
+  }
+
   override def afterAll(): Unit = {
    // close Spark Context
     if (sc!=null) {
 	sc.stop()
-    } 
-    // close decompressor
-	for ( currentDecompressor <- this.openDecompressors) {
-		if (currentDecompressor!=null) {
-			 CodecPool.returnDecompressor(currentDecompressor)
-		}
- 	}
-    // close dfs cluster
-    dfsCluster.shutdown()
+    }
     super.afterAll()
 }
+
 
 
 "A new Excel file" should "be created on DFS and reread correctly" in {
@@ -143,10 +181,10 @@ Given("In-memory data input")
  val sqlContext=new SQLContext(sc)
         import sqlContext.implicits._
 	When("store as Excel file on DFS")
-  SparkScalaExcelOutDataSource.saveAsExcelFile(sc,dfsCluster.getFileSystem().getUri().toString()+DFS_OUTPUT_DIR_NAME)
+  SparkScalaExcelOutDataSource.saveAsExcelFile(sc,DFS_OUTPUT_DIR)
 	Then("stored Excel file on DFS can be read correctly")
 	// fetch results
-  val dfIn = sqlContext.read.format("org.zuinnote.spark.office.excel").option("hadoopoffice.read.locale.bcp47", "us").load(dfsCluster.getFileSystem().getUri().toString()+DFS_OUTPUT_DIR_NAME)
+  val dfIn = sqlContext.read.format("org.zuinnote.spark.office.excel").option("hadoopoffice.read.locale.bcp47", "us").load(DFS_OUTPUT_DIR)
   assert(3==dfIn.count)
   val rowsDF=dfIn.select(explode(dfIn("rows")).alias("rows"))
   val formattedValues = rowsDF.select("rows.formattedValue").collect
@@ -181,7 +219,7 @@ Given("In-memory data input")
 	*/
      def readDefaultResults(numOfRows: Int): List[String] = {
 	val result: ArrayList[String] = new ArrayList[String]()
-	val defaultOutputfile = new Path(DFS_OUTPUT_DIR_NAME+"/"+DEFAULT_OUTPUT_FILENAME)
+	val defaultOutputfile = OUTPUT_DIR_FULLNAME+File.separator+DEFAULT_OUTPUT_FILENAME
 	val defaultInputStream = openFile(defaultOutputfile)
 	val reader=new BufferedReader(new InputStreamReader(defaultInputStream))
 	var i=0
@@ -195,9 +233,9 @@ Given("In-memory data input")
 	}
 
 /*
-* Opens a file using the Hadoop API. It supports uncompressed and compressed files.
+* Opens a local file
 *
-* @param path path to the file, e.g. file://path/to/file for a local file or hdfs://path/to/file for HDFS file. All filesystem configured for Hadoop can be used
+* @param path path to the file on local file system
 *
 * @return InputStream from which the file content can be read
 * 
@@ -206,23 +244,10 @@ Given("In-memory data input")
 *
 */
 
-def  openFile(path: Path): InputStream = {
-        val codec=new CompressionCodecFactory(conf).getCodec(path)
- 	val fileIn: InputStream=dfsCluster.getFileSystem().open(path)
+def  openFile(path: String): InputStream = {
+ 	val fileIn: InputStream=new FileInputStream(path)
 	// check if compressed
-	if (codec==null) { // uncompressed
 		return fileIn
-	} else { // compressed
-		val decompressor: Decompressor = CodecPool.getDecompressor(codec)
-		openDecompressors+=decompressor // to be returned later using close
-		if (codec.isInstanceOf[SplittableCompressionCodec]) {
-			val end : Long = dfsCluster.getFileSystem().getFileStatus(path).getLen() 
-        		val  cIn =codec.asInstanceOf[SplittableCompressionCodec].createInputStream(fileIn, decompressor, 0, end,SplittableCompressionCodec.READ_MODE.CONTINUOUS)
-					return cIn
-      		} else {
-        		return codec.createInputStream(fileIn,decompressor)
-      		}
-	}
 }
 
 }
